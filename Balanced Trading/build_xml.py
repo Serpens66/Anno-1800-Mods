@@ -171,13 +171,13 @@ if __name__ == "__main__":
                             item_vectors_dict[progression] = {"production":[],"offering":[]}
                         Good_vector = self.generate_vector("Good",pr_GUID,singleline=True,space=8)
                         
-                        if len(set(merch_info["sessions"]).intersection(info["sessions"])) > 0 or pr_GUID in GoodsProduction_values[AI_Merchants_GUID][progression]: # if they have a region in common (nate at kap and arctic seems to be the same, so no possibility to differentiate? so kap will have artic stuff?)
+                        if len(set(merch_info["sessions"]).intersection(info["sessions"])) > 0 or pr_GUID in GoodsProduction_values[AI_Merchants_GUID][progression]: # if they have a region in common
                             if pr_GUID in GoodsProduction_values[AI_Merchants_GUID][progression]: # if the merchant already sells and produces this one, keep the old values for these
                                 production = GoodsProduction_values[AI_Merchants_GUID][progression][pr_GUID]
                             else:
                                 production = round(self.SLOW_PRODUCTION*(-6+len(progression_list)+self.PROGRESSIONS.index(progression)+1),3)  # increase the production rate every progression. So for every progression that contains that product, it will add additional production
-                                if AI_Merchants_GUID in [45,46,78]: # since it are 3 merachnts in moderat, the production should be a little bit less than in other regions (pirates will have full production)
-                                    production = round(production/2)
+                                if AI_Merchants_GUID in ["45","46","78"]: # since it are 3 merachnts in moderat, the production should be a little bit less than in other regions (pirates will have full production)
+                                    production = round(production/3,2)
                             ProductionPerMinute_vector = self.generate_vector("ProductionPerMinute",production,singleline=True,space=8)
                             item_vector = self.generate_vector("Item",Good_vector+"\n"+ProductionPerMinute_vector,space=6)
                             item_vectors_dict[progression]["production"].append(item_vector)
@@ -400,12 +400,12 @@ if __name__ == "__main__":
     
     b.write_to_file("<ModOps>\n\n",type="w") # delete previous one
     
-    Total_UKosten = b.calc_UKosten(neu_Fabrik_GUIDs=False)
+    # Total_UKosten = b.calc_UKosten(neu_Fabrik_GUIDs=False)
     # print(Total_UKosten) # printen, wenn ich ihn oben neu hardcoden will
-    b.write_mod_op_baseprice() # Total_UKosten müssen bekannt sein
+    # b.write_mod_op_baseprice() # Total_UKosten müssen bekannt sein
     b.write_mod_op_Traders() # nach calc_UKosten aufrufen, damit wir wissen welche waren herstellbar sind (und so zb Schrott ausschließen)
     
-    b.write_mod_op_ShipCosts() # rechnet die materialkosten der schiffe anhand des (neuen) basispreises zusammen, fügt einen hardgecodeden Geldwert zum bauen hinzu und setzen den sellprice = 2*baupreis
+    # b.write_mod_op_ShipCosts() # rechnet die materialkosten der schiffe anhand des (neuen) basispreises zusammen, fügt einen hardgecodeden Geldwert zum bauen hinzu und setzen den sellprice = 2*baupreis
     
     # for pr_GUID,info in b.product_GUIDS.items():
         # del info["node"] # weil dies geprintet nichts bringt
