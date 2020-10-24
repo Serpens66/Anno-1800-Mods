@@ -1,14 +1,93 @@
 <ModOps>
   
-  <!-- add own BlockScore for Kaiserdom for AI? we should write one instead of using hangarship one -->
+  <!-- combine BlockCulturalScore with RatingOverwrittenBlocks from other monuments should be fine to make the AI place Kaiserdom near their city, but without overwriting other important stuff -->
+  <ModOp Type="addNextSibling" GUID='142905'>
+      <Assets>
+        <Asset>
+          <Template>PlacementScore</Template>
+          <Values>
+            <Standard>
+              <GUID>850037</GUID>
+              <Name>BlockKaiserdomScore</Name>
+            </Standard>
+            <PlacementScore>
+              <SubScores>
+                <Item>
+                  <Rating>
+                    <Template>RatingDistance</Template>
+                    <Values>
+                      <RatingDistance>
+                        <OneFrom>20</OneFrom>
+                        <OneTo>40</OneTo>
+                        <ZeroFrom>160</ZeroFrom>
+                      </RatingDistance>
+                    </Values>
+                  </Rating>
+                  <RelativeWeight>100</RelativeWeight>
+                </Item>
+                <Item>
+                  <Rating>
+                    <Template>RatingNeighborTiles</Template>
+                    <Values>
+                      <RatingNeighborTiles>
+                        <NeighborCategories>
+                          <Buildings>
+                            <Score>0.4</Score>
+                          </Buildings>
+                          <StaticBlockedLand>
+                            <Score>0.7</Score>
+                          </StaticBlockedLand>
+                          <UnusedWithinBlock>
+                            <Score>0.4</Score>
+                          </UnusedWithinBlock>
+                          <Railway>
+                            <Score>1</Score>
+                          </Railway>
+                          <Pipe>
+                            <Score>1</Score>
+                          </Pipe>
+                        </NeighborCategories>
+                      </RatingNeighborTiles>
+                    </Values>
+                  </Rating>
+                  <RelativeWeight>20</RelativeWeight>
+                </Item>
+                <Item>
+                  <Rating>
+                    <Template>RatingAdjacentBlocks</Template>
+                    <Values>
+                      <RatingAdjacentBlocks>
+                        <BlockLayoutTypes>City;Culture</BlockLayoutTypes>
+                      </RatingAdjacentBlocks>
+                    </Values>
+                  </Rating>
+                  <RelativeWeight>5</RelativeWeight>
+                </Item>
+                <Item>
+                  <Rating>
+                    <Template>RatingOverwrittenBlocks</Template>
+                    <Values>
+                      <RatingOverwrittenBlocks />
+                    </Values>
+                  </Rating>
+                  <RelativeWeight>15</RelativeWeight>
+                  <Comment>Don't overwrite existing blocks if possible</Comment>
+                </Item>
+              </SubScores>
+            </PlacementScore>
+          </Values>
+        </Asset>
+   </ModOp>
+  
+  <!-- add own BlockScore for Kaiserdom for AI. this defines where they will build it -->
   <ModOp Type="add" GUID="167" Path="/Values/ConstructionAI/MonumentConfiguration">
         <Item>
             <MonumentBuilding>850031</MonumentBuilding>
             <Region>Moderate</Region>
             <SessionType>MainForRegion</SessionType>
-            <BlockScore>BlockAirshipHangar</BlockScore>
+            <BlockScore>BlockKaiserdomScore</BlockScore>
         </Item>
-    </ModOp>
+  </ModOp>
   
   <ModOp Type="addNextSibling" GUID='1010347'>
     <Asset>
