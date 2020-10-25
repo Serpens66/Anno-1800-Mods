@@ -7,6 +7,7 @@ Coming Changes:
 -
 
 Planned Mods:
+-
 - changing the research system, will see how exactly.
 - a real blueprint mod, without possibilty to really place buildings (so you can build every building in blueprintmode right from the start)
 
