@@ -16,5 +16,5 @@ For more mods see the mod collection:
     <a href="https://github.com/anno-mods/Collection"><img src="https://github.com/anno-mods.png"></a>
 </p>
 
-Anno Mod Discord: https://discord.gg/BANwU4
+Anno Mod Discord: https://discord.gg/BANwU4 
 Many many thanks to Taubenangriff/PalpatineDidNothingWrong who explained me alot about how to mod Anno1800!
