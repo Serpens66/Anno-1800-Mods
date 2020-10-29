@@ -1,136 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ModOps>
   
-  <!-- Verwendet Serps GUIDS von 1500000050 bis 1500000054 (reserviert fuer diesen mod bis 1500000060) -->
+  <!-- Verwendet Serps GUIDS von 1500000050 bis 1500000055 (reserviert fuer diesen mod bis 1500000060) -->
   
-  <!-- make every single quest provide 50 researchpoints. -->
-  <!-- I tried my best to make RewardConfig working (and distribute researchponts based on gamestatus and difficutly, like it is done with money), but I did not succeed... -->
+  
+  <!-- make every quest provide researchpoints. -->
+  <!-- we need to put researchpoints into a pool, otherwise rewardconfig wont accept it. -->
+  <ModOp GUID="150038" Type="addNextSibling">
+    <Asset>
+      <Template>ResourcePool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000055</GUID>
+          <Name>ResearchPointsPool</Name>
+        </Standard>
+        <ResourceRewardPool>
+          <PossibleRewards>
+            <Item>
+              <Resource>119392</Resource>
+              <Amount>1</Amount>
+            </Item>
+          </PossibleRewards>
+        </ResourceRewardPool>
+        <Locked />
+      </Values>
+    </Asset>
+  </ModOp>
   <ModOp Type="add" Path="//Values[Quest]/Reward/RewardAssets">
     <Item>
-      <Reward>119392</Reward>
-      <Amount>50</Amount>
+      <Reward>1500000055</Reward>
+      <Amount>1</Amount>
     </Item>
   </ModOp>
-<!-- ################################ -->
-<!-- ################################ -->
-<!-- not working unfortunately to have variating research points per quest... (also some code in templates.xml) -->
-  <!-- <ModOp Type="replace" Path="//Asset[Template='A7_QuestDeliveryObject']/Values/Reward/RewardAssets"> -->
-      <!-- <RewardAssets> -->
-        <!-- <Item> -->
-          <!-- <VectorElement> -->
-            <!-- <InheritedIndex>0</InheritedIndex> -->
-            <!-- <InheritanceMapV2> -->
-              <!-- <Entry> -->
-                <!-- <TemplateName>A7_QuestDeliveryObject</TemplateName> -->
-                <!-- <Index>0</Index> -->
-              <!-- </Entry> -->
-            <!-- </InheritanceMapV2> -->
-          <!-- </VectorElement> -->
-        <!-- </Item> -->
-        <!-- <Item> -->
-          <!-- <VectorElement> -->
-            <!-- <InheritedIndex>1</InheritedIndex> -->
-            <!-- <InheritanceMapV2> -->
-              <!-- <Entry> -->
-                <!-- <TemplateName>A7_QuestDeliveryObject</TemplateName> -->
-                <!-- <Index>1</Index> -->
-              <!-- </Entry> -->
-            <!-- </InheritanceMapV2> -->
-          <!-- </VectorElement> -->
-          <!-- <Reward>119392</Reward> -->
-        <!-- </Item> -->
-        <!-- <Item> -->
-          <!-- <VectorElement> -->
-            <!-- <InheritedIndex>2</InheritedIndex> -->
-            <!-- <InheritanceMapV2> -->
-              <!-- <Entry> -->
-                <!-- <TemplateName>A7_QuestDeliveryObject</TemplateName> -->
-                <!-- <Index>2</Index> -->
-              <!-- </Entry> -->
-            <!-- </InheritanceMapV2> -->
-          <!-- </VectorElement> -->
-          <!-- <Reward>190808</Reward> -->
-        <!-- </Item> -->
-      <!-- </RewardAssets> -->
-  <!-- </ModOp> -->
-  <!-- <ModOp Type="replace" Path="//Asset[Template='A7_QuestPickupObject']/Values/Reward/RewardAssets"> -->
-      <!-- <RewardAssets> -->
-        <!-- <Item> -->
-          <!-- <VectorElement> -->
-            <!-- <InheritedIndex>0</InheritedIndex> -->
-            <!-- <InheritanceMapV2> -->
-              <!-- <Entry> -->
-                <!-- <TemplateName>A7_QuestPickupObject</TemplateName> -->
-                <!-- <Index>0</Index> -->
-              <!-- </Entry> -->
-            <!-- </InheritanceMapV2> -->
-          <!-- </VectorElement> -->
-        <!-- </Item> -->
-        <!-- <Item> -->
-          <!-- <VectorElement> -->
-            <!-- <InheritedIndex>1</InheritedIndex> -->
-            <!-- <InheritanceMapV2> -->
-              <!-- <Entry> -->
-                <!-- <TemplateName>A7_QuestPickupObject</TemplateName> -->
-                <!-- <Index>1</Index> -->
-              <!-- </Entry> -->
-            <!-- </InheritanceMapV2> -->
-          <!-- </VectorElement> -->
-          <!-- <Reward>119392</Reward> -->
-        <!-- </Item> -->
-        <!-- <Item> -->
-          <!-- <VectorElement> -->
-            <!-- <InheritedIndex>2</InheritedIndex> -->
-            <!-- <InheritanceMapV2> -->
-              <!-- <Entry> -->
-                <!-- <TemplateName>A7_QuestPickupObject</TemplateName> -->
-                <!-- <Index>2</Index> -->
-              <!-- </Entry> -->
-            <!-- </InheritanceMapV2> -->
-          <!-- </VectorElement> -->
-          <!-- <Reward>190808</Reward> -->
-        <!-- </Item> -->
-      <!-- </RewardAssets> -->
-  <!-- </ModOp> -->
-  
-  <!-- <ModOp Type="add" GUID="140501" Path="/Values/RewardConfig/ResourceBalancing"> -->
-    <!-- <Item> -->
-      <!-- <Resource>119392</Resource> -->
-      <!-- <BaseAmount>20</BaseAmount> -->
-      <!-- <MaxBonusPercent>25</MaxBonusPercent> -->
-      <!-- <ProgressFactor> -->
-        <!-- <EarlyGame> -->
-          <!-- <Factor>1</Factor> -->
-        <!-- </EarlyGame> -->
-        <!-- <EarlyMidGame> -->
-          <!-- <Factor>1</Factor> -->
-        <!-- </EarlyMidGame> -->
-        <!-- <MidGame> -->
-          <!-- <Factor>5</Factor> -->
-        <!-- </MidGame> -->
-        <!-- <LateMidGame> -->
-          <!-- <Factor>20</Factor> -->
-        <!-- </LateMidGame> -->
-        <!-- <LateGame> -->
-          <!-- <Factor>50</Factor> -->
-        <!-- </LateGame> -->
-        <!-- <EndGame> -->
-          <!-- <Factor>100</Factor> -->
-        <!-- </EndGame> -->
-      <!-- </ProgressFactor> -->
-      <!-- <QuestDifficultyFactor> -->
-        <!-- <Easy> -->
-          <!-- <Factor>1</Factor> -->
-        <!-- </Easy> -->
-        <!-- <Medium> -->
-          <!-- <Factor>2</Factor> -->
-        <!-- </Medium> -->
-        <!-- <Hard> -->
-          <!-- <Factor>3</Factor> -->
-        <!-- </Hard> -->
-      <!-- </QuestDifficultyFactor> -->
-    <!-- </Item> -->
-  <!-- </ModOp> -->
+  <ModOp Type="add" GUID="140501" Path="/Values/RewardConfig/ResourceBalancing">
+    <Item>
+      <Resource>119392</Resource>
+      <BaseAmount>20</BaseAmount>
+      <MaxBonusPercent>25</MaxBonusPercent>
+      <ProgressFactor>
+        <EarlyGame>
+          <Factor>1</Factor>
+        </EarlyGame>
+        <EarlyMidGame>
+          <Factor>2</Factor>
+        </EarlyMidGame>
+        <MidGame>
+          <Factor>5</Factor>
+        </MidGame>
+        <LateMidGame>
+          <Factor>15</Factor>
+        </LateMidGame>
+        <LateGame>
+          <Factor>35</Factor>
+        </LateGame>
+        <EndGame>
+          <Factor>60</Factor>
+        </EndGame>
+      </ProgressFactor>
+      <QuestDifficultyFactor>
+        <Easy>
+          <Factor>1</Factor>
+        </Easy>
+        <Medium>
+          <Factor>2</Factor>
+        </Medium>
+        <Hard>
+          <Factor>3</Factor>
+        </Hard>
+      </QuestDifficultyFactor>
+    </Item>
+  </ModOp>
 
 <!-- ################################ -->
 <!-- ################################ -->
@@ -315,15 +254,15 @@
     
     
     <ModOp GUID="502107" Path="Values/ConstructionCategory/BuildingList/Item[Building='118938']" Type="addPrevSibling">
-		<Item>
-			<Building>1500000050</Building>
-		</Item>
-	</ModOp>
+        <Item>
+            <Building>1500000050</Building>
+        </Item>
+    </ModOp>
     <ModOp GUID="500944" Path="Values/ConstructionCategory/BuildingList/Item[Building='1000178']" Type="addPrevSibling">
-		<Item>
-			<Building>1500000050</Building>
-		</Item>
-	</ModOp>
+        <Item>
+            <Building>1500000050</Building>
+        </Item>
+    </ModOp>
     
   <!-- <ModOp Type="add" GUID="502107" Path="/Values/ConstructionCategory/BuildingList"> -->
     <!-- <Item> -->
@@ -489,7 +428,7 @@
           <Value>4500</Value>
         </Item>
         <Item>
-          <Threshold>155</Threshold>
+          <Threshold>156</Threshold>
           <Value>5000</Value>
         </Item>
         <Item>
