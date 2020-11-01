@@ -1,6 +1,6 @@
 <ModOps>
   
-  <!-- verwendet Serps GUIDS von 1500000040 bis 1500000044 (bis 1500000050 fuer diesen mod freigehalten) -->
+  <!-- verwendet Serps GUIDS von 1500000040 bis 1500000044 (bis 1500000049 fuer diesen mod freigehalten) -->
   
   <!-- 2ndParty budget changes: -->
     <ModOp Type="merge" GUID="167" Path="/Values/ConstructionAI/TradeRules/ActiveTrade">
@@ -103,14 +103,13 @@
   <!-- 8 slots zu je 5 tonnen -->
   <!-- verwendung mit more passive trade budget empfohlen -->
   
-  <ModOp Type="addNextSibling" GUID='102430'>
+	<ModOp Type="addNextSibling" GUID='100438'>
 		<Asset>
-			<BaseAssetGUID>102430</BaseAssetGUID>
+			<BaseAssetGUID>100438</BaseAssetGUID>
 			<Values>
 				<Standard>
-					<GUID>1500000040</GUID>
-					<Name>Pirate Ship Frigate (Trade)</Name>
-					<IconFilename>data/graphics/ui/icons/vehicle/icon_corona_monitor.png</IconFilename>
+					<GUID>1500000041</GUID>
+					<Name>Passive Trade Schooner</Name>
 				</Standard>
 				<Object />
 				<Mesh />
@@ -121,7 +120,6 @@
 				<Drifting />
 				<Collector />
 				<Attackable />
-				<Attacker />
 				<MinimapToken />
 				<SoundEmitter />
 				<UpgradeList />
@@ -153,20 +151,24 @@
 			</Values>
 		</Asset>
 	</ModOp>
-    
-    
-	<ModOp Type="addNextSibling" GUID='100438'>
+    <ModOp Type="addNextSibling" GUID='100439'>
 		<Asset>
-			<BaseAssetGUID>100438</BaseAssetGUID>
+			<BaseAssetGUID>100439</BaseAssetGUID>
 			<Values>
 				<Standard>
-					<GUID>1500000041</GUID>
-					<Name>Passive Trade Schooner</Name>
+					<GUID>1500000044</GUID>
+					<Name>Passive Trade Frigate</Name>
 				</Standard>
 				<Object />
 				<Mesh />
 				<Selection />
-				<Walking />
+				<Walking>
+                  <TurnAroundRadius>4</TurnAroundRadius>
+                  <Acceleration>2</Acceleration>
+                  <Deceleration>4</Deceleration>
+                  <TurnRadius>4</TurnRadius>
+                  <TurnSpeed>75</TurnSpeed>
+                </Walking>
 				<Text />
 				<CommandQueue />
 				<Drifting />
@@ -299,60 +301,28 @@
 			</Values>
 		</Asset>
 	</ModOp>
-    <!-- we dont need this big ship anymore for traders, since either the budget is 2k or the max stack of all slots is 40 anyway -->
-	<!-- <ModOp Type="addNextSibling" GUID='14740009'> -->
-		<!-- <Asset> -->
-			<!-- <BaseAssetGUID>14740009</BaseAssetGUID> from Cargo Liner mod -->
-			<!-- <Values> -->
-				<!-- <Standard> -->
-					<!-- <GUID>1500000044</GUID> -->
-					<!-- <Name>Big Passive Trade Cargo Boat</Name> -->
-				<!-- </Standard> -->
-				<!-- <Object /> -->
-				<!-- <Mesh /> -->
-				<!-- <Selection /> -->
-				<!-- <Walking /> -->
-				<!-- <Text /> -->
-				<!-- <CommandQueue /> -->
-				<!-- <Drifting /> -->
-				<!-- <Collector /> -->
-				<!-- <Attackable /> -->
-				<!-- <MinimapToken /> -->
-				<!-- <SoundEmitter /> -->
-				<!-- <UpgradeList /> -->
-				<!-- <QuestObject /> -->
-				<!-- <Infolayer /> -->
-				<!-- <ItemContainer> -->
-					<!-- <SlotCount>8</SlotCount> -->
-					<!-- <StackLimit>5</StackLimit> -->
-				<!-- </ItemContainer> -->
-				<!-- <FeedbackController /> -->
-				<!-- <Draggable /> -->
-				<!-- <Cost /> -->
-				<!-- <Craftable /> -->
-				<!-- <TradeRouteVehicle /> -->
-				<!-- <Locked> -->
-					<!-- <DefaultLockedState>0</DefaultLockedState> -->
-				<!-- </Locked> -->
-				<!-- <Nameable /> -->
-				<!-- <MetaPersistent /> -->
-				<!-- <ExpeditionAttribute /> -->
-				<!-- <ShipMaintenance /> -->
-				<!-- <Sellable /> -->
-				<!-- <Stance /> -->
-				<!-- <Rentable /> -->
-				<!-- <WorldMapSound /> -->
-				<!-- <Pausable /> -->
-				<!-- <ShipIncident /> -->
-				<!-- <SoundEmitterCommandBarks /> -->
-			<!-- </Values> -->
-		<!-- </Asset> -->
-	<!-- </ModOp> -->
+   
   
   
     <!-- Only use few ships as tradefleet, to compensate the higher budget -->
     <!-- Archibald always one Clipper -->
-    <ModOp Type="replace" GUID="45" Path="/Values/Trader/Progression/*/TradeFleet">
+    <ModOp Type="replace" GUID="45,78" Path="/Values/Trader/Progression/EarlyGame/TradeFleet">
+          <TradeFleet>
+            <Item>
+              <ShipAsset>1500000041</ShipAsset>
+              <Amount>1</Amount>
+            </Item>
+          </TradeFleet>
+    </ModOp>
+    <ModOp Type="replace" GUID="45,78" Path="/Values/Trader/Progression/EarlyMidGame/TradeFleet">
+          <TradeFleet>
+            <Item>
+              <ShipAsset>1500000044</ShipAsset>
+              <Amount>1</Amount>
+            </Item>
+          </TradeFleet>
+    </ModOp>
+    <ModOp Type="replace" GUID="45,78" Path="/Values/Trader/Progression/MidGame/TradeFleet">
           <TradeFleet>
             <Item>
               <ShipAsset>1500000042</ShipAsset>
@@ -360,23 +330,7 @@
             </Item>
           </TradeFleet>
     </ModOp>
-    <!-- Eli alawys one Clipper, we need to use add here -->
-    <ModOp Type="add" GUID="46" Path="/Values/Trader/Progression/*">
-          <TradeFleet>
-            <Item>
-              <ShipAsset>1500000042</ShipAsset>
-              <Amount>1</Amount>
-            </Item>
-          </TradeFleet>
-    </ModOp>
-    <!-- Madame Kahina starts trading in MidGame with Frachter (cause she sells nothing anyway in EarlyGame/EarlyMidGame and we need to reduce the total amount of ships assuming every ship that was spawned, never disappears)  -->
-    <ModOp Type="replace" GUID="78" Path="/Values/Trader/Progression/EarlyGame/TradeFleet">
-          <TradeFleet/>
-    </ModOp>
-    <ModOp Type="replace" GUID="78" Path="/Values/Trader/Progression/EarlyMidGame/TradeFleet">
-          <TradeFleet/>
-    </ModOp>
-    <ModOp Type="replace" GUID="78" Path="/Values/Trader/Progression/*[self::MidGame or self::LateMidGame or self::LateGame or self::EndGame]/TradeFleet">
+    <ModOp Type="replace" GUID="45,78" Path="/Values/Trader/Progression/*[self::LateMidGame or self::LateGame or self::EndGame]/TradeFleet">
           <TradeFleet>
             <Item>
               <ShipAsset>1500000043</ShipAsset>
@@ -384,12 +338,63 @@
             </Item>
           </TradeFleet>
     </ModOp>
-    <!-- sarmento and Ketema will have 2 ships, a clipper and later additional a frachter (the clipper wont be removed by the game. if this really happens, we can change improve the whole code, but currently the game is bugged, so old ships never disappear) -->
-    <ModOp Type="replace" GUID="29,119051" Path="/Values/Trader/Progression/*[self::EarlyGame or self::EarlyMidGame or self::MidGame]/TradeFleet">
+    
+    <!-- Eli, we need to use add here -->
+    <ModOp Type="add" GUID="46" Path="/Values/Trader/Progression/EarlyGame">
+          <TradeFleet>
+            <Item>
+              <ShipAsset>1500000041</ShipAsset>
+              <Amount>1</Amount>
+            </Item>
+          </TradeFleet>
+    </ModOp>
+    <ModOp Type="add" GUID="46" Path="/Values/Trader/Progression/EarlyMidGame">
+          <TradeFleet>
+            <Item>
+              <ShipAsset>1500000044</ShipAsset>
+              <Amount>1</Amount>
+            </Item>
+          </TradeFleet>
+    </ModOp>
+    <ModOp Type="add" GUID="46" Path="/Values/Trader/Progression/MidGame/">
           <TradeFleet>
             <Item>
               <ShipAsset>1500000042</ShipAsset>
               <Amount>1</Amount>
+            </Item>
+          </TradeFleet>
+    </ModOp>
+    <ModOp Type="add" GUID="46" Path="/Values/Trader/Progression/*[self::LateMidGame or self::LateGame or self::EndGame]">
+          <TradeFleet>
+            <Item>
+              <ShipAsset>1500000043</ShipAsset>
+              <Amount>1</Amount>
+            </Item>
+          </TradeFleet>
+    </ModOp>
+    
+    <!-- sarmento and Ketema will have 2 ships -->
+    <ModOp Type="replace" GUID="29,119051" Path="/Values/Trader/Progression/EarlyGame/TradeFleet">
+          <TradeFleet>
+            <Item>
+              <ShipAsset>1500000041</ShipAsset>
+              <Amount>2</Amount>
+            </Item>
+          </TradeFleet>
+    </ModOp>
+    <ModOp Type="replace" GUID="29,119051" Path="/Values/Trader/Progression/EarlyMidGame/TradeFleet">
+          <TradeFleet>
+            <Item>
+              <ShipAsset>1500000044</ShipAsset>
+              <Amount>2</Amount>
+            </Item>
+          </TradeFleet>
+    </ModOp>
+    <ModOp Type="replace" GUID="29,119051" Path="/Values/Trader/Progression/MidGame/TradeFleet">
+          <TradeFleet>
+            <Item>
+              <ShipAsset>1500000042</ShipAsset>
+              <Amount>2</Amount>
             </Item>
           </TradeFleet>
     </ModOp>
@@ -397,10 +402,12 @@
           <TradeFleet>
             <Item>
               <ShipAsset>1500000043</ShipAsset>
-              <Amount>1</Amount>
+              <Amount>2</Amount>
             </Item>
           </TradeFleet>
     </ModOp>
+    
+
     <!-- Replaces Nates Frachter with our special one -->
     <ModOp Type="replace" GUID="77" Path="/Values/Trader/Progression/*/TradeFleet">
           <TradeFleet>
@@ -420,8 +427,969 @@
           </TradeFleet>
     </ModOp>
   
+  
+  
+  
+    <!-- triggers to remove old ships (because the game seems not to do so, which results in too many ships in total) -->
+    
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000045</GUID>
+          <Name>EarlyMidGame_Remove_Schoner_Neutral</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>140500</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000041</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_07_Jailor_Bleakworth</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000041</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_08_Kahina</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000041</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_02_Blake</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000041</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_05_Sarmento</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000046</GUID>
+          <Name>MidGame_Remove_Frigate_Neutral</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>140503</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000044</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_07_Jailor_Bleakworth</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000044</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_08_Kahina</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000044</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_02_Blake</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000044</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_05_Sarmento</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- just to be sure, also try to remove schoner, if there are still any -->
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_02_Blake</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_07_Jailor_Bleakworth</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_08_Kahina</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_05_Sarmento</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000047</GUID>
+          <Name>LateMidGame_Remove_Clipper_Neutral</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>140504</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000042</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_07_Jailor_Bleakworth</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000042</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_08_Kahina</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000042</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_02_Blake</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000042</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Third_party_05_Sarmento</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_02_Blake</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_07_Jailor_Bleakworth</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_08_Kahina</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_05_Sarmento</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000044</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_02_Blake</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000044</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_07_Jailor_Bleakworth</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000044</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_08_Kahina</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000044</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Third_party_05_Sarmento</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
 
 
+  <!-- africa has its own progresslevel... -->
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000048</GUID>
+          <Name>EarlyMidGame_Remove_Schoner_Neutral_africa</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>119419</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000041</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Africa_Ketema</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000049</GUID>
+          <Name>MidGame_Remove_Frigate_Neutral_africa</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>119420</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000044</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Africa_Ketema</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Africa_Ketema</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000040</GUID>
+          <Name>LateMidGame_Remove_Clipper_Neutral_africa</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>119421</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionDeleteObjects>
+                                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                    </ActionDeleteObjects>
+                                    <ObjectFilter>
+                                      <ObjectGUID>1500000042</ObjectGUID>
+                                      <CheckParticipantID>1</CheckParticipantID>
+                                      <ObjectParticipantID>Africa_Ketema</ObjectParticipantID>
+                                    </ObjectFilter>
+                                  </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000041</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Africa_Ketema</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                  <Template>ActionDeleteObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionDeleteObjects>
+                      <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                    </ActionDeleteObjects>
+                    <ObjectFilter>
+                      <ObjectGUID>1500000044</ObjectGUID>
+                      <CheckParticipantID>1</CheckParticipantID>
+                      <ObjectParticipantID>Africa_Ketema</ObjectParticipantID>
+                    </ObjectFilter>
+                  </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
 
 
 
