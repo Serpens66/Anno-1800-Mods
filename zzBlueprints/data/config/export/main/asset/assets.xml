@@ -14,8 +14,12 @@
   <!-- Wir machen nicht von jedem Gebäude so einen Platzhalter (weil viel zuviel), sondern nur von denen, bei denen es hilfreich ist, sie von anfang an in einen vorherigen Aufbau einzuplanen. -->
   <!-- Dazu gehören: alle öffentlichen Gebäude, Feuerwhr/Polizei/Krakenahus usw,  -->
   <!-- Handelskammer/Rathaus/Hafenmeisterei -->
-  <!-- Kraftwerke, Tankhof -->
+  <!-- Kraftwerke, Tankhof, Dampfschiffwerft -->
   <!-- Palast -->  
+  <!-- Silo/Traktor? does not work, since the game does not accept a second SiloUnlock (and we dont want to unlock the first, because of other triggers) -->
+  <!-- Mod Buildings: Small Powerplant -->
+  <!-- Monuments, like Kaiserdom: The boni this building provides do not work when build via blueprint dummy. needs reload of the game before they do work. -->
+  
   
   <!-- ######################################################################################## -->
   <!-- Add blueprints to Construcion menus (only for the ones sorted after residence tier, but feel free to also add them to the category ones) -->
@@ -140,6 +144,9 @@
             <ConstructionCategory>
               <BuildingList>
                 <Item>
+                  <Building>1500000406</Building>
+                </Item>
+                <Item>
                   <Building>1500000399</Building>
                 </Item>
                 <Item>
@@ -147,6 +154,9 @@
                 </Item>
                 <Item>
                   <Building>1500000368</Building>
+                </Item>
+                <Item>
+                  <Building>1500000405</Building>
                 </Item>
               </BuildingList>
               <CategoryDescription>1500000310</CategoryDescription>
@@ -181,6 +191,9 @@
                 </Item>
                 <Item>
                   <Building>1500000400</Building>
+                </Item>
+                <Item>
+                  <Building>1500000407</Building>
                 </Item>
               </BuildingList>
               <CategoryDescription>1500000310</CategoryDescription>
@@ -7430,33 +7443,641 @@
     </Asset>
   </ModOp>
   
+  <!-- Steam_Shipyard -->
+  
+  <ModOp Type="addNextSibling" GUID="1010190">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000536</GUID>
+          <Name>Steam_Shipyard Blocker</Name>
+          <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename>
+          <ID>ProductDummy</ID>
+        </Standard>
+        <Text/>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product/>
+        <ExpeditionAttribute />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000537</GUID>
+          <Name>unlock Steam_Shipyard</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1010521</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000536</Resource>
+                    <ResourceAmount>9999999</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp Type="addNextSibling" GUID="1010521">
+    <Asset>
+      <BaseAssetGUID>1010521</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000405</GUID>
+          <Name>Steam_Shipyard Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1010017</Ingredient>
+              <Amount>2000</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010196</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010205</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010221</Ingredient>
+              <Amount>5</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1500000536</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000538</GUID>
+          <Name>replace dummy with original Steam_Shipyard</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000405</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000405</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>1010521</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
   
   
+  <!-- Small_PowerPlant_MOD -->
+  
+  <ModOp Type="addNextSibling" GUID="1010190">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000539</GUID>
+          <Name>Small_PowerPlant_MOD Blocker</Name>
+          <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename>
+          <ID>ProductDummy</ID>
+        </Standard>
+        <Text/>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product/>
+        <ExpeditionAttribute />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000540</GUID>
+          <Name>unlock Small_PowerPlant_MOD</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500000300</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000539</Resource>
+                    <ResourceAmount>9999999</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp Type="addNextSibling" GUID="1500000300">
+    <Asset>
+      <BaseAssetGUID>1500000300</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000406</GUID>
+          <Name>Small_PowerPlant_MOD Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1010017</Ingredient>
+              <Amount>10000</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010196</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010205</Ingredient>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010218</Ingredient>
+              <Amount>12</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010207</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010202</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1500000539</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000541</GUID>
+          <Name>replace dummy with original Small_PowerPlant_MOD</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000406</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000406</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>1500000300</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
   
   
+  <!-- Kaiserdom_MOD -->
   
+  <ModOp Type="addNextSibling" GUID="1010190">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000542</GUID>
+          <Name>Kaiserdom_MOD Blocker</Name>
+          <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename>
+          <ID>ProductDummy</ID>
+        </Standard>
+        <Text/>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product/>
+        <ExpeditionAttribute />
+      </Values>
+    </Asset>
+  </ModOp>
   
+  <!-- do NOT give the player the needed product to build the blueprint, because the monument does not work properly until reload then. -->
+  <!-- instead the player should demolish the dummy and place a real fundament -->
   
-  
-  
-  
-  
-  
-  <!-- 1500000405 bis bis guid 1500000419 wäre noch frei, danach von 1500000536 bis 1500001000 -->
-  
-  <!-- <ModOp Type="addNextSibling" GUID=""> -->
+  <!-- <ModOp GUID="130248" Type="addNextSibling"> -->
     <!-- <Asset> -->
-      <!-- <BaseAssetGUID></BaseAssetGUID> -->
+      <!-- <Template>Trigger</Template> -->
       <!-- <Values> -->
         <!-- <Standard> -->
-          <!-- <GUID>1500000405</GUID> -->
-          <!-- <Name> Blueprint</Name> -->
+          <!-- <GUID>1500000543</GUID> -->
+          <!-- <Name>unlock Kaiserdom_MOD</Name> -->
+        <!-- </Standard> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionUnlocked</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionUnlocked> -->
+                <!-- <UnlockNeeded>1500000001</UnlockNeeded> -->
+              <!-- </ConditionUnlocked> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <!-- <TriggerActions> -->
+            <!-- <Item> -->
+              <!-- <TriggerAction> -->
+                <!-- <Template>ActionAddResource</Template> -->
+                <!-- <Values> -->
+                  <!-- <Action /> -->
+                  <!-- <ActionAddResource> -->
+                    <!-- <Resource>1500000542</Resource> -->
+                    <!-- <ResourceAmount>9999999</ResourceAmount> -->
+                  <!-- </ActionAddResource> -->
+                <!-- </Values> -->
+              <!-- </TriggerAction> -->
+            <!-- </Item> -->
+          <!-- </TriggerActions> -->
+        <!-- </Trigger> -->
+        <!-- <TriggerSetup /> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+    
+  <ModOp Type="addNextSibling" GUID="1500000001">
+    <Asset>
+      <BaseAssetGUID>1500000001</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000407</GUID>
+          <Name>Kaiserdom_MOD Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1010017</Ingredient>
+              <Amount>300000</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010196</Ingredient>
+              <Amount>100</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010205</Ingredient>
+              <Amount>100</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010218</Ingredient>
+              <Amount>150</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010207</Ingredient>
+              <Amount>0</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010202</Ingredient>
+              <Amount>50</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1500000542</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000544</GUID>
+          <Name>replace dummy with original Kaiserdom_MOD</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000407</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000407</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>1500000001</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <!-- Silo_Grain -->
+  <!-- unfortunately SiloUnlock does not work, since the game does not accept a second SiloUnlock (and we dont want to unlock the first, because of other triggers) -->
+  
+  <!-- <ModOp Type="addNextSibling" GUID="1010190"> -->
+    <!-- <Asset> -->
+      <!-- <Template>Product</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500000545</GUID> -->
+          <!-- <Name>Silo_Grain Blocker</Name> -->
+          <!-- <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename> -->
+          <!-- <ID>ProductDummy</ID> -->
+        <!-- </Standard> -->
+        <!-- <Text/> -->
+        <!-- <Locked> -->
+          <!-- <DefaultLockedState>0</DefaultLockedState> -->
+        <!-- </Locked> -->
+        <!-- <Product/> -->
+        <!-- <ExpeditionAttribute /> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+    
+  <!-- <ModOp GUID="130248" Type="addNextSibling"> -->
+    <!-- <Asset> -->
+      <!-- <Template>Trigger</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500000546</GUID> -->
+          <!-- <Name>unlock Silo_Grain</Name> -->
+        <!-- </Standard> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionUnlocked</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionUnlocked> -->
+                <!-- <UnlockNeeded>269957</UnlockNeeded> -->
+              <!-- </ConditionUnlocked> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <!-- <TriggerActions> -->
+            <!-- <Item> -->
+              <!-- <TriggerAction> -->
+                <!-- <Template>ActionAddResource</Template> -->
+                <!-- <Values> -->
+                  <!-- <Action /> -->
+                  <!-- <ActionAddResource> -->
+                    <!-- <Resource>1500000545</Resource> -->
+                    <!-- <ResourceAmount>9999999</ResourceAmount> -->
+                  <!-- </ActionAddResource> -->
+                <!-- </Values> -->
+              <!-- </TriggerAction> -->
+            <!-- </Item> -->
+          <!-- </TriggerActions> -->
+        <!-- </Trigger> -->
+        <!-- <TriggerSetup /> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+    
+  <!-- <ModOp Type="addNextSibling" GUID="269957"> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>269957</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500000408</GUID> -->
+          <!-- <Name>Silo_Grain Blueprint</Name> -->
         <!-- </Standard> -->
         <!-- <Building> -->
           <!-- <SecondPartyRelevant>0</SecondPartyRelevant> -->
         <!-- </Building> -->
         <!-- <Cost> -->
-          
+          <!-- <Costs> -->
+            <!-- <Item> -->
+              <!-- <VectorElement> -->
+                <!-- <InheritedIndex>0</InheritedIndex> -->
+                <!-- <InheritanceMapV2> -->
+                  <!-- <Entry> -->
+                    <!-- <TemplateName>BuffFactory</TemplateName> -->
+                    <!-- <Index>0</Index> -->
+                  <!-- </Entry> -->
+                <!-- </InheritanceMapV2> -->
+              <!-- </VectorElement> -->
+              <!-- <Amount>1000</Amount> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <VectorElement> -->
+                <!-- <InheritedIndex>1</InheritedIndex> -->
+                <!-- <InheritanceMapV2> -->
+                  <!-- <Entry> -->
+                    <!-- <TemplateName>BuffFactory</TemplateName> -->
+                    <!-- <Index>1</Index> -->
+                  <!-- </Entry> -->
+                <!-- </InheritanceMapV2> -->
+              <!-- </VectorElement> -->
+              <!-- <Amount>20</Amount> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <VectorElement> -->
+                <!-- <InheritedIndex>2</InheritedIndex> -->
+                <!-- <InheritanceMapV2> -->
+                  <!-- <Entry> -->
+                    <!-- <TemplateName>BuffFactory</TemplateName> -->
+                    <!-- <Index>2</Index> -->
+                  <!-- </Entry> -->
+                <!-- </InheritanceMapV2> -->
+              <!-- </VectorElement> -->
+              <!-- <Amount>10</Amount> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <VectorElement> -->
+                <!-- <InheritedIndex>3</InheritedIndex> -->
+                <!-- <InheritanceMapV2> -->
+                  <!-- <Entry> -->
+                    <!-- <TemplateName>BuffFactory</TemplateName> -->
+                    <!-- <Index>3</Index> -->
+                  <!-- </Entry> -->
+                <!-- </InheritanceMapV2> -->
+              <!-- </VectorElement> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <VectorElement> -->
+                <!-- <InheritedIndex>4</InheritedIndex> -->
+                <!-- <InheritanceMapV2> -->
+                  <!-- <Entry> -->
+                    <!-- <TemplateName>BuffFactory</TemplateName> -->
+                    <!-- <Index>4</Index> -->
+                  <!-- </Entry> -->
+                <!-- </InheritanceMapV2> -->
+              <!-- </VectorElement> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <VectorElement> -->
+                <!-- <InheritedIndex>5</InheritedIndex> -->
+                <!-- <InheritanceMapV2> -->
+                  <!-- <Entry> -->
+                    <!-- <TemplateName>BuffFactory</TemplateName> -->
+                    <!-- <Index>5</Index> -->
+                  <!-- </Entry> -->
+                <!-- </InheritanceMapV2> -->
+              <!-- </VectorElement> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Ingredient>1500000545</Ingredient> -->
+              <!-- <Amount>1</Amount> -->
+            <!-- </Item> -->
+          <!-- </Costs> -->
         <!-- </Cost> -->
         <!-- <Locked> -->
           <!-- <DefaultLockedState>0</DefaultLockedState> -->
@@ -7465,7 +8086,139 @@
     <!-- </Asset> -->
   <!-- </ModOp> -->
   
-
+  <!-- <ModOp GUID="130248" Type="addNextSibling"> -->
+    <!-- <Asset> -->
+      <!-- <Template>Trigger</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500000547</GUID> -->
+          <!-- <Name>replace dummy with original Silo_Grain</Name> -->
+        <!-- </Standard> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+                <!-- <Condition/> -->
+                <!-- <ConditionEvent> -->
+                    <!-- <ConditionEvent>ObjectBuilt</ConditionEvent> -->
+                    <!-- <ContextAsset>1500000408</ContextAsset> -->
+                <!-- </ConditionEvent> -->
+                <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <!-- <TriggerActions> -->
+            <!-- <Item> -->
+              <!-- <TriggerAction> -->
+                <!-- <Template>ActionSetObjectGUID</Template> -->
+                <!-- <Values> -->
+                  <!-- <Action /> -->
+                  <!-- <ObjectFilter> -->
+                    <!-- <ObjectGUID>1500000408</ObjectGUID> -->
+                    <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                    <!-- <CheckProcessingParticipantID>1</CheckProcessingParticipantID> -->
+                  <!-- </ObjectFilter> -->
+                  <!-- <ActionSetObjectGUID> -->
+                    <!-- <NewGUID>269957</NewGUID> -->
+                  <!-- </ActionSetObjectGUID> -->
+                <!-- </Values> -->
+              <!-- </TriggerAction> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <TriggerAction> -->
+                <!-- <Template>ActionResetTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Action /> -->
+                  <!-- <ActionResetTrigger /> -->
+                <!-- </Values> -->
+              <!-- </TriggerAction> -->
+            <!-- </Item> -->
+          <!-- </TriggerActions> -->
+        <!-- </Trigger> -->
+        <!-- <TriggerSetup /> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+  
+  <!-- <ModOp Type="replace" Path="//ModuleOwner/AdditionalModule"> -->
+    <!-- <AdditionalModule>1500000408</AdditionalModule> -->
+  <!-- </ModOp> -->
+  
+  <!-- <ModOp GUID="269999" Type="addNextSibling"> -->
+    <!-- <Asset> -->
+      <!-- <Template>FeatureUnlock</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500000548</GUID> -->
+          <!-- <Name>SiloUnlock_Blueprint</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/icon_dlc_bright_harvest_256.png</IconFilename> -->
+          <!-- <ID>FeatureSilo</ID> -->
+        <!-- </Standard> -->
+        <!-- <Locked/> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionAlwaysFalse</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionAlwaysFalse /> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+        <!-- </Trigger> -->
+        <!-- <TriggerSetup> -->
+          <!-- <AutoRegisterTrigger>0</AutoRegisterTrigger> -->
+          <!-- <AutoSelfUnlock>0</AutoSelfUnlock> -->
+        <!-- </TriggerSetup> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+  
+  <!-- <ModOp GUID="130248" Type="addNextSibling"> -->
+    <!-- <Asset> -->
+      <!-- <Template>Trigger</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500000549</GUID> -->
+          <!-- <Name>intermediate moderate tt</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/profiles/resident_tier01.png</IconFilename> -->
+        <!-- </Standard> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionPlayerCounter</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionPlayerCounter> -->
+                <!-- <PlayerCounter>PopulationByLevel</PlayerCounter> -->
+                <!-- <Context>15000000</Context> -->
+                <!-- <CounterAmount>5</CounterAmount> -->
+              <!-- </ConditionPlayerCounter> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <!-- <TriggerActions> -->
+            <!-- <Item> -->
+              <!-- <TriggerAction> -->
+                <!-- <Template>ActionUnlockAsset</Template> -->
+                <!-- <Values> -->
+                  <!-- <Action /> -->
+                  <!-- <ActionUnlockAsset> -->
+                    <!-- <UnlockAssets> -->
+                      <!-- <Item> -->
+                        <!-- <Asset>1500000548</Asset> -->
+                      <!-- </Item> -->
+                    <!-- </UnlockAssets> -->
+                  <!-- </ActionUnlockAsset> -->
+                <!-- </Values> -->
+              <!-- </TriggerAction> -->
+            <!-- </Item> -->
+          <!-- </TriggerActions> -->
+        <!-- </Trigger> -->
+        <!-- <TriggerSetup /> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+  
+  
+  
+  <!-- 1500000409 bis bis guid 1500000419 wäre noch frei, danach von 1500000550 bis 1500001000 -->
+  
 
 
   
