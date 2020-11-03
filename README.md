@@ -1,6 +1,10 @@
 # Anno 1800 Mods
 Mods for Anno 1800 created by me (Serp/Serpens66).  
 
+Important Note:
+-
+the Small Powerplant mod does cause desync for whatever reason in multiplayer.
+
 How to Download  
 -
 Click on the green "Code" button on the top right and hit "download zip" to download the complete collection.  
