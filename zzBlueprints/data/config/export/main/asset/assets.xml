@@ -16,9 +16,9 @@
   <!-- Handelskammer/Rathaus/Hafenmeisterei -->
   <!-- Kraftwerke, Tankhof, Dampfschiffwerft -->
   <!-- Palast -->  
-  <!-- Silo/Traktor? does not work, since the game does not accept a second SiloUnlock (and we dont want to unlock the first, because of other triggers) -->
+  <!-- Silo/Traktor -->
   <!-- Mod Buildings: Small Powerplant -->
-  <!-- Monuments, like Kaiserdom: The boni this building provides do not work when build via blueprint dummy. needs reload of the game before they do work. -->
+  <!-- Monuments, like Kaiserdom: The boni this building provides do not work when build via blueprint dummy. needs reload of the game before they do work -> so we simply do not unlock the dummy for build, players should replace it by the original blueprtint instead -->
   
   
   <!-- ######################################################################################## -->
@@ -7931,293 +7931,2017 @@
   
   
   <!-- Silo_Grain -->
-  <!-- unfortunately SiloUnlock does not work, since the game does not accept a second SiloUnlock (and we dont want to unlock the first, because of other triggers) -->
+  <!-- it seems the GUID 269999 is used internally outside of the assets.xml, so we can not use a dummy unlock for this. -->
+  <!-- the only possible way is to redirect the newpaper/quest to a different guid and unlock 269999 at gamestart instead. -->
   
-  <!-- <ModOp Type="addNextSibling" GUID="1010190"> -->
-    <!-- <Asset> -->
-      <!-- <Template>Product</Template> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>1500000545</GUID> -->
-          <!-- <Name>Silo_Grain Blocker</Name> -->
-          <!-- <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename> -->
-          <!-- <ID>ProductDummy</ID> -->
-        <!-- </Standard> -->
-        <!-- <Text/> -->
-        <!-- <Locked> -->
-          <!-- <DefaultLockedState>0</DefaultLockedState> -->
-        <!-- </Locked> -->
-        <!-- <Product/> -->
-        <!-- <ExpeditionAttribute /> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
-  <!-- </ModOp> -->
+  
+  <!-- we will add a new silounlock with new guid and replace all occurances of the old one. -->
+  <!-- But the game will still look for GUID 269999 to unlock the build option , even if there is no occurance in assets.xml anymore. therefore we will unlock 269999 from begin, and redirect every trigger and so on to our new fake silounlock, so eg the newspaper and tutorial quest will only trigger after we really unlocked silos. -->
+  <ModOp GUID="269999" Type="addNextSibling">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000548</GUID>
+          <Name>SiloUnlock</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_dlc_bright_harvest_256.png</IconFilename>
+          <ID>FeatureSilo</ID>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysFalse</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysFalse />
+            </Values>
+          </TriggerCondition>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- redirect everything that is waiting for silos to be unlocked, to our new entry  -->
+  <ModOp Type="replace" Path="//ConditionUnlocked[UnlockNeeded='269999']/UnlockNeeded">
+    <UnlockNeeded>1500000548</UnlockNeeded>
+  </ModOp>
+  <!-- unlock our new silounlock instead of the old one. -->
+  <ModOp Type="replace" Path="//UnlockAssets/Item[Asset='269999']/Asset">
+    <Asset>1500000548</Asset>
+  </ModOp>
+  <!-- unlock the original silounlock from begin, so we have that option in animalfarms -->
+  <ModOp Type="replace" GUID="269999" Path="/Values/Locked">
+    <Locked>
+      <DefaultLockedState>0</DefaultLockedState>
+    </Locked>
+  </ModOp>
+  <ModOp Type="remove" GUID="269999" Path="/Values/Trigger">
+  </ModOp>
+  <ModOp Type="remove" GUID="269999" Path="/Values/TriggerSetup">
+  </ModOp>
+  
+  <!-- now the different silo buildings (silo grain 269957, silo corn 269958 and silo teff 119025 ) -->
+  <!-- they are unlocked at different conditions, so we need one set of code for each of them -->
+  
+  <ModOp Type="addNextSibling" GUID="1010190">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000545</GUID>
+          <Name>Silo_Grain Blocker</Name>
+          <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename>
+          <ID>ProductDummy</ID>
+        </Standard>
+        <Text/>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product/>
+        <ExpeditionAttribute />
+      </Values>
+    </Asset>
+  </ModOp>
     
-  <!-- <ModOp GUID="130248" Type="addNextSibling"> -->
-    <!-- <Asset> -->
-      <!-- <Template>Trigger</Template> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>1500000546</GUID> -->
-          <!-- <Name>unlock Silo_Grain</Name> -->
-        <!-- </Standard> -->
-        <!-- <Trigger> -->
-          <!-- <TriggerCondition> -->
-            <!-- <Template>ConditionUnlocked</Template> -->
-            <!-- <Values> -->
-              <!-- <Condition /> -->
-              <!-- <ConditionUnlocked> -->
-                <!-- <UnlockNeeded>269957</UnlockNeeded> -->
-              <!-- </ConditionUnlocked> -->
-            <!-- </Values> -->
-          <!-- </TriggerCondition> -->
-          <!-- <TriggerActions> -->
-            <!-- <Item> -->
-              <!-- <TriggerAction> -->
-                <!-- <Template>ActionAddResource</Template> -->
-                <!-- <Values> -->
-                  <!-- <Action /> -->
-                  <!-- <ActionAddResource> -->
-                    <!-- <Resource>1500000545</Resource> -->
-                    <!-- <ResourceAmount>9999999</ResourceAmount> -->
-                  <!-- </ActionAddResource> -->
-                <!-- </Values> -->
-              <!-- </TriggerAction> -->
-            <!-- </Item> -->
-          <!-- </TriggerActions> -->
-        <!-- </Trigger> -->
-        <!-- <TriggerSetup /> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
-  <!-- </ModOp> -->
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000546</GUID>
+          <Name>unlock Silo_Grain</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>269957</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000545</Resource>
+                    <ResourceAmount>9999999</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
     
-  <!-- <ModOp Type="addNextSibling" GUID="269957"> -->
-    <!-- <Asset> -->
-      <!-- <BaseAssetGUID>269957</BaseAssetGUID> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>1500000408</GUID> -->
-          <!-- <Name>Silo_Grain Blueprint</Name> -->
-        <!-- </Standard> -->
-        <!-- <Building> -->
-          <!-- <SecondPartyRelevant>0</SecondPartyRelevant> -->
-        <!-- </Building> -->
-        <!-- <Cost> -->
-          <!-- <Costs> -->
-            <!-- <Item> -->
-              <!-- <VectorElement> -->
-                <!-- <InheritedIndex>0</InheritedIndex> -->
-                <!-- <InheritanceMapV2> -->
-                  <!-- <Entry> -->
-                    <!-- <TemplateName>BuffFactory</TemplateName> -->
-                    <!-- <Index>0</Index> -->
-                  <!-- </Entry> -->
-                <!-- </InheritanceMapV2> -->
-              <!-- </VectorElement> -->
-              <!-- <Amount>1000</Amount> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <VectorElement> -->
-                <!-- <InheritedIndex>1</InheritedIndex> -->
-                <!-- <InheritanceMapV2> -->
-                  <!-- <Entry> -->
-                    <!-- <TemplateName>BuffFactory</TemplateName> -->
-                    <!-- <Index>1</Index> -->
-                  <!-- </Entry> -->
-                <!-- </InheritanceMapV2> -->
-              <!-- </VectorElement> -->
-              <!-- <Amount>20</Amount> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <VectorElement> -->
-                <!-- <InheritedIndex>2</InheritedIndex> -->
-                <!-- <InheritanceMapV2> -->
-                  <!-- <Entry> -->
-                    <!-- <TemplateName>BuffFactory</TemplateName> -->
-                    <!-- <Index>2</Index> -->
-                  <!-- </Entry> -->
-                <!-- </InheritanceMapV2> -->
-              <!-- </VectorElement> -->
-              <!-- <Amount>10</Amount> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <VectorElement> -->
-                <!-- <InheritedIndex>3</InheritedIndex> -->
-                <!-- <InheritanceMapV2> -->
-                  <!-- <Entry> -->
-                    <!-- <TemplateName>BuffFactory</TemplateName> -->
-                    <!-- <Index>3</Index> -->
-                  <!-- </Entry> -->
-                <!-- </InheritanceMapV2> -->
-              <!-- </VectorElement> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <VectorElement> -->
-                <!-- <InheritedIndex>4</InheritedIndex> -->
-                <!-- <InheritanceMapV2> -->
-                  <!-- <Entry> -->
-                    <!-- <TemplateName>BuffFactory</TemplateName> -->
-                    <!-- <Index>4</Index> -->
-                  <!-- </Entry> -->
-                <!-- </InheritanceMapV2> -->
-              <!-- </VectorElement> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <VectorElement> -->
-                <!-- <InheritedIndex>5</InheritedIndex> -->
-                <!-- <InheritanceMapV2> -->
-                  <!-- <Entry> -->
-                    <!-- <TemplateName>BuffFactory</TemplateName> -->
-                    <!-- <Index>5</Index> -->
-                  <!-- </Entry> -->
-                <!-- </InheritanceMapV2> -->
-              <!-- </VectorElement> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <Ingredient>1500000545</Ingredient> -->
-              <!-- <Amount>1</Amount> -->
-            <!-- </Item> -->
-          <!-- </Costs> -->
-        <!-- </Cost> -->
-        <!-- <Locked> -->
-          <!-- <DefaultLockedState>0</DefaultLockedState> -->
-        <!-- </Locked> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
-  <!-- </ModOp> -->
+  <ModOp Type="addNextSibling" GUID="269957">
+    <Asset>
+      <BaseAssetGUID>269957</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000408</GUID>
+          <Name>Silo_Grain Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>0</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>0</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>1000</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>3</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>3</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>4</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>5</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <Ingredient>1500000545</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
   
-  <!-- <ModOp GUID="130248" Type="addNextSibling"> -->
-    <!-- <Asset> -->
-      <!-- <Template>Trigger</Template> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>1500000547</GUID> -->
-          <!-- <Name>replace dummy with original Silo_Grain</Name> -->
-        <!-- </Standard> -->
-        <!-- <Trigger> -->
-          <!-- <TriggerCondition> -->
-            <!-- <Template>ConditionEvent</Template> -->
-            <!-- <Values> -->
-                <!-- <Condition/> -->
-                <!-- <ConditionEvent> -->
-                    <!-- <ConditionEvent>ObjectBuilt</ConditionEvent> -->
-                    <!-- <ContextAsset>1500000408</ContextAsset> -->
-                <!-- </ConditionEvent> -->
-                <!-- <ConditionPropsNegatable/> -->
-            <!-- </Values> -->
-          <!-- </TriggerCondition> -->
-          <!-- <TriggerActions> -->
-            <!-- <Item> -->
-              <!-- <TriggerAction> -->
-                <!-- <Template>ActionSetObjectGUID</Template> -->
-                <!-- <Values> -->
-                  <!-- <Action /> -->
-                  <!-- <ObjectFilter> -->
-                    <!-- <ObjectGUID>1500000408</ObjectGUID> -->
-                    <!-- <CheckParticipantID>1</CheckParticipantID> -->
-                    <!-- <CheckProcessingParticipantID>1</CheckProcessingParticipantID> -->
-                  <!-- </ObjectFilter> -->
-                  <!-- <ActionSetObjectGUID> -->
-                    <!-- <NewGUID>269957</NewGUID> -->
-                  <!-- </ActionSetObjectGUID> -->
-                <!-- </Values> -->
-              <!-- </TriggerAction> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <TriggerAction> -->
-                <!-- <Template>ActionResetTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Action /> -->
-                  <!-- <ActionResetTrigger /> -->
-                <!-- </Values> -->
-              <!-- </TriggerAction> -->
-            <!-- </Item> -->
-          <!-- </TriggerActions> -->
-        <!-- </Trigger> -->
-        <!-- <TriggerSetup /> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
-  <!-- </ModOp> -->
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000547</GUID>
+          <Name>replace dummy with original Silo_Grain</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000408</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000408</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>269957</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- use the dummy silo grain building, instead of original -->
+  <ModOp Type="replace" Path="//ModuleOwner[AdditionalModule='269957']/AdditionalModule">
+    <AdditionalModule>1500000408</AdditionalModule>
+  </ModOp>
   
-  <!-- <ModOp Type="replace" Path="//ModuleOwner/AdditionalModule"> -->
-    <!-- <AdditionalModule>1500000408</AdditionalModule> -->
-  <!-- </ModOp> -->
+  <!-- corn -->
+  <ModOp Type="addNextSibling" GUID="1010190">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000549</GUID>
+          <Name>Silo_Corn Blocker</Name>
+          <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename>
+          <ID>ProductDummy</ID>
+        </Standard>
+        <Text/>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product/>
+        <ExpeditionAttribute />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000550</GUID>
+          <Name>unlock Silo_Corn</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>269958</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000549</Resource>
+                    <ResourceAmount>9999999</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp Type="addNextSibling" GUID="269958">
+    <Asset>
+      <BaseAssetGUID>269958</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000409</GUID>
+          <Name>Silo_Corn Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>0</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>0</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>1000</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>3</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>3</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>4</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>5</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <Ingredient>1500000549</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
   
-  <!-- <ModOp GUID="269999" Type="addNextSibling"> -->
-    <!-- <Asset> -->
-      <!-- <Template>FeatureUnlock</Template> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>1500000548</GUID> -->
-          <!-- <Name>SiloUnlock_Blueprint</Name> -->
-          <!-- <IconFilename>data/ui/2kimages/main/3dicons/icon_dlc_bright_harvest_256.png</IconFilename> -->
-          <!-- <ID>FeatureSilo</ID> -->
-        <!-- </Standard> -->
-        <!-- <Locked/> -->
-        <!-- <Trigger> -->
-          <!-- <TriggerCondition> -->
-            <!-- <Template>ConditionAlwaysFalse</Template> -->
-            <!-- <Values> -->
-              <!-- <Condition /> -->
-              <!-- <ConditionAlwaysFalse /> -->
-            <!-- </Values> -->
-          <!-- </TriggerCondition> -->
-        <!-- </Trigger> -->
-        <!-- <TriggerSetup> -->
-          <!-- <AutoRegisterTrigger>0</AutoRegisterTrigger> -->
-          <!-- <AutoSelfUnlock>0</AutoSelfUnlock> -->
-        <!-- </TriggerSetup> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
-  <!-- </ModOp> -->
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000551</GUID>
+          <Name>replace dummy with original Silo_Corn</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000409</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000409</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>269958</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- use the dummy silo Corn building, instead of original -->
+  <ModOp Type="replace" Path="//ModuleOwner[AdditionalModule='269958']/AdditionalModule">
+    <AdditionalModule>1500000409</AdditionalModule>
+  </ModOp>
   
-  <!-- <ModOp GUID="130248" Type="addNextSibling"> -->
-    <!-- <Asset> -->
-      <!-- <Template>Trigger</Template> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>1500000549</GUID> -->
-          <!-- <Name>intermediate moderate tt</Name> -->
-          <!-- <IconFilename>data/ui/2kimages/main/profiles/resident_tier01.png</IconFilename> -->
-        <!-- </Standard> -->
-        <!-- <Trigger> -->
-          <!-- <TriggerCondition> -->
-            <!-- <Template>ConditionPlayerCounter</Template> -->
-            <!-- <Values> -->
-              <!-- <Condition /> -->
-              <!-- <ConditionPlayerCounter> -->
-                <!-- <PlayerCounter>PopulationByLevel</PlayerCounter> -->
-                <!-- <Context>15000000</Context> -->
-                <!-- <CounterAmount>5</CounterAmount> -->
-              <!-- </ConditionPlayerCounter> -->
-            <!-- </Values> -->
-          <!-- </TriggerCondition> -->
-          <!-- <TriggerActions> -->
-            <!-- <Item> -->
-              <!-- <TriggerAction> -->
-                <!-- <Template>ActionUnlockAsset</Template> -->
-                <!-- <Values> -->
-                  <!-- <Action /> -->
-                  <!-- <ActionUnlockAsset> -->
-                    <!-- <UnlockAssets> -->
-                      <!-- <Item> -->
-                        <!-- <Asset>1500000548</Asset> -->
-                      <!-- </Item> -->
-                    <!-- </UnlockAssets> -->
-                  <!-- </ActionUnlockAsset> -->
-                <!-- </Values> -->
-              <!-- </TriggerAction> -->
-            <!-- </Item> -->
-          <!-- </TriggerActions> -->
-        <!-- </Trigger> -->
-        <!-- <TriggerSetup /> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
-  <!-- </ModOp> -->
+  <!-- Teff -->
+  <ModOp Type="addNextSibling" GUID="1010190">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000552</GUID>
+          <Name>Silo_Teff Blocker</Name>
+          <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename>
+          <ID>ProductDummy</ID>
+        </Standard>
+        <Text/>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product/>
+        <ExpeditionAttribute />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000553</GUID>
+          <Name>unlock Silo_Teff</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>119025</UnlockNeeded>
+              </ConditionUnlocked>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000552</Resource>
+                    <ResourceAmount>9999999</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp Type="addNextSibling" GUID="119025">
+    <Asset>
+      <BaseAssetGUID>119025</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000410</GUID>
+          <Name>Silo_Teff Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>0</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>0</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>1000</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Ingredient>114356</Ingredient>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Ingredient>114402</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>3</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>3</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>4</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>5</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <Ingredient>1500000552</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000554</GUID>
+          <Name>replace dummy with original Silo_Teff</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000410</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000410</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>119025</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- use the dummy silo Teff building, instead of original -->
+  <ModOp Type="replace" Path="//ModuleOwner[AdditionalModule='119025']/AdditionalModule">
+    <AdditionalModule>1500000410</AdditionalModule>
+  </ModOp>
+  
+  <!-- ################################### -->
+  <!-- Tractor blueprints -->
+  <!-- ################################### -->
+  
+  <!-- Same procedure like silounlock:  -->
+  
+  <!-- we will add a new unlock with new guid and replace all occurances of the old one. -->
+  <!-- But the game will still look for GUID 269832 to unlock the build option , even if there is no occurance in assets.xml anymore. therefore we will unlock 269832 from begin, and redirect every trigger and so on to our new fake unlock, so eg the newspaper and tutorial quest will only trigger after we really unlocked. -->
+  <ModOp GUID="269832" Type="addNextSibling">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000555</GUID>
+          <Name>TractorUnlock</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_dlc_bright_harvest_256.png</IconFilename>
+          <ID>FeatureTractor</ID>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysFalse</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysFalse />
+            </Values>
+          </TriggerCondition>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- redirect everything that is waiting for silos to be unlocked, to our new entry  -->
+  <ModOp Type="replace" Path="//ConditionUnlocked[UnlockNeeded='269832']/UnlockNeeded">
+    <UnlockNeeded>1500000555</UnlockNeeded>
+  </ModOp>
+  <!-- unlock our new silounlock instead of the old one. -->
+  <ModOp Type="replace" Path="//UnlockAssets/Item[Asset='269832']/Asset">
+    <Asset>1500000555</Asset>
+  </ModOp>
+  <!-- unlock the original silounlock from begin, so we have that option in animalfarms -->
+  <ModOp Type="replace" GUID="269832" Path="/Values/Locked">
+    <Locked>
+      <DefaultLockedState>0</DefaultLockedState>
+    </Locked>
+  </ModOp>
+  <ModOp Type="remove" GUID="269832" Path="/Values/Trigger">
+  </ModOp>
+  <ModOp Type="remove" GUID="269832" Path="/Values/TriggerSetup">
+  </ModOp>
   
   
+  <!-- tractor guids moderate: 269837+269839 , new: 269848+269849, africa: 119026+119027 -->
+    
+  <!-- Moderate_Tractor -->
+  <ModOp Type="addNextSibling" GUID="1010190">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000556</GUID>
+          <Name>Moderate_Tractor Blocker</Name>
+          <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename>
+          <ID>ProductDummy</ID>
+        </Standard>
+        <Text/>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product/>
+        <ExpeditionAttribute />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000557</GUID>
+          <Name>unlock Moderate_Tractor</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000556</Resource>
+                    <ResourceAmount>9999999</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>269837</UnlockNeeded>
+                        </ConditionUnlocked>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>119025</UnlockNeeded>
+                        </ConditionUnlocked>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
   
-  <!-- 1500000409 bis bis guid 1500000419 wäre noch frei, danach von 1500000550 bis 1500001000 -->
+  <!-- Moderate_Tractor1 -->
+  <ModOp Type="addNextSibling" GUID="269837">
+    <Asset>
+      <BaseAssetGUID>269837</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000411</GUID>
+          <Name>Moderate_Tractor1 Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>0</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>0</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>5000</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>3</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>3</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>4</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>5</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <Ingredient>1010224</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1500000556</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000558</GUID>
+          <Name>replace dummy with original Moderate_Tractor1</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000411</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000411</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>269837</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- use the dummy Moderate_Tractor1 building, instead of original -->
+  <ModOp Type="replace" Path="//ModuleOwner[AdditionalModule='269837']/AdditionalModule">
+    <AdditionalModule>1500000411</AdditionalModule>
+  </ModOp>  
+  
+  <!-- Moderate_Tractor2 -->
+  <ModOp Type="addNextSibling" GUID="269839">
+    <Asset>
+      <BaseAssetGUID>269839</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000412</GUID>
+          <Name>Moderate_Tractor2 Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>0</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>0</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>5000</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>3</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>3</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>4</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>5</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <Ingredient>1010224</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1500000556</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000559</GUID>
+          <Name>replace dummy with original Moderate_Tractor2</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000412</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000412</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>269839</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- use the dummy Moderate_Tractor2 building, instead of original -->
+  <ModOp Type="replace" Path="//ModuleOwner[AdditionalModule='269839']/AdditionalModule">
+    <AdditionalModule>1500000412</AdditionalModule>
+  </ModOp>  
+  
+  
+  <!-- ################################## -->
+  <!-- New_World_Tractor 269848+269849 -->
+  <ModOp Type="addNextSibling" GUID="1010190">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000560</GUID>
+          <Name>New_World_Tractor Blocker</Name>
+          <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename>
+          <ID>ProductDummy</ID>
+        </Standard>
+        <Text/>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product/>
+        <ExpeditionAttribute />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000561</GUID>
+          <Name>unlock New_World_Tractor</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000560</Resource>
+                    <ResourceAmount>9999999</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>269848</UnlockNeeded>
+                        </ConditionUnlocked>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>269849</UnlockNeeded>
+                        </ConditionUnlocked>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- New_World_Tractor1 -->
+  <ModOp Type="addNextSibling" GUID="269848">
+    <Asset>
+      <BaseAssetGUID>269848</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000413</GUID>
+          <Name>New_World_Tractor1 Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1010017</Ingredient>
+              <Amount>5000</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>FactoryBuilding7</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>FactoryBuilding7</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>3</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Ingredient>1010218</Ingredient>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>4</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>FactoryBuilding7</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>5</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>FactoryBuilding7</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <Ingredient>1010224</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1500000560</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000562</GUID>
+          <Name>replace dummy with original New_World_Tractor1</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000413</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000413</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>269848</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- use the dummy New_World_Tractor1 building, instead of original -->
+  <ModOp Type="replace" Path="//ModuleOwner[AdditionalModule='269848']/AdditionalModule">
+    <AdditionalModule>1500000413</AdditionalModule>
+  </ModOp>  
+  
+  <!-- New_World_Tractor2 -->
+  <ModOp Type="addNextSibling" GUID="269849">
+    <Asset>
+      <BaseAssetGUID>269849</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000414</GUID>
+          <Name>New_World_Tractor2 Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1010017</Ingredient>
+              <Amount>5000</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>3</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Ingredient>1010218</Ingredient>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>4</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>5</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>AdditionalModule</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <Ingredient>1010224</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1500000560</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000563</GUID>
+          <Name>replace dummy with original New_World_Tractor2</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000414</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000414</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>269849</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- use the dummy New_World_Tractor2 building, instead of original -->
+  <ModOp Type="replace" Path="//ModuleOwner[AdditionalModule='269849']/AdditionalModule">
+    <AdditionalModule>1500000414</AdditionalModule>
+  </ModOp> 
+  
+  
+  <!-- ################################## -->
+  <!-- Africa_Tractor 119026+119027 -->
+  <ModOp Type="addNextSibling" GUID="1010190">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000564</GUID>
+          <Name>Africa_Tractor Blocker</Name>
+          <IconFilename>data/modgraphics/icons/third_icon.png</IconFilename>
+          <ID>ProductDummy</ID>
+        </Standard>
+        <Text/>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product/>
+        <ExpeditionAttribute />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000565</GUID>
+          <Name>unlock Africa_Tractor</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000564</Resource>
+                    <ResourceAmount>9999999</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>119026</UnlockNeeded>
+                        </ConditionUnlocked>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>119027</UnlockNeeded>
+                        </ConditionUnlocked>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- Africa_Tractor1 -->
+  <ModOp Type="addNextSibling" GUID="119026">
+    <Asset>
+      <BaseAssetGUID>119026</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000415</GUID>
+          <Name>Africa_Tractor1 Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>0</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>0</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>5000</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>3</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>3</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>4</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>5</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <Ingredient>1010224</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1500000564</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000566</GUID>
+          <Name>replace dummy with original Africa_Tractor1</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000415</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000415</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>119026</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- use the dummy Africa_Tractor1 building, instead of original -->
+  <ModOp Type="replace" Path="//ModuleOwner[AdditionalModule='119026']/AdditionalModule">
+    <AdditionalModule>1500000415</AdditionalModule>
+  </ModOp>  
+  
+  <!-- Africa_Tractor2 -->
+  <ModOp Type="addNextSibling" GUID="119027">
+    <Asset>
+      <BaseAssetGUID>119027</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500000416</GUID>
+          <Name>Africa_Tractor2 Blueprint</Name>
+        </Standard>
+        <Building>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Cost>
+          <Costs>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>0</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>0</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>5000</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>1</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>2</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>3</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>3</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>4</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>4</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>5</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>BuffFactory</TemplateName>
+                    <Index>5</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+            </Item>
+            <Item>
+              <Ingredient>1010224</Ingredient>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1500000564</Ingredient>
+              <Amount>1</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="addNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000567</GUID>
+          <Name>replace dummy with original Africa_Tractor2</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+                <Condition/>
+                <ConditionEvent>
+                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                    <ContextAsset>1500000416</ContextAsset>
+                </ConditionEvent>
+                <ConditionPropsNegatable/>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetObjectGUID</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500000416</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                  <ActionSetObjectGUID>
+                    <NewGUID>119027</NewGUID>
+                  </ActionSetObjectGUID>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionResetTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionResetTrigger />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- use the dummy Africa_Tractor2 building, instead of original -->
+  <ModOp Type="replace" Path="//ModuleOwner[AdditionalModule='119027']/AdditionalModule">
+    <AdditionalModule>1500000416</AdditionalModule>
+  </ModOp> 
+  
+  
+  <!-- 1500000417 bis bis guid 1500000419 wäre noch frei, danach von 1500000568 bis 1500001000 -->
   
 
 
