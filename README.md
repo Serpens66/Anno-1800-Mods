@@ -1,5 +1,6 @@
 # Anno 1800 Mods
 Mods for Anno 1800 created by me (Serp/Serpens66).  
+(not yet checked for compatibilty for latest game update in May 2021!)
 
 How to Download  
 -
