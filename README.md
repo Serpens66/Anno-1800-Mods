@@ -1,6 +1,20 @@
 # Anno 1800 Mods
 Mods for Anno 1800 created by me (Serp/Serpens66).  
-(not yet checked for compatibilty for latest game update in May 2021!)
+
+Game Version Compatibility
+-
+Most Mods should work with Game Version 16.1.
+Mods I still need to check and fix for that version are:
+- Attainments by Research
+- Balanced Trading
+- Everyone Hard AI
+- Kaiserdom
+- More Passive Trade Budget +
+- More Passive Trade Budget
+- Small Powerplant
+- Stronger Pirates
+- Stronger Steamships
+- zzBlueprints
 
 How to Download  
 -
