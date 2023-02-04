@@ -1,7 +1,7 @@
 from xml.etree import cElementTree as ET
 import math
 
-# unfinished/unfertig, Text='Pier' ist doch keine moeglichkeit alle piers zu finden, besser wäre "(Pier)" im teil des namens
+# unfinished/unfertig, Text='Pier' ist doch keine moeglichkeit alle piers zu finden, besser wäre "(Pier)" im teil des namens, wobei es auch high-tech pier und Dockland_Module_Pier gibt
 
 # bzw. die normalen piers evlt darüber finden, dass sie BaseAssetGUID vom ersten pier nutzen?
 

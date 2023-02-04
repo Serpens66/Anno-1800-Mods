@@ -1,18 +1,23 @@
 <ModOps>
     
+    <!-- no need to adjust GUIDs 168 and 169, because we will make all AIs use 170 instead as BaseAssetGUID
+      But we will adjust assets that are using BaseAssetGUID 168 and 169 (easy and medium AIs), before we swap the BaseAssetGUID -->
+    
   <!-- faster and cheaper ship production for hard AI, original 0.6 -->
-  <ModOp Type="replace" GUID="170" Path="/Values/ConstructionAI/ShipConstructionBonus">
-      <ShipConstructionBonus>
-        <TimeBonus>0.4</TimeBonus>
-        <ProductBonus>0.4</ProductBonus>
-      </ShipConstructionBonus>
+  <ModOp Type="replace" GUID="170" Path="/Values/ConstructionAI/ShipConstructionBonus/ProductBonus">
+    <ProductBonus>0.4</ProductBonus>
   </ModOp>
-  <!-- check more often if you have enough ships, original 30000. not sure if this is needed -->
-  <ModOp Type="replace" GUID="170" Path="/Values/MilitaryAI/StrengthLevels/UpdateInterval">
-      <UpdateInterval>15000</UpdateInterval>
+  <ModOp Type="replace" GUID="170" Path="/Values/ConstructionAI/ShipConstructionBonus/TimeBonus">
+    <TimeBonus>0.4</TimeBonus>
   </ModOp>
   
-    
+  <!-- check more often if you have enough ships, original 30000. not sure if this is needed -->
+  <!-- As of Game Version 16.1, this was already reduced to 15000 from game devs, so no longer needed -->
+  <!-- <ModOp Type="replace" GUID="170" Path="/Values/MilitaryAI/StrengthLevels/UpdateInterval"> -->
+      <!-- <UpdateInterval>15000</UpdateInterval> -->
+  <!-- </ModOp> -->
+  
+  <!-- Faster settlement of second island, default hard value from Hunt is 1200000, most easy had 2400000 in original  -->
   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/IslandSettlement/Settle2ndIslandDelay">
     <Settle2ndIslandDelay>1200000</Settle2ndIslandDelay>
   </ModOp>
@@ -23,6 +28,7 @@
   <ModOp Type="replace" GUID="79" Path="/Values/ConstructionAI/IslandSettlement/Settle2ndIslandDelay">
     <Settle2ndIslandDelay>1500000</Settle2ndIslandDelay>
   </ModOp>
+  <!-- 81 George Smith does not has this entry, so add it -->
   <ModOp Type="add" GUID="81" Path="/Values/ConstructionAI">
     <IslandSettlement>
       <Settle2ndIslandDelay>1400000</Settle2ndIslandDelay>
@@ -31,6 +37,7 @@
   <ModOp Type="replace" GUID="83" Path="/Values/ConstructionAI/IslandSettlement/Settle2ndIslandDelay">
     <Settle2ndIslandDelay>1300000</Settle2ndIslandDelay>
   </ModOp>
+  <!-- Hugo Mercier does not has this entry, so add it -->
   <ModOp Type="add" GUID="220" Path="/Values/ConstructionAI">
     <IslandSettlement>
       <Settle2ndIslandDelay>1100000</Settle2ndIslandDelay>
@@ -42,14 +49,15 @@
 
 
   
-    
+    <!-- dont ask for permission when settling, removing it from all easy and medium AIs (hard does not have it anyways) -->
    <ModOp Type="remove" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/IslandSettlement/AskForSettlePermissionsCooldowns">
    </ModOp>
    
    <!-- better defense, copy pasted from hard AI Lady Margarete Hunt-->
-   
-   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/DefenseStructures">
-     <DefenseStructures>
+   <!-- DefenseStructuresAir seems to be identical for all AIs (defined in <GUID>167</GUID>), so don't touch this yet. Maybe check in few updates( current 16.1) if devs changed it -->
+   <!-- everyone has the DefenseStructuresGround entry, so replace will work -->
+   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/DefenseStructuresGround">
+     <DefenseStructuresGround>
         <Moderate>
           <HarborDefenses>
             <Item>
@@ -80,26 +88,36 @@
               <Building>1010524</Building>
               <Weight>20</Weight>
             </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+              </VectorElement>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>3</InheritedIndex>
+              </VectorElement>
+            </Item>
           </HarborDefenses>
           <SecurityFactor>
-            <EndGame>
-              <Factor>4</Factor>
-            </EndGame>
-            <LateGame>
-              <Factor>3</Factor>
-            </LateGame>
-            <LateMidGame>
-              <Factor>2.5</Factor>
-            </LateMidGame>
-            <MidGame>
-              <Factor>2</Factor>
-            </MidGame>
-            <EarlyMidGame>
-              <Factor>1.75</Factor>
-            </EarlyMidGame>
             <EarlyGame>
               <Factor>1.5</Factor>
             </EarlyGame>
+            <EarlyMidGame>
+              <Factor>1.75</Factor>
+            </EarlyMidGame>
+            <MidGame>
+              <Factor>2</Factor>
+            </MidGame>
+            <LateMidGame>
+              <Factor>2.5</Factor>
+            </LateMidGame>
+            <LateGame>
+              <Factor>3</Factor>
+            </LateGame>
+            <EndGame>
+              <Factor>4</Factor>
+            </EndGame>
           </SecurityFactor>
           <HighProtectIslandSecurityFactor>2.5</HighProtectIslandSecurityFactor>
         </Moderate>
@@ -129,68 +147,72 @@
               </VectorElement>
               <Weight>60</Weight>
             </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>2</InheritedIndex>
+              </VectorElement>
+            </Item>
           </HarborDefenses>
           <SecurityFactor>
-            <EndGame>
-              <Factor>4</Factor>
-            </EndGame>
-            <LateGame>
-              <Factor>3</Factor>
-            </LateGame>
-            <LateMidGame>
-              <Factor>2.5</Factor>
-            </LateMidGame>
-            <MidGame>
-              <Factor>2</Factor>
-            </MidGame>
-            <EarlyMidGame>
-              <Factor>1.75</Factor>
-            </EarlyMidGame>
             <EarlyGame>
               <Factor>1.5</Factor>
             </EarlyGame>
+            <EarlyMidGame>
+              <Factor>1.75</Factor>
+            </EarlyMidGame>
+            <MidGame>
+              <Factor>2</Factor>
+            </MidGame>
+            <LateMidGame>
+              <Factor>2.5</Factor>
+            </LateMidGame>
+            <LateGame>
+              <Factor>3</Factor>
+            </LateGame>
+            <EndGame>
+              <Factor>4</Factor>
+            </EndGame>
           </SecurityFactor>
           <HighProtectIslandSecurityFactor>2.5</HighProtectIslandSecurityFactor>
         </Colony01>
-      </DefenseStructures>
+      </DefenseStructuresGround>
   </ModOp>
    
 
-  <!-- better MilitaryAI, copy pasted from Margarete with MinStrengthRatio at 75 instead of 70 and a bit more strong ships weight -->
+  <!-- better MilitaryAI, copy pasted from Margarete with MinStrengthRatio at 75 instead of 70 -->
+  <!-- everyone has the MilitaryAI entry, so replace will work -->
   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI">
     <MilitaryAI>
       <StrengthLevels>
         <Levels>
-          <Equal>
-            <MaxStrengthRatio>100</MaxStrengthRatio>
+          <Inferior>
             <MaxAttackRatio>100</MaxAttackRatio>
-            <MaxEscortRatio>75</MaxEscortRatio>
+            <MaxEscortRatio>80</MaxEscortRatio>
+            <MaxDefendRatio>80</MaxDefendRatio>
             <MaxPatrolRatio>100</MaxPatrolRatio>
-            <MaxDefendAllyRatio>50</MaxDefendAllyRatio>
+            <MaxDefendAllyRatio>20</MaxDefendAllyRatio>
+            <MaxBombardRatio>67</MaxBombardRatio>
+          </Inferior>
+          <Equal>
+            <MaxAttackRatio>100</MaxAttackRatio>
+            <MaxPatrolRatio>100</MaxPatrolRatio>
+            <MaxBombardRatio>67</MaxBombardRatio>
           </Equal>
           <Superior>
-            <MaxStrengthRatio>99999999</MaxStrengthRatio>
+            <MaxStrengthRatio>110</MaxStrengthRatio>
             <Flee>1</Flee>
-            <MaxEscortRatio>50</MaxEscortRatio>
             <MaxDefendRatio>100</MaxDefendRatio>
             <MaxPatrolRatio>100</MaxPatrolRatio>
-            <MaxDefendAllyRatio>75</MaxDefendAllyRatio>
+            <MaxBombardRatio>67</MaxBombardRatio>
           </Superior>
-          <Inferior>
-            <!-- <MaxStrengthRatio>50</MaxStrengthRatio> -->
-            <Flee>1</Flee>
-            <MaxAttackRatio>100</MaxAttackRatio>
-            <MaxEscortRatio>100</MaxEscortRatio>
-            <MaxPatrolRatio>100</MaxPatrolRatio>
-            <MaxDefendAllyRatio>25</MaxDefendAllyRatio>
-          </Inferior>
         </Levels>
         <BudgetThreshold>110</BudgetThreshold>
       </StrengthLevels>
       <Attack>
         <MilitaryStrengthRatio>110</MilitaryStrengthRatio>
-        <AdditionalUnitsRatio>2</AdditionalUnitsRatio>
+        <AdditionalUnitsRatio>1</AdditionalUnitsRatio>
         <AttackInterval>600000</AttackInterval>
+        <AirAttackInterval>600000</AirAttackInterval>
         <AttackTargetPrio>
           <Item>
             <Targets>OngoingWarTarget</Targets>
@@ -199,6 +221,27 @@
                 <Condition>LowMilitaryTakeoverMorale</Condition>
               </Item>
             </Conditions>
+            <MaximumConsideredTargets>35</MaximumConsideredTargets>
+          </Item>
+          <Item>
+            <Targets>MilitaryTakeoverTarget</Targets>
+            <Conditions>
+              <Item>
+                <Condition>IsLargerHarbour</Condition>
+              </Item>
+            </Conditions>
+            <SkipProbability>75</SkipProbability>
+            <MaximumConsideredTargets>45</MaximumConsideredTargets>
+          </Item>
+          <Item>
+            <Targets>WarShip</Targets>
+            <Conditions>
+              <Item>
+                <Condition>IsWeaker</Condition>
+              </Item>
+            </Conditions>
+            <SkipProbability>50</SkipProbability>
+            <MaximumConsideredTargets>5</MaximumConsideredTargets>
           </Item>
           <Item>
             <Targets>Kontor</Targets>
@@ -208,29 +251,7 @@
               </Item>
             </Conditions>
             <SkipProbability>50</SkipProbability>
-          </Item>
-          <Item>
-            <Targets>Kontor</Targets>
-            <Conditions>
-              <Item>
-                <Condition>IsSmallerHarbour</Condition>
-              </Item>
-            </Conditions>
-            <SkipProbability>30</SkipProbability>
-          </Item>
-          <Item>
-            <Targets>WarShip</Targets>
-            <Conditions>
-              <Item />
-            </Conditions>
-          </Item>
-          <Item>
-            <Targets>WarShip</Targets>
-            <Conditions>
-              <Item>
-                <Condition>IsWeaker</Condition>
-              </Item>
-            </Conditions>
+            <MaximumConsideredTargets>5</MaximumConsideredTargets>
           </Item>
           <Item>
             <Targets>TradeShip</Targets>
@@ -239,14 +260,7 @@
                 <Condition>IsNearer</Condition>
               </Item>
             </Conditions>
-          </Item>
-          <Item>
-            <Targets>TradeShip</Targets>
-            <Conditions>
-              <Item>
-                <Condition>IsFarther</Condition>
-              </Item>
-            </Conditions>
+            <MaximumConsideredTargets>5</MaximumConsideredTargets>
           </Item>
           <Item>
             <Targets>MilitaryTakeoverTarget</Targets>
@@ -255,24 +269,58 @@
                 <Condition>IsSmallerHarbour</Condition>
               </Item>
             </Conditions>
+            <MaximumConsideredTargets>45</MaximumConsideredTargets>
           </Item>
         </AttackTargetPrio>
         <OwnedShareThreshold>3</OwnedShareThreshold>
         <OverkillAttackThreshold>20</OverkillAttackThreshold>
       </Attack>
+      <Bombard>
+        <PropagandaDrops>
+          <MidGame>
+            <IsActive>0</IsActive>
+          </MidGame>
+          <LateMidGame>
+            <IsActive>0</IsActive>
+          </LateMidGame>
+          <LateGame>
+            <IsActive>0</IsActive>
+          </LateGame>
+          <EndGame>
+            <IsActive>0</IsActive>
+          </EndGame>
+        </PropagandaDrops>
+        <CarePackageDrops>
+          <MidGame>
+            <IsActive>0</IsActive>
+          </MidGame>
+          <LateMidGame>
+            <IsActive>0</IsActive>
+          </LateMidGame>
+          <LateGame>
+            <IsActive>0</IsActive>
+          </LateGame>
+          <EndGame>
+            <IsActive>0</IsActive>
+          </EndGame>
+        </CarePackageDrops>
+      </Bombard>
       <Defend>
         <MinStrengthRatio>75</MinStrengthRatio>
         <AdditionalUnits>2</AdditionalUnits>
         <DefendInterval>15000</DefendInterval>
+        <AirDefendInterval>15000</AirDefendInterval>
         <AttackStrongestTargetFirst>1</AttackStrongestTargetFirst>
       </Defend>
       <Patrol>
         <MinSize>1</MinSize>
         <MaxSize>5</MaxSize>
         <CheckPatrolInterval>30000</CheckPatrolInterval>
+        <CheckAirPatrolInterval>30000</CheckAirPatrolInterval>
       </Patrol>
       <SquadLogic>
         <FleeStrengthRatio>75</FleeStrengthRatio>
+        <BombardFleeStrengthRatio>38</BombardFleeStrengthRatio>
         <TargetPriorities>
           <Item>
             <Targets>WarShip;Kontor;DefenseBuilding</Targets>
@@ -315,7 +363,7 @@
             </Conditions>
           </Item>
         </TargetPriorities>
-        <CommandsToSupport>Attack;Defend</CommandsToSupport>
+        <CommandsToSupport>Attack;Defend;DefendAlly</CommandsToSupport>
         <CommandsToAbandon>Patrol;Escort</CommandsToAbandon>
         <ObservationRange>110</ObservationRange>
       </SquadLogic>
@@ -324,6 +372,7 @@
         <MaxSize>1</MaxSize>
         <MinStrengthRatio>100</MinStrengthRatio>
         <CheckEscortInterval>60000</CheckEscortInterval>
+        <CheckAirEscortInterval>60000</CheckAirEscortInterval>
         <MaxEscapeDistance>5</MaxEscapeDistance>
         <Priorities>
           <Idle>
@@ -337,21 +386,21 @@
       </Repair>
       <SquadPriorities>
         <Commands>
-          <DefendAlly>
-            <Priority>8</Priority>
-          </DefendAlly>
-          <Defend>
-            <Priority>11</Priority>
-          </Defend>
-          <Escort>
-            <Priority>2</Priority>
-          </Escort>
-          <Patrol>
-            <Priority>1</Priority>
-          </Patrol>
           <Attack>
             <Priority>10</Priority>
           </Attack>
+          <Defend>
+            <Priority>11</Priority>
+          </Defend>
+          <Patrol>
+            <Priority>1</Priority>
+          </Patrol>
+          <Escort>
+            <Priority>2</Priority>
+          </Escort>
+          <DefendAlly>
+            <Priority>8</Priority>
+          </DefendAlly>
         </Commands>
       </SquadPriorities>
       <WarFleet>
@@ -366,15 +415,19 @@
           </Item>
           <Item>
             <Type>100440</Type>
-            <Weight>3</Weight>
+            <Weight>2</Weight>
           </Item>
           <Item>
             <Type>100442</Type>
-            <Weight>2</Weight>
+            <Weight>1</Weight>
           </Item>
           <Item>
             <Type>100443</Type>
-            <Weight>2</Weight>
+            <Weight>1</Weight>
+          </Item>
+          <Item>
+            <Type>968</Type>
+            <Weight>1</Weight>
           </Item>
         </ShipList>
         <ShipLimits>
@@ -386,18 +439,18 @@
               <EarlyMidGame>
                 <MaxShipCount>14</MaxShipCount>
               </EarlyMidGame>
-              <EndGame>
-                <MaxShipCount>52</MaxShipCount>
-              </EndGame>
-              <LateGame>
-                <MaxShipCount>42</MaxShipCount>
-              </LateGame>
-              <LateMidGame>
-                <MaxShipCount>30</MaxShipCount>
-              </LateMidGame>
               <MidGame>
                 <MaxShipCount>20</MaxShipCount>
               </MidGame>
+              <LateMidGame>
+                <MaxShipCount>30</MaxShipCount>
+              </LateMidGame>
+              <LateGame>
+                <MaxShipCount>42</MaxShipCount>
+              </LateGame>
+              <EndGame>
+                <MaxShipCount>52</MaxShipCount>
+              </EndGame>
             </Progress>
           </Peace>
           <War>
@@ -408,18 +461,18 @@
               <EarlyMidGame>
                 <MaxShipCount>14</MaxShipCount>
               </EarlyMidGame>
-              <EndGame>
-                <MaxShipCount>52</MaxShipCount>
-              </EndGame>
-              <LateGame>
-                <MaxShipCount>42</MaxShipCount>
-              </LateGame>
-              <LateMidGame>
-                <MaxShipCount>30</MaxShipCount>
-              </LateMidGame>
               <MidGame>
                 <MaxShipCount>20</MaxShipCount>
               </MidGame>
+              <LateMidGame>
+                <MaxShipCount>30</MaxShipCount>
+              </LateMidGame>
+              <LateGame>
+                <MaxShipCount>42</MaxShipCount>
+              </LateGame>
+              <EndGame>
+                <MaxShipCount>52</MaxShipCount>
+              </EndGame>
             </Progress>
           </War>
         </ShipLimits>
@@ -438,10 +491,61 @@
           </Item>
         </SessionOverride>
       </WarFleet>
+      <AirWarFleet>
+        <ShipList>
+          <Item>
+            <VectorElement>
+              <InheritedIndex>0</InheritedIndex>
+            </VectorElement>
+            <Weight>3</Weight>
+          </Item>
+          <Item>
+            <VectorElement>
+              <InheritedIndex>1</InheritedIndex>
+            </VectorElement>
+            <Weight>1</Weight>
+          </Item>
+        </ShipList>
+        <ShipLimits>
+          <Peace>
+            <Progress>
+              <MidGame>
+                <MaxShipCount>2</MaxShipCount>
+              </MidGame>
+              <LateMidGame>
+                <MaxShipCount>5</MaxShipCount>
+              </LateMidGame>
+              <LateGame>
+                <MaxShipCount>8</MaxShipCount>
+              </LateGame>
+              <EndGame>
+                <MaxShipCount>12</MaxShipCount>
+              </EndGame>
+            </Progress>
+          </Peace>
+          <War>
+            <Progress>
+              <MidGame>
+                <MaxShipCount>4</MaxShipCount>
+              </MidGame>
+              <LateMidGame>
+                <MaxShipCount>7</MaxShipCount>
+              </LateMidGame>
+              <LateGame>
+                <MaxShipCount>12</MaxShipCount>
+              </LateGame>
+              <EndGame>
+                <MaxShipCount>16</MaxShipCount>
+              </EndGame>
+            </Progress>
+          </War>
+        </ShipLimits>
+      </AirWarFleet>
     </MilitaryAI>
   </ModOp>
   
   <!-- better BuyShares from Margarete -->
+  <!-- everyone has the BuyShares entry, so replace will work -->
   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/BuyShares">
     <BuyShares>
       <BuySharePriorities>
@@ -518,60 +622,60 @@
   
   
   <!-- a bit diplomacy changes, also copied from Margarete -->
-  
+  <!-- everyone has the DiplomacyActionBalancing entry, so replace will work -->
   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/DiplomacyActionBalancing">
-    <DiplomacyActionBalancing>
-      <CancelTraderights>
-        <ActionWeight>100</ActionWeight>
-      </CancelTraderights>
-      <RequestAlliance>
-        <AgreementThreshold>120</AgreementThreshold>
-        <PartialAgreementThreshold>80</PartialAgreementThreshold>
-      </RequestAlliance>
-      <RequestPeace>
-        <AgreementThreshold>60</AgreementThreshold>
-        <PartialAgreementThreshold>20</PartialAgreementThreshold>
-      </RequestPeace>
-      <RequestTraderights>
-        <PartialAgreementThreshold>60</PartialAgreementThreshold>
-      </RequestTraderights>
-      <ThreatWar>
-        <AgreementThreshold>20</AgreementThreshold>
-      </ThreatWar>
-      <RequestCeaseFire>
-        <AgreementThreshold>35</AgreementThreshold>
-      </RequestCeaseFire>
-      <RequestNonAttack>
-        <AgreementThreshold>70</AgreementThreshold>
-        <PartialAgreementThreshold>50</PartialAgreementThreshold>
-      </RequestNonAttack>
-    </DiplomacyActionBalancing>
+      <DiplomacyActionBalancing>
+        <ThreatWar>
+          <AgreementThreshold>20</AgreementThreshold>
+        </ThreatWar>
+        <RequestPeace>
+          <AgreementThreshold>60</AgreementThreshold>
+          <PartialAgreementThreshold>20</PartialAgreementThreshold>
+        </RequestPeace>
+        <CancelTraderights>
+          <ActionWeight>100</ActionWeight>
+        </CancelTraderights>
+        <RequestTraderights>
+          <PartialAgreementThreshold>60</PartialAgreementThreshold>
+        </RequestTraderights>
+        <RequestAlliance>
+          <AgreementThreshold>120</AgreementThreshold>
+          <PartialAgreementThreshold>80</PartialAgreementThreshold>
+        </RequestAlliance>
+        <RequestCeaseFire>
+          <AgreementThreshold>35</AgreementThreshold>
+        </RequestCeaseFire>
+        <RequestNonAttack>
+          <AgreementThreshold>70</AgreementThreshold>
+          <PartialAgreementThreshold>50</PartialAgreementThreshold>
+        </RequestNonAttack>
+      </DiplomacyActionBalancing>
   </ModOp>
-  
+  <!-- everyone has the ReputationChangeCalculation entry, so replace will work -->
   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/ReputationChangeCalculation">
-    <ReputationChangeCalculation>
-      <PaymentGivingMoney>
-        <MaxPossibleReputation>100</MaxPossibleReputation>
-      </PaymentGivingMoney>
-      <PaymentReceivingMoney>
-        <ReputationAddedLimit>40</ReputationAddedLimit>
-        <ReputationAddedSteepness>0.015</ReputationAddedSteepness>
-      </PaymentReceivingMoney>
-      <EconomyPowerTempReputation>
-        <NegBorderMax>-30</NegBorderMax>
-        <PosBorderMax>30</PosBorderMax>
-      </EconomyPowerTempReputation>
-      <MilitaryPowerTempReputation>
-        <NegBorderMin>-6</NegBorderMin>
-        <NegBorderMax>-30</NegBorderMax>
-        <PosBorderMin>6</PosBorderMin>
-        <PosBorderMax>30</PosBorderMax>
-        <NegativeReputationChanged>1</NegativeReputationChanged>
-        <PositiveReputationChanged>1</PositiveReputationChanged>
-      </MilitaryPowerTempReputation>
-    </ReputationChangeCalculation>
+      <ReputationChangeCalculation>
+        <PaymentGivingMoney>
+          <MaxPossibleReputation>100</MaxPossibleReputation>
+        </PaymentGivingMoney>
+        <PaymentReceivingMoney>
+          <ReputationAddedLimit>40</ReputationAddedLimit>
+          <ReputationAddedSteepness>0.015</ReputationAddedSteepness>
+        </PaymentReceivingMoney>
+        <EconomyPowerTempReputation>
+          <NegBorderMax>-30</NegBorderMax>
+          <PosBorderMax>30</PosBorderMax>
+        </EconomyPowerTempReputation>
+        <MilitaryPowerTempReputation>
+          <NegBorderMin>-6</NegBorderMin>
+          <NegBorderMax>-30</NegBorderMax>
+          <PosBorderMin>6</PosBorderMin>
+          <PosBorderMax>30</PosBorderMax>
+          <NegativeReputationChanged>1</NegativeReputationChanged>
+          <PositiveReputationChanged>1</PositiveReputationChanged>
+        </MilitaryPowerTempReputation>
+      </ReputationChangeCalculation>
   </ModOp>
-  
+  <!-- everyone has the GiftBalancing entry, so replace will work -->
   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/GiftBalancing">
     <GiftBalancing>
       <receivePayment>
@@ -583,7 +687,7 @@
     </GiftBalancing>
   </ModOp>
   
-  <!-- only change Default values to values between medium and hard. wont change all chars, since we use merge, but it is good enough I think -->
+  <!-- only change Default values to values between medium and hard. wont change all chars, since we use merge (which does not add it, if it does not exist yet), but it is good enough I think, some variation might be good -->
   <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/InitialRelation">
     <InitialRelation>
       <DefaultReputation>50</DefaultReputation>
