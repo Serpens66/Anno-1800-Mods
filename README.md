@@ -7,13 +7,7 @@ Most Mods should work with Game Version 16.1.
 Mods I still need to check and fix for that version are:
 - Attainments by Research
 - Balanced Trading
-- Everyone Hard AI
-- Kaiserdom
-- More Passive Trade Budget +
-- More Passive Trade Budget
-- Small Powerplant
-- Stronger Pirates
-- Stronger Steamships
+- More Passive Trade Budget (will be removed instead of updated)
 - zzBlueprints
 
 How to Download  
@@ -29,7 +23,7 @@ Coming Changes:
 -
 
 Planned Mods:
--
+- Small adjustments to optional Bonus Needs (Lebensqualität) to only include DLC goods.
 
 Please report back any bugs and if the mods do well with a mod manager, cause I did not test the new modinfo.json format.
 
