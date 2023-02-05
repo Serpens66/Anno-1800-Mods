@@ -7,7 +7,6 @@ Most Mods should work with Game Version 16.1.
 Mods I still need to check and fix for that version are:
 - Attainments by Research
 - Balanced Trading
-- More Passive Trade Budget (will be removed instead of updated)
 - zzBlueprints
 
 How to Download  
