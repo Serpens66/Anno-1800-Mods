@@ -1,5 +1,6 @@
 # Anno 1800 Mods
-Mods for Anno 1800 created by me (Serp/Serpens66).  
+Mods for Anno 1800 created by me (Serp/Serpens66).
+You can open the modinfo.json file of each mod for an explanation what it does (should be displayed automatically when you use a modmanager).
 
 Game Version Compatibility
 -
@@ -11,7 +12,7 @@ Mods I still need to check and fix for that version are:
 
 How to Download  
 -
-Click on the green "Code" button on the top right and hit "download zip" to download the complete collection.  
+Click on the green "Code" button on the top right and hit "download zip" to download the complete collection. Of course you can delete the mods you don't want after download (I know no way to only download a single folder from github).  
 
 Usage  
 -
