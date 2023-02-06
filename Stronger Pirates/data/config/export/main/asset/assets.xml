@@ -379,13 +379,149 @@
         <Amount>10</Amount> <!-- original 1, seems this is not used by the game, so we will use it to replace LateMidGame, so it is different from LateGame -->
     </ModOp>
 	<ModOp Type="replace" GUID='153270,153276' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102431']/Amount">
-        <Amount>18</Amount> <!-- original 3 LateGame -->
+        <Amount>10</Amount> <!-- original 3 LateGame, adding 8 monitors below -->
     </ModOp>
 	<ModOp Type="replace" GUID='153271,153277' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102432']/Amount">
-        <Amount>25</Amount> <!-- original 3 EndGame-->
+        <Amount>15</Amount> <!-- Piraten-​Monitor original 3 EndGame, adding 12 ship of line below -->
     </ModOp>
     
     
+    <!-- add more ship types LateGame/EndGame to the comeback quest. Unfortunately each fleet is spawned at another random location. -->
+    <ModOp Type="add" GUID='153271,153277' Path="/Values/Trigger/TriggerActions">
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>102431</SpawnGUID>
+                <Amount>12</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <SpawnArea>
+                <DistanceToBorder>Near</DistanceToBorder>
+                <DistanceToIsland>Far</DistanceToIsland>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>968</SpawnGUID>
+                <Amount>6</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <SpawnArea>
+                <DistanceToBorder>Near</DistanceToBorder>
+                <DistanceToIsland>Far</DistanceToIsland>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionMoveObject</Template>
+            <Values>
+              <Action />
+              <ObjectFilter>
+                <ObjectLabel>PirateHarlowResettleGroup</ObjectLabel>
+              </ObjectFilter>
+              <ObjectTargetFilter>
+                <TargetGUID>100681</TargetGUID>
+              </ObjectTargetFilter>
+              <ActionMoveObject>
+                <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
+                <UseDangerLayer>1</UseDangerLayer>
+              </ActionMoveObject>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    <ModOp Type="add" GUID='153270,153276' Path="/Values/Trigger/TriggerActions">
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>102432</SpawnGUID>
+                <Amount>8</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <SpawnArea>
+                <DistanceToBorder>Near</DistanceToBorder>
+                <DistanceToIsland>Far</DistanceToIsland>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionMoveObject</Template>
+            <Values>
+              <Action />
+              <ObjectFilter>
+                <ObjectLabel>PirateHarlowResettleGroup</ObjectLabel>
+              </ObjectFilter>
+              <ObjectTargetFilter>
+                <TargetGUID>100681</TargetGUID>
+              </ObjectTargetFilter>
+              <ActionMoveObject>
+                <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
+                <UseDangerLayer>1</UseDangerLayer>
+              </ActionMoveObject>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    
+    
+    
+      <!-- Make Pirates demand more money (gifts and counterproposals , eg when you ask for peace) Diplomacy/GiftBalancing 
+      (see Combat Overhaul AI assets.xml for explanation what value does what, only "receivesmall" is used, not medium or big) -->
+      <!-- While it is possible to change the Base-Amount, it does not scale on the game progress for pirates, because they have no progress -->
+      <!-- I reported this as bug at ubisoft, but it is not likely they will fix it (currently GU 16.1) -->
+      <!-- If this gets fixed, I may test again what BaseValue suits best for early and endgame -->
+      <ModOp Type="replace" GUID='73,76' Path="/Values/Diplomacy/GiftBalancing">
+        <counterProposal>
+          <BaseValue>1000</BaseValue> <!-- original 300, a value of 1000 results in max costs of ~66k with no reputation and less military strength, Ac3s: changes player money, requesting cease-fire/peace/trade/alliance from AI -->
+          <IncreasePerLevel>7</IncreasePerLevel>
+        </counterProposal>
+      </ModOp>
 
 
 </ModOps>
