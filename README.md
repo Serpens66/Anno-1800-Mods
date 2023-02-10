@@ -23,7 +23,7 @@ Coming Changes:
 -
 
 Planned Mods:
-- Small adjustments to optional Bonus Needs (Lebensqualität) to only include DLC goods.
+-
 
 Please report back any bugs and if the mods do well with a mod manager, cause I did not test the new modinfo.json format.
 
