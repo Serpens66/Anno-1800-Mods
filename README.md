@@ -16,7 +16,7 @@ Click on the green "Code" button on the top right and hit "download zip" to down
 
 Usage  
 -
-Verwendung mit dem/Use with Anno 1800 Mod Loader: https://github.com/xforce/anno1800-mod-loader/releases  
+Modloader no longer required. Simply put the mods you want to use into your "Documents/Anno 1800/mods" folder (create it if it does not exist) and start the game. 
 
 
 Coming Changes:
