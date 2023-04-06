@@ -12,7 +12,7 @@ Mods I still need to check and fix for that version are:
 
 How to Download  
 -
-Click on the green "Code" button on the top right and hit "download zip" to download the complete collection. Of course you can delete the mods you don't want after download (I know no way to only download a single folder from github).  
+Click on the green "Code" button on the top right and hit "download zip" to download the complete collection. Of course you can delete the mods you don't want after download (I know no way to only download a single folder from github).  Make sure you have either only the zip file of a mod or only the unpacked folder of the mod here, otherwise the mod may load twice.
 
 Usage  
 -
