@@ -4,46 +4,46 @@
       But we will adjust assets that are using BaseAssetGUID 168 and 169 (easy and medium AIs), before we swap the BaseAssetGUID -->
     
   <!-- faster and cheaper ship production for hard AI, original 0.6 -->
-  <ModOp Type="replace" GUID="170" Path="/Values/ConstructionAI/ShipConstructionBonus/ProductBonus">
+  <ModOp Type="merge" GUID="170" Path="/Values/ConstructionAI/ShipConstructionBonus">
     <ProductBonus>0.4</ProductBonus>
   </ModOp>
-  <ModOp Type="replace" GUID="170" Path="/Values/ConstructionAI/ShipConstructionBonus/TimeBonus">
+  <ModOp Type="merge" GUID="170" Path="/Values/ConstructionAI/ShipConstructionBonus">
     <TimeBonus>0.4</TimeBonus>
   </ModOp>
   
   <!-- check more often if you have enough ships, original 30000. not sure if this is needed -->
   <!-- As of Game Version 16.1, this was already reduced to 15000 from game devs, so no longer needed -->
-  <!-- <ModOp Type="replace" GUID="170" Path="/Values/MilitaryAI/StrengthLevels/UpdateInterval"> -->
-      <!-- <UpdateInterval>15000</UpdateInterval> -->
-  <!-- </ModOp> -->
+  <ModOp Type="merge" GUID="170" Path="/Values/MilitaryAI/StrengthLevels">
+      <UpdateInterval>15000</UpdateInterval>
+  </ModOp>
   
   <!-- Faster settlement of second island, default hard value from Hunt is 1200000, most easy had 2400000 in original  -->
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/IslandSettlement/Settle2ndIslandDelay">
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/IslandSettlement">
     <Settle2ndIslandDelay>1200000</Settle2ndIslandDelay>
   </ModOp>
   <!-- add little bit of variation for some, so they dont settle everyone at exactly the same time.. -->
-  <ModOp Type="replace" GUID="47" Path="/Values/ConstructionAI/IslandSettlement/Settle2ndIslandDelay">
+  <ModOp Type="merge" GUID="47" Path="/Values/ConstructionAI/IslandSettlement">
     <Settle2ndIslandDelay>1600000</Settle2ndIslandDelay>
   </ModOp>
-  <ModOp Type="replace" GUID="79" Path="/Values/ConstructionAI/IslandSettlement/Settle2ndIslandDelay">
+  <ModOp Type="merge" GUID="79" Path="/Values/ConstructionAI/IslandSettlement">
     <Settle2ndIslandDelay>1500000</Settle2ndIslandDelay>
   </ModOp>
   <!-- 81 George Smith does not has this entry, so add it -->
-  <ModOp Type="add" GUID="81" Path="/Values/ConstructionAI">
+  <ModOp Type="merge" GUID="81" Path="/Values/ConstructionAI">
     <IslandSettlement>
       <Settle2ndIslandDelay>1400000</Settle2ndIslandDelay>
     </IslandSettlement>
   </ModOp>
-  <ModOp Type="replace" GUID="83" Path="/Values/ConstructionAI/IslandSettlement/Settle2ndIslandDelay">
+  <ModOp Type="merge" GUID="83" Path="/Values/ConstructionAI/IslandSettlement">
     <Settle2ndIslandDelay>1300000</Settle2ndIslandDelay>
   </ModOp>
-  <!-- Hugo Mercier does not has this entry, so add it -->
-  <ModOp Type="add" GUID="220" Path="/Values/ConstructionAI">
+  <!-- Hugo Mercier does not has this entry, so add it (IslandSettlement is therefore needed in node) -->
+  <ModOp Type="merge" GUID="220" Path="/Values/ConstructionAI">
     <IslandSettlement>
       <Settle2ndIslandDelay>1100000</Settle2ndIslandDelay>
     </IslandSettlement>
   </ModOp>
-  <ModOp Type="replace" GUID="84" Path="/Values/ConstructionAI/IslandSettlement/Settle2ndIslandDelay">
+  <ModOp Type="merge" GUID="84" Path="/Values/ConstructionAI/IslandSettlement">
     <Settle2ndIslandDelay>1100000</Settle2ndIslandDelay>
   </ModOp>
 
@@ -56,679 +56,24 @@
    <!-- better defense, copy pasted from hard AI Lady Margarete Hunt-->
    <!-- DefenseStructuresAir seems to be identical for all AIs (defined in <GUID>167</GUID>), so don't touch this yet. Maybe check in few updates( current 16.1) if devs changed it -->
    <!-- everyone has the DefenseStructuresGround entry, so replace will work -->
-   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/DefenseStructuresGround">
-     <DefenseStructuresGround>
-        <Moderate>
-          <HarborDefenses>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-                <InheritanceMapV2>
-                  <Entry>
-                    <TemplateName>Profile_2ndParty</TemplateName>
-                    <Index>0</Index>
-                  </Entry>
-                </InheritanceMapV2>
-              </VectorElement>
-              <Weight>35</Weight>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-                <InheritanceMapV2>
-                  <Entry>
-                    <TemplateName>Profile_2ndParty</TemplateName>
-                    <Index>1</Index>
-                  </Entry>
-                </InheritanceMapV2>
-              </VectorElement>
-              <Weight>45</Weight>
-            </Item>
-            <Item>
-              <Building>1010524</Building>
-              <Weight>20</Weight>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </HarborDefenses>
-          <SecurityFactor>
-            <EarlyGame>
-              <Factor>1.5</Factor>
-            </EarlyGame>
-            <EarlyMidGame>
-              <Factor>1.75</Factor>
-            </EarlyMidGame>
-            <MidGame>
-              <Factor>2</Factor>
-            </MidGame>
-            <LateMidGame>
-              <Factor>2.5</Factor>
-            </LateMidGame>
-            <LateGame>
-              <Factor>3</Factor>
-            </LateGame>
-            <EndGame>
-              <Factor>4</Factor>
-            </EndGame>
-          </SecurityFactor>
-          <HighProtectIslandSecurityFactor>2.5</HighProtectIslandSecurityFactor>
-        </Moderate>
-        <Colony01>
-          <HarborDefenses>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-                <InheritanceMapV2>
-                  <Entry>
-                    <TemplateName>Profile_2ndParty</TemplateName>
-                    <Index>0</Index>
-                  </Entry>
-                </InheritanceMapV2>
-              </VectorElement>
-              <Weight>40</Weight>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-                <InheritanceMapV2>
-                  <Entry>
-                    <TemplateName>Profile_2ndParty</TemplateName>
-                    <Index>1</Index>
-                  </Entry>
-                </InheritanceMapV2>
-              </VectorElement>
-              <Weight>60</Weight>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </HarborDefenses>
-          <SecurityFactor>
-            <EarlyGame>
-              <Factor>1.5</Factor>
-            </EarlyGame>
-            <EarlyMidGame>
-              <Factor>1.75</Factor>
-            </EarlyMidGame>
-            <MidGame>
-              <Factor>2</Factor>
-            </MidGame>
-            <LateMidGame>
-              <Factor>2.5</Factor>
-            </LateMidGame>
-            <LateGame>
-              <Factor>3</Factor>
-            </LateGame>
-            <EndGame>
-              <Factor>4</Factor>
-            </EndGame>
-          </SecurityFactor>
-          <HighProtectIslandSecurityFactor>2.5</HighProtectIslandSecurityFactor>
-        </Colony01>
-      </DefenseStructuresGround>
-  </ModOp>
+   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/DefenseStructuresGround"
+      Content="//Values[Standard/GUID='85']/ConstructionAI/DefenseStructuresGround">
+   </ModOp>
   
 
 
-  <!-- better MilitaryAI, copy pasted from Margarete with MinStrengthRatio at 75 instead of 70 and doubled all WarFleet MaxShipCount (not AirWarFleet) and custom SessionOverride -->
+  <!-- better MilitaryAI, copy pasted from Margarete with Defend/MinStrengthRatio at 75 instead of 70 and doubled all WarFleet MaxShipCount (not AirWarFleet) and custom SessionOverride and MaxSize for Escort at 2 -->
   <!-- everyone has the MilitaryAI entry, so replace will work -->
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI">
-    <MilitaryAI>
-      <StrengthLevels>
-        <Levels>
-          <Inferior>
-            <MaxAttackRatio>100</MaxAttackRatio>
-            <MaxEscortRatio>80</MaxEscortRatio>
-            <MaxDefendRatio>80</MaxDefendRatio>
-            <MaxPatrolRatio>100</MaxPatrolRatio>
-            <MaxDefendAllyRatio>20</MaxDefendAllyRatio>
-            <MaxBombardRatio>67</MaxBombardRatio>
-          </Inferior>
-          <Equal>
-            <MaxAttackRatio>100</MaxAttackRatio>
-            <MaxPatrolRatio>100</MaxPatrolRatio>
-            <MaxBombardRatio>67</MaxBombardRatio>
-          </Equal>
-          <Superior>
-            <MaxStrengthRatio>110</MaxStrengthRatio>
-            <Flee>1</Flee>
-            <MaxDefendRatio>100</MaxDefendRatio>
-            <MaxPatrolRatio>100</MaxPatrolRatio>
-            <MaxBombardRatio>67</MaxBombardRatio>
-          </Superior>
-        </Levels>
-        <BudgetThreshold>110</BudgetThreshold>
-      </StrengthLevels>
-      <Attack>
-        <MilitaryStrengthRatio>110</MilitaryStrengthRatio>
-        <AdditionalUnitsRatio>1</AdditionalUnitsRatio>
-        <AttackInterval>600000</AttackInterval>
-        <AirAttackInterval>600000</AirAttackInterval>
-        <AttackTargetPrio>
-          <Item>
-            <Targets>OngoingWarTarget</Targets>
-            <Conditions>
-              <Item>
-                <Condition>LowMilitaryTakeoverMorale</Condition>
-              </Item>
-            </Conditions>
-            <MaximumConsideredTargets>35</MaximumConsideredTargets>
-          </Item>
-          <Item>
-            <Targets>MilitaryTakeoverTarget</Targets>
-            <Conditions>
-              <Item>
-                <Condition>IsLargerHarbour</Condition>
-              </Item>
-            </Conditions>
-            <SkipProbability>75</SkipProbability>
-            <MaximumConsideredTargets>45</MaximumConsideredTargets>
-          </Item>
-          <Item>
-            <Targets>WarShip</Targets>
-            <Conditions>
-              <Item>
-                <Condition>IsWeaker</Condition>
-              </Item>
-            </Conditions>
-            <SkipProbability>50</SkipProbability>
-            <MaximumConsideredTargets>5</MaximumConsideredTargets>
-          </Item>
-          <Item>
-            <Targets>Kontor</Targets>
-            <Conditions>
-              <Item>
-                <Condition>IsLargerHarbour</Condition>
-              </Item>
-            </Conditions>
-            <SkipProbability>50</SkipProbability>
-            <MaximumConsideredTargets>5</MaximumConsideredTargets>
-          </Item>
-          <Item>
-            <Targets>TradeShip</Targets>
-            <Conditions>
-              <Item>
-                <Condition>IsNearer</Condition>
-              </Item>
-            </Conditions>
-            <MaximumConsideredTargets>5</MaximumConsideredTargets>
-          </Item>
-          <Item>
-            <Targets>MilitaryTakeoverTarget</Targets>
-            <Conditions>
-              <Item>
-                <Condition>IsSmallerHarbour</Condition>
-              </Item>
-            </Conditions>
-            <MaximumConsideredTargets>45</MaximumConsideredTargets>
-          </Item>
-        </AttackTargetPrio>
-        <OwnedShareThreshold>3</OwnedShareThreshold>
-        <OverkillAttackThreshold>20</OverkillAttackThreshold>
-      </Attack>
-      <Bombard>
-        <PropagandaDrops>
-          <MidGame>
-            <IsActive>0</IsActive>
-          </MidGame>
-          <LateMidGame>
-            <IsActive>0</IsActive>
-          </LateMidGame>
-          <LateGame>
-            <IsActive>0</IsActive>
-          </LateGame>
-          <EndGame>
-            <IsActive>0</IsActive>
-          </EndGame>
-        </PropagandaDrops>
-        <CarePackageDrops>
-          <MidGame>
-            <IsActive>0</IsActive>
-          </MidGame>
-          <LateMidGame>
-            <IsActive>0</IsActive>
-          </LateMidGame>
-          <LateGame>
-            <IsActive>0</IsActive>
-          </LateGame>
-          <EndGame>
-            <IsActive>0</IsActive>
-          </EndGame>
-        </CarePackageDrops>
-      </Bombard>
-      <Defend>
-        <MinStrengthRatio>75</MinStrengthRatio>
-        <AdditionalUnits>2</AdditionalUnits>
-        <DefendInterval>15000</DefendInterval>
-        <AirDefendInterval>15000</AirDefendInterval>
-        <AttackStrongestTargetFirst>1</AttackStrongestTargetFirst>
-      </Defend>
-      <Patrol>
-        <MinSize>1</MinSize>
-        <MaxSize>5</MaxSize>
-        <CheckPatrolInterval>30000</CheckPatrolInterval>
-        <CheckAirPatrolInterval>30000</CheckAirPatrolInterval>
-      </Patrol>
-      <SquadLogic>
-        <FleeStrengthRatio>75</FleeStrengthRatio>
-        <BombardFleeStrengthRatio>38</BombardFleeStrengthRatio>
-        <TargetPriorities>
-          <Item>
-            <Targets>WarShip;Kontor;DefenseBuilding</Targets>
-            <Range>100</Range>
-            <MinStrengthRatio>110</MinStrengthRatio>
-            <Conditions>
-              <Item>
-                <Condition>LowHitpoints</Condition>
-              </Item>
-            </Conditions>
-          </Item>
-          <Item>
-            <Targets>OngoingWarTarget</Targets>
-            <Range>100</Range>
-            <MinStrengthRatio>110</MinStrengthRatio>
-            <Conditions>
-              <Item>
-                <Condition>LowHitpoints</Condition>
-              </Item>
-            </Conditions>
-          </Item>
-          <Item>
-            <Targets>TradeShip</Targets>
-            <Range>100</Range>
-            <MinStrengthRatio>110</MinStrengthRatio>
-            <Conditions>
-              <Item>
-                <Condition>LowHitpoints</Condition>
-              </Item>
-            </Conditions>
-          </Item>
-          <Item>
-            <Targets>MilitaryTakeoverTarget</Targets>
-            <Range>100</Range>
-            <MinStrengthRatio>110</MinStrengthRatio>
-            <Conditions>
-              <Item>
-                <Condition>LowHitpoints</Condition>
-              </Item>
-            </Conditions>
-          </Item>
-        </TargetPriorities>
-        <CommandsToSupport>Attack;Defend;DefendAlly</CommandsToSupport>
-        <CommandsToAbandon>Patrol;Escort</CommandsToAbandon>
-        <ObservationRange>110</ObservationRange>
-      </SquadLogic>
-      <Escort>
-        <MinSize>1</MinSize>
-        <MaxSize>1</MaxSize>
-        <MinStrengthRatio>100</MinStrengthRatio>
-        <CheckEscortInterval>60000</CheckEscortInterval>
-        <CheckAirEscortInterval>60000</CheckAirEscortInterval>
-        <MaxEscapeDistance>5</MaxEscapeDistance>
-        <Priorities>
-          <Idle>
-            <Value>0</Value>
-          </Idle>
-        </Priorities>
-      </Escort>
-      <Repair>
-        <HPRatioCombat>25</HPRatioCombat>
-        <HPRatioIdle>50</HPRatioIdle>
-      </Repair>
-      <SquadPriorities>
-        <Commands>
-          <Attack>
-            <Priority>10</Priority>
-          </Attack>
-          <Defend>
-            <Priority>11</Priority>
-          </Defend>
-          <Patrol>
-            <Priority>1</Priority>
-          </Patrol>
-          <Escort>
-            <Priority>2</Priority>
-          </Escort>
-          <DefendAlly>
-            <Priority>8</Priority>
-          </DefendAlly>
-        </Commands>
-      </SquadPriorities>
-      <WarFleet>
-        <ShipList>
-          <Item>
-            <Type>100437</Type>
-            <Weight>1</Weight>
-          </Item>
-          <Item>
-            <Type>100439</Type>
-            <Weight>1</Weight>
-          </Item>
-          <Item>
-            <Type>100440</Type>
-            <Weight>2</Weight>
-          </Item>
-          <Item>
-            <Type>100442</Type>
-            <Weight>1</Weight>
-          </Item>
-          <Item>
-            <Type>100443</Type>
-            <Weight>1</Weight>
-          </Item>
-          <Item>
-            <Type>968</Type>
-            <Weight>1</Weight>
-          </Item>
-        </ShipList>
-        <ShipLimits>
-          <Peace>
-            <Progress>
-              <EarlyGame>
-                <MaxShipCount>16</MaxShipCount>
-              </EarlyGame>
-              <EarlyMidGame>
-                <MaxShipCount>28</MaxShipCount>
-              </EarlyMidGame>
-              <MidGame>
-                <MaxShipCount>40</MaxShipCount>
-              </MidGame>
-              <LateMidGame>
-                <MaxShipCount>60</MaxShipCount>
-              </LateMidGame>
-              <LateGame>
-                <MaxShipCount>84</MaxShipCount>
-              </LateGame>
-              <EndGame>
-                <MaxShipCount>104</MaxShipCount>
-              </EndGame>
-            </Progress>
-          </Peace>
-          <War>
-            <Progress>
-              <EarlyGame>
-                <MaxShipCount>16</MaxShipCount>
-              </EarlyGame>
-              <EarlyMidGame>
-                <MaxShipCount>28</MaxShipCount>
-              </EarlyMidGame>
-              <MidGame>
-                <MaxShipCount>40</MaxShipCount>
-              </MidGame>
-              <LateMidGame>
-                <MaxShipCount>60</MaxShipCount>
-              </LateMidGame>
-              <LateGame>
-                <MaxShipCount>84</MaxShipCount>
-              </LateGame>
-              <EndGame>
-                <MaxShipCount>104</MaxShipCount>
-              </EndGame>
-            </Progress>
-          </War>
-        </ShipLimits>
-        <SessionOverride> <!-- Ac3s: the importance of each region to the AI, the higher the number the more ships they will keep in that region, hence it should be highest in Old World since that is where their main islands are, then New World since most important goods come from there. -->
-          <Item>
-            <SessionGUID>180023</SessionGUID> <!-- Old World (not Cape) --> <!-- Ac3s: was not set in vanilla -->
-            <Percentage>70</Percentage>
-          </Item>
-          <Item>
-            <SessionGUID>180025</SessionGUID> <!-- New World -->
-            <Percentage>50</Percentage>
-          </Item>
-          <Item>
-            <SessionGUID>110934</SessionGUID> <!-- Cape -->
-            <Percentage>50</Percentage>
-          </Item>
-          <Item>
-            <SessionGUID>180045</SessionGUID> <!-- Artic -->
-            <Percentage>25</Percentage>
-          </Item>
-          <Item>
-            <SessionGUID>112132</SessionGUID> <!-- Africa --> <!-- Ac3s: was not set in vanilla -->
-            <Percentage>20</Percentage>
-          </Item>
-        </SessionOverride>
-      </WarFleet>
-      <AirWarFleet>
-        <ShipList>
-          <Item>
-            <VectorElement>
-              <InheritedIndex>0</InheritedIndex>
-            </VectorElement>
-            <Weight>3</Weight>
-          </Item>
-          <Item>
-            <VectorElement>
-              <InheritedIndex>1</InheritedIndex>
-            </VectorElement>
-            <Weight>1</Weight>
-          </Item>
-        </ShipList>
-        <ShipLimits>
-          <Peace>
-            <Progress>
-              <MidGame>
-                <MaxShipCount>2</MaxShipCount>
-              </MidGame>
-              <LateMidGame>
-                <MaxShipCount>5</MaxShipCount>
-              </LateMidGame>
-              <LateGame>
-                <MaxShipCount>8</MaxShipCount>
-              </LateGame>
-              <EndGame>
-                <MaxShipCount>12</MaxShipCount>
-              </EndGame>
-            </Progress>
-          </Peace>
-          <War>
-            <Progress>
-              <MidGame>
-                <MaxShipCount>4</MaxShipCount>
-              </MidGame>
-              <LateMidGame>
-                <MaxShipCount>7</MaxShipCount>
-              </LateMidGame>
-              <LateGame>
-                <MaxShipCount>12</MaxShipCount>
-              </LateGame>
-              <EndGame>
-                <MaxShipCount>16</MaxShipCount>
-              </EndGame>
-            </Progress>
-          </War>
-        </ShipLimits>
-      </AirWarFleet>
-    </MilitaryAI>
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI"
+      Content="//Values[Standard/GUID='85']/MilitaryAI">
   </ModOp>
-  
-  <!-- better BuyShares from Margarete, with TakeoverIslandProbability and MilitaryTakeoverProbability set to 95 (if not defined it is 100) -->
-  <!-- everyone has the BuyShares entry, so replace will work -->
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/BuyShares">
-    <BuyShares>
-      <BuySharePriorities>
-        <OwnShare>
-          <Priority>3</Priority>
-        </OwnShare>
-      </BuySharePriorities>
-      <NextDecisionMinTime>2900000</NextDecisionMinTime>
-      <NextDecisionMaxTime>3700000</NextDecisionMaxTime>
-      <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
-      <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
-      <MaxAmountOfOtherShares>13</MaxAmountOfOtherShares>
-    </BuyShares>
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI/Defend">
+    <MinStrengthRatio>75</MinStrengthRatio>
   </ModOp>
-  <!-- add little bit of variation for some, so they dont buy everyone at exactly the same time.. -->
-  <ModOp Type="replace" GUID="47" Path="/Values/BuyShares">
-    <BuyShares>
-      <BuySharePriorities>
-        <OwnShare>
-          <Priority>3</Priority>
-        </OwnShare>
-      </BuySharePriorities>
-      <NextDecisionMinTime>2700000</NextDecisionMinTime>
-      <NextDecisionMaxTime>3800000</NextDecisionMaxTime>
-      <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
-      <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
-      <MaxAmountOfOtherShares>13</MaxAmountOfOtherShares>
-    </BuyShares>
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI/Escort">
+    <MaxSize>2</MaxSize>
   </ModOp>
-  <ModOp Type="replace" GUID="79" Path="/Values/BuyShares">
-    <BuyShares>
-      <BuySharePriorities>
-        <OwnShare>
-          <Priority>3</Priority>
-        </OwnShare>
-      </BuySharePriorities>
-      <NextDecisionMinTime>2500000</NextDecisionMinTime>
-      <NextDecisionMaxTime>3400000</NextDecisionMaxTime>
-      <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
-      <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
-      <MaxAmountOfOtherShares>13</MaxAmountOfOtherShares>
-    </BuyShares>
-  </ModOp>
-  <ModOp Type="replace" GUID="81" Path="/Values/BuyShares">
-    <BuyShares>
-      <BuySharePriorities>
-        <OwnShare>
-          <Priority>3</Priority>
-        </OwnShare>
-      </BuySharePriorities>
-      <NextDecisionMinTime>2200000</NextDecisionMinTime>
-      <NextDecisionMaxTime>3300000</NextDecisionMaxTime>
-      <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
-      <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
-      <MaxAmountOfOtherShares>13</MaxAmountOfOtherShares>
-    </BuyShares>
-  </ModOp>
-  <ModOp Type="replace" GUID="83" Path="/Values/BuyShares">
-    <BuyShares>
-      <BuySharePriorities>
-        <OwnShare>
-          <Priority>3</Priority>
-        </OwnShare>
-      </BuySharePriorities>
-      <NextDecisionMinTime>2600000</NextDecisionMinTime>
-      <NextDecisionMaxTime>3200000</NextDecisionMaxTime>
-      <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
-      <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
-      <MaxAmountOfOtherShares>13</MaxAmountOfOtherShares>
-    </BuyShares>
-  </ModOp>
-  <ModOp Type="replace" GUID="220" Path="/Values/BuyShares">
-    <BuyShares>
-      <BuySharePriorities>
-        <OwnShare>
-          <Priority>3</Priority>
-        </OwnShare>
-      </BuySharePriorities>
-      <NextDecisionMinTime>2000000</NextDecisionMinTime>
-      <NextDecisionMaxTime>3000000</NextDecisionMaxTime>
-      <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
-      <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
-      <MaxAmountOfOtherShares>13</MaxAmountOfOtherShares>
-    </BuyShares>
-  </ModOp>
-  
-  
-  <!-- a bit diplomacy changes, also copied from Margarete -->
-  <!-- everyone has the DiplomacyActionBalancing entry, so replace will work -->
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/DiplomacyActionBalancing">
-      <DiplomacyActionBalancing>
-        <ThreatWar>
-          <AgreementThreshold>20</AgreementThreshold>
-        </ThreatWar>
-        <RequestPeace>
-          <AgreementThreshold>60</AgreementThreshold>
-          <PartialAgreementThreshold>20</PartialAgreementThreshold>
-        </RequestPeace>
-        <CancelTraderights>
-          <ActionWeight>100</ActionWeight>
-        </CancelTraderights>
-        <RequestTraderights>
-          <PartialAgreementThreshold>60</PartialAgreementThreshold>
-        </RequestTraderights>
-        <RequestAlliance>
-          <AgreementThreshold>120</AgreementThreshold>
-          <PartialAgreementThreshold>80</PartialAgreementThreshold>
-        </RequestAlliance>
-        <RequestCeaseFire>
-          <AgreementThreshold>35</AgreementThreshold>
-        </RequestCeaseFire>
-        <RequestNonAttack>
-          <AgreementThreshold>70</AgreementThreshold>
-          <PartialAgreementThreshold>50</PartialAgreementThreshold>
-        </RequestNonAttack>
-      </DiplomacyActionBalancing>
-  </ModOp>
-  <!-- everyone has the ReputationChangeCalculation entry, so replace will work -->
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/ReputationChangeCalculation">
-      <ReputationChangeCalculation>
-        <PaymentGivingMoney>
-          <MaxPossibleReputation>100</MaxPossibleReputation>
-        </PaymentGivingMoney>
-        <PaymentReceivingMoney>
-          <ReputationAddedLimit>40</ReputationAddedLimit>
-          <ReputationAddedSteepness>0.015</ReputationAddedSteepness>
-        </PaymentReceivingMoney>
-        <EconomyPowerTempReputation>
-          <NegBorderMax>-30</NegBorderMax>
-          <PosBorderMax>30</PosBorderMax>
-        </EconomyPowerTempReputation>
-        <MilitaryPowerTempReputation>
-          <NegBorderMin>-6</NegBorderMin>
-          <NegBorderMax>-30</NegBorderMax>
-          <PosBorderMin>6</PosBorderMin>
-          <PosBorderMax>30</PosBorderMax>
-          <NegativeReputationChanged>1</NegativeReputationChanged>
-          <PositiveReputationChanged>1</PositiveReputationChanged>
-        </MilitaryPowerTempReputation>
-      </ReputationChangeCalculation>
-  </ModOp>
-  
-  
-  <!-- only change Default values to values between medium and hard. wont change all chars, since we use merge (which does not add it, if it does not exist yet), but it is good enough I think, some variation might be good -->
-  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/InitialRelation">
-    <InitialRelation>
-      <DefaultReputation>50</DefaultReputation>
-      <DefaultMemory>25</DefaultMemory>
-    </InitialRelation>
-  </ModOp>
-  <!-- use default value for AutomaticDiscovery (whatever this is) -->
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/AutomaticDiscovery/Time">
-    <Time>10800000</Time>
-  </ModOp>
-
-
-
-  
-  <!-- Adjustments also to some aspects of already hard AIs, to be in line with hardest hard AI -->
-  <!-- Alonso (48) has this set to 60, unlike all other hard AIs (100) -->
-  <ModOp Type="replace" GUID="48" Path="/Values/BuyShares/TakeoverIslandProbability">
-    <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
-  </ModOp>  
-  <ModOp Type="replace" GUID="48" Path="/Values/BuyShares/MilitaryTakeoverProbability">
-    <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
-  </ModOp>
-  <!-- Set it to 95% for all AIs (not 100 like hard), because it is okay if in rare cases the island is just bought -->
-  <ModOp Type="add" GUID="170" Path="/Values/BuyShares">
-    <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
-    <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
-  </ModOp>
-  
-  <!-- Increased ShipLimits also for the hard AIs: -->
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/ShipLimits">
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI/WarFleet">
     <ShipLimits>
       <Peace>
         <Progress>
@@ -776,6 +121,149 @@
       </War>
     </ShipLimits>
   </ModOp>
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI/WarFleet/SessionOverride">
+        <SessionOverride> <!-- Ac3s: the importance of each region to the AI, the higher the number the more ships they will keep in that region, hence it should be highest in Old World since that is where their main islands are, then New World since most important goods come from there. -->
+          <Item>
+            <SessionGUID>180023</SessionGUID> <!-- Old World (not Cape) --> <!-- Ac3s: was not set in vanilla -->
+            <Percentage>70</Percentage>
+          </Item>
+          <Item>
+            <SessionGUID>180025</SessionGUID> <!-- New World -->
+            <Percentage>50</Percentage>
+          </Item>
+          <Item>
+            <SessionGUID>110934</SessionGUID> <!-- Cape -->
+            <Percentage>50</Percentage>
+          </Item>
+          <Item>
+            <SessionGUID>180045</SessionGUID> <!-- Artic -->
+            <Percentage>25</Percentage>
+          </Item>
+          <Item>
+            <SessionGUID>112132</SessionGUID> <!-- Africa --> <!-- Ac3s: was not set in vanilla -->
+            <Percentage>20</Percentage>
+          </Item>
+        </SessionOverride>
+  </ModOp>
+  
+  <!-- better BuyShares from Margarete, with TakeoverIslandProbability and MilitaryTakeoverProbability set to 95 (if not defined it is 100) -->
+  <!-- everyone has the BuyShares entry, so replace will work -->
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/BuyShares"
+      Content="//Values[Standard/GUID='85']/BuyShares">
+  </ModOp>
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/BuyShares">
+      <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
+      <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
+  </ModOp>
+  <!-- add little bit of variation for some, so they dont buy shares everyone at exactly the same time.. -->
+  <ModOp Type="merge" GUID="47" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2700000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3800000</NextDecisionMaxTime>
+  </ModOp>
+  <ModOp Type="merge" GUID="79" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2500000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3400000</NextDecisionMaxTime>
+  </ModOp>
+  <ModOp Type="merge" GUID="81" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2200000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3300000</NextDecisionMaxTime>
+  </ModOp>
+  <ModOp Type="merge" GUID="83" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2600000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3200000</NextDecisionMaxTime>
+  </ModOp>
+  <ModOp Type="merge" GUID="220" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2000000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3000000</NextDecisionMaxTime>
+  </ModOp>
+
+  
+  
+  <!-- a bit diplomacy copied from Margarete -->
+  <!-- everyone has the DiplomacyActionBalancing entry, so replace will work -->
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/DiplomacyActionBalancing"
+      Content="//Values[Standard/GUID='85']/Diplomacy/DiplomacyActionBalancing">
+  </ModOp>
+  <!-- everyone has the ReputationChangeCalculation entry, so replace will work -->
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/ReputationChangeCalculation"
+      Content="//Values[Standard/GUID='85']/Diplomacy/ReputationChangeCalculation">
+  </ModOp>
+
+  
+  <!-- only change Default values to values between medium and hard (die werte schwanken zwischen den is stark, also nicht sicher ob das so sinnvoll ist) -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/InitialRelation">
+      <DefaultReputation>50</DefaultReputation>
+      <DefaultMemory>25</DefaultMemory>
+  </ModOp>
+  <!-- use default value for AutomaticDiscovery (whatever this is) -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/AutomaticDiscovery">
+    <Time>10800000</Time>
+  </ModOp>
+
+
+
+  
+  <!-- Adjustments also to some aspects of already hard AIs, to be in line with hardest hard AI -->
+  <!-- Alonso (48) has this set to 60, unlike all other hard AIs (100) -->
+  <ModOp Type="merge" GUID="48" Path="/Values/BuyShares">
+    <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
+  </ModOp>  
+  <ModOp Type="merge" GUID="48" Path="/Values/BuyShares">
+    <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
+  </ModOp>
+  <!-- Set it to 95% for all AIs (not 100 like hard), because it is okay if in rare cases the island is just bought -->
+  <ModOp Type="merge" GUID="170" Path="/Values/BuyShares">
+    <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
+    <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
+  </ModOp>
+  
+  <!-- Increased ShipLimits also for the hard AIs: -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/ShipLimits">
+      <Peace>
+        <Progress>
+          <EarlyGame>
+            <MaxShipCount>16</MaxShipCount>
+          </EarlyGame>
+          <EarlyMidGame>
+            <MaxShipCount>28</MaxShipCount>
+          </EarlyMidGame>
+          <MidGame>
+            <MaxShipCount>40</MaxShipCount>
+          </MidGame>
+          <LateMidGame>
+            <MaxShipCount>60</MaxShipCount>
+          </LateMidGame>
+          <LateGame>
+            <MaxShipCount>84</MaxShipCount>
+          </LateGame>
+          <EndGame>
+            <MaxShipCount>104</MaxShipCount>
+          </EndGame>
+        </Progress>
+      </Peace>
+      <War>
+        <Progress>
+          <EarlyGame>
+            <MaxShipCount>16</MaxShipCount>
+          </EarlyGame>
+          <EarlyMidGame>
+            <MaxShipCount>28</MaxShipCount>
+          </EarlyMidGame>
+          <MidGame>
+            <MaxShipCount>40</MaxShipCount>
+          </MidGame>
+          <LateMidGame>
+            <MaxShipCount>60</MaxShipCount>
+          </LateMidGame>
+          <LateGame>
+            <MaxShipCount>84</MaxShipCount>
+          </LateGame>
+          <EndGame>
+            <MaxShipCount>104</MaxShipCount>
+          </EndGame>
+        </Progress>
+      </War>
+  </ModOp>
   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/ShipLimits">
     <SessionOverride> <!-- Ac3s: the importance of each region to the AI, the higher the number the more ships they will keep in that region, hence it should be highest in Old World since that is where their main islands are, then New World since most important goods come from there. -->
       <Item>
@@ -802,7 +290,7 @@
   </ModOp>
   
   <!-- Let everyone place seamines around harbor, like Mercier (I guess only if airship DLC is active?) -->
-  <ModOp Type="add" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/ConstructionAI">
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/ConstructionAI">
       <SeamineConfig>
         <HarborMineDefence>
           <PlaceMinesAroundHarbor>1</PlaceMinesAroundHarbor>
@@ -813,8 +301,8 @@
   
   <!-- Increase required money amount for diplomatic interactions. No changes to success chances and reputationgain/loss though, to keep friendly personality of characters -->
   <!-- everyone has the GiftBalancing entry, so replace will work -->
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/Diplomacy/GiftBalancing">
-    <GiftBalancing>
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/Diplomacy/GiftBalancing">
+    <!-- <GiftBalancing> -->
         <receivePayment>
           <BaseValue>800</BaseValue> <!-- original 500, Ac3s: changes money demand for treaty cancelation and war threats from AI -->
           <IncreasePerLevel>7</IncreasePerLevel> <!-- original 7, Ac3s: note that increasing the "level" on pirates to make their prices increase does almost nothing since pirates do not advance in level because they do not expand to other islands like normal AIs do -->
@@ -853,7 +341,7 @@
           <BaseValue>20000</BaseValue> <!-- original 5000, Ac3s: changes AI money gifting to player(alliance) -->
           <IncreasePerLevel>7</IncreasePerLevel>
         </giveGenerous>
-      </GiftBalancing>
+      <!-- </GiftBalancing> -->
   </ModOp>
   
   
