@@ -61,8 +61,22 @@
     
     <!-- Luckily "TargetIsOwner" does work, although it is not mentiond in any assets.xml, templates.xml or properties.xml, because with SourceIsOwner the logic would be in the wrong direction -->
       <!-- "Is the opinion from target about you less than x, then change your opinion about the target." -->
+    <!-- (without TargetIsOwner the code does cause heavy lag (if there is no actionreset delay), because condition will always be true, so it is important) -->
     
-    <!-- Attention: TargetIsOwner does not exist as command, it is the default behavior, if SourceIsOwner is not defined. so the game just ignores TargetIsOwner command -->
+    
+    <!-- Erklärung: -->
+    <!-- Jeder Trigger wird für jeden Spieler,  also Mensch und KI (second party) ausgeführt. Der ausführende Spieler wird im code oft "Owner" oder auch "Processing" genannt (Synonym). -->
+    <!-- Diese ConditionReputation soll prüfen wie die Meinung von dem "Source"-Spieler über den "Target"-Spieler ist. Wenn sie weniger als 100 ist, gilt die Condition als erfüllt. Sinn ist es bei Erfüllung die Meinung der Source über das Target auf 100 zu setzen, damit diese sich immer mögen. Der Trigger wird wie gesagt auch mit der KI als Owner durchgeführt -->
+    <!-- Die in properties.xml definerten Defaultwerte für Source und Target sind: -->
+              <!-- <ParticipantRelation> -->
+                  <!-- <SourceParticipant>Human0</SourceParticipant> -->
+                  <!-- <TargetParticipant>Human0</TargetParticipant> -->
+                <!-- </ParticipantRelation> -->
+    <!-- Das heißt wenn man eins oder beides nicht definiert, dann wird der erste menschliche Spieler als Vergleich herangezogen. -->
+    <!-- In meinem Beispiel habe ich die KI Jorgensen als source definiert. -->
+    <!-- So, ein Problem ist nun, dass im ActionAddReputation scheinbar nur das Target definiert werden kann. Also zwischen welchen beiden Parteien wird da die Reputation erhöht? Es gilt wohl immer zwischen Owner und dem Target. Das bedeutet also, wenn ich die Meinung zwischen 2 KIs verbessern will, dann MUSS eine der beiden KIs der Owner und Target zugleich sein und der andere entsprechend Target. -->
+    <!-- Deswegen war es wichtig, dass es ein "TargetIsOwner" Befehl gibt. Wenn wir annehmen, dass "TargetIsOwner" keinerlei Wirkung hat, weil dieses Property nicht existiert, dann würde dieser code durch den defaultwert Human0 machen, während eine KI der Owner ist: "ist die Meinung von Bente über Mensch0 kleiner als 100, dann erhöhe die Meinung von Bente über den Owner (KI) um 100". -->
+    <!-- Diese Bedingung wäre dann quasi dauerhaft erfüllt und durch ein ActionResetTrigger löst dies Lags aus. Da ich aber mit "TargetIsOwner" keine Lags habe ist das der Beweis, dass es TargetIsOwner gibt. -->
     
     
     <!-- The trigger is also executed for humans, but luckily it is no problem if our human opinion about an AI is changed, because it does not effect the game -->
@@ -130,7 +144,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_01_Jorgensen</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -165,10 +179,31 @@
                 <!-- reset trigger, so it is executed again if the condition is met again -->
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -439,7 +474,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_02_Qing</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -472,10 +507,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -747,7 +803,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_03_Wibblesock</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -780,10 +836,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -1052,7 +1129,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_04_Smith</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -1085,10 +1162,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -1357,7 +1455,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_05_OMara</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -1390,10 +1488,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -1662,7 +1781,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_06_Gasparov</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -1695,10 +1814,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -1967,7 +2107,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_07_von_Malching</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -2000,10 +2140,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -2273,7 +2434,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_08_Gravez</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -2306,10 +2467,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -2578,7 +2760,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_09_Silva</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -2611,10 +2793,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -2883,7 +3086,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_10_Hunt</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -2916,10 +3119,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
@@ -3189,7 +3413,7 @@
                   </ConditionReputation>
                   <ParticipantRelation>
                     <SourceParticipant>Second_ai_11_Mercier</SourceParticipant>
-                    <!-- <TargetIsOwner>1</TargetIsOwner> -->
+                    <TargetIsOwner>1</TargetIsOwner>
                   </ParticipantRelation>
                 </Values>
               </TriggerCondition>
@@ -3222,10 +3446,31 @@
                 </Item>
                 <Item>
                   <TriggerAction>
-                    <Template>ActionResetTrigger</Template>
+                    <Template>ActionDelayedActions</Template>
                     <Values>
                       <Action />
-                      <ActionResetTrigger />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
                     </Values>
                   </TriggerAction>
                 </Item>
