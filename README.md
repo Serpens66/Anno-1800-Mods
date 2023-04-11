@@ -4,11 +4,11 @@ You can open the modinfo.json file of each mod for an explanation what it does (
 
 Game Version Compatibility
 -
-Most Mods should work with Game Version 16.1.
+Most Mods should work with Game Version 17.
 Mods I still need to check and fix for that version are:
 - Attainments by Research
 - Balanced Trading
-- zzBlueprints
+- zzBlueprints (no longer maintend, just for reference. Use "Stamps Single Buildings" instead)
 
 How to Download  
 -
