@@ -4,9 +4,8 @@ You can open the modinfo.json file of each mod for an explanation what it does (
 
 Game Version Compatibility
 -
-Most Mods should work with Game Version 17.
-Mods I still need to check and fix for that version are:
-- Attainments by Research
+Mods should all work with Game Version 17.
+
 
 How to Download  
 -
