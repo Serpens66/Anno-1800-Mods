@@ -7,8 +7,6 @@ Game Version Compatibility
 Most Mods should work with Game Version 17.
 Mods I still need to check and fix for that version are:
 - Attainments by Research
-- Balanced Trading
-- zzBlueprints (no longer maintained, just for reference. Use "Stamps Single Buildings" instead)
 
 How to Download  
 -
