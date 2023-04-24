@@ -1,0 +1,1489 @@
+
+<ModOps>
+
+    <!-- Replace guns from pirates with flak if airships are nearby the puckel guns -->
+   
+   
+   <!-- verwendet Serps GUIDS von 1500001030 bis 1500001036 (bis 1500001039 fuer diesen mod freigehalten) -->
+
+  <!-- Flak with higher range for pirates, so the few defend mostly the whole base -->
+  <ModOp GUID="736" Type="AddNextSibling">
+        <Asset>
+            <BaseAssetGUID>736</BaseAssetGUID>
+            <Values>
+              <Standard>
+                <GUID>1500001031</GUID>
+                <Name>harbor_18 (Tower 05, FlaK) Double Range</Name>
+              </Standard>
+              <Attacker>
+               <AttackRange>104</AttackRange>
+               <LineOfSightRange>120</LineOfSightRange>
+              </Attacker>
+            </Values>
+        </Asset>
+    </ModOp>
+    <ModOp GUID="2968" Type="AddNextSibling">
+        <Asset>
+            <BaseAssetGUID>2968</BaseAssetGUID>
+            <Values>
+              <Standard>
+                <GUID>1500001037</GUID>
+                <Name>harbor_18 Colony01 (Tower 05, FlaK) Double Range</Name>
+              </Standard>
+              <Attacker>
+               <AttackRange>104</AttackRange>
+               <LineOfSightRange>120</LineOfSightRange>
+              </Attacker>
+            </Values>
+        </Asset>
+    </ModOp>
+    
+    
+    
+    
+    <!-- ########################################################## -->
+      <!-- ### Replace guns from pirates with flak      -->
+      
+      <!-- The triggers are very tricky and difficult and I would prefer them working better, but seems not to be possible. -->
+      
+      <!-- UseSpecificShipGuid muss 1 sein, wenn SpecifiedShipOrPool eine schiffsguid ist. Wenns hingegen ein Pool ist und das 1, dann klappt scheinbar kein schiff. und wenns 0 ist dann triggerts für alle schiffe ?! -->
+      <!-- Keine Ahnung wie ich korrekt einen Pool von schiffen verwenden kann.  -->
+      <!--  ItemEffectTargetPool 4148 und AssetPool 2011 und PlayerCounterContextPool 104661 funktionieren nicht  -->
+      <!-- Deswegen listen wir jetzt über dutzende SubTriggers jedes aktuell existierende Airship einzeln auf... -->
+      
+      <!-- mein ConditionShipsInRange Trigger wird offenbar nicht vollumfänglich von alleine registered (für die session?) -->
+      <!-- wenn ich condition durch AlwaysTrue ersetze klappt es aber. -->
+      <!-- Wenn ich ConditionShipsInRange-Trigger durch ein AlwaysTrue registern lasse, -->
+       <!-- dann funktioniert es nur, wenn die Session definiert ist. -->
+      <!-- Wenn ich ConditionShipsInRange-Trigger durch vanilla trigger 153263 registern lasse, dann klappt es auch ohne Sessionangabe. -->
+      
+        <!-- wenn CheckSpecificShipOwner oder auch CheckParticipantID nicht 1 ist, dann wird es für jeden Spieler ausgeführt, auch wenn -->
+         <!-- wenn CheckProcessingParticipantID 1 ist! , deswegen immer CheckParticipantID usw 1 setzen, wenns ein bestimmter sein soll -->
+        <!-- der eintrag von ObjectParticipantID wird vom spiel nicht verwendet, wenn CheckProcessingParticipantID 1 ist, also so wies sein soll -->
+      
+      <!-- leider können wir bei ActionSetObjectGUID nicht genau auf ein Objekt zielen, es geht nur besitzer, session und maximal island genau (mit island guid) -->
+      <!-- gut wäre es zb. wenn man prüfen würde ob ein luftschiff nah an einem Geschütz ist und wenn ja, dann nur dieses Geschütz in Flak umwandelt, -->
+       <!-- aber das scheint leider nicht zu gehen...  wuesste auch nicht wie man in ConditionShipsInRange ein Label für das condition erfüllende objekt erstellt -->
+      
+        <!-- evlt. noch condition zufügen, ob im krieg und kein waffenstillstand (geht nicht sinnvoll siehe folgenden text)  -->
+        <!-- und überlegen, wie man handhabt, dass trigger für alle spieler ausgeführt wird.  -->
+        <!--  Angenommen spieler 1 und 2 fahren gemeinsam zum piraten, spieler 1 kommt zuerst an und triggert die -->
+        <!--  umwandlung und den reset in 60 sekunden. Spieler 2 kommt 55 sekunden später an, triggert auch seinen trigger -->
+        <!--  und spieler 1 verliert alle schiffe und 5 sekunden später kommt der reset von spieler 1, der es wieder in geschütze umwandelt -->
+        <!--  dann ists weitere 55 sekunden für spieler2 geschütze, obwohls flak sein sollte -->
+        <!-- Da wir den Trigger nicht für den Piraten laufen lassen können, wäre das einzig sinnvolle dann die condition -->
+        <!-- für alle bei jedem spieler beim piraten zu triggern, sodass alle gleichzeitig triggern -->
+          <!-- aber in dem fall können wir nicht sinnvoll prüfen, ob dieser jemand im Krieg mit Piraten ist. Wobei das nicht soo wichtig wäre, oder? -->
+       
+       <!-- transform the flaks back after 1 minute (cause we can not check if no airhips are in range anymore.. but they will transform back back to flak if they are still some) -->
+
+    
+    
+    <!-- 100681 Harlow Harbor -->
+    <!-- 102448 gun from harlow -->
+    <!-- replace if airhsip in range of a 102448 gun -->
+    <ModOp GUID="153263" Type="AddNextSibling">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001033</GUID>
+              <Name>Replace guns from pirates with flak Harlow</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionAlwaysTrue</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                  </Condition>
+                  <ConditionAlwaysTrue />
+                </Values>
+              </TriggerCondition>
+              <SubTriggers>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1054</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1056</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1654</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1655</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1058</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1059</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1060</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1755</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1731</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1732</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1733</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1734</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1735</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1736</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1737</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>102448</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_03_Pirate_Harlow</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>114166</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180023</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionSetObjectGUID</Template>
+                    <Values>
+                      <Action />
+                      <ObjectFilter>
+                        <ObjectGUID>102448</ObjectGUID>
+                        <CheckParticipantID>1</CheckParticipantID>
+                        <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID>
+                      </ObjectFilter>
+                      <ActionSetObjectGUID>
+                        <NewGUID>1500001031</NewGUID>
+                      </ActionSetObjectGUID>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <ExecutionDelay>60000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionSetObjectGUID</Template>
+                                    <Values>
+                                      <Action />
+                                      <ObjectFilter>
+                                        <ObjectGUID>1500001031</ObjectGUID>
+                                        <CheckParticipantID>1</CheckParticipantID>
+                                        <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID>
+                                      </ObjectFilter>
+                                      <ActionSetObjectGUID>
+                                        <NewGUID>102448</NewGUID>
+                                      </ActionSetObjectGUID>
+                                    </Values>
+                                  </Action>
+                                </Item>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+            </Trigger>
+          </Values>
+        </Asset>
+      </ModOp>
+      
+      <!-- Third_party_04_Pirate_LaFortune -->
+      <!-- 100682 harbor, using this for "near"-check should be fine, since guns are directly next to it -->
+      <!-- guns are using guid 102448 , but when we change back to this, the GroundDecal is wrong. -->
+      <!-- So we are changing it back to fitting guid 80038 and the trigger then also works for this -->
+      <ModOp GUID="153263" Type="AddNextSibling">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001030</GUID>
+              <Name>Replace guns from pirates with flak LaFortune</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionAlwaysTrue</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                  </Condition>
+                  <ConditionAlwaysTrue />
+                </Values>
+              </TriggerCondition>
+              <SubTriggers>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1054</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1056</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1654</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1655</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1058</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1059</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1060</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1755</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1731</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1732</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1733</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1734</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1735</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1736</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>1737</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                            <Template>ConditionShipsInRange</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionShipsInRange>
+                                <Range>104</Range>
+                                <TargetObject_sir>100682</TargetObject_sir>
+                                <CheckSpecificTargetOwner>1</CheckSpecificTargetOwner>
+                                <TargetOwnerParticipant>Third_party_04_Pirate_LaFortune</TargetOwnerParticipant>
+                                <SpecifiedShipOrPool>114166</SpecifiedShipOrPool>
+                                <UseSpecificShipGuid>1</UseSpecificShipGuid>
+                                <!-- <CheckSpecificShipOwner>1</CheckSpecificShipOwner> -->
+                                <!-- <UseProcessingParticipantAsShipOwner>1</UseProcessingParticipantAsShipOwner> -->
+                              </ConditionShipsInRange>
+                              <SessionFilter>
+                                <Sessions>
+                                  <Item>
+                                    <Session>180025</Session>
+                                  </Item>
+                                </Sessions>
+                              </SessionFilter>
+                            </Values>
+                          </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionSetObjectGUID</Template>
+                    <Values>
+                      <Action />
+                      <ObjectFilter>
+                        <ObjectGUID>102448</ObjectGUID>
+                        <CheckParticipantID>1</CheckParticipantID>
+                        <ObjectParticipantID>Third_party_04_Pirate_LaFortune</ObjectParticipantID>
+                      </ObjectFilter>
+                      <ActionSetObjectGUID>
+                        <NewGUID>1500001037</NewGUID>
+                      </ActionSetObjectGUID>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionSetObjectGUID</Template>
+                    <Values>
+                      <Action />
+                      <ObjectFilter>
+                        <ObjectGUID>80038</ObjectGUID>
+                        <CheckParticipantID>1</CheckParticipantID>
+                        <ObjectParticipantID>Third_party_04_Pirate_LaFortune</ObjectParticipantID>
+                      </ObjectFilter>
+                      <ActionSetObjectGUID>
+                        <NewGUID>1500001037</NewGUID>
+                      </ActionSetObjectGUID>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <ExecutionDelay>60000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionSetObjectGUID</Template>
+                                    <Values>
+                                      <Action />
+                                      <ObjectFilter>
+                                        <ObjectGUID>1500001037</ObjectGUID>
+                                        <CheckParticipantID>1</CheckParticipantID>
+                                        <ObjectParticipantID>Third_party_04_Pirate_LaFortune</ObjectParticipantID>
+                                      </ObjectFilter>
+                                      <ActionSetObjectGUID>
+                                        <NewGUID>80038</NewGUID>
+                                      </ActionSetObjectGUID>
+                                    </Values>
+                                  </Action>
+                                </Item>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+            </Trigger>
+          </Values>
+        </Asset>
+      </ModOp>
+      
+      
+      <!-- Register the ConditionShipsInRange Triggers. No clue why they don't work without registering (since they should autoregister) -->
+      
+      <ModOp GUID="153271" Type="AddNextSibling">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001032</GUID>
+              <Name>register Flak Harlow</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionIsParticipantInGame</Template>
+                <Values>
+                  <Condition />
+                  <ConditionIsParticipantInGame>
+                    <InGameParticipant>Third_party_03_Pirate_Harlow</InGameParticipant>
+                  </ConditionIsParticipantInGame>
+                </Values>
+              </TriggerCondition>
+              <SubTriggers>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionIsDLCActive</Template>
+                          <Values>
+                              <Condition />
+                              <ConditionIsDLCActive>
+                                <DLCAssetList>
+                                  <Item>
+                                    <DLCAsset>24962</DLCAsset>
+                                  </Item>
+                                </DLCAssetList>
+                              </ConditionIsDLCActive>
+                              <ConditionPropsNegatable />
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+              <TriggerActions>
+                <Item>
+                    <TriggerAction>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500001033</TriggerAsset>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                  
+                  <!-- testing, spawn some airships -->
+                  <!-- <Item> -->
+                    <!-- <TriggerAction> -->
+                      <!-- <Template>ActionSpawnObjects</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Action /> -->
+                        <!-- <ActionSpawnObjects> -->
+                          <!-- <SpawnGUID>1655</SpawnGUID> -->
+                          <!-- <Amount>2</Amount> -->
+                          <!-- <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant> -->
+                        <!-- </ActionSpawnObjects> -->
+                        <!-- <SpawnArea> -->
+                          <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                          <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+                        <!-- </SpawnArea> -->
+                        <!-- <SessionFilter> -->
+                          <!-- <Sessions> -->
+                            <!-- <Item> -->
+                              <!-- <Session>180023</Session> -->
+                            <!-- </Item> -->
+                          <!-- </Sessions> -->
+                        <!-- </SessionFilter> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerAction> -->
+                  <!-- </Item> -->
+                  
+              </TriggerActions>
+            </Trigger>
+          </Values>
+        </Asset>
+      </ModOp>
+      
+      
+      <ModOp GUID="153271" Type="AddNextSibling">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001034</GUID>
+              <Name>register Flak LaFortune</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionIsParticipantInGame</Template>
+                <Values>
+                  <Condition />
+                  <ConditionIsParticipantInGame>
+                    <InGameParticipant>Third_party_04_Pirate_LaFortune</InGameParticipant>
+                  </ConditionIsParticipantInGame>
+                </Values>
+              </TriggerCondition>
+              <SubTriggers>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionIsDLCActive</Template>
+                          <Values>
+                              <Condition />
+                              <ConditionIsDLCActive>
+                                <DLCAssetList>
+                                  <Item>
+                                    <DLCAsset>24962</DLCAsset>
+                                  </Item>
+                                </DLCAssetList>
+                              </ConditionIsDLCActive>
+                              <ConditionPropsNegatable />
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+              <TriggerActions>
+                <Item>
+                    <TriggerAction>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500001030</TriggerAsset>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                  
+                  <!-- testing, spawn some airships -->
+                  <!-- <Item> -->
+                    <!-- <TriggerAction> -->
+                      <!-- <Template>ActionSpawnObjects</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Action /> -->
+                        <!-- <ActionSpawnObjects> -->
+                          <!-- <SpawnGUID>1655</SpawnGUID> -->
+                          <!-- <Amount>2</Amount> -->
+                          <!-- <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant> -->
+                        <!-- </ActionSpawnObjects> -->
+                        <!-- <SpawnArea> -->
+                          <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                          <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+                        <!-- </SpawnArea> -->
+                        <!-- <SessionFilter> -->
+                          <!-- <Sessions> -->
+                            <!-- <Item> -->
+                              <!-- <Session>180025</Session> -->
+                            <!-- </Item> -->
+                          <!-- </Sessions> -->
+                        <!-- </SessionFilter> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerAction> -->
+                  <!-- </Item> -->
+                  
+              </TriggerActions>
+            </Trigger>
+          </Values>
+        </Asset>
+      </ModOp>
+      
+      
+
+
+
+</ModOps>
