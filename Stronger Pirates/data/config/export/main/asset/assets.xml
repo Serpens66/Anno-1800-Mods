@@ -1,7 +1,7 @@
 
 <ModOps>
 
-     <!-- verwendet Serps GUIDS von 1500000030 bis 1500000032 (bis 1500000040 fuer diesen mod freigehalten) -->
+     <!-- verwendet Serps GUIDS von 1500000030 bis 1500000036 (bis 1500000039 fuer diesen mod freigehalten) -->
 
   <!-- reduce the time of caese fire and nonattack agreement -->
   <!-- the RequestCeaseFire cooldown in Pirates is 60 min, so this means you have to fight at least 15 min -->
@@ -11,6 +11,9 @@
   <ModOp Type="merge" GUID="140054" Path="/Values/DiplomacyConfig/NonAttack/TimeLength/Default">
     <Length>5400000</Length>
   </ModOp>
+  
+  
+
   
   <!-- increase the range of harbor of Archibald and Sarmento, because they also have canons and pirates should avaid them, but priate ships only care for the harbor range -->
   <ModOp Type="merge" GUID='100680,100683' Path="/Values/Attacker">
@@ -74,21 +77,17 @@
 
  <!--  Anne Harlow's Harbour modified -->
   <ModOp Type="merge" GUID='100681' Path="/Values">
-    <!-- <Values> -->
         <Attackable>
           <MaximumHitPoints>30000</MaximumHitPoints>						  
           <MoralePower>500</MoralePower>                          
         </Attackable>    
-    <!-- </Values> -->
   </ModOp>
 <!--  Jean La Fortune Harbour modified -->
   <ModOp Type="merge" GUID='100682' Path="/Values">
-    <!-- <Values> -->
          <Attackable>
           <MaximumHitPoints>30000</MaximumHitPoints>						  
           <MoralePower>500</MoralePower>                         
          </Attackable>
-    <!-- </Values> -->
   </ModOp>
 <!-- All harbor_04 (Puckle Gun) - Pirates modified -->						
    <ModOp Type="merge" GUID='102448' Path="/Values">
@@ -100,11 +99,9 @@
         <Attacker>
           <BaseDamage>30</BaseDamage>                     
         </Attacker>
-    <!-- </Values> -->
   </ModOp>
   <!-- All harbor_05 (Cannon Tower) - Pirates modified -->
 <ModOp Type="merge" GUID='102449' Path="/Values">
-    <!-- <Values> -->
         <Attackable>
           <MaximumHitPoints>8000</MaximumHitPoints>
           <SelfHealPerHealTick>10</SelfHealPerHealTick>
@@ -112,11 +109,9 @@
         <Attacker>
           <BaseDamage>200</BaseDamage>                          
         </Attacker>
-    <!-- </Values> -->
   </ModOp>
      <!-- Alle harbor_06 (Monster Gun) - Pirates modified -->
  <ModOp Type="merge" GUID='102450' Path="/Values">
-    <!-- <Values>						 -->
         <Attackable>
           <MaximumHitPoints>15000</MaximumHitPoints>
           <SelfHealPerHealTick>10</SelfHealPerHealTick>
@@ -124,7 +119,6 @@
         <Attacker>
           <BaseDamage>1500</BaseDamage>                         
         </Attacker>
-    <!-- </Values> -->
   </ModOp> 
   
     
@@ -174,11 +168,65 @@
     </ModOp>
 
     
+    <!-- Add a pirate flamethrower monitor (same as original, but halfed CraftingTime from 900000) -->
+    <ModOp Type="AddNextSibling" GUID='968'>
+      <Asset>
+        <BaseAssetGUID>968</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500000031</GUID>
+            <Name>Pirate Monitor Crocodile (Military)</Name>
+          </Standard>
+          <Attackable>
+            <SelfHealPerHealTick>3</SelfHealPerHealTick>
+          </Attackable>
+          <Craftable>
+            <CraftingTime>450000</CraftingTime>
+          </Craftable>
+        </Values>
+      </Asset>
+    </ModOp>
+    <!-- Pirate battle cruiser -->
+    <ModOp Type="AddNextSibling" GUID='100442'>
+      <Asset>
+        <BaseAssetGUID>100442</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500000032</GUID>
+            <Name>Pirate Battle Cruiser (Military)</Name>
+          </Standard>
+          <Attackable>
+            <SelfHealPerHealTick>3</SelfHealPerHealTick>
+          </Attackable>
+          <Craftable>
+            <CraftingTime>450000</CraftingTime>
+          </Craftable>
+        </Values>
+      </Asset>
+    </ModOp>
+    <!-- add them to the list of steam ships so they are affected by items and so on -->
+    <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs">                                      
+      <Item>
+        <GUID>1500000031</GUID>
+      </Item>
+      <Item>
+        <GUID>1500000032</GUID>
+      </Item>
+    </ModOp>
+    <!-- list of all pirate ships -->
+    <ModOp Type="add" GUID='700138' Path="/Values/PlayerCounterContextPool/Contexts">                                      
+      <Item>
+        <Asset>1500000031</Asset>
+      </Item>
+      <Item>
+        <Asset>1500000032</Asset>
+      </Item>
+    </ModOp>
 
     
     <!-- dont use merge here, because incompatible with "Item"-like stucture and we want to replace WarFleet in most cases, not change single entries -->
     <!-- unfortunately the pirates will build the ships in the order and number of this list, so eg. they won't build the second ship of list, until the target numer ob first ship is reached. Adding a ship multiple times to the list has no effect -->
-    <ModOp Type="add" GUID='73' Path="/Values/Trader/Progression/EarlyGame">                                      
+    <ModOp Type="add" GUID='73' Path="/Values/Trader/Progression/EarlyGame" Condition="!~/Values/Trader/Progression/EarlyGame/WarFleet">                                      
         <WarFleet>
             <Item>
                 <ShipAsset>102429</ShipAsset>
@@ -287,267 +335,23 @@
     </ModOp>
 	
     
-    
-    <!-- Strategy -->
-    
-    <!-- These attacks are coordinated with multiple ships, not just the random "pirate ships attacks all tradeships nearby" -->
-    <!-- MilitaryStrengthRatio is a percentage of hoch much stronger the priate fleet should be than their target. vanilla is 90, so the priates also will attack a bit stronger targets -->
-    <!-- the skipchance in the targetprios is alawys checked, so if it is 100 they will never do it, and 0 alawys and 50 they will sometimes do it sometimes not.  --> 
-    <!--     It has nothing to do with this "SkipinHarbor" value, harbor is always skipped when this is set to 1, although for whatever reason pirate still will be sometimes in harbor range -->
-    <ModOp Type="merge" GUID='73,76' Path="/Values/MilitaryAI/Attack">                    
-      <!-- <Attack> -->
-        <MilitaryStrengthRatio>95</MilitaryStrengthRatio>
-        <AttackInterval>900000</AttackInterval> <!-- from 1500000 -->
-      <!-- </Attack> -->
-    </ModOp>
-    
-    
-    
-	<!-- <ModOp Type="merge" GUID='73,76' Path="/Values/MilitaryAI/Defend">                     -->
-       <!-- <Defend> -->
-        <!-- <MinStrengthRatio>500</MinStrengthRatio> -->
-      <!-- </Defend> -->
-    <!-- </ModOp> -->
-	<!-- <ModOp Type="merge" GUID='73,76' Path="/Values/MilitaryAI/SquadLogic"> -->
-          <!-- <SquadLogic> -->
-            <!-- <FleeStrengthRatio>80</FleeStrengthRatio> -->
-            <!-- <TargetPriorities> -->
-              <!-- <Item> -->
-                <!-- <Range>60</Range> -->
-                <!-- <MinStrengthRatio>80</MinStrengthRatio> -->
-              <!-- </Item> -->
-            <!-- </TargetPriorities> -->
-            <!-- <ObservationRange>80</ObservationRange> -->
-          <!-- </SquadLogic> -->
-    <!-- </ModOp>	 -->
-	<!-- <ModOp Type="merge" GUID='73,76' Path="/Values/MilitaryAI/SquadPriorities">                   -->
-          <!-- <SquadPriorities> -->
-            <!-- <Commands> -->
-              <!-- <DefendAlly> -->
-                <!-- <Priority>9</Priority> -->
-              <!-- </DefendAlly> -->
-            <!-- </Commands> -->
-          <!-- </SquadPriorities> -->
-    <!-- </ModOp> -->
-    
-    <!-- no clue what this does -->
-    <!-- <ModOp Type="replace" GUID='73,76' Path="/Values/Interaction/WorkingConditionsEvaluationTime">                     -->
-        <!-- <WorkingConditionsEvaluationTime>500000</WorkingConditionsEvaluationTime> -->
-    <!-- </ModOp>   -->
-    
-    
-    <!-- Comeback -->
-    <!-- 1 hour instead of 2.5 -->
-	<ModOp Type="merge" GUID='73,76' Path="/Values/Pirate">
-        <ComebackAfterKontorDestruction>3600000</ComebackAfterKontorDestruction>
-    </ModOp>
-    
-    <!-- 20 min, instead of 30, to defeat the pirate comeback fleat, before they rebuild their island, timer starts when the combeback fleet reaches the pirate island -->
-    <ModOp Type="merge" GUID="153264,153279,153273,153280" Path="/Values/Quest">
-      <QuestTimeLimit>1200000</QuestTimeLimit>
-    </ModOp>
-    
-    <!-- rebuild island after war (if not fully destroyed) within 5 minutes -->
-    <ModOp Type="merge" GUID='73,76' Path="/Values/Pirate">
-        <RebuildAfterIslandWarTimer>300000</RebuildAfterIslandWarTimer>
-    </ModOp>
-    
-    <!-- 
-    153262 -> basisquest, die wohl immer dabei sein muss, iwie zusmmenhängend mit 152280 und 153264. aber einfach 153262 immer dabei haben und gut ist
-    153233 1 Frigate
-    153236 1 Linienschiff
-    153237 2 Monitor
-    153266 3 Frigaten 
-    153269 5 Frigatten
-    153270 3 Linienschiffe
-    153271 3 Monitor
-    
-    macht eig nicht viel sinn die comeback quest vom gamestatus abhängig zu machen, da die Festung der Piraten immer gleich stark ist.
-    NUr der Schiffstyp ist technologisch halbwegs sinnvoll. Dh im EarlyGame sollte die Comeback flotte vllt auch 50 Kanonenbooten oderso bestehen (weil man soviele selbst gebraucht hätte,um die piraten erst platt zu machen)
-    dann 20 Frigatten, 10 Linienschiffe usw. Die gesamtsträrke bleibt dabei immer gleich ,ungefähr die Stärke, die man brauchte die Basis zu zerstören.
-    
-    berücksichtigen, dass ich alle dampfkriegsschiffe (hier monitor) allgemein stärker machen will, ca. doppelt so stark
-    -->
-    
-    <ModOp Type="replace" GUID='73' Path="/Values/Pirate/ComebackQuests/LateMidGame">
-        <LateMidGame>
-          <PossibleQuests>
-            <Item>
-              <GUID>153236</GUID>
-            </Item>
-            <Item>
-              <GUID>153262</GUID>
-            </Item>
-          </PossibleQuests>
-        </LateMidGame>
-    </ModOp>
-    <ModOp Type="replace" GUID='76' Path="/Values/Pirate/ComebackQuests/LateMidGame">
-        <LateMidGame>
-          <PossibleQuests>
-            <Item>
-              <GUID>153240</GUID>
-            </Item>
-            <Item>
-              <GUID>153272</GUID>
-            </Item>
-          </PossibleQuests>
-        </LateMidGame>
-    </ModOp>
-    
-	<ModOp Type="merge" GUID='153266,153274' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102430']">
-        <Amount>6</Amount> <!-- original 3 EarlyGame/EarlyMidGame-->
-    </ModOp>
-	<ModOp Type="merge" GUID='153269,153275' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102430']">
-        <Amount>14</Amount> <!-- original 5 MidGame -->
-    </ModOp>
-    <ModOp Type="merge" GUID='153236,153240' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102431']">
-        <Amount>10</Amount> <!-- original 1, seems this is not used by the game, so we will use it to replace LateMidGame, so it is different from LateGame -->
-    </ModOp>
-	<ModOp Type="merge" GUID='153270,153276' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102431']">
-        <Amount>10</Amount> <!-- original 3 LateGame, adding 8 monitors below -->
-    </ModOp>
-	<ModOp Type="merge" GUID='153271,153277' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102432']">
-        <Amount>15</Amount> <!-- Piraten-​Monitor original 3 EndGame, adding 12 ship of line below -->
-    </ModOp>
-    
-    
-    <!-- add more ship types LateGame/EndGame to the comeback quest. Unfortunately each fleet is spawned at another random location. -->
-    <ModOp Type="add" GUID='153271,153277' Path="/Values/Trigger/TriggerActions">
-        <Item>
-          <TriggerAction>
-            <Template>ActionSpawnObjects</Template>
-            <Values>
-              <Action />
-              <ActionSpawnObjects>
-                <SpawnGUID>102431</SpawnGUID>
-                <Amount>12</Amount>
-                <Owner>General_Enemy</Owner>
-                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
-                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
-                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
-              </ActionSpawnObjects>
-              <SpawnArea>
-                <DistanceToBorder>Near</DistanceToBorder>
-                <DistanceToIsland>Far</DistanceToIsland>
-              </SpawnArea>
-              <SessionFilter>
-                <Sessions>
-                  <Item>
-                    <Session>180023</Session>
-                  </Item>
-                </Sessions>
-              </SessionFilter>
-            </Values>
-          </TriggerAction>
-        </Item>
-        <Item>
-          <TriggerAction>
-            <Template>ActionSpawnObjects</Template>
-            <Values>
-              <Action />
-              <ActionSpawnObjects>
-                <SpawnGUID>1500000031</SpawnGUID>
-                <Amount>6</Amount>
-                <Owner>General_Enemy</Owner>
-                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
-                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
-                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
-              </ActionSpawnObjects>
-              <SpawnArea>
-                <DistanceToBorder>Near</DistanceToBorder>
-                <DistanceToIsland>Far</DistanceToIsland>
-              </SpawnArea>
-              <SessionFilter>
-                <Sessions>
-                  <Item>
-                    <Session>180023</Session>
-                  </Item>
-                </Sessions>
-              </SessionFilter>
-            </Values>
-          </TriggerAction>
-        </Item>
-        <Item>
-          <TriggerAction>
-            <Template>ActionMoveObject</Template>
-            <Values>
-              <Action />
-              <ObjectFilter>
-                <ObjectLabel>PirateHarlowResettleGroup</ObjectLabel>
-              </ObjectFilter>
-              <ObjectTargetFilter>
-                <TargetGUID>100681</TargetGUID>
-              </ObjectTargetFilter>
-              <ActionMoveObject>
-                <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
-                <UseDangerLayer>1</UseDangerLayer>
-              </ActionMoveObject>
-            </Values>
-          </TriggerAction>
-        </Item>
-    </ModOp>
-    <ModOp Type="add" GUID='153270,153276' Path="/Values/Trigger/TriggerActions">
-        <Item>
-          <TriggerAction>
-            <Template>ActionSpawnObjects</Template>
-            <Values>
-              <Action />
-              <ActionSpawnObjects>
-                <SpawnGUID>102432</SpawnGUID>
-                <Amount>8</Amount>
-                <Owner>General_Enemy</Owner>
-                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
-                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
-                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
-              </ActionSpawnObjects>
-              <SpawnArea>
-                <DistanceToBorder>Near</DistanceToBorder>
-                <DistanceToIsland>Far</DistanceToIsland>
-              </SpawnArea>
-              <SessionFilter>
-                <Sessions>
-                  <Item>
-                    <Session>180023</Session>
-                  </Item>
-                </Sessions>
-              </SessionFilter>
-            </Values>
-          </TriggerAction>
-        </Item>
-        <Item>
-          <TriggerAction>
-            <Template>ActionMoveObject</Template>
-            <Values>
-              <Action />
-              <ObjectFilter>
-                <ObjectLabel>PirateHarlowResettleGroup</ObjectLabel>
-              </ObjectFilter>
-              <ObjectTargetFilter>
-                <TargetGUID>100681</TargetGUID>
-              </ObjectTargetFilter>
-              <ActionMoveObject>
-                <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
-                <UseDangerLayer>1</UseDangerLayer>
-              </ActionMoveObject>
-            </Values>
-          </TriggerAction>
-        </Item>
-    </ModOp>
-    
-    
+
     
       <!-- Make Pirates demand more money (gifts and counterproposals , eg when you ask for peace) Diplomacy/GiftBalancing 
       (see Combat Overhaul AI assets.xml for explanation what value does what, only "receivesmall" is used, not medium or big) -->
       <!-- While it is possible to change the Base-Amount, it does not scale on the game progress for pirates, because they have no progress -->
       <!-- I reported this as bug at ubisoft, but it is not likely they will fix it (currently GU 16.1) -->
-      <!-- If this gets fixed, I may test again what BaseValue suits best for early and endgame -->
+      <!-- If this gets fixed, I may test again what BaseValue suits best for early and endgame (GU17, not fixed) -->
+      <!-- We dont change counterProposal money request, because it still should be possible to pay this in EarlyGame (not scale bug) -->
+      <!-- so you can always request CeaseFire/Peace cheap, but instead we will make the pirates ask for more money from time to time, to not cancel current treaty, if you are weaker -->
       <ModOp Type="merge" GUID='73,76' Path="/Values/Diplomacy/GiftBalancing/counterProposal">
-          <BaseValue>1000</BaseValue> <!-- original 300, a value of 1000 results in max costs of ~66k with no reputation and less military strength, Ac3s: changes player money, requesting cease-fire/peace/trade/alliance from AI -->
+          <BaseValue>300</BaseValue> <!-- original 300, a value of 1000 results in max costs of ~66k with no reputation and less military strength, Ac3s: changes player money, requesting cease-fire/peace/trade/alliance from AI -->
           <IncreasePerLevel>7</IncreasePerLevel>
       </ModOp>
-      <!-- changes money demand for treaty cancelation and war threats from AI, but I see no effect ingame?! -->
+      <!-- changes money demand for treaty cancelation and war threats from AI, but I see no effect ingame?! maybe also buggy for pirates... -->
+      <!-- sees bugged, so we can not adjust how much pirates will request for no-treaty-cancelation. I will try to solve this via a Quest or so.. -->
       <ModOp Type="merge" GUID='73,76' Path="/Values/Diplomacy/GiftBalancing/receivePayment">
-          <BaseValue>1000</BaseValue> <!-- original 250 -->
+          <BaseValue>500</BaseValue> <!-- original 250 -->
           <IncreasePerLevel>7</IncreasePerLevel>
       </ModOp>
       
@@ -590,6 +394,7 @@
     <!--  Zb. kleines/mitteleres/großes Geschenk. Oder auch ThreatCancelAlliance/ThreatWar -->
     <!-- TriggerChance: Chance in Prozent dies auszuführen jedesmal wenn TriggerType erfüllt ist -->
     <!-- AddMoney 0 oder 1, ob Pirat dafür Geld verlangen soll -->
+    <!-- leider hat keiner der Werte in GiftBalancing Einfluss auf die Höhe der Summe, die der Pirat beim GenericTimer verlangt, auch nicht receivePayment wie es eig sein sollte. -->
     <!-- CheckMilitaryStrength -->
     <!--   Rechnung: if Piratenstrength * 1/abs(Wert) <= Spielerstrength -->
     <!--   wobei eine negative Zahl in der Gleichung "<=" und eine positive Zahl ">=" bedeutet. -->
@@ -657,241 +462,106 @@
       
       
       
-      
-    <!-- Add a pirate flamethrower monitor (same as original, but halfed CraftingTime from 900000) -->
-    <ModOp Type="AddNextSibling" GUID='968'>
-      <Asset>
-        <BaseAssetGUID>968</BaseAssetGUID>
-        <Values>
-          <Standard>
-            <GUID>1500000031</GUID>
-            <Name>Pirate Monitor Crocodile (Military)</Name>
-          </Standard>
-          <Attackable>
-            <SelfHealPerHealTick>3</SelfHealPerHealTick>
-          </Attackable>
-          <Craftable>
-            <CraftingTime>450000</CraftingTime>
-          </Craftable>
-        </Values>
-      </Asset>
-    </ModOp>
-    <!-- Pirate battle cruiser -->
-    <ModOp Type="AddNextSibling" GUID='100442'>
-      <Asset>
-        <BaseAssetGUID>100442</BaseAssetGUID>
-        <Values>
-          <Standard>
-            <GUID>1500000032</GUID>
-            <Name>Pirate Battle Cruiser (Military)</Name>
-          </Standard>
-          <Attackable>
-            <SelfHealPerHealTick>3</SelfHealPerHealTick>
-          </Attackable>
-          <Craftable>
-            <CraftingTime>450000</CraftingTime>
-          </Craftable>
-        </Values>
-      </Asset>
-    </ModOp>
-    <!-- add them to the list of steam ships so they are affected by items and so on -->
-    <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs">                                      
-      <Item>
-        <GUID>1500000031</GUID>
-      </Item>
-      <Item>
-        <GUID>1500000032</GUID>
-      </Item>
-    </ModOp>
-    <!-- list of all pirate ships -->
-    <ModOp Type="add" GUID='700138' Path="/Values/PlayerCounterContextPool/Contexts">                                      
-      <Item>
-        <Asset>1500000031</Asset>
-      </Item>
-      <Item>
-        <Asset>1500000032</Asset>
-      </Item>
-    </ModOp>
-      
-      
-      <!-- spawn some pirate ships every 30 minutes, if pirate has 0 of this kind currently, to make sure pirate always have some variety of all ship kinds:
-      Problem with this trigger:
-      we should spawn at least the amount of ships that is checked, eg check if there are atleast 4 ships and if not spawn 4
-        if we spawn less, it gets executed multiple times in a row, because the triggers are executed for each human player (up to 4) and not for the pirates directly
-      And when the needed amount gets less, it might get executed directly wihtout a delay for another human player, meaning we have up to 4 times the delay timer
-      but this is only based on number of human players and if we have 4 players it might be ok to spawn the pirate ships 4 times as often
-      
-      Outcommented because I have no clue how "IslandHealth" works or how else we can make sure the priate is currently not destroyed..
-      
-      <ModOp Type="AddNextSibling" GUID='141003'>
-        <Asset>
-          <Template>Trigger</Template>
-          <Values>
-            <Standard>
-              <GUID>1500000033</GUID>
-              <Name>Spawn Pirate Ships 1</Name>
-            </Standard>
-            <Trigger>
-              <TriggerCondition>
-                <Template>ConditionIsParticipantInGame</Template>
-                <Values>
-                  
-                  condition and subtrigger condition must be true the same time: Linear
-                  
-                  <Condition>
-                    <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
-                  </Condition>
-                  
-                  if pirate is enabled (does not check if destroyed or not unfortunately)
-                  
-                  <ConditionIsParticipantInGame>
-                    <InGameParticipant>Third_party_03_Pirate_Harlow</InGameParticipant>
-                  </ConditionIsParticipantInGame>
-                </Values>
-              </TriggerCondition>
-              <SubTriggers>
-                <Item>
-                  <SubTrigger>
-                    <Template>AutoCreateTrigger</Template>
-                    <Values>
-                      <Trigger>
-                        <TriggerCondition>
-                          <Template>ConditionShipsOwnedInSession</Template>
-                          <Values>
-                            <Condition />
-                            <ConditionShipsOwnedInSession>
-                              <ShipSession>180023</ShipSession>
-                              <ShipTarget>102430</ShipTarget>
-                              <ShipComparison>LessThan</ShipComparison>
-                              <ShipOwner>Third_party_03_Pirate_Harlow</ShipOwner>
-                              <ShipAmount>5</ShipAmount>
-                            </ConditionShipsOwnedInSession>
-                          </Values>
-                        </TriggerCondition>
-                      </Trigger>
-                    </Values>
-                  </SubTrigger>
-                </Item>
-                
-                make sure the pirate dont have their island destroyed (check for IslandSettled is still true even after pirate island destroyed, so health check is needed) and IslandHealth
-                It seems the CounterAmount here does not check for health, but for damage in percent, because "AtMost 1" does work for full health island 
-                But also low and damged island is true this way... So really no clue what this is checking
-                
-                <Item>
-                  <SubTrigger>
-                    <Template>AutoCreateTrigger</Template>
-                    <Values>
-                      <Trigger>
-                        <TriggerCondition>
-                          <Template>ConditionPlayerCounter</Template>
-                          <Values>
-                            <Condition />
-                            <ConditionPlayerCounter>
-                              <PlayerCounter>IslandHealth</PlayerCounter>
-                              <ComparisonOp>AtMost</ComparisonOp>
-                              <CounterAmount>1</CounterAmount>
-                              <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                              <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
-                            </ConditionPlayerCounter>
-                          </Values>
-                        </TriggerCondition>
-                      </Trigger>
-                    </Values>
-                  </SubTrigger>
-                </Item>
-              </SubTriggers>
-              <TriggerActions>
-                <Item>
-                  <TriggerAction>
-                    <Template>ActionSpawnObjects</Template>
-                    <Values>
-                      <Action />
-                      <ActionSpawnObjects>
-                        <SpawnGUID>102430</SpawnGUID>
-                        <Amount>5</Amount>
-                        <Owner>Third_party_03_Pirate_Harlow</Owner>
-                        <SpawnObjectGroupLabel>PirateHarlowReinforcement1</SpawnObjectGroupLabel> this adds the ships to this group, it does not replace the group luckily
-                      </ActionSpawnObjects>
-                      <SpawnArea>
-                        <DistanceToBorder>Near</DistanceToBorder>
-                        <DistanceToIsland>Far</DistanceToIsland>
-                      </SpawnArea>
-                      <SessionFilter>
-                        <Sessions>
-                          <Item>
-                            <Session>180023</Session>
-                          </Item>
-                        </Sessions>
-                      </SessionFilter>
-                    </Values>
-                  </TriggerAction>
-                </Item>
-                
-                Command the ship to move to pirate harbor first, but do not ignore distractions, because otherwise they might stand there doing nothing until the next AttackInterval (~15 minutes)
-                downside is that the ObjectLabel will most likely persist, so if we spawn 1 ship with that label and some time later another ship with same label, both will be in the same group and a command to the group will command both the old and the new ship.
-                but if it is only a single ship this does not matter and maybe it is also ok to command multiple ships back to harbor from time to time
-                Reason against this movement command: camping the priate harbor is then again a valid strategy...
-                if we set IgnoreEveryDistractionDuringMove to 0, they do follow nearby ships to destry them, but afterwards they again stand still until they are commaned for an attack...
-                so better use IgnoreEveryDistractionDuringMove=1 so they at least guard the harbor in that time.
-                
-                <Item>  
-                  <TriggerAction>
-                    <Template>ActionMoveObject</Template>
-                    <Values>
-                      <Action />
-                      <ObjectFilter>
-                        <ObjectLabel>PirateHarlowReinforcement1</ObjectLabel>
-                      </ObjectFilter>
-                      <ObjectTargetFilter>
-                        <TargetGUID>100681</TargetGUID>
-                      </ObjectTargetFilter>
-                      <ActionMoveObject>
-                        <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
-                        <UseDangerLayer>1</UseDangerLayer>
-                      </ActionMoveObject>
-                    </Values>
-                  </TriggerAction>
-                </Item>
-                <Item>
-                  <TriggerAction>
-                    <Template>ActionDelayedActions</Template>
-                    <Values>
-                      <Action />
-                      <ActionDelayedActions>
-                        <ExecutionDelay>1800000</ExecutionDelay>
-                        <ExecutionDelay>60000</ExecutionDelay>
-                        <DelayedActions>
-                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                          <Values>
-                            <ActionList>
-                              <Actions>
-                                <Item>
-                                  <Action>
-                                    <Template>ActionResetTrigger</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionResetTrigger />
-                                    </Values>
-                                  </Action>
-                                </Item>
-                              </Actions>
-                            </ActionList>
-                          </Values>
-                        </DelayedActions>
-                      </ActionDelayedActions>
-                    </Values>
-                  </TriggerAction>
-                </Item>
-              </TriggerActions>
-            </Trigger>
-            <TriggerSetup>
-                <UsedBySecondParties>0</UsedBySecondParties>
-            </TriggerSetup>
-          </Values>
-        </Asset>
-    </ModOp>
+      <!-- Strategy -->
     
-    -->
+    <!-- These attacks are coordinated with multiple ships, not just the random "pirate ships attacks all tradeships nearby" -->
+    <!-- MilitaryStrengthRatio is a percentage of how much stronger the priate fleet should be than their target. vanilla is 90, so the priates also will attack a bit stronger targets -->
+    <!-- the skipchance in the targetprios is alawys checked, so if it is 100 they will never do it, and 0 alawys and 50 they will sometimes do it sometimes not.  --> 
+    <!--     It has nothing to do with this "SkipinHarbor" value, harbor is always skipped when this is set to 1, although for whatever reason pirate still will be sometimes in harbor range -->
+    <ModOp Type="merge" GUID='73,76' Path="/Values/MilitaryAI/Attack">                    
+        <MilitaryStrengthRatio>95</MilitaryStrengthRatio>
+        <AttackInterval>900000</AttackInterval> <!-- from 1500000 -->
+    </ModOp>
+      
+      <!-- Values TESTING: -->
+      <!-- ####################### -->
+      
+        <!-- SquadLogic is normal drive around behaviour of single ships -->
+        <!-- add that they should attack warships, if pirates are stronger,  -->
+        <!-- in vanilla they flee or ignore it even if stronger, which causes losses -->
+        
+        <!-- FleeStrengthRatio 90 means the ships will flee if their strenght is 90% or less than the others -->
+        <!-- I think MinStrengthRatio and FleeStrengthRatio should be identical or at least close to each other -->
+        <!-- because when it is eg 60 and 90, everything between will make the pirate ships ignore other ships -->
+        <!-- and ignoring ships that are shooting and hunting at you is not a good idea -->
+        
+        <!-- aber ich fürchte wenn die werte gleich hoch/nah sind, dann flieht der pirat schon nach dem ersten schuss, kann das sien? -->
+        <!-- jop.. -->
+        <!-- also aufjedenfall nicht 99 und 100 setzen.  -->
+        <!-- sondern vllt 80 und 81, damit es bei gleichstarken schiffen nicht direkt nach einem schuss zum fliehen kommt. -->
+        <!-- Leider wirkt sich FleeStrengthRatio auf den PreCombat und den Kampf selbst aus.. -->
+             
+         <!-- Die Strenght wird vor der Begegnung anhand vom MilitaryShipPoints Wert des/der Schiffe bewertet. -->
+         <!-- Im Kampf wenn ein schiff lebenspunkte verliert, wird für die FleeStrengthRatio offenbar auch die Lebenspunkte herangezeogen, -->
+         <!-- möglicherweise aber nur prozentual? Denn ein Piratenschiff mit demselben MilitaryShipPoints Wert aber viel mehr Lebenspunkten, -->
+         <!-- flieht dennoch vor demgleichen MilitaryShipPoints wenn FleeStrengthRatio 101 ist. -->
+         <!-- Aber wenn beide schiffe exakt gleiche werte haben und wir FleeStrengthRatio auf 100 setzen, das piratenschiff also nicht flieht, -->
+         <!-- fängt es sofort an zu fliehen, sobald es auch nur einen schaden bekommen hat. -->
+
+        <!-- According to my tests, the health is only considered percentual. So if both ships have all the same 
+        values (also same MilitaryShipPoints), but the max health from one is 2.000 and the other is 30.000 and
+        we set MinStrengthRatio to 99 and FleeStrengthRatio to 98, the 30.000 health pirateship 
+        will attack my 2.000 health ship, but again as soon as the pirate ship has percentual less health 
+        than mine ship, it starts to flee. -->
+        <!-- - -->
+        <!-- This shows that it is important to always adjust the MilitaryShipPoints value, if you change combat values of ships, so the AI is able to correctly consider the strenght -->
+        
+        <!-- testen: 80 zu 81 oder 60 zu 61 -->
+        
+        <!-- Eventuell wirkt sich FleeStrengthRatio auch auf Kämpfe mit mehreren Schiffen, ausgelöst durch Attack aus, da wäre 80% evlt zu früh fliehen.. allerdings haben piraten keine SquadLogic bzgl warships definiert, was die Vermutung unwahrscheinlich macht  -->
+        
+        <ModOp Type="merge" GUID='73,76' Path="/Values/MilitaryAI/SquadLogic">
+             <FleeStrengthRatio>60</FleeStrengthRatio>
+             <ObservationRange>120</ObservationRange>
+        </ModOp>	
+        <ModOp Type="add" GUID='73,76' Path="/Values/MilitaryAI/SquadLogic/TargetPriorities">
+            <Item>
+                <Targets>TradeShip;WarShip</Targets>
+                <Range>100</Range>
+                <MinStrengthRatio>61</MinStrengthRatio>
+                <Conditions>
+                  <Item>
+                    <Condition>IsWeaker</Condition>
+                  </Item>
+                </Conditions>
+                <SkipTargetWhenInHarbourArea>1</SkipTargetWhenInHarbourArea>
+              </Item>
+        </ModOp>
+        <ModOp Type="add" GUID='73,76' Path="/Values/MilitaryAI/SquadLogic/TargetPriorities">
+            <Item>
+                <Targets>TradeShip;WarShip</Targets>
+                <Range>90</Range>
+                <MinStrengthRatio>61</MinStrengthRatio>
+                <Conditions>
+                  <Item>
+                    <Condition>IsNearer</Condition>
+                  </Item>
+                </Conditions>
+                <SkipTargetWhenInHarbourArea>1</SkipTargetWhenInHarbourArea>
+              </Item>
+        </ModOp>
+        <!-- LowHitpoints -->
+        <ModOp Type="merge" GUID='73,76' Path="/Values/MilitaryAI/SquadLogic/TargetPriorities/Item[1]">
+            <Targets>WarShip;TradeShip</Targets>
+            <MinStrengthRatio>61</MinStrengthRatio>
+        </ModOp>
+        
+        
+      <!-- ####################### -->
+      
+      
+      
+    
+      
+      
+      
+    <Include File="/data/config/export/main/asset/ComeBack.include.xml" />
+    
+    <!-- spawn 1 pirate ship every x minutes, if pirate has less than 2 of this kind currently, to make sure pirate always have some variety of all ship kinds: -->
+    <!-- extra file, because the trigger is really huge... -->
+    <Include File="/data/config/export/main/asset/SpawnShips.include.xml" />
+    
+    <Include File="/data/config/export/main/asset/CeaseFireDiscover.include.xml" />
       
 
 

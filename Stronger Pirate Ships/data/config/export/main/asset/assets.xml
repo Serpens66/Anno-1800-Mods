@@ -10,7 +10,7 @@
      <!-- MilitaryShipPoints shows the AI how strong a ship is, so we will multiply this also with 3 -->
 
      
-     <!-- dont know what IgnoreDamageFactorUpgrade in VehicleUpgrade does, I see no damage reduction, maybe it is used to reduce vulnerability? -->
+     <!--  IgnoreDamageFactorUpgrade in VehicleUpgrade is regarding speed when damaged, so not what we are looking for -->
      <ModOp Type="AddNextSibling" GUID='13648'>
         <Asset>
           <Template>ShipSpecialist</Template>
@@ -20,6 +20,7 @@
             </Standard>
             <Text />
             <Item>
+              <Rarity>Common</Rarity>
               <MaxStackSize>1</MaxStackSize>
               <Flotsam>1500001027</Flotsam>
             </Item>
@@ -76,7 +77,12 @@
             </Values>
         </Asset>
      </ModOp>
-     
+     <!-- make this Common cheat item not researchable -->
+     <ModOp Type="add" GUID="131176" Path="/Values/AssetPool/AssetList">
+        <Item>
+          <Asset>1500001026</Asset>
+        </Item>
+      </ModOp>
      
      
      
@@ -203,9 +209,36 @@
     <!-- halving or 1/3 the amounts -->
     <Group Condition="//Values[Standard/GUID='1500000031']">
         
+        <!-- tripple the halfed CraftingTime from Stronger Pirates: -->
+        <!-- orig: 720000 from GUID 100440  -->
+        <ModOp Type="merge" GUID='102431' Path="/Values/Craftable">
+          <CraftingTime>1080000</CraftingTime>
+        </ModOp>
+        <!-- orig: 360000 from GUID 100439  -->
+        <ModOp Type="merge" GUID='102430' Path="/Values/Craftable">
+          <CraftingTime>540000</CraftingTime>
+        </ModOp>
+        <!-- orig: 180000 from GUID 100437  -->
+        <ModOp Type="merge" GUID='102429' Path="/Values/Craftable">
+          <CraftingTime>270000</CraftingTime>
+        </ModOp>
+        <!-- orig: 720000 from GUID 100443  -->
+        <ModOp Type="merge" GUID='102432' Path="/Values/Craftable">
+          <CraftingTime>1080000</CraftingTime>
+        </ModOp>
+        <!-- orig: 900000 from GUID 968  -->
+        <ModOp Type="merge" GUID='1500000031' Path="/Values/Craftable">
+          <CraftingTime>1350000</CraftingTime>
+        </ModOp>
+        <!-- orig: 900000 from GUID 100442  -->
+        <ModOp Type="merge" GUID='102432' Path="/Values/Craftable">
+          <CraftingTime>1350000</CraftingTime>
+        </ModOp>
+        
+        
         <!-- dont use merge here, because incompatible with "Item"-like stucture and we want to replace WarFleet in most cases, not change single entries -->
         <!-- unfortunately the pirates will build the ships in the order and number of this list, so eg. they won't build the second ship of list, until the target numer ob first ship is reached. Adding a ship multiple times to the list has no effect -->
-        <ModOp Type="replace" GUID='73' Path="/Values/Trader/Progression/EarlyGame">                                      
+        <ModOp Type="replace" GUID='73' Path="/Values/Trader/Progression/EarlyGame/WarFleet">                                      
             <WarFleet>
                 <Item>
                     <ShipAsset>102429</ShipAsset>
@@ -337,6 +370,14 @@
         <ModOp Type="merge" GUID='153270,153276' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102432']">
             <Amount>4</Amount>
         </ModOp>
+        
+        
+        <!-- if my Stronger Pirates mod is active, reduce the spawning of ships with trigger to only up to 1 of each kind (instead of 2) -->
+        <ModOp Type="replace" GUID='1500000033' Path="//ShipAmount">
+            <ShipAmount>1</ShipAmount>
+        </ModOp>
+        
+        
         
     </Group>
 
