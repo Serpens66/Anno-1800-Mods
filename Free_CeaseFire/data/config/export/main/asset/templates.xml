@@ -1,15 +1,14 @@
 <ModOps>
     
-    <!-- remove the money if it is triggered trough Ships Destroyed -->
-    <!-- unfortunately when she is asking for caesefire, while we are attcking her base, the normal ceasefire will trigger, so it will still cost money...  -->
-    <!-- <ModOp Type="merge" Path="Templates/Group[Name='Profiles']/Group[Name='Profiles']/Template[Name='Profile_3rdParty_Pirate']/Properties/Diplomacy/DiplomacyAI/SpecialTrigger/Item[TriggerType='ShipDestroyedByEnemy']"> -->
-        <!-- <AddMoney>0</AddMoney> -->
-    <!-- </ModOp> -->
-    
-    <!-- I think to remove it for all is best. If you ask her cease, she will still ask you for money -->
-    <!-- <ModOp Type="merge" Template="Profile_3rdParty_Pirate" Path="/Properties/Diplomacy/DiplomacyAI/SpecialTrigger/Item[TriggerAction='RequestCeaseFire' or TriggerAction='RequestPeace']"> -->
-    <ModOp Type="merge" Path="Templates/Group[Name='Profiles']/Group[Name='Profiles']/Template[Name='Profile_3rdParty_Pirate']/Properties/Diplomacy/DiplomacyAI/SpecialTrigger/Item[TriggerAction='RequestCeaseFire' or TriggerAction='RequestPeace']">
+    <!-- remove the money if it is triggered trough ShipDestroyedByEnemy, TraderouteEndangeredByEnemy or BuildingDestroyedByEnemy (in last case TriggerType is not present and filled by default values from properties.xml)  -->
+    <!-- (pirates have no TraderouteEndangeredByEnemy, for AI this already costs not money, but still add it to be complete) -->
+    <!-- for pirates we do this in templates.xml, because the assets.xml uses alot of inheritance and no way to proper edit it withoug replacing everything. -->
+    <ModOp Type="merge" Template="Profile_3rdParty_Pirate" Path="/Properties/Diplomacy/DiplomacyAI/SpecialTrigger/Item[(TriggerAction='RequestCeaseFire' or TriggerAction='RequestPeace') and (TriggerType='ShipDestroyedByEnemy' or TriggerType='TraderouteEndangeredByEnemy' or TriggerType='BuildingDestroyedByEnemy' or not(TriggerType))]">
         <AddMoney>0</AddMoney>
     </ModOp>
+    
+    
+    
+    
     
 </ModOps>

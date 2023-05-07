@@ -3,8 +3,10 @@
     <!-- no need to adjust GUIDs 168 and 169, because we will make all AIs use 170 instead as BaseAssetGUID
       But we will adjust assets that are using BaseAssetGUID 168 and 169 (easy and medium AIs), before we swap the BaseAssetGUID -->
     
+    <!-- With CatchupToPercentage , AI is able to build more ships than ShipLimits, if human has more ships! -->
     
     <!-- if we want to make AI even stronger, we could change catchup/rubberband values: -->
+    <!-- WarFleet CatchupToPercentage allows the AI to build more ships than defined in ShipLimits, it is 110% of human number of ships for hard AI -->
             <!-- <CatchupFactor> -->
               <!-- <Enabled>1</Enabled> -->
               <!-- <CatchupToPercentage>110</CatchupToPercentage> -->
@@ -26,11 +28,11 @@
     
     
   <!-- faster and cheaper ship production for hard AI, original 0.6 -->
-  <ModOp Type="merge" GUID="170" Path="/Values/ConstructionAI/ShipConstructionBonus">
-    <ProductBonus>0.5</ProductBonus>
-  </ModOp>
-  <ModOp Type="merge" GUID="170" Path="/Values/ConstructionAI/ShipConstructionBonus">
-    <TimeBonus>0.5</TimeBonus>
+  <ModOp Type="merge" GUID="170" Path="/Values/ConstructionAI">
+    <ShipConstructionBonus>
+        <TimeBonus>0.5</TimeBonus>
+        <ProductBonus>0.5</ProductBonus>
+    </ShipConstructionBonus>
   </ModOp>
   
   <!-- check more often if you have enough ships, original 30000. not sure if this is needed -->
@@ -82,9 +84,11 @@
       Content="//Values[Standard/GUID='85']/ConstructionAI/DefenseStructuresGround">
    </ModOp>
   
+  <!-- <EconomyRules> should mostly be adjusted by using the Hard template already. directly in AIcode is only SupplementSessionAdditions defined, and this is character-profile specific not difficulty , eg producing help-packages instead of seamines for drops. -->
 
 
-  <!-- better MilitaryAI, copy pasted from Margarete with Defend/MinStrengthRatio at 75 instead of 70 and doubled all WarFleet MaxShipCount (not AirWarFleet) and custom SessionOverride and MaxSize for Escort at 2 -->
+  <!-- better MilitaryAI, copy pasted from Margarete with Defend/MinStrengthRatio at 75 instead of 70 and *1.5 all WarFleet MaxShipCount (not AirWarFleet) and custom SessionOverride and MaxSize for Escort at 2 -->
+  <!-- ShipLimits kann von KI überschritten werden, durch CatchupToPercentage=110%, wenn Spieler mehr Schiffe hat -->
   <!-- everyone has the MilitaryAI entry, so replace will work -->
   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI"
       Content="//Values[Standard/GUID='85']/MilitaryAI">
@@ -95,55 +99,55 @@
   <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI/Escort">
     <MaxSize>2</MaxSize>
   </ModOp>
-  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI/WarFleet">
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/MilitaryAI/WarFleet">
     <ShipLimits>
       <Peace>
         <Progress>
           <EarlyGame>
-            <MaxShipCount>16</MaxShipCount>
+            <MaxShipCount>12</MaxShipCount>
           </EarlyGame>
           <EarlyMidGame>
-            <MaxShipCount>28</MaxShipCount>
+            <MaxShipCount>21</MaxShipCount>
           </EarlyMidGame>
           <MidGame>
-            <MaxShipCount>40</MaxShipCount>
+            <MaxShipCount>30</MaxShipCount>
           </MidGame>
           <LateMidGame>
-            <MaxShipCount>60</MaxShipCount>
+            <MaxShipCount>45</MaxShipCount>
           </LateMidGame>
           <LateGame>
-            <MaxShipCount>84</MaxShipCount>
+            <MaxShipCount>63</MaxShipCount>
           </LateGame>
           <EndGame>
-            <MaxShipCount>104</MaxShipCount>
+            <MaxShipCount>78</MaxShipCount>
           </EndGame>
         </Progress>
       </Peace>
       <War>
         <Progress>
           <EarlyGame>
-            <MaxShipCount>16</MaxShipCount>
+            <MaxShipCount>12</MaxShipCount>
           </EarlyGame>
           <EarlyMidGame>
-            <MaxShipCount>28</MaxShipCount>
+            <MaxShipCount>21</MaxShipCount>
           </EarlyMidGame>
           <MidGame>
-            <MaxShipCount>40</MaxShipCount>
+            <MaxShipCount>30</MaxShipCount>
           </MidGame>
           <LateMidGame>
-            <MaxShipCount>60</MaxShipCount>
+            <MaxShipCount>45</MaxShipCount>
           </LateMidGame>
           <LateGame>
-            <MaxShipCount>84</MaxShipCount>
+            <MaxShipCount>63</MaxShipCount>
           </LateGame>
           <EndGame>
-            <MaxShipCount>104</MaxShipCount>
+            <MaxShipCount>78</MaxShipCount>
           </EndGame>
         </Progress>
       </War>
     </ShipLimits>
   </ModOp>
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI/WarFleet/SessionOverride">
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/SessionOverride">
         <SessionOverride> <!-- Ac3s: the importance of each region to the AI, the higher the number the more ships they will keep in that region, hence it should be highest in Old World since that is where their main islands are, then New World since most important goods come from there. -->
           <Item>
             <SessionGUID>180023</SessionGUID> <!-- Old World (not Cape) --> <!-- Ac3s: was not set in vanilla -->
@@ -239,77 +243,6 @@
     <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
   </ModOp>
   
-  <!-- Increased ShipLimits also for the hard AIs: -->
-  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/ShipLimits">
-      <Peace>
-        <Progress>
-          <EarlyGame>
-            <MaxShipCount>16</MaxShipCount>
-          </EarlyGame>
-          <EarlyMidGame>
-            <MaxShipCount>28</MaxShipCount>
-          </EarlyMidGame>
-          <MidGame>
-            <MaxShipCount>40</MaxShipCount>
-          </MidGame>
-          <LateMidGame>
-            <MaxShipCount>60</MaxShipCount>
-          </LateMidGame>
-          <LateGame>
-            <MaxShipCount>84</MaxShipCount>
-          </LateGame>
-          <EndGame>
-            <MaxShipCount>104</MaxShipCount>
-          </EndGame>
-        </Progress>
-      </Peace>
-      <War>
-        <Progress>
-          <EarlyGame>
-            <MaxShipCount>16</MaxShipCount>
-          </EarlyGame>
-          <EarlyMidGame>
-            <MaxShipCount>28</MaxShipCount>
-          </EarlyMidGame>
-          <MidGame>
-            <MaxShipCount>40</MaxShipCount>
-          </MidGame>
-          <LateMidGame>
-            <MaxShipCount>60</MaxShipCount>
-          </LateMidGame>
-          <LateGame>
-            <MaxShipCount>84</MaxShipCount>
-          </LateGame>
-          <EndGame>
-            <MaxShipCount>104</MaxShipCount>
-          </EndGame>
-        </Progress>
-      </War>
-  </ModOp>
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/ShipLimits">
-    <SessionOverride> <!-- Ac3s: the importance of each region to the AI, the higher the number the more ships they will keep in that region, hence it should be highest in Old World since that is where their main islands are, then New World since most important goods come from there. -->
-      <Item>
-        <SessionGUID>180023</SessionGUID> <!-- Old World (not Cape) --> <!-- Ac3s: was not set in vanilla -->
-        <Percentage>70</Percentage>
-      </Item>
-      <Item>
-        <SessionGUID>180025</SessionGUID> <!-- New World -->
-        <Percentage>50</Percentage>
-      </Item>
-      <Item>
-        <SessionGUID>110934</SessionGUID> <!-- Cape -->
-        <Percentage>50</Percentage>
-      </Item>
-      <Item>
-        <SessionGUID>180045</SessionGUID> <!-- Artic -->
-        <Percentage>25</Percentage>
-      </Item>
-      <Item>
-        <SessionGUID>112132</SessionGUID> <!-- Africa --> <!-- Ac3s: was not set in vanilla -->
-        <Percentage>20</Percentage>
-      </Item>
-    </SessionOverride>
-  </ModOp>
   
   <!-- Let everyone place seamines around harbor, like Mercier (I guess only if airship DLC is active?) -->
   <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/ConstructionAI">
