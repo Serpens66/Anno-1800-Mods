@@ -1,20 +1,37 @@
 <ModOps>
     
 
-    
-    
     <!-- trading with AI opponents and other humans gets slightly worse prices, but it is still good enough. -->
+    <!-- reduce the item price drastically, sell them for researchpoints instead  -->
+    <!-- The PriceFactors here in PassiveTradeFeature define at what price (compared to BasePrice) the Parties put goods/items into  -->
+     <!-- their passive trade! So the prices here in 2nd and 3rd party are at the same time the active prices the human sees at their harbour  -->
+    <!-- The game unfortunately is only calculating with integers , so although it accepts PriceFactors being float here, for preferred goods it calcualtes like this: -->
+      <!-- 16 * 0.8 = 12(.8), 12 * 2 = 24 (instead of 12.8*2 = 25.6). -->
     <ModOp Type="merge" GUID="140115" Path="/Values">
         <PassiveTradeFeature>
           <PriceFactors>
+            <!-- make passive trading at human harbor a bit better than the trading at third party harbor -->
             <Human>
               <GlobalProductSellPriceFactor>0.9</GlobalProductSellPriceFactor>
               <GlobalProductBuyPriceFactor>1.6</GlobalProductBuyPriceFactor>
+              <GlobalItemSellPriceFactor>0.02</GlobalItemSellPriceFactor>
+              <GlobalItemBuyPriceFactor>0.5</GlobalItemBuyPriceFactor>
             </Human>
             <SecondParty>
-              <GlobalProductSellPriceFactor>0.9</GlobalProductSellPriceFactor> 
-              <GlobalProductBuyPriceFactor>1.6</GlobalProductBuyPriceFactor> <!-- same value like prefered goods from AI merchants 0.8*2 = 1.6 -->
+              <GlobalProductSellPriceFactor>0.9</GlobalProductSellPriceFactor>
+               <!-- same value like selling prefered goods to AI merchants same session 0.8*2 = 1.6 -->
+              <GlobalProductBuyPriceFactor>1.6</GlobalProductBuyPriceFactor>
+              <GlobalItemSellPriceFactor>0.5</GlobalItemSellPriceFactor>
+              <GlobalItemBuyPriceFactor>0.02</GlobalItemBuyPriceFactor>
             </SecondParty>
+            <ThirdParty>
+              <GlobalItemSellPriceFactor>0.5</GlobalItemSellPriceFactor>
+              <GlobalItemBuyPriceFactor>0.02</GlobalItemBuyPriceFactor>
+            </ThirdParty>
+            <VirtualParticipant_NeverOwnsGameObjects>
+              <GlobalItemSellPriceFactor>0.5</GlobalItemSellPriceFactor>
+              <GlobalItemBuyPriceFactor>0.02</GlobalItemBuyPriceFactor>
+            </VirtualParticipant_NeverOwnsGameObjects>
           </PriceFactors>
         </PassiveTradeFeature>
         <!-- ActiveTradeFeature affects the slots in your activetrade screen, which is limited by 4 from the UI. So no benefit to change this (it can be increased over 4, but wont be shown in UI) -->
@@ -24,10 +41,22 @@
         <!-- </ActiveTradeFeature> -->
     </ModOp>
     
+    
+    <!-- PREFERRED GOODS -->
     <!-- vanilla value of all PreferedGoods PriceMultiplier is 4. For third party traders the value is multiplied with 0.8, so the vanilla final price is 3.2*baseprice -->
     
     <!-- With this mod: All AI Merchants will only give 0.8*2=1.6 times the of the baseprice for requested products from the same region. -->
     <!-- While giving 0.8*3=2.4 times the baseprice for products from different regions (previously everything was 0.8*4=3.2) -->
+    
+    <!-- Eg. Sarmento was passivley producing and selling canons, while buyig them back on high price, this is vanilla nonsense -->
+    <!-- The game is already smart enough to not display this in the OfferingGoods, but you still can buy it passively, so still an exploit -->
+    <!-- Sarmento remove canons from offering, since she also requests them, guess this is a game bug -->
+    <ModOp Type="remove" GUID="29" Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets/Item[Good='1010221']"> </ModOp>
+    <ModOp Type="remove" GUID="29" Path="/Values/Trader/Progression/*/GoodsProduction/Item[Good='1010221']"> </ModOp>
+    <!--  Pirates remove Rum from the Offering and Production, since they also requests it. -->
+    <ModOp Type="remove" GUID="73,76" Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets/Item[Good='1010257']"> </ModOp>
+    <ModOp Type="remove" GUID="73,76" Path="/Values/Trader/Progression/*/GoodsProduction/Item[Good='1010257']"> </ModOp>
+
     
     <!-- Madame Kahina, half PriceMultiplier from 1010247 Pelzmäntel -->
     <ModOp Type="merge" GUID="78" Path="/Values/Trader/Progression/*/PreferedGoods/Item[Product='1010247']">
@@ -47,10 +76,6 @@
     
     
     <!-- Isabel Sarmento, reduce PriceMultiplier from 1010221 Kanonen and 120033 gebackene Bananen -->
-    <!-- remove canons from offering, since she also requests them, guess this is a game bug -->
-    <!-- but for whatever reason it is not showed ingame anyways, so better leave it as it is? -->
-    <!-- <ModOp Type="remove" GUID="29" Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets/Item[Good='1010221']"> </ModOp> -->
-    <!-- <ModOp Type="remove" GUID="29" Path="/Values/Trader/Progression/*/GoodsProduction/Item[Good='1010221']"> </ModOp> -->
     <ModOp Type="merge" GUID="29" Path="/Values/Trader/Progression/*/PreferedGoods/Item[Product='120033']">
         <PriceMultiplier>2</PriceMultiplier>
         <ReputationMultiplier>1.5</ReputationMultiplier>
@@ -83,10 +108,6 @@
     
     <!-- Pirates with a bit better value -->
     <!-- Anne Harlow, reduce PriceMultiplier from 1010216 Schnaps and 1010214 Bier and 1010257 Rum -->
-    <!-- remove Rum from the Offering, since she also requests it. So offering makes no sense at all (might be a bug of current version) -->
-    <!-- but for whatever reason it is not showed ingame anyways, so better leave it as it is? -->
-    <!-- <ModOp Type="remove" GUID="73" Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets/Item[Good='1010257']"> </ModOp> -->
-    <!-- <ModOp Type="remove" GUID="73" Path="/Values/Trader/Progression/*/GoodsProduction/Item[Good='1010257']"> </ModOp> -->
     <ModOp Type="merge" GUID="73" Path="/Values/Trader/Progression/*/PreferedGoods/Item[Product='1010216' or Product='1010214']">
         <PriceMultiplier>2.5</PriceMultiplier>
         <ReputationMultiplier>1.5</ReputationMultiplier>
@@ -98,10 +119,6 @@
     
     
     <!-- La Fortune, reduce PriceMultiplier from 1010216 Schnaps and 1010214 Bier and 1010257 Rum  -->
-    <!-- remove Rum from the Offering, since he also requests it. So offering makes no sense at all (might be a bug of current version) -->
-    <!-- but for whatever reason it is not showed ingame anyways, so better leave it as it is? -->
-    <!-- <ModOp Type="remove" GUID="76" Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets/Item[Good='1010257']"> </ModOp> -->
-    <!-- <ModOp Type="remove" GUID="76" Path="/Values/Trader/Progression/*/GoodsProduction/Item[Good='1010257']"> </ModOp> -->
     <ModOp Type="merge" GUID="76" Path="/Values/Trader/Progression/*/PreferedGoods/Item[Product='1010216' or Product='1010214']">
         <PriceMultiplier>3.3</PriceMultiplier>
         <ReputationMultiplier>2</ReputationMultiplier>
@@ -158,9 +175,6 @@
     </ModOp>
 
     <!-- Isabel Sarmento -->
-    <!-- remove canons from offering, since she also requests them, guess this is a game bug -->
-    <!-- <ModOp Type="remove" GUID="29" Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets/Item[Good='1010221']"> </ModOp> -->
-    <!-- <ModOp Type="remove" GUID="29" Path="/Values/Trader/Progression/*/GoodsProduction/Item[Good='1010221']"> </ModOp> -->
     <ModOp Type="merge" GUID="29" Path="/Values/Trader/Progression/*/PreferedGoods/Item[Product='1010213' or Product='114410' or Product='112701']" AllowNoMatch="1">
         <PriceMultiplier>3</PriceMultiplier>  <!--  Brot, Meeresfrüchte-Eintopf, Schlafsäcke -->
         <ReputationMultiplier>2</ReputationMultiplier>
@@ -196,18 +210,12 @@
     </ModOp>
 
     <!-- Anne Harlow -->
-    <!-- remove Rum from the Offering, since she also requests it. So offering makes no sense at all (might be a bug of current version) -->
-    <!-- <ModOp Type="remove" GUID="73" Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets/Item[Good='1010257']"> </ModOp> -->
-    <!-- <ModOp Type="remove" GUID="73" Path="/Values/Trader/Progression/*/GoodsProduction/Item[Good='1010257']"> </ModOp> -->
     <ModOp Type="merge" GUID="73" Path="/Values/Trader/Progression/*/PreferedGoods/Item[Product='120016']" AllowNoMatch="1">
         <PriceMultiplier>2.5</PriceMultiplier> <!-- Sekt -->
         <ReputationMultiplier>1.5</ReputationMultiplier>
     </ModOp>
     
     <!-- La Fortune -->
-    <!-- remove Rum from the Offering, since he also requests it. So offering makes no sense at all (might be a bug of current version) -->
-    <!-- <ModOp Type="remove" GUID="76" Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets/Item[Good='1010257']"> </ModOp> -->
-    <!-- <ModOp Type="remove" GUID="76" Path="/Values/Trader/Progression/*/GoodsProduction/Item[Good='1010257']"> </ModOp> -->
     <ModOp Type="merge" GUID="76" Path="/Values/Trader/Progression/*/PreferedGoods/Item[Product='120016']" AllowNoMatch="1">
         <PriceMultiplier>3.3</PriceMultiplier> <!-- Sekt -->
         <ReputationMultiplier>2</ReputationMultiplier>
