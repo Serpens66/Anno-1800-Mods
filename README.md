@@ -17,7 +17,7 @@ Modloader no longer required. Simply put the mods you want to use into your "Doc
 
 
 Coming Changes:
--
+- Change "Preferred Goods" mod a bit, especially adding some of the newer DLC products.
 
 Planned Mods:
 -
