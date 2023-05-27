@@ -18,6 +18,7 @@ Modloader no longer required. Simply put the mods you want to use into your "Doc
 
 Coming Changes:
 - Change "Preferred Goods" mod a bit, especially adding some of the newer DLC products.
+- I will rename more mods soon, so you can see at once glance that it affects AI or Pirates. (Mod ID is and will be unchanged)
 
 Planned Mods:
 -
