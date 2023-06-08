@@ -21,7 +21,8 @@ Coming Changes:
 - I will rename more mods soon, so you can see at once glance that it affects AI or Pirates. (Mod ID is and will be unchanged)
 
 Planned Mods:
--
+- Sabotage Mod
+- Request Support Fleet Mod
 
 Please report back any bugs and if the mods do well with a mod manager, cause I did not test the new modinfo.json format.
 
