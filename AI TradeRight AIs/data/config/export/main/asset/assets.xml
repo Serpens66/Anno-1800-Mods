@@ -1,0 +1,3696 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModOps>
+
+  <!-- # Ein Mod damit alle KI Mitspieler untereinander immer die höchste Reputation und eine TradeRights haben (per Trigger) -->
+
+    <!-- Uses Serps GUID Range from 1500001010 to 1500001020 (included), same GUIDs like AI Allied AIs mod, because they are incompatible anyways -->
+
+
+
+
+    <!-- ActionForceDiplomaticRelation macht nur den einen Status, soll heißen bei Alliance hat man KEINE Handelsrechte. -->
+     <!-- und es gibt scheinbar auch keinen Weg wie man beides damit bekommen kann, weder über Peace;TradeRights;Alliance -->
+      <!-- noch andere Reihenfolge noch über mehrere ActionForceDiplomaticRelation hintereinander. -->
+    <!-- ist bei allied ai aber vermutlich nicht so wichtig, brauchen keine handelsrechte untereinander, oder? -->
+    <!-- alternativ könnte man einfach nur TradeRights machen, da die Allianz selber ja eh keine Besonderheit mehr ist -->
+    <!-- ACHTUNG ActionForceDiplomaticRelation ist auch bei TradeRights böse. Zwar ist man nicht im Krieg, -->
+        <!-- aber wenn jemand TradeRights kündigt landet man nicht im Peace sondern direkt im Krieg -->
+
+
+    <!-- Information for modders: -->
+
+    <!-- As long as in TriggerSetup UsedBySecondParties is set to 1 (default in a normal Trigger template), the triggers are executed 
+        for first (humans) and second (AI players) parties, but not for 3rd party (merchants and pirates) -->
+
+    <!-- Eg. in first Trigger below with Jorgensen: 
+    <!--  ConditionReputation is looping through every party (Human and AI) and is checking if this party (also called "owner" or sometimes "processing"   -->
+    <!--   (for this check it is also Target, therefore TargetIsOwner)) has less than 100 opinion about Jorgensen (Source). -->
+    <!-- If yes, then change this parties opinion (Owner) about Jorgensen (ParticipantTarget). -->
+    
+    <!-- Luckily "TargetIsOwner" does work, although it is not mentiond in any assets.xml, templates.xml or properties.xml, because with SourceIsOwner the logic would be in the wrong direction -->
+      <!-- "Is the opinion from target about you less than x, then change your opinion about the target." -->
+    <!-- (without TargetIsOwner the code does cause heavy lag (if there is no actionreset delay), because condition will always be true, so it is important) -->
+    
+    
+    <!-- Erklärung: -->
+    <!-- Jeder Trigger wird für jeden Spieler,  also Mensch und KI (second party) ausgeführt. Der ausführende Spieler wird im code oft "Owner" oder auch "Processing" genannt (Synonym). -->
+    <!-- Diese ConditionReputation soll prüfen wie die Meinung von dem "Source"-Spieler über den "Target"-Spieler ist. Wenn sie weniger als 100 ist, gilt die Condition als erfüllt. Sinn ist es bei Erfüllung die Meinung der Source über das Target auf 100 zu setzen, damit diese sich immer mögen. Der Trigger wird wie gesagt auch mit der KI als Owner durchgeführt -->
+    <!-- Die in properties.xml definerten Defaultwerte für Source und Target sind: -->
+              <!-- <ParticipantRelation> -->
+                  <!-- <SourceParticipant>Human0</SourceParticipant> -->
+                  <!-- <TargetParticipant>Human0</TargetParticipant> -->
+                <!-- </ParticipantRelation> -->
+    <!-- Das heißt wenn man eins oder beides nicht definiert, dann wird der erste menschliche Spieler als Vergleich herangezogen. -->
+    <!-- In meinem Beispiel habe ich die KI Jorgensen als source definiert. -->
+    <!-- So, ein Problem ist nun, dass im ActionAddReputation scheinbar nur das Target definiert werden kann. Also zwischen welchen beiden Parteien wird da die Reputation erhöht? Es gilt wohl immer zwischen Owner und dem Target. Das bedeutet also, wenn ich die Meinung zwischen 2 KIs verbessern will, dann MUSS eine der beiden KIs der Owner und Target zugleich sein und der andere entsprechend Target. -->
+    <!-- Deswegen war es wichtig, dass es ein "TargetIsOwner" Befehl gibt. Wenn wir annehmen, dass "TargetIsOwner" keinerlei Wirkung hat, weil dieses Property nicht existiert, dann würde dieser code durch den defaultwert Human0 machen, während eine KI der Owner ist: "ist die Meinung von Bente über Mensch0 kleiner als 100, dann erhöhe die Meinung von Bente über den Owner (KI) um 100". -->
+    <!-- Diese Bedingung wäre dann quasi dauerhaft erfüllt und durch ein ActionResetTrigger löst dies Lags aus. Da ich aber mit "TargetIsOwner" keine Lags habe ist das der Beweis, dass es TargetIsOwner gibt. -->
+    
+    
+    <!-- The trigger is also executed for humans, but luckily it is no problem if our human opinion about an AI is changed, because it does not effect the game -->
+    <!-- But for all other stuff we only want for AI, eg. ActionForceDiplomaticRelation, we nned to make sure we only deal with AI -->
+    <!-- For this I only now a workaround to check if the processing (owner) Party has a AI-lighthouse GUID build. This is done by adding subtriggers. -->
+    <!-- We will use 11 MutuallyExclusive Subtriggers per Trigger to check if the processing/owner does own any of the lighthouses. -->
+    <!--  Eg. if you want a trigger only be executed by Jorgensen, simply add this subtriggers sections: -->
+      <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+      <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+      <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+      <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+      <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+      <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+      <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+      <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+      <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+      <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+      <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+      <!-- <SubTriggers> -->
+        <!-- <Item> -->
+          <!-- <SubTrigger> -->
+            <!-- <Template>AutoCreateTrigger</Template> -->
+            <!-- <Values> -->
+              <!-- <Trigger> -->
+                <!-- <TriggerCondition> -->
+                  <!-- <Template>ConditionPlayerCounter</Template> -->
+                  <!-- <Values> -->
+                    <!-- <Condition /> -->
+                    <!-- <ConditionPlayerCounter> -->
+                      <!-- <PlayerCounter>ObjectBuilt</PlayerCounter> -->
+                      <!-- <Context>100549</Context> -->
+                      <!-- <CounterAmount>1</CounterAmount> -->
+                    <!-- </ConditionPlayerCounter> -->
+                  <!-- </Values> -->
+                <!-- </TriggerCondition> -->
+              <!-- </Trigger> -->
+            <!-- </Values> -->
+          <!-- </SubTrigger> -->
+        <!-- </Item> -->
+      <!-- </SubTriggers> -->
+     
+    <!-- We could add a safety check if a specific AI is part of the game with ConditionIsParticipantInGame, but I think this is not mandatory, it works without it. -->
+
+
+
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001010</GUID>
+              <Name>Reputation Change Jorgensen</Name>
+            </Standard>
+            <Trigger>
+              <!-- check for every party (owner/processing and target) if they have x reputation (opinion) about the Source -->
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_01_Jorgensen</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <!-- Increase reputation -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_01_Jorgensen</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_01_Jorgensen</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- reset trigger, so it is executed again if the condition is met again -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+
+
+
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001011</GUID>
+              <Name>Reputation Change Qing</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_02_Qing</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_02_Qing</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_02_Qing</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    
+    
+    
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001012</GUID>
+              <Name>Reputation Change Wibblesock</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_03_Wibblesock</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_03_Wibblesock</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_03_Wibblesock</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001013</GUID>
+              <Name>Reputation Change Smith</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_04_Smith</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_04_Smith</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_04_Smith</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001014</GUID>
+              <Name>Reputation Change OMara</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_05_OMara</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_05_OMara</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_05_OMara</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001015</GUID>
+              <Name>Reputation Change Gasparov</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_06_Gasparov</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_06_Gasparov</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_06_Gasparov</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001016</GUID>
+              <Name>Reputation Change Malching</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_07_von_Malching</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_07_von_Malching</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_07_von_Malching</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001017</GUID>
+              <Name>Reputation Change Gravez</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_08_Gravez</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_08_Gravez</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_08_Gravez</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001018</GUID>
+              <Name>Reputation Change Silva</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_09_Silva</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_09_Silva</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_09_Silva</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001019</GUID>
+              <Name>Reputation Change Hunt</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_10_Hunt</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_10_Hunt</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_10_Hunt</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001020</GUID>
+              <Name>Reputation Change Mercier</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionReputation</Template>
+                <Values>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> <!-- one of the subtrigger conditions should be true (so have one of the AI lighthouses built) -->
+                  </Condition>
+                  <ConditionReputation>
+                    <Reputation>100</Reputation>
+                    <ComparisonOperator>LessThan</ComparisonOperator>
+                  </ConditionReputation>
+                  <ParticipantRelation>
+                    <SourceParticipant>Second_ai_11_Mercier</SourceParticipant>
+                    <TargetIsOwner>1</TargetIsOwner>
+                  </ParticipantRelation>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionAddReputation</Template>
+                    <Values>
+                      <Action />
+                      <ActionAddReputation>
+                        <ReputationAmount>100</ReputationAmount>
+                        <ParticipantTarget>Second_ai_11_Mercier</ParticipantTarget>
+                      </ActionAddReputation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <!-- Force TradeRights -->
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionForceDiplomaticRelation</Template>
+                    <Values>
+                      <Action />
+                      <ActionForceDiplomaticRelation>
+                        <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                        <ForceRelationTargetParticipant>Second_ai_11_Mercier</ForceRelationTargetParticipant>
+                        <ForcedRelationType>TradeRights</ForcedRelationType>
+                      </ActionForceDiplomaticRelation>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionDelayedActions</Template>
+                    <Values>
+                      <Action />
+                      <ActionDelayedActions>
+                        <!-- reset the trigger after x miliseconds. delay is important to reduce lag -->
+                        <ExecutionDelay>10000</ExecutionDelay>
+                        <DelayedActions>
+                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                          <Values>
+                            <ActionList>
+                              <Actions>
+                                <Item>
+                                  <Action>
+                                    <Template>ActionResetTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionResetTrigger />
+                                    </Values>
+                                  </Action>
+                                </Item>
+                              </Actions>
+                            </ActionList>
+                          </Values>
+                        </DelayedActions>
+                      </ActionDelayedActions>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+              <!-- Make sure the trigger is only executed for AIs by checking if the processing/owner has any of the AI lighthouses built -->
+              <SubTriggers>
+                <!-- <GUID>100549</GUID> Jorgensens Leuchtturm , Second_ai_01_Jorgensen -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100549</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100700</GUID> Qings Leuchtturm , Second_ai_02_Qing -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100700</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100701</GUID> Wibblesocks' Leuchtturm , Second_ai_03_Wibblesock -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100701</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100702</GUID> Smiths Leuchtturm , Second_ai_04_Smith -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100702</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100703</GUID> O'Maras Leuchtturm , Second_ai_05_OMara -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100703</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100704</GUID> Gasparovs Leuchtturm , Second_ai_06_Gasparov -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100704</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100518</GUID> von Malchings Leuchtturm , Second_ai_07_von_Malching -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100518</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100550</GUID> Graves Leuchtturm , Second_ai_08_Gravez -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100550</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100705</GUID> Silvas Leuchtturm , Second_ai_09_Silva -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100705</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>100706</GUID> Hunts Leuchtturm , Second_ai_10_Hunt -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>100706</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <!-- <GUID>110669</GUID> Merciers Leuchtturm , Second_ai_11_Mercier -->
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>ObjectBuilt</PlayerCounter>
+                              <Context>110669</Context>
+                              <CounterAmount>1</CounterAmount>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+            </Trigger>
+            <TriggerSetup> <!-- this is Trigger default anyway, but just in case someone is modifying the Trigger template -->
+                <AutoRegisterTrigger>1</AutoRegisterTrigger> 
+                <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    
+    
+    
+    <Include File="/data/config/export/main/asset/LighthouseFix.include.xml" />
+    
+    
+    
+</ModOps>
