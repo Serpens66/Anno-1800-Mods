@@ -9,6 +9,12 @@ Mods should all work with Game Version 17.
 
 How to Download  
 -
+I uploaded most of my mods at mod.io: https://mod.io/g/anno-1800/u/serp66
+
+You can also find them in the Anno 1800 ingame ModBrowser by searching for "Serp".
+
+Or:
+
 Click on the green "Code" button on the top right and hit "download zip" to download the complete collection. Of course you can delete the mods you don't want after download (I know no way to only download a single folder from github).
 
 Usage  
