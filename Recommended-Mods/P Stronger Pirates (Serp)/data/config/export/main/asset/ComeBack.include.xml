@@ -1,0 +1,571 @@
+<ModOps>
+
+   
+   <!-- Comeback -->
+    <!-- 2 hours instead of 2.5 -->
+	<ModOp Type="merge" GUID='73,76' Path="/Values/Pirate">
+        <ComebackAfterKontorDestruction>7200000</ComebackAfterKontorDestruction>
+    </ModOp>
+    
+    <!-- 20 min, instead of 30, to defeat the pirate comeback fleat, before they rebuild their island, timer starts when the combeback fleet reaches the pirate island -->
+    <!-- 153279 und 153280 sind nur fake quests um ein Reparatursymbol über den Kontor zu spawnen (Destroy quests ist unerfuellbar, auch weil sie keine Gebäude kann) und werden automatisch beendet, wenn 153264/153273 erfoglreich oder fail sind. -->
+    <!-- aber ich denke es schadet dennoch nicht auch für sie ein questlimit einzutragen, by default haben sie ja auch dasselbe -->
+    <ModOp Type="merge" GUID="153264,153279,153273,153280" Path="/Values/Quest">
+      <QuestTimeLimit>1200000</QuestTimeLimit>
+    </ModOp>
+    
+    <!-- rebuild island after war (if not fully destroyed) within 10 minutes after last attack -->
+    <ModOp Type="merge" GUID='73,76' Path="/Values/Pirate">
+        <RebuildAfterIslandWarTimer>600000</RebuildAfterIslandWarTimer>
+    </ModOp>
+    
+    <!-- 
+    153262 -> basisquest, die wohl immer dabei sein muss, iwie zusmmenhängend mit 152280 und 153264. aber einfach 153262 immer dabei haben und gut ist
+    (152280 ist veraltet und wird nicht mehr verwendet (wäre sonst auch als quest sichtbar), 62 ist quasi der ersatz dafür. 62 läuft sobald comebackfleet gespawned ist, 64 läuft zusätzlich sobald sie hafen erreicht haben)
+    153233 1 Frigate
+    153236 1 Linienschiff
+    153237 2 Monitor
+    153266 3 Frigaten 
+    153269 5 Frigatten
+    153270 3 Linienschiffe
+    153271 3 Monitor
+    
+    macht eig nicht viel sinn die comeback quest vom gamestatus abhängig zu machen, da die Festung der Piraten immer gleich stark ist.
+    NUr der Schiffstyp ist technologisch halbwegs sinnvoll. Dh im EarlyGame sollte die Comeback flotte vllt auch 50 Kanonenbooten oderso bestehen (weil man soviele selbst gebraucht hätte,um die piraten erst platt zu machen)
+    dann 20 Frigatten, 10 Linienschiffe usw. Die gesamtsträrke bleibt dabei immer gleich ,ungefähr die Stärke, die man brauchte die Basis zu zerstören.
+    hm...
+    
+    berücksichtigen, dass ich alle dampfkriegsschiffe (hier monitor) allgemein stärker machen will, ca. doppelt so stark in Stronger Steamships mod
+    -->
+    
+    <ModOp Type="replace" GUID='73' Path="/Values/Pirate/ComebackQuests/LateMidGame">
+        <LateMidGame>
+          <PossibleQuests>
+            <Item>
+              <GUID>153236</GUID>
+            </Item>
+            <Item>
+              <GUID>153262</GUID>
+            </Item>
+          </PossibleQuests>
+        </LateMidGame>
+    </ModOp>
+    <ModOp Type="replace" GUID='76' Path="/Values/Pirate/ComebackQuests/LateMidGame">
+        <LateMidGame>
+          <PossibleQuests>
+            <Item>
+              <GUID>153240</GUID>
+            </Item>
+            <Item>
+              <GUID>153272</GUID>
+            </Item>
+          </PossibleQuests>
+        </LateMidGame>
+    </ModOp>
+    
+	<ModOp Type="merge" GUID='153266,153274' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102430']">
+        <Amount>6</Amount> <!-- original 3 EarlyGame/EarlyMidGame-->
+    </ModOp>
+	<ModOp Type="merge" GUID='153269,153275' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102430']">
+        <Amount>14</Amount> <!-- original 5 MidGame -->
+    </ModOp>
+    <ModOp Type="merge" GUID='153236,153240' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102431']">
+        <Amount>10</Amount> <!-- original 1, seems this is not used by the game, so we will use it to replace LateMidGame, so it is different from LateGame -->
+    </ModOp>
+	<ModOp Type="merge" GUID='153270,153276' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102431']">
+        <Amount>10</Amount> <!-- original 3 LateGame, adding 8 monitors below -->
+    </ModOp>
+	<ModOp Type="merge" GUID='153271,153277' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102432']">
+        <Amount>15</Amount> <!-- Piraten-​Monitor original 3 EndGame, adding 12 ship of line below -->
+    </ModOp>
+    <!-- LaFortune GUID quest 153241 und Anne 153233 wird auch nicht verwendet vom spiel -->
+    
+    
+    <!-- add more ship types LateGame/EndGame to the comeback quest. -->
+    <!-- using ContextGUID (to spawn ships nearby each other) should still work here, because only Harlow can own the ship GUID in this session. -->
+    <!-- If this changes for whatever reason, we should switch to MatcherGUID and create an Matcher Object, that checks for the owner at least  -->
+    <!-- Harlow, we use AddPrevSibling to insert the spawning in fornt of the ActionMoveObject command, so we dont need to give this command again -->
+    <ModOp Type="AddPrevSibling" GUID='153271' Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Template='ActionMoveObject']">
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>102431</SpawnGUID>
+                <Amount>12</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <!-- spawn them next to the already spawned Monitor instead at a random location -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102432</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000031</SpawnGUID>
+                <Amount>6</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102432</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000032</SpawnGUID>
+                <Amount>3</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102432</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000037</SpawnGUID>
+                <Amount>2</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102432</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    <ModOp Type="AddPrevSibling" GUID='153270' Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Template='ActionMoveObject']">
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>102432</SpawnGUID>
+                <Amount>8</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102431</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000031</SpawnGUID>
+                <Amount>2</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102431</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000032</SpawnGUID>
+                <Amount>1</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_03_Pirate_Harlow</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateHarlowResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102431</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180023</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    
+    <!-- LaFortune, we use AddPrevSibling to insert the spawning in fornt of the ActionMoveObject command, so we dont need to give this command again -->
+    <ModOp Type="AddPrevSibling" GUID='153277' Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Template='ActionMoveObject']">
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>102431</SpawnGUID>
+                <Amount>12</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_04_Pirate_LaFortune</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateLafortuneResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <!-- spawn them next to the already spawned Monitor instead at a random location -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102432</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180025</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000031</SpawnGUID>
+                <Amount>6</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_04_Pirate_LaFortune</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateLafortuneResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102432</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180025</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000032</SpawnGUID>
+                <Amount>3</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_04_Pirate_LaFortune</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateLafortuneResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102432</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180025</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000037</SpawnGUID>
+                <Amount>2</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_04_Pirate_LaFortune</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateLafortuneResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102432</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180025</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    <ModOp Type="AddPrevSibling" GUID='153276' Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Template='ActionMoveObject']">
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>102432</SpawnGUID>
+                <Amount>8</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_04_Pirate_LaFortune</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateLafortuneResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102431</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180025</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000031</SpawnGUID>
+                <Amount>2</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_04_Pirate_LaFortune</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateLafortuneResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102431</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180025</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionSpawnObjects</Template>
+            <Values>
+              <Action />
+              <ActionSpawnObjects>
+                <SpawnGUID>1500000032</SpawnGUID>
+                <Amount>1</Amount>
+                <Owner>General_Enemy</Owner>
+                <DoSetVisualSpawnOwner>1</DoSetVisualSpawnOwner>
+                <VisualSpawnOwner>Third_party_04_Pirate_LaFortune</VisualSpawnOwner>
+                <SpawnObjectGroupLabel>PirateLafortuneResettleGroup</SpawnObjectGroupLabel> <!-- this adds the ships to this group, it does not replace the group luckily -->
+              </ActionSpawnObjects>
+              <!-- <SpawnArea> -->
+                <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+              <!-- </SpawnArea> -->
+              <SpawnArea>
+                <SpawnContext>ForceContextPosition</SpawnContext>
+                <ContextGUID>102431</ContextGUID>
+                <DistanceToContext>10</DistanceToContext>
+                <MinObjectDistance>5</MinObjectDistance>
+                <MaxObjectDistance>10</MaxObjectDistance>
+              </SpawnArea>
+              <SessionFilter>
+                <Sessions>
+                  <Item>
+                    <Session>180025</Session>
+                  </Item>
+                </Sessions>
+              </SessionFilter>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    
+    
+    
+</ModOps>

@@ -1,0 +1,450 @@
+
+<ModOps>
+
+    <!-- verwendet Serps GUIDS von 1500001026+1500001029 -->
+
+    <!-- you can set -->
+    <!-- ShouldBeShownInForeignObjectMenu -->
+    <!-- to 0 , to not disply the Buff in the ship UI. -->
+    <!-- This way the portrait wont be kind of "hidden" behind the UI anymore (blame ubisoft..) -->
+
+    <!-- Ships that reach max health higher than ~32k , eg. via items or code, will get destroyed on repairing -.- -->
+     <!-- therefore we will not increase health from ships, but give the ships an item that decreases the damage they take -->
+     
+     
+    <!--  IgnoreDamageFactorUpgrade in VehicleUpgrade is regarding speed when damaged, so not what we are looking for -->
+
+    <Group Condition="!#Stronger_Pirate_Ships_Serp">
+      <Group Condition="!#Buffed_GeneralEnemy_Ships_Serp">
+
+         <!-- same buff guid and content and trigger guid like in my Stronger_Pirate_Ships_Serp/Buffed_GeneralEnemy_Ships_Serp mod. if it is not active, create it. -->
+         <!-- if it is active add to it. -->
+         
+        <ModOp Type="AddNextSibling" GUID="130942">
+          <Asset>
+            <Template>InfluenceTitleBuff</Template>
+            <Values>
+              <Standard>
+                <GUID>1500001026</GUID>
+                <Name>Stronger AI Ships</Name>
+                <IconFilename>data/ui/2kimages/main/3dicons/icon_skull.png</IconFilename>
+              </Standard>
+              <ItemEffect>
+                <EffectTargets>
+                  <Item>
+                    <GUID>1512</GUID>
+                  </Item>
+                </EffectTargets>
+                <AllowStacking>0</AllowStacking>
+              </ItemEffect>
+              <Buff>
+                <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+              </Buff>
+              <AttackerUpgrade>
+                <BaseDamageUpgrade>
+                  <Value>50</Value>
+                  <Percental>1</Percental>
+                </BaseDamageUpgrade>
+                <AttackSpeedUpgrade>50</AttackSpeedUpgrade>
+              </AttackerUpgrade>
+              <AttackableUpgrade>
+                <SelfHealUpgrade>
+                  <Value>200</Value>
+                  <Percental>1</Percental>
+                </SelfHealUpgrade>
+                <DamageReceiveFactor>
+                  <Cannon>
+                    <Factor>0.35</Factor>
+                  </Cannon>
+                  <Normal>
+                    <Factor>0.35</Factor>
+                  </Normal>
+                  <Torpedo>
+                    <Factor>0.35</Factor>
+                  </Torpedo>
+                  <BigBertha>
+                    <Factor>0.35</Factor>
+                  </BigBertha>
+                </DamageReceiveFactor>
+              </AttackableUpgrade>
+            </Values>
+          </Asset>
+        </ModOp>
+        
+
+        <!-- needs some kind of reapply for the new sessions -->
+        <ModOp GUID="153271" Type="AddNextSibling">
+          <Asset>
+            <Template>Trigger</Template>
+            <Values>
+              <Standard>
+                <GUID>1500001029</GUID>
+              </Standard>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition/>
+                    <ConditionEvent>
+                      <ConditionEvent>SessionEnter</ConditionEvent>
+                    </ConditionEvent>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions />
+                <ResetTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionTimer</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionTimer>
+                            <TimeLimit>30000</TimeLimit>
+                          </ConditionTimer>
+                        </Values>
+                      </TriggerCondition>
+                    </Trigger>
+                  </Values>
+                </ResetTrigger>
+              </Trigger>
+              <TriggerSetup>
+                <AutoRegisterTrigger>1</AutoRegisterTrigger>
+                <UsedBySecondParties>0</UsedBySecondParties>
+              </TriggerSetup>
+            </Values>
+          </Asset>
+        </ModOp>
+        
+      </Group>
+    </Group>
+    
+    <!-- this icon fits a bit better for non-pirates -->
+    <ModOp Type="replace" GUID='1500001026' Path="/Values/Standard/IconFilename">
+      <IconFilename>data/ui/2kimages/main/3dicons/icon_skull.png</IconFilename>
+    </ModOp>
+    <!-- add airhsips -->
+    <ModOp Type="add" GUID='1500001026' Path="/Values/ItemEffect/EffectTargets" 
+      Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='4146']">
+      <Item>
+        <GUID>4146</GUID>
+      </Item>
+    </ModOp>
+    
+    
+    <ModOp Type="add" GUID='1500001029' Path="/Values/Trigger/TriggerActions">
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_01_Jorgensen</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_02_Qing</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_03_Wibblesock</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_04_Smith</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_05_OMara</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_06_Gasparov</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_07_von_Malching</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_08_Gravez</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_09_Silva</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_10_Hunt</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>Second_ai_11_Mercier</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      
+      <Item>
+        <TriggerAction>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>100</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_01_Jorgensen</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_02_Qing</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_03_Wibblesock</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_04_Smith</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_05_OMara</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_06_Gasparov</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_07_von_Malching</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_08_Gravez</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_09_Silva</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_10_Hunt</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500001026</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <AffectedParticipant>Second_ai_11_Mercier</AffectedParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </TriggerAction>
+      </Item>
+      
+      
+    </ModOp>
+
+
+
+
+</ModOps>

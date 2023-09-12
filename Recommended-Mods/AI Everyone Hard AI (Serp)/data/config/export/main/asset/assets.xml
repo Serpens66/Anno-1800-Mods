@@ -1,0 +1,355 @@
+<ModOps>
+    
+    <!-- no need to adjust GUIDs 168 and 169, because we will make all AIs use 170 instead as BaseAssetGUID
+      But we will adjust assets that are using BaseAssetGUID 168 and 169 (easy and medium AIs), before we swap the BaseAssetGUID -->
+    
+    <!-- With CatchupToPercentage , AI is able to build more ships than ShipLimits, if human has more ships! -->
+    
+    <!-- if we want to make AI even stronger, we could change catchup/rubberband values: -->
+    <!-- WarFleet CatchupToPercentage allows the AI to build more ships than defined in ShipLimits, it is 110% of human number of ships for hard AI -->
+            <!-- <CatchupFactor> -->
+              <!-- <Enabled>1</Enabled> -->
+              <!-- <CatchupToPercentage>110</CatchupToPercentage> -->
+            <!-- </CatchupFactor> -->
+            <!-- <SlowdownFactor> -->
+              <!-- <Enabled>1</Enabled> -->
+              <!-- <SlowdownToPercentage>200</SlowdownToPercentage> -->
+              <!-- <MinSlowdown>30</MinSlowdown> -->
+            <!-- </SlowdownFactor> -->
+          <!-- </WarFleet> -->
+      <!-- </MilitaryAI> -->
+      <!-- <ConstructionAI> -->
+        <!-- <BuildRules> -->
+            <!-- <MinTimeBetweenBuilds>5000</MinTimeBetweenBuilds> -->
+            <!-- <MaxTimeBetweenBuilds>90000</MaxTimeBetweenBuilds> -->
+            <!-- <RubberbandSpeedUp>1</RubberbandSpeedUp> -->
+            <!-- <RubberbandSlowDown>1</RubberbandSlowDown> -->
+          <!-- </BuildRules> -->
+  
+
+  <!-- Adjust difficulty-points for the gamesettings, every AI gives +20points: -->
+  <ModOp Type="merge" GUID="2002450" Path="/Values/DifficultySettings/AvailableSecondParties/Item">
+    <Points>20</Points>
+  </ModOp>
+    
+  <!-- faster and cheaper ship production for hard AI, original 0.6 -->
+  <ModOp Type="merge" GUID="170" Path="/Values/ConstructionAI">
+    <ShipConstructionBonus>
+        <TimeBonus>0.5</TimeBonus>
+        <ProductBonus>0.5</ProductBonus>
+    </ShipConstructionBonus>
+  </ModOp>
+  
+  <!-- check more often if you have enough ships, original 30000. not sure if this is needed -->
+  <!-- As of Game Version 16.1, this was already reduced to 15000 from game devs, so no longer needed -->
+  <ModOp Type="merge" GUID="170" Path="/Values/MilitaryAI/StrengthLevels">
+      <UpdateInterval>15000</UpdateInterval>
+  </ModOp>
+  
+  <!-- Faster settlement of second island, default hard value from Hunt is 1200000, most easy had 2400000 in original  -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/IslandSettlement">
+    <Settle2ndIslandDelay>1200000</Settle2ndIslandDelay>
+  </ModOp>
+  <!-- add little bit of variation for some, so they dont settle everyone at exactly the same time.. -->
+  <ModOp Type="merge" GUID="47" Path="/Values/ConstructionAI/IslandSettlement">
+    <Settle2ndIslandDelay>1600000</Settle2ndIslandDelay>
+  </ModOp>
+  <ModOp Type="merge" GUID="79" Path="/Values/ConstructionAI/IslandSettlement">
+    <Settle2ndIslandDelay>1500000</Settle2ndIslandDelay>
+  </ModOp>
+  <!-- 81 George Smith does not has this entry, so add it -->
+  <ModOp Type="merge" GUID="81" Path="/Values/ConstructionAI">
+    <IslandSettlement>
+      <Settle2ndIslandDelay>1400000</Settle2ndIslandDelay>
+    </IslandSettlement>
+  </ModOp>
+  <ModOp Type="merge" GUID="83" Path="/Values/ConstructionAI/IslandSettlement">
+    <Settle2ndIslandDelay>1300000</Settle2ndIslandDelay>
+  </ModOp>
+  <!-- Hugo Mercier does not has this entry, so add it (IslandSettlement is therefore needed in node) -->
+  <ModOp Type="merge" GUID="220" Path="/Values/ConstructionAI">
+    <IslandSettlement>
+      <Settle2ndIslandDelay>1100000</Settle2ndIslandDelay>
+    </IslandSettlement>
+  </ModOp>
+  <ModOp Type="merge" GUID="84" Path="/Values/ConstructionAI/IslandSettlement">
+    <Settle2ndIslandDelay>1100000</Settle2ndIslandDelay>
+  </ModOp>
+
+
+  
+    <!-- dont ask for permission when settling, removing it from all easy and medium AIs (hard does not have it anyways) -->
+   <ModOp Type="remove" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/IslandSettlement/AskForSettlePermissionsCooldowns">
+   </ModOp>
+   
+   <!-- better defense, copy pasted from hard AI Lady Margarete Hunt-->
+   <!-- DefenseStructuresAir seems to be identical for all AIs (defined in <GUID>167</GUID>), so don't touch this yet. Maybe check in few updates( current 16.1) if devs changed it -->
+   <!-- everyone has the DefenseStructuresGround entry, so replace will work -->
+   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/ConstructionAI/DefenseStructuresGround"
+      Content="//Values[Standard/GUID='85']/ConstructionAI/DefenseStructuresGround">
+   </ModOp>
+  
+  <!-- <EconomyRules> should mostly be adjusted by using the Hard template already. directly in AIcode is only SupplementSessionAdditions defined, and this is character-profile specific not difficulty , eg producing help-packages instead of seamines for drops. -->
+
+
+  <!-- better MilitaryAI, copy pasted from Margarete with Defend/MinStrengthRatio at 75 instead of 70 and *1.5 all WarFleet MaxShipCount (not AirWarFleet) and custom SessionOverride and MaxSize for Escort at 2 -->
+  <!-- ShipLimits kann von KI überschritten werden, durch CatchupToPercentage=110%, wenn Spieler mehr Schiffe hat -->
+  <!-- everyone has the MilitaryAI entry, so replace will work -->
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI"
+      Content="//Values[Standard/GUID='85']/MilitaryAI">
+  </ModOp>
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI/Defend">
+    <MinStrengthRatio>75</MinStrengthRatio>
+  </ModOp>
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/MilitaryAI/Escort">
+    <MaxSize>2</MaxSize>
+  </ModOp>
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/MilitaryAI/WarFleet">
+    <ShipLimits>
+      <Peace>
+        <Progress>
+          <EarlyGame>
+            <MaxShipCount>12</MaxShipCount>
+          </EarlyGame>
+          <EarlyMidGame>
+            <MaxShipCount>21</MaxShipCount>
+          </EarlyMidGame>
+          <MidGame>
+            <MaxShipCount>30</MaxShipCount>
+          </MidGame>
+          <LateMidGame>
+            <MaxShipCount>45</MaxShipCount>
+          </LateMidGame>
+          <LateGame>
+            <MaxShipCount>63</MaxShipCount>
+          </LateGame>
+          <EndGame>
+            <MaxShipCount>78</MaxShipCount>
+          </EndGame>
+        </Progress>
+      </Peace>
+      <War>
+        <Progress>
+          <EarlyGame>
+            <MaxShipCount>12</MaxShipCount>
+          </EarlyGame>
+          <EarlyMidGame>
+            <MaxShipCount>21</MaxShipCount>
+          </EarlyMidGame>
+          <MidGame>
+            <MaxShipCount>30</MaxShipCount>
+          </MidGame>
+          <LateMidGame>
+            <MaxShipCount>45</MaxShipCount>
+          </LateMidGame>
+          <LateGame>
+            <MaxShipCount>63</MaxShipCount>
+          </LateGame>
+          <EndGame>
+            <MaxShipCount>78</MaxShipCount>
+          </EndGame>
+        </Progress>
+      </War>
+    </ShipLimits>
+  </ModOp>
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/SessionOverride">
+        <SessionOverride> <!-- Ac3s: the importance of each region to the AI, the higher the number the more ships they will keep in that region, hence it should be highest in Old World since that is where their main islands are, then New World since most important goods come from there. -->
+          <Item>
+            <SessionGUID>180023</SessionGUID> <!-- Old World (not Cape) --> <!-- Ac3s: was not set in vanilla -->
+            <Percentage>70</Percentage>
+          </Item>
+          <Item>
+            <SessionGUID>180025</SessionGUID> <!-- New World -->
+            <Percentage>50</Percentage>
+          </Item>
+          <Item>
+            <SessionGUID>110934</SessionGUID> <!-- Cape -->
+            <Percentage>50</Percentage>
+          </Item>
+          <Item>
+            <SessionGUID>180045</SessionGUID> <!-- Artic -->
+            <Percentage>25</Percentage>
+          </Item>
+          <Item>
+            <SessionGUID>112132</SessionGUID> <!-- Africa --> <!-- Ac3s: was not set in vanilla -->
+            <Percentage>20</Percentage>
+          </Item>
+        </SessionOverride>
+  </ModOp>
+  
+  <!-- better BuyShares from Margarete, with TakeoverIslandProbability and MilitaryTakeoverProbability set to 95 (if not defined it is 100) -->
+  <!-- everyone has the BuyShares entry, so replace will work -->
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/BuyShares"
+      Content="//Values[Standard/GUID='85']/BuyShares">
+  </ModOp>
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/BuyShares">
+      <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
+      <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
+  </ModOp>
+  <!-- add little bit of variation for some, so they dont buy shares everyone at exactly the same time.. -->
+  <ModOp Type="merge" GUID="47" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2700000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3800000</NextDecisionMaxTime>
+  </ModOp>
+  <ModOp Type="merge" GUID="79" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2500000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3400000</NextDecisionMaxTime>
+  </ModOp>
+  <ModOp Type="merge" GUID="81" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2200000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3300000</NextDecisionMaxTime>
+  </ModOp>
+  <ModOp Type="merge" GUID="83" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2600000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3200000</NextDecisionMaxTime>
+  </ModOp>
+  <ModOp Type="merge" GUID="220" Path="/Values/BuyShares">
+      <NextDecisionMinTime>2000000</NextDecisionMinTime>
+      <NextDecisionMaxTime>3000000</NextDecisionMaxTime>
+  </ModOp>
+
+  
+  
+  <!-- a bit diplomacy copied from Margarete -->
+  <!-- everyone has the DiplomacyActionBalancing entry, so replace will work -->
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/DiplomacyActionBalancing"
+      Content="//Values[Standard/GUID='85']/Diplomacy/DiplomacyActionBalancing">
+  </ModOp>
+  <!-- everyone has the ReputationChangeCalculation entry, so replace will work -->
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/ReputationChangeCalculation"
+      Content="//Values[Standard/GUID='85']/Diplomacy/ReputationChangeCalculation">
+  </ModOp>
+
+  
+  <!-- only change Default values to values between medium and hard (die werte schwanken zwischen den is stark, also nicht sicher ob das so sinnvoll ist) -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/InitialRelation">
+      <DefaultReputation>50</DefaultReputation>
+      <DefaultMemory>25</DefaultMemory>
+  </ModOp>
+  <!-- use default value for AutomaticDiscovery (whatever this is) -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/Values/Diplomacy/AutomaticDiscovery">
+    <Time>10800000</Time>
+  </ModOp>
+  
+  
+  <!-- RequestCeaseFire bei BuildingDestroyedByEnemy und ShipDestroyedByEnemy -->
+  <!-- mercier, Bente, Graves, Qing and Wibblesock haben TriggerChance auf 0, alle anderen auf 20%, warum? -->
+  <!-- CheckMilitaryStrength -0.75 triggert sobald spieler mindestens (1/0.75)=~1.333 mal soviel wie AI hat (siehe mehr erklärung mein stronger pirates mod) -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/Diplomacy/DiplomacyAI/SpecialTrigger/Item[position()=4 or position()=5]">
+      <TriggerChance>20</TriggerChance>
+      <MinTriggerReputation>0</MinTriggerReputation>
+      <MaxTriggerReputation>100</MaxTriggerReputation>
+      <CheckMilitaryStrength>-0.75</CheckMilitaryStrength>
+      <TriggerPriority>1</TriggerPriority>
+  </ModOp>
+  
+  <!-- RequestPeace bei BuildingDestroyedByEnemy und ShipDestroyedByEnemy -->
+  <!-- if player is at least 2 times stronger -->
+  <!-- you get a small amount of + reputation when you accept ceasefire, so I think it is ok to have a small MinTriggerReputation here, so after a few ceasefires they will finally offer peace -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/Diplomacy/DiplomacyAI/SpecialTrigger/Item[position()=6 or position()=7]">
+      <TriggerChance>20</TriggerChance>
+      <MinTriggerReputation>3</MinTriggerReputation>
+      <MaxTriggerReputation>100</MaxTriggerReputation>
+      <CheckMilitaryStrength>-0.5</CheckMilitaryStrength>
+      <TriggerPriority>2</TriggerPriority>
+  </ModOp>
+
+
+
+  
+  <!-- Adjustments also to some aspects of already hard AIs, to be in line with hardest hard AI -->
+  <!-- Alonso (48) has this set to 60, unlike all other hard AIs (100) -->
+  <ModOp Type="merge" GUID="48" Path="/Values/BuyShares">
+    <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
+  </ModOp>  
+  <ModOp Type="merge" GUID="48" Path="/Values/BuyShares">
+    <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
+  </ModOp>
+  <!-- Set it to 95% for all AIs (not 100 like hard), because it is okay if in rare cases the island is just bought -->
+  <ModOp Type="merge" GUID="170" Path="/Values/BuyShares">
+    <TakeoverIslandProbability>95</TakeoverIslandProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after getting all its shares -->
+    <MilitaryTakeoverProbability>95</MilitaryTakeoverProbability> <!-- Ac3s: this determines the chance of the AI taking over an island after defeating it in combat -->
+  </ModOp>
+  
+  
+  <!-- Let everyone place seamines around harbor, like Mercier -->
+  <!-- there are several more options, like when and how far and how often to spawn mines, see properties-toolone.xml SeamineConfig. but default is ok. -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/ConstructionAI">
+      <SeamineConfig>
+        <HarborMineDefence>
+          <PlaceMinesAroundHarbor>1</PlaceMinesAroundHarbor>
+        </HarborMineDefence>
+      </SeamineConfig>
+  </ModOp>
+  
+  
+  <!-- Increase required money amount for diplomatic interactions. No changes to success chances and reputationgain/loss though, to keep friendly personality of characters -->
+  <!-- everyone has the GiftBalancing entry, so replace will work -->
+  <!-- receiveOrdinary and receiveGenerous are not used by the game itself, but by other mods eg. SupportFleet. -->
+   <!-- unfortunately there is not even a way to fetch the amount for text, so we can only display the one for Small. -->
+   <!-- that means receiveOrdinary and receiveGenerous should have the same value like small -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/Diplomacy/GiftBalancing">
+    <!-- <GiftBalancing> -->
+        <receivePayment>
+          <BaseValue>800</BaseValue> <!-- original 500, Ac3s: changes money demand for treaty cancelation and war threats from AI -->
+          <IncreasePerLevel>7</IncreasePerLevel> <!-- original 7, Ac3s: note that increasing the "level" on pirates to make their prices increase does almost nothing since pirates do not advance in level because they do not expand to other islands like normal AIs do -->
+        </receivePayment>
+        <receiveSmall> <!-- this is used for gifting money to AIs. Ordinary/Generous are disabled -->
+          <BaseValue>6000</BaseValue> <!-- original Silva 8000 other hard 4000, Ac3s: changes player money gifting to AI -->
+          <IncreasePerLevel>7</IncreasePerLevel>
+        </receiveSmall>
+        <receiveOrdinary>
+          <BaseValue>6000</BaseValue> <!-- Ac3s: changes player money gifting to AI -->
+          <IncreasePerLevel>7</IncreasePerLevel>
+        </receiveOrdinary>
+        <receiveGenerous>
+          <BaseValue>6000</BaseValue> <!-- Ac3s: changes player money gifting to AI -->
+          <IncreasePerLevel>7</IncreasePerLevel>
+        </receiveGenerous>
+        
+        <counterProposal>
+          <BaseValue>3000</BaseValue> <!-- original 2400-2700, Ac3s: changes player money, requesting cease-fire/peace/trade/alliance from AI -->
+          <IncreasePerLevel>7</IncreasePerLevel>
+        </counterProposal>
+        
+        <givePayment>
+          <BaseValue>1500</BaseValue> <!-- original 400, Ac3s: changes AI money gifting to player(alliance) -->
+          <IncreasePerLevel>7</IncreasePerLevel>
+        </givePayment>
+        <giveSmall>
+          <BaseValue>3000</BaseValue> <!-- original 500, Ac3s: changes AI money gifting to player(alliance) -->
+          <IncreasePerLevel>7</IncreasePerLevel>
+        </giveSmall>
+        <giveOrdinary>
+          <BaseValue>10000</BaseValue> <!-- original 2500, Ac3s: changes AI money gifting to player(alliance) -->
+          <IncreasePerLevel>7</IncreasePerLevel>
+        </giveOrdinary>
+        <giveGenerous>
+          <BaseValue>20000</BaseValue> <!-- original 5000, Ac3s: changes AI money gifting to player(alliance) -->
+          <IncreasePerLevel>7</IncreasePerLevel>
+        </giveGenerous>
+      <!-- </GiftBalancing> -->
+  </ModOp>
+  
+  
+  <!-- only one time request ceasefire every 60 min, so this means you have to fight at least 15 min with shorter ceasefire mod active (DiceDebuff=20 roughly means you need ~50 rep for a chance they accept another request, so value 20 is enough based on their agreement threshold) -->
+  <ModOp Type="merge" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/Diplomacy">
+    <ActionDebuffs>
+      <DebuffSettings>
+        <CeaseFire>
+          <DiceDebuff>20</DiceDebuff>
+          <DebuffTime>3600000</DebuffTime>
+          <ApplyWhenSuccesful>1</ApplyWhenSuccesful>
+        </CeaseFire>
+      </DebuffSettings>
+    </ActionDebuffs>
+  </ModOp>
+  
+  
+  <!-- at last, change the BaseAssetGUID from easy/medium, to hard -->
+   <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/BaseAssetGUID">
+    <BaseAssetGUID>170</BaseAssetGUID>
+   </ModOp>
+
+</ModOps>
+

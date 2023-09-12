@@ -1,0 +1,980 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModOps>
+  
+  <!-- Verwendet Serps GUIDS von 1500000050 bis 1500000057 (reserviert fuer diesen mod bis 1500000060) -->
+  <!-- 1500000056 wieder frei  -->
+  
+  
+
+  <!-- make every quest provide researchpoints. -->
+  <!-- we need to put researchpoints into a pool, otherwise rewardconfig wont accept it. -->
+  <ModOp GUID="150038" Type="addNextSibling">
+    <Asset>
+      <Template>ResourcePool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000055</GUID>
+          <Name>ResearchPointsPool</Name>
+        </Standard>
+        <ResourceRewardPool>
+          <PossibleRewards>
+            <Item>
+              <Resource>119392</Resource>
+              <Amount>1</Amount>
+            </Item>
+          </PossibleRewards>
+        </ResourceRewardPool>
+        <Locked />
+      </Values>
+    </Asset>
+  </ModOp>
+  <ModOp Type="add" Path="//Values[Quest]/Reward/RewardAssets">
+    <Item>
+      <Reward>1500000055</Reward>
+      <Amount>1</Amount>
+    </Item>
+  </ModOp>
+  <ModOp Type="add" GUID="140501" Path="/Values/RewardConfig/ResourceBalancing">
+    <Item>
+      <Resource>119392</Resource>
+      <BaseAmount>20</BaseAmount>
+      <MaxBonusPercent>25</MaxBonusPercent>
+      <ProgressFactor>
+        <EarlyGame>
+          <Factor>1</Factor>
+        </EarlyGame>
+        <EarlyMidGame>
+          <Factor>2</Factor>
+        </EarlyMidGame>
+        <MidGame>
+          <Factor>5</Factor>
+        </MidGame>
+        <LateMidGame>
+          <Factor>15</Factor>
+        </LateMidGame>
+        <LateGame>
+          <Factor>35</Factor>
+        </LateGame>
+        <EndGame>
+          <Factor>60</Factor>
+        </EndGame>
+      </ProgressFactor>
+      <QuestDifficultyFactor>
+        <Easy>
+          <Factor>1</Factor>
+        </Easy>
+        <Medium>
+          <Factor>2</Factor>
+        </Medium>
+        <Hard>
+          <Factor>3</Factor>
+        </Hard>
+      </QuestDifficultyFactor>
+    </Item>
+  </ModOp>
+
+<!-- ################################ -->
+<!-- ################################ -->
+
+  <!-- change multiplayer quest/trigger to only give 5 scholar permit when reaching 1500 elders, instead of 10 scholar permits. you need 10 to research more permits. you will get +6 when researchcenter completed. This way you need to build the center -->
+  <ModOp Type="merge" GUID="125010" Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionAddResource[Resource='114445']">
+    <ResourceAmount>5</ResourceAmount>
+  </ModOp>
+  <ModOp Type="merge" GUID="128474" Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionPlayerCounter[Context='114445']">
+    <CounterAmount>5</CounterAmount>
+  </ModOp>
+  <!-- change the story quest to only give 5 instead of 10 scholar permits. you need 10 to research more permits. you will get +6 when researchcenter completed. This way you need to build the center -->
+  <ModOp Type="merge" GUID="119999" Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestObjective/OnSuccessActions/Values/ActionList/Actions/Item/Action/Values/ActionAddResource[Resource='114445']">
+    <ResourceAmount>5</ResourceAmount>
+  </ModOp>
+  <ModOp Type="merge" GUID="119999" Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionPlayerCounter[Context='114445']">
+    <CounterAmount>5</CounterAmount>
+  </ModOp>
+  
+  <!-- add the new research building -->
+  <ModOp Type="addNextSibling" GUID="100780">
+    <Asset>
+      <Template>ResearchCenter</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000050</GUID>
+          <Name>ResearchCenter_03_Mod</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_research_center.png</IconFilename>
+          <InfoDescription>1500000053</InfoDescription>
+        </Standard>
+        <Building>
+          <AssociatedRegions>Moderate</AssociatedRegions>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+        </Building>
+        <Blocking />
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1010017</Ingredient>
+              <Amount>10000</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010196</Ingredient>
+              <Amount>75</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010205</Ingredient>
+              <Amount>75</Amount>
+            </Item>
+            <Item>
+              <Ingredient>1010218</Ingredient>
+              <Amount>25</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/buildings/public/service_07/service_07.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Mesh />
+        <Selection>
+          <GUIType>ResearchCentre</GUIType>
+          <OnSelection>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList />
+            </Values>
+          </OnSelection>
+          <ParticipantMessageArcheType>Africa_Resident_tier03</ParticipantMessageArcheType>
+        </Selection>
+        <Text />
+        <Constructable />
+        <Locked>
+          <DefaultLockedState>1</DefaultLockedState>
+          <DLCDependency>410071</DLCDependency>
+          <VisibleWhenLocked>1</VisibleWhenLocked>
+        </Locked>
+        <SoundEmitter>
+          <ActiveSounds>
+            <Item>
+              <Sound>270400</Sound>
+            </Item>
+          </ActiveSounds>
+          <ConstructionSounds>
+            <BuildUpgrade>
+              <Item>
+                <VectorElement>
+                  <InheritanceMapV2>
+                    <Entry>
+                      <TemplateName>Monument</TemplateName>
+                      <Index>0</Index>
+                    </Entry>
+                  </InheritanceMapV2>
+                </VectorElement>
+                <Sound>201232</Sound>
+              </Item>
+            </BuildUpgrade>
+          </ConstructionSounds>
+          <SpawnSounds>
+            <Item>
+              <Sound>200912</Sound>
+            </Item>
+          </SpawnSounds>
+          <BuildingRepaired>
+            <Item>
+              <Sound>203866</Sound>
+            </Item>
+          </BuildingRepaired>
+        </SoundEmitter>
+        <FeedbackController />
+        <Infolayer />
+        <FactoryBase />
+        <LogisticNode>
+          <TransporterCountMax>0</TransporterCountMax>
+          <NeedsTransporterQueue>0</NeedsTransporterQueue>
+        </LogisticNode>
+        <Culture>
+          <Attractiveness>50</Attractiveness>
+          <CultureSpawnGroup>1</CultureSpawnGroup>
+        </Culture>
+        <AmbientMoodProvider>
+          <Murmur>ResearchCenter</Murmur>
+        </AmbientMoodProvider>
+        <Maintenance>
+          <Maintenances>
+            <Item>
+              <Product>1010115</Product>
+            </Item>
+            <Item>
+              <Product>1010017</Product>
+              <Amount>100</Amount>
+              <InactiveAmount>10</InactiveAmount>
+            </Item>
+          </Maintenances>
+          <ConsumerPriority>1</ConsumerPriority>
+          <ConsumerPriorityAlarmed>2</ConsumerPriorityAlarmed>
+        </Maintenance>
+        <Attackable>
+          <MaximumHitPoints>10000</MaximumHitPoints>
+          <SelfHealPerHealTick>6</SelfHealPerHealTick>
+        </Attackable>
+        <Pausable />
+        <BuildingUnique>
+          <Uniques>
+            <Item>
+              <UniqueType>ResearchCenter</UniqueType>
+              <UniqueScope>Game</UniqueScope>
+            </Item>
+          </Uniques>
+        </BuildingUnique>
+        <UpgradeList />
+        <Industrializable>
+          <BoostedByIndustrialization>0</BoostedByIndustrialization>
+        </Industrializable>
+        <QuestObject />
+        <Electrifiable />
+        <ResearchCenter />
+        
+        <PublicService>
+          <FunctionDescription>100364</FunctionDescription>
+          <FullSatisfactionDistance>45</FullSatisfactionDistance>
+          <NoSatisfactionDistance>90</NoSatisfactionDistance>
+          <PublicServiceOutputs>
+            <Item>
+              <Product>1010353</Product>
+            </Item>
+          </PublicServiceOutputs>
+        </PublicService>
+      </Values>
+    </Asset>    
+  </ModOp> 
+    
+    
+    <ModOp GUID="502107" Path="Values/ConstructionCategory/BuildingList/Item[Building='118938']" Type="addPrevSibling">
+        <Item>
+            <Building>1500000050</Building>
+        </Item>
+    </ModOp>
+    <ModOp GUID="500092" Path="Values/ConstructionCategory/BuildingList/Item[Building='1000178']" Type="addPrevSibling">
+        <Item>
+            <Building>1500000050</Building>
+        </Item>
+    </ModOp>
+    
+
+  <!-- buildable when having workers -->
+    <ModOp Type="AddNextSibling" GUID='130221'>
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500000054</GUID>
+              <Name>intermediate moderate 2.0 Hochschule</Name>
+              <IconFilename>data/ui/2kimages/main/profiles/resident_tier02.png</IconFilename>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionPlayerCounter</Template>
+                <Values>
+                  <Condition />
+                  <ConditionPlayerCounter>
+                    <PlayerCounter>PopulationByLevel</PlayerCounter>
+                    <Context>15000001</Context>
+                    <CounterAmount>1</CounterAmount>
+                  </ConditionPlayerCounter>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions>
+                <Item>
+                  <TriggerAction>
+                    <Template>ActionUnlockAsset</Template>
+                    <Values>
+                      <Action />
+                      <ActionUnlockAsset>
+                        <UnlockAssets>
+                          <Item>
+                            <Asset>1500000050</Asset>
+                          </Item>
+                        </UnlockAssets>
+                        <UnhideAssets />
+                      </ActionUnlockAsset>
+                    </Values>
+                  </TriggerAction>
+                </Item>
+              </TriggerActions>
+            </Trigger>
+            <TriggerSetup>
+              <UsedBySecondParties>0</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+  
+  <ModOp Type="add" GUID="190611,193879,193666,368" Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs">
+    <Item>
+      <GUID>1500000050</GUID>
+    </Item>
+  </ModOp>
+  
+  <!-- unlock research stuff with Hochschule building and give 100 researchpoints for free -->
+  <ModOp Type="addNextSibling" GUID="127844">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000051</GUID>
+          <Name>ResearchFeatureUnlockTrigger_Mod</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500000050</Context>
+                <CounterAmount>1</CounterAmount>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <Asset>120244</Asset>
+                      </Item>
+                      <Item>
+                        <Asset>127612</Asset>
+                      </Item>
+                      <Item>
+                        <Asset>127613</Asset>
+                      </Item>
+                      <Item>
+                        <Asset>127614</Asset>
+                      </Item>
+                      <Item>
+                        <Asset>125028</Asset>
+                      </Item>
+                      <Item>
+                        <Asset>125193</Asset>
+                      </Item>
+                      <Item>
+                        <Asset>125191</Asset>
+                      </Item>
+                      <Item>
+                        <Asset>125192</Asset>
+                      </Item>
+                      <Item>
+                        <Asset>119392</Asset>
+                      </Item>
+                    </UnlockAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>119392</Resource>
+                    <ResourceAmount>100</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+</ModOp>
+  <!-- give 6 scholar build permit when completing the researchcenter -->
+  <!-- and give 500 researchpoints for free -->
+  <!-- Und sobald das originale Forschungszentrum fertig gebaut wurde, lässt sich das Mod-Forschungszentrum nicht mehr bauen (weils mit Arbeitern und ohne Strom deutlich stärker wäre) -->
+  <!--  Das ist der Preis dafür, selbst Forschungspunkte generieren und die höheren Forschungsprojekte erforschen zu können -->
+  <ModOp Type="add" GUID="127844" Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionAddResource</Template>
+        <Values>
+          <Action />
+          <ActionAddResource>
+            <Resource>114445</Resource>
+            <ResourceAmount>6</ResourceAmount>
+          </ActionAddResource>
+        </Values>
+      </TriggerAction>
+    </Item>
+    <Item>
+      <TriggerAction>
+        <Template>ActionAddResource</Template>
+        <Values>
+          <Action />
+          <ActionAddResource>
+            <Resource>119392</Resource>
+            <ResourceAmount>500</ResourceAmount>
+          </ActionAddResource>
+        </Values>
+      </TriggerAction>
+    </Item>
+    <Item>
+      <TriggerAction>
+        <Template>ActionLockAsset</Template>
+        <Values>
+          <Action />
+          <ActionLockAsset>
+            <LockAssets>
+              <Item>
+                <Asset>1500000050</Asset>
+              </Item>
+            </LockAssets>
+          </ActionLockAsset>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  
+  
+  <!-- ################################### -->
+  <!-- ResearchFeature changes: -->
+  <!-- ################################### -->
+  
+  <!-- increase the max limit of researchpoints without any scholars in ResearchLimitBalancing -->
+  <!-- the threshold is the number of scholars -->
+  <!-- use 310 as needed scholars to get a limit of 5k (which makes you able to research new scholar permits) cause this means you need at least 10 scholar houses (31 scholars per house without africa goods), gained by building the researchcenter (the quests only give 5 instead of 10 permits) -->
+  <ModOp Type="replace" GUID="123399" Condition="/Values/ProgressBalancing/Progress/Item[1][Value&gt;4999 or Value&lt;3000]" Path="/Values/ProgressBalancing/Progress/Item[1]/Value">
+      <Value>4500</Value>
+  </ModOp>
+  <ModOp Type="replace" GUID="123399" Condition="/Values/ProgressBalancing/Progress/Item[2][Value&lt;5000]" Path="/Values/ProgressBalancing/Progress/Item[2]/Value">
+      <Value>5000</Value>
+  </ModOp>
+  <ModOp Type="replace" GUID="123399" Condition="/Values/ProgressBalancing/Progress/Item[2]" Path="/Values/ProgressBalancing/Progress/Item[2]/Threshold">
+      <Threshold>310</Threshold>
+  </ModOp>
+  <ModOp Type="replace" GUID="123399" Condition="/Values/ProgressBalancing/Progress/Item[3][Value&lt;5000]" Path="/Values/ProgressBalancing/Progress/Item[3]/Value">
+      <Value>5000</Value>
+  </ModOp>
+  
+  
+  <!-- make everything only need 1 worker, so this is no hurdle anymore. needed if we want workers and ingeneurs. cant use 0 because of divide by zero problem... -->
+  <ModOp Type = "replace" GUID="120244" Path = "/Values/ResearchFeature/ItemCraftingConfig/*/MinimumWorkforceAmount">
+    <MinimumWorkforceAmount>1</MinimumWorkforceAmount>
+  </ModOp>
+  <ModOp Type = "replace" Path = "//Godlike/CraftingConfig/MinimumWorkforceAmount">
+    <MinimumWorkforceAmount>1</MinimumWorkforceAmount>
+  </ModOp>
+  
+  <ModOp Type="merge" GUID="120244" Path="/Values/ResearchFeature">
+    <ItemCraftingWorkforce>1010115</ItemCraftingWorkforce>
+  </ModOp>
+    
+  <!-- changing forschungspunkte costs of item research -->
+  <!-- goal is to have it a fixed amount researchable with the early research, but still not make it too easy/different from vanilla. -->
+  <!-- So we will add a fixed amount of cheap entries but after that it will be vanilla -->
+  <!-- Common -->
+  <!-- if the Value in Progress is bigger than X, then add our values so our early research works well (eg. changed by mods (loaded before ours) that make everything cheaper) -->
+  <Group Condition="@128475/ProgressBalancing/Progress/Item[1][Value&gt;250]">
+    <ModOp Type="addPrevSibling" GUID="128475" Path="/Values/ProgressBalancing/Progress/Item[1]/Value">
+      <Threshold>20</Threshold>
+    </ModOp>
+    <ModOp Type="addPrevSibling" GUID="128475" Path="/Values/ProgressBalancing/Progress/Item[1]">
+      <Item>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>1</Threshold>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>2</Threshold>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>3</Threshold>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>4</Threshold>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>5</Threshold>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>6</Threshold>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>7</Threshold>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>8</Threshold>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>9</Threshold>
+        <Value>250</Value>
+      </Item>
+      <Item>
+        <Threshold>10</Threshold>
+        <Value>400</Value>
+      </Item>
+      <Item>
+        <Threshold>11</Threshold>
+        <Value>400</Value>
+      </Item>
+      <Item>
+        <Threshold>12</Threshold>
+        <Value>400</Value>
+      </Item>
+      <Item>
+        <Threshold>13</Threshold>
+        <Value>400</Value>
+      </Item>
+      <Item>
+        <Threshold>14</Threshold>
+        <Value>400</Value>
+      </Item>
+      <Item>
+        <Threshold>15</Threshold>
+        <Value>400</Value>
+      </Item>
+      <Item>
+        <Threshold>16</Threshold>
+        <Value>400</Value>
+      </Item>
+      <Item>
+        <Threshold>17</Threshold>
+        <Value>400</Value>
+      </Item>
+      <Item>
+        <Threshold>18</Threshold>
+        <Value>400</Value>
+      </Item>
+      <Item>
+        <Threshold>19</Threshold>
+        <Value>400</Value>
+      </Item>
+    </ModOp>
+  </Group>
+  <!-- Uncommon -->
+  <Group Condition="@128952/ProgressBalancing/Progress/Item[1][Value&gt;350]">
+    <ModOp Type="addPrevSibling" GUID="128952" Path="/Values/ProgressBalancing/Progress/Item[1]/Value">
+      <Threshold>15</Threshold>
+    </ModOp>
+    <ModOp Type="addPrevSibling" GUID="128952" Path="/Values/ProgressBalancing/Progress/Item[1]">
+      <Item>
+        <Value>350</Value>
+      </Item>
+      <Item>
+        <Threshold>1</Threshold>
+        <Value>350</Value>
+      </Item>
+      <Item>
+        <Threshold>2</Threshold>
+        <Value>350</Value>
+      </Item>
+      <Item>
+        <Threshold>3</Threshold>
+        <Value>350</Value>
+      </Item>
+      <Item>
+        <Threshold>4</Threshold>
+        <Value>350</Value>
+      </Item>
+      <Item>
+        <Threshold>5</Threshold>
+        <Value>350</Value>
+      </Item>
+      <Item>
+        <Threshold>6</Threshold>
+        <Value>350</Value>
+      </Item>
+      <Item>
+        <Threshold>7</Threshold>
+        <Value>350</Value>
+      </Item>
+      <Item>
+        <Threshold>8</Threshold>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>9</Threshold>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>10</Threshold>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>11</Threshold>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>12</Threshold>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>13</Threshold>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>14</Threshold>
+        <Value>600</Value>
+      </Item>
+    </ModOp>
+  </Group>
+  <!-- Rare -->
+  <Group Condition="@128953/ProgressBalancing/Progress/Item[1][Value&gt;600]">
+    <ModOp Type="addPrevSibling" GUID="128953" Path="/Values/ProgressBalancing/Progress/Item[1]/Value">
+      <Threshold>10</Threshold>
+    </ModOp>
+    <ModOp Type="addPrevSibling" GUID="128953" Path="/Values/ProgressBalancing/Progress/Item[1]">
+      <Item>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>1</Threshold>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>2</Threshold>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>3</Threshold>
+        <Value>600</Value>
+      </Item>
+      <Item>
+        <Threshold>4</Threshold>
+        <Value>1000</Value>
+      </Item>
+      <Item>
+        <Threshold>5</Threshold>
+        <Value>1000</Value>
+      </Item>
+      <Item>
+        <Threshold>6</Threshold>
+        <Value>1000</Value>
+      </Item>
+      <Item>
+        <Threshold>7</Threshold>
+        <Value>1000</Value>
+      </Item>
+      <Item>
+        <Threshold>8</Threshold>
+        <Value>1500</Value>
+      </Item>
+      <Item>
+        <Threshold>9</Threshold>
+        <Value>1500</Value>
+      </Item>
+    </ModOp>
+  </Group>
+  <!-- Epic -->
+  <Group Condition="@128954/ProgressBalancing/Progress/Item[1][Value&gt;1000]">
+    <ModOp Type="addPrevSibling" GUID="128954" Path="/Values/ProgressBalancing/Progress/Item[1]/Value">
+      <Threshold>6</Threshold>
+    </ModOp>
+    <ModOp Type="addPrevSibling" GUID="128954" Path="/Values/ProgressBalancing/Progress/Item[1]">
+      <Item>
+        <Value>1000</Value>
+      </Item>
+      <Item>
+        <Threshold>1</Threshold>
+        <Value>1000</Value>
+      </Item>
+      <Item>
+        <Threshold>2</Threshold>
+        <Value>2000</Value>
+      </Item>
+      <Item>
+        <Threshold>3</Threshold>
+        <Value>2000</Value>
+      </Item>
+      <Item>
+        <Threshold>4</Threshold>
+        <Value>3000</Value>
+      </Item>
+      <Item>
+        <Threshold>5</Threshold>
+        <Value>3000</Value>
+      </Item>
+    </ModOp>
+  </Group>
+  <!-- Legendary -->
+  <Group Condition="@128955/ProgressBalancing/Progress/Item[1][Value&gt;4500]">
+    <ModOp Type="addPrevSibling" GUID="128955" Path="/Values/ProgressBalancing/Progress/Item[1]/Value">
+      <Threshold>3</Threshold>
+    </ModOp>
+    <ModOp Type="addPrevSibling" GUID="128955" Path="/Values/ProgressBalancing/Progress/Item[1]">
+      <Item>
+        <Value>4000</Value>
+      </Item>
+      <Item>
+        <Threshold>1</Threshold>
+        <Value>4500</Value>
+      </Item>
+      <Item>
+        <Threshold>2</Threshold>
+        <Value>4500</Value>
+      </Item>
+    </ModOp>
+  </Group>
+  
+  
+  <!-- PermitCraftingCostsBalancingNew, at least 4501k cost for the first one, because we dont want this to be researchable before ResearchCenter is built -->
+  <ModOp Type="addPrevSibling" GUID="129525" Condition="/Values/ProgressBalancing/Progress/Item[1]" Path="/Values/ProgressBalancing/Progress/Item[1]/Value">
+    <Threshold>1</Threshold>
+  </ModOp>
+  <ModOp Type="addPrevSibling" GUID="129525" Condition="/Values/ProgressBalancing/Progress/Item[2]"  Path="/Values/ProgressBalancing/Progress/Item[2]/Value">
+    <Threshold>2</Threshold>
+  </ModOp>
+  <ModOp Type="addPrevSibling" GUID="129525" Condition="/Values/ProgressBalancing/Progress/Item[3]"  Path="/Values/ProgressBalancing/Progress/Item[3]/Value">
+    <Threshold>3</Threshold>
+  </ModOp>
+  <!-- put it at the beginning without changing other value within to be compatible with mods loaded before -->
+  <ModOp Type="addPrevSibling" GUID="129525" Path="/Values/ProgressBalancing/Progress/Item[1]">
+    <Item>
+      <Value>4501</Value>
+    </Item>
+  </ModOp>
+  
+  <!-- new costs for things like moving clay/oil. This should be much cheaper than changing mine/fertility -->
+  <ModOp Type="addNextSibling" GUID="126888">
+   <Asset>
+      <Template>ProgressBalancing</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000052</GUID>
+          <Name>GodlikeResearchCostsBalancing_Mod</Name>
+        </Standard>
+        <ProgressBalancing>
+          <Progress>
+            <Item>
+              <Value>1500</Value>
+            </Item>
+            <Item>
+              <Threshold>1</Threshold>
+              <Value>1500</Value>
+            </Item>
+            <Item>
+              <Threshold>2</Threshold>
+              <Value>2500</Value>
+            </Item>
+            <Item>
+              <Threshold>3</Threshold>
+              <Value>2500</Value>
+            </Item>
+            <Item>
+              <Threshold>4</Threshold>
+              <Value>3500</Value>
+            </Item>
+            <Item>
+              <Threshold>5</Threshold>
+              <Value>3500</Value>
+            </Item>
+            <Item>
+              <Threshold>6</Threshold>
+              <Value>4500</Value>
+            </Item>
+            <Item>
+              <Threshold>7</Threshold>
+              <Value>4500</Value>
+            </Item>
+          </Progress>
+          <PostProgress>
+            <ThresholdInterval>1</ThresholdInterval>
+            <ValueIncrease>1000</ValueIncrease>
+          </PostProgress>
+          <AbsoluteLimit>50000</AbsoluteLimit>
+        </ProgressBalancing>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- make move clay/oil and researchkit use the new costs -->
+  <ModOp Type="merge" Condition="@126888/ProgressBalancing/Progress/Item[1][Value&gt;1500]" GUID="124839,124840,124846" Path="/Values/Godlike">
+    <CraftingCostBalancing>1500000052</CraftingCostBalancing>
+  </ModOp>
+  <!-- allow a single cheap/early one for other godlikes like ChangeMine/Fertility/advanced production -->
+  <ModOp Type="replace" GUID="126888" Condition="/Values/ProgressBalancing/Progress/Item[1][Value&gt;4500]" Path="/Values/ProgressBalancing/Progress/Item[1]">
+    <Item>
+      <Value>4500</Value>
+    </Item>
+  </ModOp>
+  
+  <!-- Increase the researchpoints you get when donating items (to have better source of researchpoints when not being able to generate them with scholars early). Use condition to make sure to not reduce values, if it was set to higher values by another mod -->
+  <ModOp Type="merge" GUID="120244"  Condition="/Values/ResearchFeature/ItemDonationConfig/Narrative[ResearchGain&lt;500]" Path="/Values/ResearchFeature/ItemDonationConfig/Narrative">
+    <ResearchGain>500</ResearchGain>
+  </ModOp>
+  <ModOp Type="merge" GUID="120244"  Condition="/Values/ResearchFeature/ItemDonationConfig/Common[ResearchGain&lt;75]" Path="/Values/ResearchFeature/ItemDonationConfig/Common">
+    <ResearchGain>75</ResearchGain>
+  </ModOp>
+  <ModOp Type="merge" GUID="120244"  Condition="/Values/ResearchFeature/ItemDonationConfig/Uncommon[ResearchGain&lt;150]" Path="/Values/ResearchFeature/ItemDonationConfig/Uncommon">
+    <ResearchGain>150</ResearchGain>
+  </ModOp>
+  <ModOp Type="merge" GUID="120244"  Condition="/Values/ResearchFeature/ItemDonationConfig/Rare[ResearchGain&lt;300]" Path="/Values/ResearchFeature/ItemDonationConfig/Rare">
+    <ResearchGain>300</ResearchGain>
+  </ModOp>
+  <ModOp Type="merge" GUID="120244"  Condition="/Values/ResearchFeature/ItemDonationConfig/Epic[ResearchGain&lt;600]" Path="/Values/ResearchFeature/ItemDonationConfig/Epic">
+    <ResearchGain>600</ResearchGain>
+  </ModOp>
+  <ModOp Type="merge" GUID="120244"  Condition="/Values/ResearchFeature/ItemDonationConfig/Legendary[ResearchGain&lt;1500]" Path="/Values/ResearchFeature/ItemDonationConfig/Legendary">
+    <ResearchGain>1500</ResearchGain>
+  </ModOp>
+  
+  
+  
+  <!-- ############################################## -->
+  <!-- Distribute some researchpoints on unlocking stuff by population -->
+  <!-- ############################################## -->
+  <!-- moderate -->
+  <ModOp Type="add" GUID="130253,130254,130255,130256,130216,130217,130218,130219,130220,130221,130222,130224,130226,130227,130228,130229,130230,130232,130233" Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionAddResource</Template>
+        <Values>
+          <Action />
+          <ActionAddResource>
+            <Resource>119392</Resource>
+            <ResourceAmount>100</ResourceAmount>
+          </ActionAddResource>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  <!-- new world, also added artista -->
+  <ModOp Type="add" GUID="130237,130238,130239,130240,130241,130242,130243,130244,130246,5799,6020,6021,6022,7222,7224" Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionAddResource</Template>
+        <Values>
+          <Action />
+          <ActionAddResource>
+            <Resource>119392</Resource>
+            <ResourceAmount>250</ResourceAmount>
+          </ActionAddResource>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  <!-- africa -->
+  <ModOp Type="add" GUID="114332,114333,114334,114336,114337,114338,114339,128534" Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionAddResource</Template>
+        <Values>
+          <Action />
+          <ActionAddResource>
+            <Resource>119392</Resource>
+            <ResourceAmount>250</ResourceAmount>
+          </ActionAddResource>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  <!-- arctic -->
+  <ModOp Type="add" GUID="112645,112646,112647,112648,112649,112650,112651" Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionAddResource</Template>
+        <Values>
+          <Action />
+          <ActionAddResource>
+            <Resource>119392</Resource>
+            <ResourceAmount>500</ResourceAmount>
+          </ActionAddResource>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  <!-- tourism -->
+  <ModOp Type="add" GUID="137657,137658,137659,137660,137661,137662,137663,134249" Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionAddResource</Template>
+        <Values>
+          <Action />
+          <ActionAddResource>
+            <Resource>119392</Resource>
+            <ResourceAmount>250</ResourceAmount>
+          </ActionAddResource>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  
+  
+  
+  <!-- unlock in CreativeMode: -->
+  <ModOp Type="AddNextSibling" GUID='130221'>
+      <Asset>
+        <Template>Trigger</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000057</GUID>
+            <Name>intermediate moderate 2.0 Hochschule creativemode</Name>
+            <IconFilename>data/ui/2kimages/main/profiles/resident_tier02.png</IconFilename>
+          </Standard>
+          <Trigger>
+            <TriggerCondition>
+              <Values>
+                <ConditionPropsNegatable />
+                <Condition />
+                <ConditionIsCreativeMode />
+              </Values>
+              <Template>ConditionIsCreativeMode</Template>
+            </TriggerCondition>
+            <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionUnlockAsset</Template>
+                  <Values>
+                    <Action />
+                    <ActionUnlockAsset>
+                        <UnlockAssets>
+                          <Item>
+                            <Asset>1500000050</Asset>
+                          </Item>
+                        </UnlockAssets>
+                    </ActionUnlockAsset>
+                  </Values>
+                </TriggerAction>
+              </Item>
+            </TriggerActions>
+          </Trigger>
+          <TriggerSetup>
+            <UsedBySecondParties>0</UsedBySecondParties>
+          </TriggerSetup>
+        </Values>
+      </Asset>
+  </ModOp>
+  
+  <!-- if sabotage mod is active, make the spy/police also cost researchpoints to build -->
+  <Group Condition="#Sabotage_Serp">
+    <ModOp Type="add" GUID='1500001173' Path="/Values/Cost/Costs">
+      <Item>
+        <Ingredient>119392</Ingredient>
+        <Amount>500</Amount>
+      </Item>
+    </ModOp>
+    <ModOp Type="add" GUID='1500001499,1500001507,1500001508,1500001509' Path="/Values/Cost/Costs">
+      <Item>
+        <Ingredient>119392</Ingredient>
+        <Amount>10</Amount>
+      </Item>
+    </ModOp>
+  </Group>
+  
+</ModOps>

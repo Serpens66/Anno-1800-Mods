@@ -1,0 +1,186 @@
+
+<ModOps>
+
+     <!-- verwendet Serps GUIDS 1500000039 -->
+
+
+  
+  
+    <!-- give towers of sarmento to Third_party_02b_Blake_AttacksPirate, so they attack pirates too -->
+    
+    <!-- Vanilla Bug that is also true for Archibald in Old world: -->
+    <!-- the towers from vanilla archibald also belong to him and a kind of "bug" is, that pirate ships will try to attack -->
+     <!-- ships standing next to the harbor but then again turn around when close by because of the towers and shortly after again drive towards it and turn around and so on. -->
+     <!-- this is because the harborarea belongs to the normal archibald they have peace with, while the patrol/attack AI tries to attack ships that are not in harborrange (SkipTargetWhenInHarbourArea) -->
+      <!-- I already tried to change owner of archibalds kontor 100680 to Third_party_02b_Blake_AttacksPirate and make it not attackable -->
+      <!-- and I tried around with some Blocking values from the building. sometimes the pirates did not come close, sometimes they did, like 50:50 of the games I tried. -->
+      <!-- I think it was just luck or based on the island positioning or so. but even if it worked, we should not change owner of kontor because it will also break quests. -->
+      <!-- So I fear there is no solution for this, but I hoppe it is not that bad -->
+    
+    <!-- Make Third_party_02b_Blake_AttacksPirate also at war with Third_party_04_Pirate_LaFortune -->
+    <ModOp Type="add" GUID='240' Path="/Values/Diplomacy/InitialRelation/Exceptions">
+      <Item>
+        <Participant>Third_party_04_Pirate_LaFortune</Participant>
+        <Treaties>War</Treaties>
+      </Item>
+    </ModOp>
+    <!-- make guns from archibald 102666 shooting faster but less damage per shot, maybe pirate ships will turn around faster this way -->
+    <ModOp Type="merge" GUID='102666' Path="/Values">
+      <Attackable>
+          <MaximumHitPoints>10000</MaximumHitPoints>
+          <MilitaryDefensePoints>10</MilitaryDefensePoints>
+      </Attackable>
+      <Attacker>
+          <BaseDamage>50</BaseDamage>
+          <ReloadTime>10</ReloadTime>
+          <AttackRange>100</AttackRange>
+          <LineOfSightRange>100</LineOfSightRange>
+      </Attacker>
+    </ModOp>
+    <!-- change guns from sarmento to guns from archibald to shoot at pirates -->
+    <ModOp GUID="130248" Type="AddNextSibling">
+        <Asset>
+            <Template>Trigger</Template>
+            <Values>
+                <Standard>
+                    <GUID>1500000039</GUID>
+                </Standard>
+                <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Third_party_05_Sarmento</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionDiplomaticState</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionDiplomaticState>
+                                    <SourceParticipant2>Third_party_02b_Blake_AttacksPirate</SourceParticipant2>
+                                    <TargetParticipant2>Third_party_04_Pirate_LaFortune</TargetParticipant2>
+                                    <DesiredState>War</DesiredState>
+                                  </ConditionDiplomaticState>
+                                  <ConditionPropsNegatable>
+                                    <NegateCondition>1</NegateCondition>
+                                  </ConditionPropsNegatable>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteDiplomaticAction</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteDiplomaticAction>
+                                        <DiplomacyAction>DeclareWar</DiplomacyAction>
+                                        <DiplomaticTargetParticipant>Third_party_02b_Blake_AttacksPirate</DiplomaticTargetParticipant>
+                                        <DiplomaticSourceParticipant>Third_party_04_Pirate_LaFortune</DiplomaticSourceParticipant>
+                                      </ActionExecuteDiplomaticAction>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                    <TriggerActions>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionDelayedActions</Template>
+                            <Values>
+                              <Action />
+                              <ActionDelayedActions>
+                                <ExecutionDelay>1000</ExecutionDelay>
+                                <DelayedActions>
+                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                  <Values>
+                                    <ActionList>
+                                      <Actions>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionChangeParticipant</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionChangeParticipant>
+                                                <NewParticipantID>Third_party_02b_Blake_AttacksPirate</NewParticipantID>
+                                              </ActionChangeParticipant>
+                                              <ObjectFilter>
+                                                <ObjectGUID>102448</ObjectGUID>
+                                                <ObjectSession>180025</ObjectSession>
+                                                <CheckParticipantID>1</CheckParticipantID>
+                                                <ObjectParticipantID>Third_party_05_Sarmento</ObjectParticipantID>
+                                              </ObjectFilter>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionChangeParticipant</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionChangeParticipant>
+                                                <NewParticipantID>Third_party_02b_Blake_AttacksPirate</NewParticipantID>
+                                              </ActionChangeParticipant>
+                                              <ObjectFilter>
+                                                <ObjectGUID>102449</ObjectGUID>
+                                                <ObjectSession>180025</ObjectSession>
+                                                <CheckParticipantID>1</CheckParticipantID>
+                                                <ObjectParticipantID>Third_party_05_Sarmento</ObjectParticipantID>
+                                              </ObjectFilter>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionSetObjectGUID</Template>
+                                            <Values>
+                                              <Action />
+                                              <ObjectFilter>
+                                                <ObjectGUID>102449</ObjectGUID>
+                                                <CheckParticipantID>1</CheckParticipantID>
+                                                <ObjectParticipantID>Third_party_02b_Blake_AttacksPirate</ObjectParticipantID>
+                                              </ObjectFilter>
+                                              <ActionSetObjectGUID>
+                                                <NewGUID>102666</NewGUID>
+                                              </ActionSetObjectGUID>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                      </Actions>
+                                    </ActionList>
+                                  </Values>
+                                </DelayedActions>
+                              </ActionDelayedActions>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                    </TriggerActions>
+                </Trigger>
+                <TriggerSetup>
+                    <AutoRegisterTrigger>1</AutoRegisterTrigger>
+                    <UsedBySecondParties>0</UsedBySecondParties>
+                </TriggerSetup>
+            </Values>
+        </Asset>
+    </ModOp>
+  
+
+
+</ModOps>

@@ -1,0 +1,165 @@
+<ModOps>
+  
+    <!-- Written by Serp, uses Serp reserved GUID 1500001169 + 1500000222 -->
+  
+  <!-- A mod to disable the SunkenTreasures Session by disabling the expedition for humans and preventing the AI from unlocking the session. -->
+
+  
+  
+  <!-- ActionUnloadSession 110934 (für human locken müssen wir nicht unbedingt, dann könnte man es bei bedarf doch noch wieder laden) -->
+  <!-- unloadsession evlt häufiger machen, sodass die session immer wiede runloded wird, wenn man sie läd und wenn man sie wirklich geladen haben -->
+  <!-- will soll man den mod deaktivren -->
+    
+  <!-- when visiting the session: throw all players into the old world session and then unload cape session (because game crashes if we unload the session a player is in) -->
+  <ModOp GUID="153271" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000222</GUID>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionActiveSession</Template>
+            <Values>
+              <Condition />
+              <ConditionActiveSession>
+                <ActiveSession>110934</ActiveSession>
+              </ConditionActiveSession>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionEnterSession</Template>
+                                <Values>
+                                  <ActionEnterSession>
+                                    <TargetSession>180023</TargetSession>
+                                  </ActionEnterSession>
+                                  <Action />
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>5000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionUnloadSession</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionUnloadSession>
+                                    <UnloadSession>110934</UnloadSession>
+                                  </ActionUnloadSession>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>10000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+
+  <!-- replace the main TriggerCondition of the "SunkenTreasures SessionDiscovery Condition" with "AlwaysFalse" so it never unlocks the expeditions for humans -->
+  <ModOp Type="replace" GUID='113818' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionAlwaysFalse</Template>
+      <Values>
+        <Condition />
+        <ConditionAlwaysFalse />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  <!-- Never Unlock for AI SunkenTreasures_Session -->
+  <ModOp Type="replace" GUID='110934' Path="/Values/Session/SecondPartyReferenceUnlock">
+    <SecondPartyReferenceUnlock>1500001169</SecondPartyReferenceUnlock>
+  </ModOp>
+
+  <!-- the AlwaysFalse unlock object -->
+  <ModOp Type="AddNextSibling" GUID="141489">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001169</GUID>
+          <Name>Always False</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysFalse</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysFalse />
+            </Values>
+          </TriggerCondition>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+
+</ModOps>

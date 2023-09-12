@@ -1,0 +1,78 @@
+<ModOps>
+   
+   <!-- ölhandel: -->
+  <ModOp Type="add" GUID='45' Path="/Values/Trader/Progression/*/GoodsProduction">
+    <Item>
+      <Good>1010566</Good>
+      <ProductionPerMinute>10</ProductionPerMinute>
+    </Item>
+  </ModOp>
+  <ModOp Type="add" GUID='45' Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets">
+    <Item>
+      <Good>1010566</Good>
+    </Item>
+  </ModOp>
+  
+  <!-- make traders rerorll their offer fast so we see the change in offered products -->
+  <!-- <ModOp Type='merge' GUID='45' Path='/Values/Trader'> -->
+      <!-- <TraderRerollInterval>30000</TraderRerollInterval> -->
+  <!-- </ModOp> -->
+  
+  <!-- IsStrategicResource = 0 und zufügen zu 120055 ist notwendig, damits im handelsmenü der ki angezeigt wird. -->
+  <!-- ProductCategory ist nicht noetig, vermutlich nur text -->
+  <ModOp Type='merge' GUID='1010566' Path='/Values/Product'>
+    <IsStrategicResource>0</IsStrategicResource>
+    <!-- <ProductCategory>11702</ProductCategory> -->
+  </ModOp>
+  
+  <!-- 120055 notwendig damit händler es anzeigt und auch passiv verkaufen kann -->
+  <!-- zu den normalen gütern zufügen, dadurch zeigt händler es an und depot lagergröße wirkt fuer die produkte der liste 1010566 -->
+  <ModOp Type="add" GUID='120055' Path="/Values/ProductStorageList/ProductList">
+    <Item>
+      <Product>1010566</Product>
+    </Item>
+  </ModOp>
+  <!-- aus StandardOilHarborStorageList entfernen? nicht noetig glaub ich. wenn nicht entfernt, dann wirds auch weiterhin im olhafen angezeigt -->
+  <!-- 120056 sorgt auch dafür, dass lagergröße des ölhafens auf produkte wirkt -->
+  <!-- <ModOp Type="remove" GUID='120056' Path="/Values/ProductStorageList/ProductList/Item" /> -->
+  
+  
+  <!-- Anzeige/Sortierung: -->
+  <!-- zufügen zu "Alle" und "Rohmaterial" von allen Regions -->
+  <!-- damit es in eigenem kontor angezeigt und verladen werden kann und in den passiven handel eingestellt werden kann -->
+  <ModOp Type="add" GUID='502065,502067,502068,502080,502049,502050,502051,502075' Path="/Values/ProductList/List">
+    <Item>
+      <Product>1010566</Product>
+    </Item>
+  </ModOp>
+  <!-- aus strategic good liste entfernen? nicht noetig glaub ich, wobei ich auch nicht weiß wo diese liste angezeigt wird -->
+  <!-- <ModOp Type="remove" GUID='501961' Path="/Values/ProductList/List/Item[Product='1010566']" /> -->
+
+
+
+  <!-- öltanker muss handelsmenü bei kontor öffenen können? 100853 oder einfach auf diese schiffsart verzichten? denn jetzt koennen alle es transportieren -->
+  <!-- muss FixedSlotContent bleiben, damit es für öl handelsrouten verwendet werden kann (oder wir erlauben öl auf normalen handelsrouten, siehe TradeRouteBalancing) -->
+  <!-- aber öltanker kann dan vermutlich nicht bei archibald öl holen, auch nicht als handelsroute... also alternativ ölroute entfernen und öl da wie jedes andere Gut behandeln und FixedSlotContent von Öltanker entfernen -->
+  <!-- doch über handelsroute kann öltanker öl bei archibald einladen -->
+  <!-- <ModOp Type="remove" GUID='100853' Path="/Values/ItemContainer/FixedSlotContent" /> -->
+  
+  
+  <!-- the StrategicKontor type from oil harbor is most likely hardcoded to display strategic ressources from 120056 and to not allow passive trade... -->
+  <!-- so we have to add it to kontor 502066 and so on to be able to use passive trade for oil -->
+  <!-- we could not add oil to 502066 and so on lists, so it wont be displayed at kontor and active trade would still work (and normal ships can still transport it) -->
+  
+  
+  <!-- <Template>HarborWarehouseStrategic</Template> -->
+    <!-- <Values> -->
+      <!-- <Standard> -->
+        <!-- <GUID>100783</GUID> -->
+        <!-- <Name>harbor_14a (Oil Harbor I)</Name> -->
+        <!-- <IconFilename>data/ui/2kimages/main/3dicons/icon_oil_habour_01.png</IconFilename> -->
+        <!-- <InfoDescription>10951</InfoDescription> -->
+      <!-- </Standard> -->
+      <!-- <Warehouse> -->
+        <!-- <StorageType>StrategicKontor</StorageType> -->
+      <!-- </Warehouse> -->
+    
+
+</ModOps>

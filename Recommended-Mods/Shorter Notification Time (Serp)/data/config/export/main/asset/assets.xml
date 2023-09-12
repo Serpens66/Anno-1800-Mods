@@ -1,0 +1,83 @@
+<ModOps>
+
+
+  <!-- Jede notification wird mindestens so lange angezegit wie ihr Audio abgespielt wird, selbst wenn man alles 0 setzt. -->
+  <!-- Mit NotificationMinDisplayTime kann man eine mindestanzegigezeit machen, diese wird nicht zum audio addiert, -->
+   <!-- sondern wenn der wert zb 2 sekunden ist und das audio auch 2 sekunden geht, dann wirds 2 sek angezeigt, -->
+   <!-- wenn audio 5 sek ist und wert 2, dann wirds 5 sek angezeigt. -->
+   <!-- wenn audio 1 sek ist und wert 2 sek dann wirds 2 sek angezeigt. -->
+  <!-- Mit PostAudioTime kann man zusätzlich nach dem Audio noch x sek warten, wobei das offenbar zu NotificationMinDisplayTime hinzuaddiert wird. -->
+  
+  
+  
+  <!-- We assume that every NotificationMinDisplayTime set by devs have a good reason, at least the high ones. -->
+  
+  <!-- We will reduce the ones with 8 seconds to 5 seconds and within properties.xml we will reduce the default of 5 seconds to ~2 seconds -->
+  <!-- (the ones with 20k are often sth. like counterproposal and ceasefire requests from AI that need interaction, although they dont have ThirdpartyNotificationButtons defined) -->
+  <!-- ATTENTION: Must be at least 1000ms ! otherwise it causes bugs (eg. when you click on a ship with quest star above it to accept a quest, wth a value of 500ms here, you wont get the quest offered!) -->
+  <ModOp Type="merge" Path="//Values[not(CharacterNotification/ThirdpartyNotificationButtons)]/BaseNotification[NotificationMinDisplayTime='8000']">
+      <NotificationMinDisplayTime>5000</NotificationMinDisplayTime>
+  </ModOp>
+  
+  <!-- and everything that is SideNotification and has no NotificationMinDisplayTime defined (means it will use properties.xml) we define the old default value of 5 here, because we may want to click on the jump notificaiton -->
+  <!-- (there may be some which have NotificationMinDisplayTime defined, but we will asume that their values are fine) -->
+  <!-- only if it is a jump notification (has not HasJumpLocation=0 defined) or is a warning, then it is worth to be displayed longer than others -->
+  <ModOp Type="merge" Path="//Values[SideNotification[not(HasJumpLocation='0') or IsWarning='1']]/BaseNotification[not(NotificationMinDisplayTime)]">
+      <NotificationMinDisplayTime>5000</NotificationMinDisplayTime>
+  </ModOp>
+  
+  
+  <!-- 25000040 NotificationConfiguration is fine I guess, maybe a bit less PostAudioTime (vanilla 2sec) -->
+  <!-- AdditionalInteractionTime (from vanilla 30000 ms) adds extra time to all notifications you need to interact with , eg yes/no. -->
+    <!-- This is fine, since these are normally important ones. -->
+    <!-- It does not affect messages within the diplomacy menu, so DONT set NotificationMinDisplayTime for reactions like counterproposal to few seconds (20000ms in vanilla), -->
+     <!-- otherwise you wont be able to accpet eg. counterproposal within the diplomacy menu -->
+   <!-- I dont really know what MinDisplayTime does here, because all notifications have it defined for themself (or via properties.xml) which seems to have priority -->
+    <!-- und wenn ich NotificationMinDisplayTime niedriger gesetzt hab, hatte MinDisplayTime offenbar keine Wirkung -->
+  <ModOp Type="merge" GUID="25000040" Path="/Values/NotificationConfiguration/NotificationTypeArray">
+    <Character>
+      <PostAudioTime>0</PostAudioTime>
+      <!-- <AdditionalInteractionTime>30000</AdditionalInteractionTime> -->
+      <!-- <MinDisplayTime>5000</MinDisplayTime> -->
+    </Character>
+    <!-- <Main> -->
+      <!-- <PostAudioTime>0</PostAudioTime> -->
+      <!-- <AdditionalInteractionTime>30000</AdditionalInteractionTime> -->
+      <!-- <MinDisplayTime>5000</MinDisplayTime> -->
+    <!-- </Main> -->
+    <Side>
+      <PostAudioTime>0</PostAudioTime>
+      <!-- <AdditionalInteractionTime>30000</AdditionalInteractionTime> -->
+      <!-- <MinDisplayTime>5000</MinDisplayTime> -->
+    </Side>
+    <!-- <OnScreenText> -->
+      <!-- <PostAudioTime>0</PostAudioTime> -->
+      <!-- <AdditionalInteractionTime>30000</AdditionalInteractionTime> -->
+      <!-- <MinDisplayTime>5000</MinDisplayTime> -->
+    <!-- </OnScreenText> -->
+    <!-- <Campaign> -->
+      <!-- <PostAudioTime>0</PostAudioTime> -->
+      <!-- <AdditionalInteractionTime>30000</AdditionalInteractionTime> -->
+      <!-- <MinDisplayTime>5000</MinDisplayTime> -->
+    <!-- </Campaign> -->
+    <Audio>
+      <PostAudioTime>0</PostAudioTime>
+      <!-- <AdditionalInteractionTime>30000</AdditionalInteractionTime> -->
+      <!-- <MinDisplayTime>5000</MinDisplayTime> -->
+    </Audio>
+    <!-- <Palace> -->
+      <!-- <PostAudioTime>0</PostAudioTime> -->
+      <!-- <AdditionalInteractionTime>30000</AdditionalInteractionTime> -->
+      <!-- <MinDisplayTime>5000</MinDisplayTime> -->
+    <!-- </Palace> -->
+    <!-- <Attractiveness> -->
+      <!-- <PostAudioTime>0</PostAudioTime> -->
+      <!-- <AdditionalInteractionTime>30000</AdditionalInteractionTime> -->
+      <!-- <MinDisplayTime>5000</MinDisplayTime> -->
+    <!-- </Attractiveness> -->
+  </ModOp>
+
+
+
+  
+</ModOps>

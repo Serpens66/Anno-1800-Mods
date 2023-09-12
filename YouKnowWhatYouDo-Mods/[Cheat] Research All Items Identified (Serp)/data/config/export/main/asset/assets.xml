@@ -1,0 +1,109 @@
+<ModOps>
+
+  <!-- uses Serp GUID 1500001168 -->
+  
+  <ModOp GUID="153271" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001168</GUID>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/init.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/unlockresearchrecipes.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- unfortunately lua GetStorageAmount always returns the very same within the same ActionExecuteScript-call, even if the amounts should have changed meanwhile. -->
+            <!-- Therefore we need to do another ActionExecuteScript-call shortly after to restore the researchpoints to the previous amounts (since SetResearchRecipes consumes researchpoints even with ToggleIgnoreBuildingCosts active) -->
+            <!-- thanks to the user "Taubenangriff" for pointing to this problem. -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/restorepoints.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+    
+    
+    
+</ModOps>

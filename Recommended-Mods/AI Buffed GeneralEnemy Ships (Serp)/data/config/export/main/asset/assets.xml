@@ -1,0 +1,704 @@
+
+<ModOps>
+
+    <!-- verwendet Serps GUIDS von 1500001026+1500001029 -->
+
+    <!-- you can set -->
+    <!-- ShouldBeShownInForeignObjectMenu -->
+    <!-- to 0 , to not disply the Buff in the ship UI. -->
+    <!-- This way the portrait wont be kind of "hidden" behind the UI anymore (blame ubisoft..) -->
+
+    <!-- Ships that reach max health higher than ~32k , eg. via items or code, will get destroyed on repairing -.- -->
+     <!-- therefore we will not increase health from ships, but give the ships an item that decreases the damage they take -->
+     
+     <!-- Sometimes ships owned by General_Enemy are shown as owned by eg. Pirates (ComebackFleet) or other AIs. -->
+      <!-- This is why these ships will also be affected from the Buff. -->
+     
+     <!-- Unfortunately every single ship GUID the buff should be affect needs to be mentioned. -->
+     <!-- And vanilla adds ALOT new ship GUIDs just for the quests, so it is very likely I miss one or the other.. -->
+     
+     
+     <!--  IgnoreDamageFactorUpgrade in VehicleUpgrade is regarding speed when damaged, so not what we are looking for -->
+     
+     
+     <!-- add MetaBuffHandler to GeneralEnemy, so they can receive global buffs -->
+      <ModOp Type="merge" GUID='44' Path="/Values">
+        <MetaBuffHandler />
+      </ModOp>
+      
+     
+     <Group Condition="!#Stronger_Pirate_Ships_Serp">
+       
+       <!-- same buff guid and content and trigger guid like in my Stronger_Pirate_Ships_Serp mod. if it is not active, create it. -->
+       <!-- if it is active add to it. -->
+       
+      <ModOp Type="AddNextSibling" GUID="130942">
+        <Asset>
+          <Template>InfluenceTitleBuff</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001026</GUID>
+              <Name>Stronger GeneralEnemy Ships</Name>
+              <IconFilename>data/ui/2kimages/main/3dicons/icon_skull.png</IconFilename>
+            </Standard>
+            <ItemEffect>
+              <EffectTargets>
+                <Item>
+                  <GUID>1512</GUID>
+                </Item>
+              </EffectTargets>
+              <AllowStacking>0</AllowStacking>
+            </ItemEffect>
+            <Buff>
+              <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+            </Buff>
+            <AttackerUpgrade>
+              <BaseDamageUpgrade>
+                <Value>50</Value>
+                <Percental>1</Percental>
+              </BaseDamageUpgrade>
+              <AttackSpeedUpgrade>50</AttackSpeedUpgrade>
+            </AttackerUpgrade>
+            <AttackableUpgrade>
+              <SelfHealUpgrade>
+                <Value>200</Value>
+                <Percental>1</Percental>
+              </SelfHealUpgrade>
+              <DamageReceiveFactor>
+                <Cannon>
+                  <Factor>0.35</Factor>
+                </Cannon>
+                <Normal>
+                  <Factor>0.35</Factor>
+                </Normal>
+                <Torpedo>
+                  <Factor>0.35</Factor>
+                </Torpedo>
+                <BigBertha>
+                  <Factor>0.35</Factor>
+                </BigBertha>
+              </DamageReceiveFactor>
+            </AttackableUpgrade>
+          </Values>
+        </Asset>
+      </ModOp>
+      
+
+      <!-- needs some kind of reapply for the new sessions -->
+      <ModOp GUID="153271" Type="AddNextSibling">
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001029</GUID>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionEvent</Template>
+                <Values>
+                  <Condition/>
+                  <ConditionEvent>
+                    <ConditionEvent>SessionEnter</ConditionEvent>
+                  </ConditionEvent>
+                </Values>
+              </TriggerCondition>
+              <TriggerActions />
+              <ResetTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionTimer</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionTimer>
+                          <TimeLimit>30000</TimeLimit>
+                        </ConditionTimer>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </ResetTrigger>
+            </Trigger>
+            <TriggerSetup>
+              <AutoRegisterTrigger>1</AutoRegisterTrigger>
+              <UsedBySecondParties>0</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+      </ModOp>
+    </Group>
+    
+    <!-- this icon fits a bit better for non-pirates -->
+    <ModOp Type="replace" GUID='1500001026' Path="/Values/Standard/IconFilename">
+      <IconFilename>data/ui/2kimages/main/3dicons/icon_skull.png</IconFilename>
+    </ModOp>
+    <!-- add airhsips -->
+    <ModOp Type="add" GUID='1500001026' Path="/Values/ItemEffect/EffectTargets" 
+      Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='4146']">
+      <Item>
+        <GUID>4146</GUID>
+      </Item>
+    </ModOp>
+    
+    <ModOp Type="add" GUID='1500001029' Path="/Values/Trigger/TriggerActions">
+        <Item>
+          <TriggerAction>
+            <Template>ActionBuff</Template>
+            <Values>
+              <Action />
+              <ActionBuff>
+                <BuffAsset>1500001026</BuffAsset>
+                <AddBuff>0</AddBuff>
+                <AffectedParticipant>General_Enemy</AffectedParticipant>
+              </ActionBuff>
+            </Values>
+          </TriggerAction>
+        </Item>
+        <Item>
+          <TriggerAction>
+            <Template>ActionDelayedActions</Template>
+            <Values>
+              <Action />
+              <ActionDelayedActions>
+                <ExecutionDelay>100</ExecutionDelay>
+                <DelayedActions>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <ActionList>
+                      <Actions>
+                        <Item>
+                          <Action>
+                            <Template>ActionBuff</Template>
+                            <Values>
+                              <Action />
+                              <ActionBuff>
+                                <BuffAsset>1500001026</BuffAsset>
+                                <AddBuff>1</AddBuff>
+                                <AffectedParticipant>General_Enemy</AffectedParticipant>
+                              </ActionBuff>
+                            </Values>
+                          </Action>
+                        </Item>
+                      </Actions>
+                    </ActionList>
+                  </Values>
+                </DelayedActions>
+              </ActionDelayedActions>
+            </Values>
+          </TriggerAction>
+        </Item>
+      </ModOp>
+    
+    <Group Condition="#Stronger_Pirate_Ships_Serp">
+      
+      <!-- when GeneralEnemy has the same Buff, it is no longer needed to use DefaultBuff to also affect the GeneralEnemy-ComebackFleet from pirates -->
+      <ModOp Type="replace" GUID='102429' Path="/Values/UpgradeList/DefaultBuff"
+        Condition="/Values/UpgradeList[DefaultBuff='1500001026']">
+          <DefaultBuff>0</DefaultBuff>
+      </ModOp>
+      <ModOp Type="replace" GUID='102430' Path="/Values/UpgradeList/DefaultBuff"
+        Condition="/Values/UpgradeList[DefaultBuff='1500001026']">
+          <DefaultBuff>0</DefaultBuff>
+      </ModOp>
+      <ModOp Type="replace" GUID='102431' Path="/Values/UpgradeList/DefaultBuff"
+        Condition="/Values/UpgradeList[DefaultBuff='1500001026']">
+          <DefaultBuff>0</DefaultBuff>
+      </ModOp>
+      <ModOp Type="replace" GUID='102432' Path="/Values/UpgradeList/DefaultBuff"
+        Condition="/Values/UpgradeList[DefaultBuff='1500001026']">
+          <DefaultBuff>0</DefaultBuff>
+      </ModOp>
+      <ModOp Type="replace" GUID='1500000031' Path="/Values/UpgradeList/DefaultBuff"
+        Condition="/Values/UpgradeList[DefaultBuff='1500001026']">
+          <DefaultBuff>0</DefaultBuff>
+      </ModOp>
+      <ModOp Type="replace" GUID='1500000032' Path="/Values/UpgradeList/DefaultBuff"
+        Condition="/Values/UpgradeList[DefaultBuff='1500001026']">
+          <DefaultBuff>0</DefaultBuff>
+      </ModOp>
+       
+    </Group>
+
+
+<!-- ####################################################################################################### -->
+  <!-- now add hopefully all these new ship GUIDs that are used in quests to the ItemEffectTargetPool: -->
+  <!-- BugFix add FlakMonitor -->
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='720']">
+        <Item>
+          <GUID>720</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='101121']">
+        <Item>
+          <GUID>101121</GUID>
+        </Item>
+      </ModOp>
+      <!-- Add all questships in any AttackerList/DestroyObjects to 1398 (wooden) or 1404 (steal), so it is also included in all ships for combat effects 1512  -->
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='101143']">
+        <Item>
+          <GUID>101143</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='116641']">
+        <Item>
+          <GUID>116641</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102375']">
+        <Item>
+          <GUID>102375</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102381']">
+        <Item>
+          <GUID>102381</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102403']">
+        <Item>
+          <GUID>102403</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102380']">
+        <Item>
+          <GUID>102380</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='100566']">
+        <Item>
+          <GUID>100566</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102372']">
+        <Item>
+          <GUID>102372</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102373']">
+        <Item>
+          <GUID>102373</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102556']">
+        <Item>
+          <GUID>102556</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102610']">
+        <Item>
+          <GUID>102610</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102612']">
+        <Item>
+          <GUID>102612</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102613']">
+        <Item>
+          <GUID>102613</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102615']">
+        <Item>
+          <GUID>102615</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102616']">
+        <Item>
+          <GUID>102616</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102377']">
+        <Item>
+          <GUID>102377</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102378']">
+        <Item>
+          <GUID>102378</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102385']">
+        <Item>
+          <GUID>102385</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102387']">
+        <Item>
+          <GUID>102387</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102305']">
+        <Item>
+          <GUID>102305</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102391']">
+        <Item>
+          <GUID>102391</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102571']">
+        <Item>
+          <GUID>102571</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102506']">
+        <Item>
+          <GUID>102506</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102617']">
+        <Item>
+          <GUID>102617</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='100565']">
+        <Item>
+          <GUID>100565</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='100568']">
+        <Item>
+          <GUID>100568</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='100569']">
+        <Item>
+          <GUID>100569</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='80023']">
+        <Item>
+          <GUID>80023</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='80024']">
+        <Item>
+          <GUID>80024</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='80025']">
+        <Item>
+          <GUID>80025</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='100564']">
+        <Item>
+          <GUID>100564</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='100563']">
+        <Item>
+          <GUID>100563</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='101981']">
+        <Item>
+          <GUID>101981</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='103070']">
+        <Item>
+          <GUID>103070</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='103071']">
+        <Item>
+          <GUID>103071</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102400']">
+        <Item>
+          <GUID>102400</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='103072']">
+        <Item>
+          <GUID>103072</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='103073']">
+        <Item>
+          <GUID>103073</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='100567']">
+        <Item>
+          <GUID>100567</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102368']">
+        <Item>
+          <GUID>102368</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102371']">
+        <Item>
+          <GUID>102371</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102369']">
+        <Item>
+          <GUID>102369</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102367']">
+        <Item>
+          <GUID>102367</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102370']">
+        <Item>
+          <GUID>102370</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102374']">
+        <Item>
+          <GUID>102374</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102611']">
+        <Item>
+          <GUID>102611</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102614']">
+        <Item>
+          <GUID>102614</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102519']">
+        <Item>
+          <GUID>102519</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102514']">
+        <Item>
+          <GUID>102514</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102650']">
+        <Item>
+          <GUID>102650</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102656']">
+        <Item>
+          <GUID>102656</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102880']">
+        <Item>
+          <GUID>102880</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102881']">
+        <Item>
+          <GUID>102881</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102882']">
+        <Item>
+          <GUID>102882</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='111166']">
+        <Item>
+          <GUID>111166</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='111165']">
+        <Item>
+          <GUID>111165</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='111164']">
+        <Item>
+          <GUID>111164</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='111168']">
+        <Item>
+          <GUID>111168</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='111196']">
+        <Item>
+          <GUID>111196</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='112168']">
+        <Item>
+          <GUID>112168</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='111201']">
+        <Item>
+          <GUID>111201</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='103682']">
+        <Item>
+          <GUID>103682</GUID>
+        </Item>
+      </ModOp>
+      
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102631']">
+        <Item>
+          <GUID>102631</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102632']">
+        <Item>
+          <GUID>102632</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102633']">
+        <Item>
+          <GUID>102633</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102635']">
+        <Item>
+          <GUID>102635</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102636']">
+        <Item>
+          <GUID>102636</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102637']">
+        <Item>
+          <GUID>102637</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102638']">
+        <Item>
+          <GUID>102638</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102639']">
+        <Item>
+          <GUID>102639</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102640']">
+        <Item>
+          <GUID>102640</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102641']">
+        <Item>
+          <GUID>102641</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102642']">
+        <Item>
+          <GUID>102642</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102643']">
+        <Item>
+          <GUID>102643</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102644']">
+        <Item>
+          <GUID>102644</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102645']">
+        <Item>
+          <GUID>102645</GUID>
+        </Item>
+      </ModOp>
+      <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+        Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='102646']">
+        <Item>
+          <GUID>102646</GUID>
+        </Item>
+      </ModOp>
+
+</ModOps>

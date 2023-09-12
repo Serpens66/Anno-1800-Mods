@@ -1,0 +1,547 @@
+
+<ModOps>
+
+    <!-- verwendet Serps GUIDS von 1500001026+1500001029 (1500001027+1500001028 wird in shared mods genutzt) (bis einschließlich 1500001029 fuer diesen mod freigehalten) -->
+
+    <!-- you can set -->
+    <!-- ShouldBeShownInForeignObjectMenu -->
+    <!-- to 0 , to not disply the Buff in the ship UI. -->
+    <!-- This way the pirate portrait wont be kind of "hidden" behind the UI anymore (blame ubisoft..) -->
+
+
+    <!-- Ships that reach max health higher than ~32k , eg. via items or code, will get destroyed on repairing -.- -->
+     <!-- therefore we will not increase health from ships, but give the pirate ships an item that decreases the damage they take -->
+     
+     <!-- MilitaryShipPoints shows the AI how strong a ship is, so we will multiply this also with 3 -->
+  
+    <!-- we could give the pirates an cheat item via InitSocketItems and that cheatitem could have "instant sink" Flotsam so it can not be collected from players. -->
+    <!-- Also UpgradeList/DefaultBuff also works fine -->
+    <!-- But with MetaBuffHandler we can also use ActionBuff global buffs which will be more compatible to other mods and affects also mod-ships if they are added to the ItemEffectTargetPool -->
+    
+    <!-- Downside of ActionBuff is that ships which dont belong to the pirates (eg comebackfleet belongs to GeneralEnemy) wont have this Buff. -->
+    <!-- Therefore we will still add the Buff via UpgradeList/DefaultBuff too to all known pirates ships -->
+     
+     <!--  IgnoreDamageFactorUpgrade in VehicleUpgrade is regarding speed when damaged, so not what we are looking for -->
+     
+     <ModOp Type="AddNextSibling" GUID="130942">
+      <Asset>
+        <Template>InfluenceTitleBuff</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001026</GUID>
+            <Name>Stronger Pirate Ships</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/icon_skull.png</IconFilename>
+          </Standard>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1512</GUID>
+              </Item>
+            </EffectTargets>
+            <AllowStacking>0</AllowStacking>
+          </ItemEffect>
+          <Buff>
+            <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+          </Buff>
+          <AttackerUpgrade>
+            <BaseDamageUpgrade>
+              <Value>50</Value>
+              <Percental>1</Percental>
+            </BaseDamageUpgrade>
+            <AttackSpeedUpgrade>50</AttackSpeedUpgrade>
+          </AttackerUpgrade>
+          <AttackableUpgrade>
+            <SelfHealUpgrade>
+              <Value>200</Value>
+              <Percental>1</Percental>
+            </SelfHealUpgrade>
+            <DamageReceiveFactor>
+              <Cannon>
+                <Factor>0.35</Factor>
+              </Cannon>
+              <Normal>
+                <Factor>0.35</Factor>
+              </Normal>
+              <Torpedo>
+                <Factor>0.35</Factor>
+              </Torpedo>
+              <BigBertha>
+                <Factor>0.35</Factor>
+              </BigBertha>
+            </DamageReceiveFactor>
+          </AttackableUpgrade>
+        </Values>
+      </Asset>
+    </ModOp>
+    
+
+    <!-- add MetaBuffHandler to pirates, so they can receive global buffs -->
+    <ModOp Type="merge" GUID='73,76' Path="/Values">
+      <MetaBuffHandler />
+    </ModOp>
+    
+    <!-- needs some kind of reapply for the new world session Third_party_04_Pirate_LaFortune (SessionEnter with GUID 180025 does not seem to work, but does not hurt to reapply it every now an then, even if not needed) -->
+    <ModOp GUID="153271" Type="AddNextSibling">
+      <Asset>
+        <Template>Trigger</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001029</GUID>
+          </Standard>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionEvent</Template>
+              <Values>
+                <Condition/>
+                <ConditionEvent>
+                  <ConditionEvent>SessionEnter</ConditionEvent>
+                </ConditionEvent>
+              </Values>
+            </TriggerCondition>
+            <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionBuff</Template>
+                  <Values>
+                    <Action />
+                    <ActionBuff>
+                      <BuffAsset>1500001026</BuffAsset>
+                      <AddBuff>1</AddBuff>
+                      <AffectedParticipant>Third_party_03_Pirate_Harlow</AffectedParticipant>
+                    </ActionBuff>
+                  </Values>
+                </TriggerAction>
+              </Item>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionBuff</Template>
+                  <Values>
+                    <Action />
+                    <ActionBuff>
+                      <BuffAsset>1500001026</BuffAsset>
+                      <AddBuff>1</AddBuff>
+                      <AffectedParticipant>Third_party_04_Pirate_LaFortune</AffectedParticipant>
+                    </ActionBuff>
+                  </Values>
+                </TriggerAction>
+              </Item>
+            </TriggerActions>
+            <ResetTrigger>
+              <Template>AutoCreateTrigger</Template>
+              <Values>
+                <Trigger>
+                  <TriggerCondition>
+                    <Template>ConditionTimer</Template>
+                    <Values>
+                      <Condition />
+                      <ConditionTimer>
+                        <TimeLimit>30000</TimeLimit>
+                      </ConditionTimer>
+                    </Values>
+                  </TriggerCondition>
+                </Trigger>
+              </Values>
+            </ResetTrigger>
+          </Trigger>
+          <TriggerSetup>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
+          </TriggerSetup>
+        </Values>
+      </Asset>
+    </ModOp>
+    
+     
+    <!-- Kanonenboot:  -->
+      <!-- <MilitaryShipPoints>0.8</MilitaryShipPoints> -->
+    <!-- </CommandQueue> -->
+    <ModOp Type="merge" GUID='102429' Path="/Values">
+        <CommandQueue>
+          <MilitaryShipPoints>2.4</MilitaryShipPoints>
+        </CommandQueue>
+        <UpgradeList>
+          <DefaultBuff>1500001026</DefaultBuff>
+        </UpgradeList>
+    </ModOp>
+    <!-- Fregatte: -->
+      <!-- <MilitaryShipPoints>1.5</MilitaryShipPoints> -->
+    <!-- </CommandQueue> -->
+    <ModOp Type="merge" GUID='102430' Path="/Values">
+        <CommandQueue>
+          <MilitaryShipPoints>4.5</MilitaryShipPoints>
+        </CommandQueue>
+        <UpgradeList>
+          <DefaultBuff>1500001026</DefaultBuff>
+        </UpgradeList>
+    </ModOp>
+    <!-- Linienschiff: -->
+    <!-- <MilitaryShipPoints>3.2</MilitaryShipPoints> -->
+    <ModOp Type="merge" GUID='102431' Path="/Values">
+        <CommandQueue>
+          <MilitaryShipPoints>9.6</MilitaryShipPoints>
+        </CommandQueue>
+        <UpgradeList>
+          <DefaultBuff>1500001026</DefaultBuff>
+        </UpgradeList>
+    </ModOp>
+    <!-- Monitor -->
+    <!-- <MilitaryShipPoints>3</MilitaryShipPoints> -->
+    <ModOp Type="merge" GUID='102432' Path="/Values">
+        <CommandQueue>
+            <MilitaryShipPoints>9</MilitaryShipPoints>
+        </CommandQueue>
+        <UpgradeList>
+          <DefaultBuff>1500001026</DefaultBuff>
+        </UpgradeList>
+    </ModOp>
+    
+    
+    <!-- Reduce the chance for "nothing" as reward when destroying a pirate ship from 25% to 7.4%. a bit lower number entered, because we do not change weight of the others -->
+    <ModOp Type="merge" GUID='193205,193206' Path="/Values/RewardPool/ItemsPool/Item[ItemLink='190961']">
+        <Weight>6</Weight>
+    </ModOp>
+    
+    
+    <!-- Combat Overhaul Pirate ships (will have buff even without mentioning them here, but not for comebackfleet and to increase MilitaryShipPoints might also be needed) -->
+    <Group Condition="//Values[Standard/GUID='6800010']">
+        
+        <ModOp Type="merge" GUID='6800010' Path="/Values">
+          <CommandQueue>
+              <MilitaryShipPoints>66</MilitaryShipPoints>
+          </CommandQueue>
+          <UpgradeList>
+            <DefaultBuff>1500001026</DefaultBuff>
+          </UpgradeList>
+        </ModOp>
+        <ModOp Type="merge" GUID='6799973' Path="/Values">
+          <CommandQueue>
+              <MilitaryAirShipPoints>9</MilitaryAirShipPoints>
+          </CommandQueue>
+          <UpgradeList>
+            <DefaultBuff>1500001026</DefaultBuff>
+          </UpgradeList>
+        </ModOp>
+        <ModOp Type="merge" GUID='6799998' Path="/Values">
+          <CommandQueue>
+              <MilitaryShipPoints>9</MilitaryShipPoints>
+          </CommandQueue>
+          <UpgradeList>
+            <DefaultBuff>1500001026</DefaultBuff>
+          </UpgradeList>
+        </ModOp>
+        <ModOp Type="merge" GUID='6799999' Path="/Values">
+          <CommandQueue>
+              <MilitaryShipPoints>9</MilitaryShipPoints>
+          </CommandQueue>
+          <UpgradeList>
+            <DefaultBuff>1500001026</DefaultBuff>
+          </UpgradeList>
+        </ModOp>
+        <ModOp Type="merge" GUID='6799987' Path="/Values">
+          <CommandQueue>
+              <MilitaryShipPoints>9</MilitaryShipPoints>
+          </CommandQueue>
+          <UpgradeList>
+            <DefaultBuff>1500001026</DefaultBuff>
+          </UpgradeList>
+        </ModOp>
+        <ModOp Type="merge" GUID='6799997' Path="/Values">
+          <CommandQueue>
+              <MilitaryShipPoints>18</MilitaryShipPoints>
+          </CommandQueue>
+          <UpgradeList>
+            <DefaultBuff>1500001026</DefaultBuff>
+          </UpgradeList>
+        </ModOp>
+        <ModOp Type="merge" GUID='6799969' Path="/Values">
+          <CommandQueue>
+              <MilitaryShipPoints>24</MilitaryShipPoints>
+          </CommandQueue>
+          <UpgradeList>
+            <DefaultBuff>1500001026</DefaultBuff>
+          </UpgradeList>
+        </ModOp>
+        <ModOp Type="merge" GUID='6799996' Path="/Values">
+          <CommandQueue>
+              <MilitaryShipPoints>24</MilitaryShipPoints>
+          </CommandQueue>
+          <UpgradeList>
+            <DefaultBuff>1500001026</DefaultBuff>
+          </UpgradeList>
+        </ModOp>
+        
+    </Group>
+    
+    
+    <!-- ################################# -->
+    
+    
+    <!-- if stronger pirates mod is active, reduce the number of ships, so we have few strong ships instead of many weak ones -->
+    <!-- halving or 1/3 the amounts -->
+    <Group Condition="#Stronger_Pirates_Serp">
+        
+        <!-- Flamethrower: -->
+        <!-- <MilitaryShipPoints>3</MilitaryShipPoints> -->
+        <ModOp Type="merge" GUID='1500000031' Path="/Values">
+            <CommandQueue>
+                <MilitaryShipPoints>9</MilitaryShipPoints>
+            </CommandQueue>
+            <UpgradeList>
+              <DefaultBuff>1500001026</DefaultBuff>
+            </UpgradeList>
+        </ModOp>
+        <!-- Battle Cruiser -->
+        <!-- <MilitaryShipPoints>6</MilitaryShipPoints> -->
+        <ModOp Type="merge" GUID='1500000032' Path="/Values">
+            <CommandQueue>
+                <MilitaryShipPoints>18</MilitaryShipPoints>
+            </CommandQueue>
+            <UpgradeList>
+              <DefaultBuff>1500001026</DefaultBuff>
+            </UpgradeList>
+        </ModOp>
+        <!-- Flak Monitor -->
+        <!-- <MilitaryAirShipPoints>3</MilitaryAirShipPoints> -->
+        <ModOp Type="merge" GUID='1500000037' Path="/Values">
+            <CommandQueue>
+                <MilitaryAirShipPoints>9</MilitaryAirShipPoints>
+            </CommandQueue>
+            <UpgradeList>
+              <DefaultBuff>1500001026</DefaultBuff>
+            </UpgradeList>
+        </ModOp>
+        
+        
+        
+        <!-- Because of the +200% selfheal buff, kind of undo the doubling of SelfHealPerHealTick from Stronger Pirates Mod -->
+        <!-- tripple the halfed CraftingTime from Stronger Pirates: -->
+        <!-- orig: 720000 from GUID 100440  -->
+        <ModOp Type="merge" GUID='102431' Path="/Values">
+          <Craftable>
+            <CraftingTime>1080000</CraftingTime>
+          </Craftable>
+          <Attackable>
+            <SelfHealPerHealTick>1.5</SelfHealPerHealTick>
+          </Attackable>
+        </ModOp>
+        <!-- orig: 360000 from GUID 100439  -->
+        <ModOp Type="merge" GUID='102430' Path="/Values">
+          <Craftable>
+            <CraftingTime>540000</CraftingTime>
+          </Craftable>
+          <Attackable>
+            <SelfHealPerHealTick>1.5</SelfHealPerHealTick>
+          </Attackable>
+        </ModOp>
+        <!-- orig: 180000 from GUID 100437  -->
+        <ModOp Type="merge" GUID='102429' Path="/Values">
+          <Craftable>
+            <CraftingTime>270000</CraftingTime>
+          </Craftable>
+          <Attackable>
+            <SelfHealPerHealTick>1.5</SelfHealPerHealTick>
+          </Attackable>
+        </ModOp>
+        <!-- orig: 720000 from GUID 100443  -->
+        <ModOp Type="merge" GUID='102432' Path="/Values">
+          <Craftable>
+            <CraftingTime>1080000</CraftingTime>
+          </Craftable>
+          <Attackable>
+            <SelfHealPerHealTick>1.5</SelfHealPerHealTick>
+          </Attackable>
+        </ModOp>
+        <!-- orig: 900000 from GUID 968  -->
+        <ModOp Type="merge" GUID='1500000031' Path="/Values">
+          <Craftable>
+            <CraftingTime>1350000</CraftingTime>
+          </Craftable>
+          <Attackable>
+            <SelfHealPerHealTick>1.5</SelfHealPerHealTick>
+          </Attackable>
+        </ModOp>
+        <!-- orig: 900000 from GUID 100442  -->
+        <ModOp Type="merge" GUID='102432' Path="/Values">
+          <Craftable>
+            <CraftingTime>1350000</CraftingTime>
+          </Craftable>
+          <Attackable>
+            <SelfHealPerHealTick>1.5</SelfHealPerHealTick>
+          </Attackable>
+        </ModOp>
+        <ModOp Type="merge" GUID='1500000032' Path="/Values">
+          <Craftable>
+            <CraftingTime>1350000</CraftingTime>
+          </Craftable>
+          <Attackable>
+            <SelfHealPerHealTick>1.5</SelfHealPerHealTick>
+          </Attackable>
+        </ModOp>
+        <!-- orig: 600000  -->
+        <ModOp Type="merge" GUID='1500000037' Path="/Values">
+          <Craftable>
+            <CraftingTime>900000</CraftingTime>
+          </Craftable>
+          <Attackable>
+            <SelfHealPerHealTick>1.5</SelfHealPerHealTick>
+          </Attackable>
+        </ModOp>
+        
+        
+        <!-- dont use merge here, because incompatible with "Item"-like stucture and we want to replace WarFleet in most cases, not change single entries -->
+        <!-- unfortunately the pirates will build the ships in the order and number of this list, so eg. they won't build the second ship of list, until the target numer ob first ship is reached. Adding a ship multiple times to the list has no effect -->
+        <ModOp Type="replace" GUID='73' Path="/Values/Trader/Progression/EarlyGame/WarFleet">                                      
+            <WarFleet>
+                <Item>
+                    <ShipAsset>102429</ShipAsset>
+                    <Amount>2</Amount>
+                </Item>
+            </WarFleet>
+        </ModOp>
+        <ModOp Type="replace" GUID='73' Path="/Values/Trader/Progression/EarlyMidGame/WarFleet">              
+              <WarFleet>
+                <Item>
+                  <ShipAsset>102429</ShipAsset>
+                  <Amount>4</Amount>
+                </Item>
+              </WarFleet>
+        </ModOp>
+        <ModOp Type="replace" GUID='73,76' Path="/Values/Trader/Progression/MidGame/WarFleet">              
+              <WarFleet>
+                <Item>
+                  <ShipAsset>102430</ShipAsset>
+                  <Amount>3</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102429</ShipAsset>
+                  <Amount>2</Amount>
+                </Item>
+              </WarFleet>
+        </ModOp>
+        <ModOp Type="replace" GUID='73,76' Path="/Values/Trader/Progression/LateMidGame/WarFleet">              
+              <WarFleet>
+                <Item>
+                  <ShipAsset>102431</ShipAsset>
+                  <Amount>2</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102430</ShipAsset>
+                  <Amount>3</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102429</ShipAsset>
+                  <Amount>2</Amount>
+                </Item>
+              </WarFleet>
+        </ModOp>
+        <ModOp Type="replace" GUID='73,76' Path="/Values/Trader/Progression/LateGame/WarFleet">              
+              <WarFleet>
+                <Item>
+                  <ShipAsset>1500000032</ShipAsset>
+                  <Amount>1</Amount>
+                </Item>
+                <!-- Monitor mit Flammenwerfer -->
+                <Item>
+                  <ShipAsset>1500000031</ShipAsset>
+                  <Amount>2</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102431</ShipAsset>
+                  <Amount>3</Amount>
+                </Item>            
+                <Item>
+                  <ShipAsset>102432</ShipAsset>
+                  <Amount>2</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102430</ShipAsset>
+                  <Amount>2</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102429</ShipAsset>
+                  <Amount>1</Amount>
+                </Item>
+              </WarFleet>
+        </ModOp>
+        <ModOp Type="replace" GUID='73,76' Path="/Values/Trader/Progression/EndGame/WarFleet">              
+              <WarFleet>
+                <Item>
+                  <ShipAsset>1500000032</ShipAsset>
+                  <Amount>2</Amount>
+                </Item>
+                <!-- Monitor mit Flammenwerfer -->
+                <Item>
+                  <ShipAsset>1500000031</ShipAsset>
+                  <Amount>3</Amount>
+                </Item>
+                <!-- Flak-Monitor, seems to be fine even without owning the DLC -->
+                <Item>
+                  <ShipAsset>1500000037</ShipAsset>
+                  <Amount>2</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102431</ShipAsset>
+                  <Amount>5</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102432</ShipAsset>
+                  <Amount>5</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102430</ShipAsset>
+                  <Amount>1</Amount>
+                </Item>
+                <Item>
+                  <ShipAsset>102429</ShipAsset>
+                  <Amount>1</Amount>
+                </Item>
+              </WarFleet>
+        </ModOp>
+        
+        <ModOp Type="merge" GUID='153266,153274' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102430']">
+            <Amount>2</Amount> <!-- original 3 EarlyGame/EarlyMidGame-->
+        </ModOp>
+        <ModOp Type="merge" GUID='153269,153275' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102430']">
+            <Amount>5</Amount> <!-- original 5 MidGame -->
+        </ModOp>
+        <ModOp Type="merge" GUID='153236,153240' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102431']">
+            <Amount>4</Amount> <!-- original 1, seems this is not used by the game, so we will use it to replace LateMidGame, so it is different from LateGame -->
+        </ModOp>
+        <ModOp Type="merge" GUID='153270,153276' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102431']">
+            <Amount>4</Amount> <!-- original 3 LateGame, adding 8 monitors below -->
+        </ModOp>
+        <ModOp Type="merge" GUID='153271,153277' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102432']">
+            <Amount>6</Amount> <!-- Piraten-​Monitor original 3 EndGame, adding 12 ship of line below -->
+        </ModOp>
+        <ModOp Type="merge" GUID='153271,153277' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102431']">
+            <Amount>4</Amount>
+        </ModOp>
+        <ModOp Type="merge" GUID='153271,153277' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='1500000031']">
+            <Amount>2</Amount>
+        </ModOp>
+        <ModOp Type="merge" GUID='153270,153276' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='102432']">
+            <Amount>3</Amount>
+        </ModOp>
+        <ModOp Type="merge" GUID='153270,153276' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='1500000031']">
+            <Amount>1</Amount>
+        </ModOp>
+        <ModOp Type="merge" GUID='153270,153276' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='1500000032']">
+            <Amount>1</Amount>
+        </ModOp>
+        <ModOp Type="merge" GUID='153271,153277' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='1500000032']">
+            <Amount>2</Amount>
+        </ModOp>
+        
+        
+        <!-- if my Stronger Pirates mod is active, reduce the spawning of ships with trigger to only up to 1 of each kind (instead of 2) -->
+        <ModOp Type="replace" GUID='1500000033,1500000034' Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition/Values/ConditionShipsOwnedInSession/ShipAmount">
+            <ShipAmount>1</ShipAmount>
+        </ModOp>
+        
+        
+        
+    </Group>
+
+
+
+</ModOps>
