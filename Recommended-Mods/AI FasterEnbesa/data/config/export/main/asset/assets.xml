@@ -1,0 +1,40 @@
+<ModOps>
+    
+    <!-- in den sessions sind voraussetzungen defininiert zb für arctic: -->
+    <!-- <SecondPartyReferenceUnlock>116870</SecondPartyReferenceUnlock> -->
+    <!-- africa: <SecondPartyReferenceUnlock>130450</SecondPartyReferenceUnlock> wird ungelocked in Trigger 130435 -->
+    <!-- suedamerika <SecondPartyReferenceUnlock>1010285</SecondPartyReferenceUnlock> -->
+    <!-- sunken treasures <SecondPartyReferenceUnlock>1010464</SecondPartyReferenceUnlock> -->
+    
+    
+    
+    <!-- Wenn ich SecondPartyReferenceUnlock auf etwas mit AlwaysTrue setze (=0 setzen reicht dafür wohl), dann ist KI nach ~5 Minuten in allen Sessions AUßER in Sunken treasures (leicht zu sehen mit "easy seed search mod"). -->
+     <!-- Erst wenn ich selbst in Sunken treasures bin (die Session fertig geladen habe), folgt die KI mir. Deswegen dachte ich dass SecondPartyForceFollowPlayer vllt verbietet, dass die KI -->
+     <!-- da zuerst hin darf, aber der Wert ist auch für Arktis definiert und da geht KI auch hin ohne dass human es unlocked hat... -->
+    <!-- Auch wenn ich für sunken SecondPartyForceFollowPlayer=0 setze, unlocked cape nicht vorher für die KI... -->
+    
+    <!-- Wenn ich SecondPartyReferenceUnlock auf etwas mit AlwaysFalse setze, dann kommt KI niemals in die Sessions. -->
+    <!-- Auch nicht wenn SecondPartyForceFollowPlayer=1 ist und ich bereits dort bin -->
+    
+    <!-- Daher weiß ich grad nicht was SecondPartyForceFollowPlayer=1 macht?! -->
+    <!-- Offizielle Beschreibung aus properties-toolone.xml: -->
+     <!-- <Description>If true the AI will follow the player in the session as soon as possible (even if the AI doesn't need an island in the new session)</Description> -->
+    <!-- hilft nicht wirklich.. und lock muss wohl dennoch erfüllt sein?! -->
+    
+     <!-- Manche AI session conditions könnten tatsächlich nur aus Sicht des Human0 geprüft werden, nicht aus Sicht der KI -->
+     <!-- zb bei passage unlock 116870 haben wir drinstehen, dass dies unlocked wird in 116022 wenn 116024 unlocked ist. Doch 116024 hat UsedBySecondParties=0 -->
+    <!-- In Triggern wird an sich nichts "nur für Human0" ausgeführt, aber im C-iwas code kann sowas gemacht werden (wird zb. bei pirate comeback gemacht) -->
+     <!-- Daher kanns sein, dass das aus xml Sicht alles keinen Sinn ergibt     -->
+     <!-- Aber allgemein werden die SecondPartyReferenceUnlock aus Sicht der KI geprüft, das ist confirmed. Bei Passage ist es deswegen wohl auch dieser komplizierte Aufbau mit mehreren GUIDs anstatt alles direkt in 116870 zu prüfen, sodass der C code hier etwas machen kann, sodass es letzlich davon abhängt, ob Human die Quest abgeschlossen hat. -->
+    
+    <!-- TimeLimit reduzieren von 7200000 auf 1800000 (2 Stunden auf 30 Minuten, nachdem KI Hospital gebaut hat) -->
+    <ModOp Type="merge" GUID="130435" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition/Values/ConditionTimer">
+      <TimeLimit>1800000</TimeLimit>
+    </ModOp>
+    <!-- aber KI folgt dem Spieler relativ schnell hierdurch, oder?? -->
+    <ModOp Type="merge" GUID="112132" Path="/Values/Session">
+       <SecondPartyForceFollowPlayer>1</SecondPartyForceFollowPlayer>
+    </ModOp>
+    
+    
+</ModOps>
