@@ -1,0 +1,640 @@
+<ModOps>
+  
+
+
+  
+  <ModOp Type="addNextSibling" GUID="119903">
+    <Asset>
+      <BaseAssetGUID>119903</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500003523</GUID>
+          <Name>Ship Quest (Ketema)</Name>
+        </Standard>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp Type="addNextSibling" GUID="150725">
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003513</GUID>
+          <Name>TradeQuests_Merchant_Pool</Name>
+          <IconFilename>data/ui/2kimages/main/assets/bg_om_info.png</IconFilename>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <!-- quests added below with conditions -->
+          </Quests>
+          <PoolCooldown>7200000</PoolCooldown>
+          <QuestCooldown>18000000</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>1</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>0</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+          <QuestPoolActionCallbacks>
+            <OnQuestDiscarded>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionDelayedActions</Template>
+                        <Values>
+                          <Action />
+                          <ActionDelayedActions>
+                            <ExecutionDelay>30000</ExecutionDelay>
+                            <DelayedActions>
+                              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                              <Values>
+                                <ActionList>
+                                  <Actions>
+                                    <Item>
+                                      <Action>
+                                        <Template>ActionDeleteObjects</Template>
+                                        <Values>
+                                          <Action />
+                                          <ActionDeleteObjects />
+                                          <ObjectFilter>
+                                            <ObjectGUID>1500003523</ObjectGUID>
+                                          </ObjectFilter>
+                                        </Values>
+                                      </Action>
+                                    </Item>
+                                  </Actions>
+                                </ActionList>
+                              </Values>
+                            </DelayedActions>
+                          </ActionDelayedActions>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </OnQuestDiscarded>
+          </QuestPoolActionCallbacks>
+        </QuestPool>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Africa_Ketema</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- only if the pool 1500003631 we load after is containing preferred goods, add this quest to the pool -->
+   <!-- otherwise the quest would be instantly solved -->
+  <ModOp Type="add" GUID="1500003513" Path="/Values/QuestPool/Quests"
+    Condition="//Values[Standard/GUID='1500003631']/PlayerCounterContextPool/Contexts/Item">
+    <Item>
+      <Quest>1500003568</Quest>
+      <Weight>15</Weight>
+    </Item>
+    <Item>
+      <Quest>1500003569</Quest>
+      <Weight>15</Weight>
+    </Item>
+  </ModOp>
+  <!-- only if offering goods pool 1500003640 has any entries -->
+  <ModOp Type="add" GUID="1500003513" Path="/Values/QuestPool/Quests"
+    Condition="//Values[Standard/GUID='1500003640']/PlayerCounterContextPool/Contexts/Item">
+    <Item>
+      <Quest>1500003570</Quest>
+      <Weight>10</Weight>
+    </Item>
+    <Item>
+      <Quest>1500003571</Quest>
+      <Weight>10</Weight>
+    </Item>
+  </ModOp>
+
+  <!-- sell all preferred goods of this merchant at *2.5 price -->
+  <!-- Only count the preferred products 1500003631, because we can not properly check who traded with who. -->
+     <!-- therefore for allowing every product it is better to have another session/regionwide thing without the need to trade with a specific merchant -->
+  <ModOp Type="addNextSibling" GUID="1500003567">
+    <Asset>
+      <Template>A7_QuestStatusQuo</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003568</GUID>
+          <Name>Quest_Trade_SellPreferred</Name>
+        </Standard>
+        <Quest>
+          <InvitationMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <NotificationTextFemale>1500003611</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationText>1500003610</NotificationText>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <Subtitle>122825</Subtitle>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </InvitationMessage>
+          <QuestGiver>119051</QuestGiver>
+          <QuestDifficulty>Easy</QuestDifficulty>
+          <NeededProgressLevel>EarlyGame;EarlyMidGame;MidGame;LateMidGame</NeededProgressLevel>
+          <StoryText>6635</StoryText>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>112132</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+          <PreActivationTimer>1800000</PreActivationTimer>
+          <DelayTimer>90000</DelayTimer>
+          <QuestTimeLimit>7200000</QuestTimeLimit>
+          <QuestCategory>RandomQuest</QuestCategory>
+          <QuestActivation>ManualActivation</QuestActivation>
+          <CountForQuestLimit>1</CountForQuestLimit>
+          <QuestTrackerVisibility>Session</QuestTrackerVisibility>
+          <QuestBookVisibility>SameAsQuestTracker</QuestBookVisibility>
+          <IsAbortable>1</IsAbortable>
+          <CanBeActiveForMultipleParticipants>1</CanBeActiveForMultipleParticipants>
+          <ConfirmOnReached>0</ConfirmOnReached>
+          <HasExclusiveQuestGiver>0</HasExclusiveQuestGiver>
+          <QuestBookBackground>data/ui/2kimages/main/assets16/questbackground/bg_quest_smugglewithoutscanners_delivery_pickup.png</QuestBookBackground>
+          <ReputationQuestFail>
+            <ReputationFailList />
+          </ReputationQuestFail>
+          <QuestHints>
+            <Item>
+              <Text>1500003616</Text>
+            </Item>
+            <Item>
+              <Text>112132</Text>
+            </Item>
+            <Item>
+              <Text>1500003609</Text>
+            </Item>
+          </QuestHints>
+          <HasStarterSpeechBubble>0</HasStarterSpeechBubble>
+        </Quest>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlockedList</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlockList>
+                <UnlockNeededList>
+                  <!-- will be filled at end of this file -->
+                </UnlockNeededList>
+                <UnlockRangeOP>Any</UnlockRangeOP>
+              </ConditionUnlockList>
+            </Values>
+          </Condition>
+        </PreConditionList>
+        <Text />
+        <Reward>
+          <RewardAssets>
+            <Item>
+              <Reward>1010017</Reward>
+              <Amount>7500</Amount>
+            </Item>
+          </RewardAssets>
+          <RewardReputation />
+        </Reward>
+        <Objectives>
+          <WinConditionCompletionOrder>Parallel</WinConditionCompletionOrder>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>TradeMoneyEarnedObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>1500003600</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionPlayerCounter>
+                    <Context>1500003631</Context>
+                    <CounterAmount>5000</CounterAmount>
+                    <CounterScopeContext>112132</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>TradeMoneyPayedObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>1500003604</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionPlayerCounter>
+                    <Context>1500003631</Context>
+                    <CounterAmount>5000</CounterAmount>
+                    <CounterScopeContext>112132</CounterScopeContext>
+                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    <CheckedParticipant>Africa_Ketema</CheckedParticipant>
+                  </ConditionPlayerCounter>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+        <QuestOptional>
+          <HasStarterObject>Specific</HasStarterObject>
+          <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionStarterObject>
+                <StarterObjectObject>
+                  <Template>ConditionObjectSpawnedObject</Template>
+                  <Values>
+                    <ConditionObjectSpawnedObject>
+                      <ExecutionObject>1500003523</ExecutionObject>
+                      <ObjectSpawnArea>
+                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                        <Values>
+                          <SpawnArea>
+                            <SpawnContext>ClientObject</SpawnContext>
+                            <DistanceToContext>30</DistanceToContext>
+                          </SpawnArea>
+                        </Values>
+                      </ObjectSpawnArea>
+                      <DoSetVisualObjectOwner>1</DoSetVisualObjectOwner>
+                      <VisualObjectOwner>Africa_Ketema</VisualObjectOwner>
+                    </ConditionObjectSpawnedObject>
+                    <ConditionScanner />
+                    <ConditionObjectiveSignsAndFeedback>
+                      <Infolayer>500173</Infolayer>
+                    </ConditionObjectiveSignsAndFeedback>
+                  </Values>
+                </StarterObjectObject>
+              </ConditionStarterObject>
+              <ConditionQuestObjective />
+              <ConditionPropsSessionSettings />
+            </Values>
+          </StarterObject>
+        </QuestOptional>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500003568</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500003569</GUID>
+          <Name>Quest_Trade_SellPreferred2</Name>
+        </Standard>
+        <Quest>
+          <QuestDifficulty>Medium</QuestDifficulty>
+          <NeededProgressLevel>LateMidGame;LateGame;EndGame</NeededProgressLevel>
+        </Quest>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlockedList</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlockList>
+                <UnlockNeededList>
+                  <!-- will be filled at end of this file -->
+                </UnlockNeededList>
+                <UnlockRangeOP>Any</UnlockRangeOP>
+              </ConditionUnlockList>
+            </Values>
+          </Condition>
+        </PreConditionList>
+        <Text />
+        <Reward>
+          <RewardAssets>
+            <Item>
+              <Reward>1010017</Reward>
+              <Amount>75000</Amount>
+            </Item>
+          </RewardAssets>
+          <RewardReputation />
+        </Reward>
+        <Objectives>
+          <WinConditionCompletionOrder>Parallel</WinConditionCompletionOrder>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>TradeMoneyEarnedObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>1500003600</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionPlayerCounter>
+                    <Context>1500003631</Context>
+                    <CounterAmount>50000</CounterAmount>
+                    <CounterScopeContext>112132</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>TradeMoneyPayedObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>1500003604</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionPlayerCounter>
+                    <Context>1500003631</Context>
+                    <CounterAmount>50000</CounterAmount>
+                    <CounterScopeContext>112132</CounterScopeContext>
+                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    <CheckedParticipant>Africa_Ketema</CheckedParticipant>
+                  </ConditionPlayerCounter>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+      </Values>
+    </Asset>
+
+    <!-- All merchant goods at 2/5 price -->
+     <!-- I thought about precondition GoodsInStock, this works with a pool, but 1) we can not check the value of goods in stock and 2) just because right now it are not enough, it does not mean it will not be enough over the whole quest time. SO offer this quest regardless of GoodsInStock -->
+    <!-- Only count the products visible in the active trade offering goods 1500003640, because we can not properly check who traded with who. -->
+     <!-- therefore for allowing every product it is better to have another session/regionwide thing without the need to trade with a specific merchant -->
+    <Asset>
+      <BaseAssetGUID>1500003568</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500003570</GUID>
+          <Name>Quest_Trade_BUYFromMerchant1</Name>
+        </Standard>
+        <Quest>
+          <InvitationMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <NotificationTextFemale>1500003619</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationText>1500003618</NotificationText>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <Subtitle>122452</Subtitle>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </InvitationMessage>
+          <StoryText>14880</StoryText>
+          <QuestDifficulty>Easy</QuestDifficulty>
+          <NeededProgressLevel>EarlyGame;EarlyMidGame;MidGame;LateMidGame</NeededProgressLevel>
+          <QuestHints>
+            <Item>
+              <Text>1500003616</Text>
+            </Item>
+            <Item>
+              <Text>112132</Text>
+            </Item>
+            <Item>
+              <Text>1500003609</Text>
+            </Item>
+          </QuestHints>
+        </Quest>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlockedList</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlockList>
+                <UnlockNeededList>
+                  <!-- will be filled at end of this file -->
+                </UnlockNeededList>
+                <UnlockRangeOP>Any</UnlockRangeOP>
+              </ConditionUnlockList>
+            </Values>
+          </Condition>
+        </PreConditionList>
+        <!-- <PreConditionList> -->
+          <!-- <Condition> -->
+            <!-- <Template>ConditionPlayerCounter</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionPlayerCounter> -->
+                <!-- <PlayerCounter>GoodsInStock</PlayerCounter> -->
+                <!-- <Context>1500003640</Context> -->
+                <!-- <ComparisonOp>MoreThan</ComparisonOp> -->
+                <!-- <CounterAmount>50</CounterAmount> -->
+                <!-- <CheckSpecificParticipant>1</CheckSpecificParticipant> -->
+                <!-- <CheckedParticipant>Africa_Ketema</CheckedParticipant> -->
+              <!-- </ConditionPlayerCounter> -->
+            <!-- </Values> -->
+          <!-- </Condition> -->
+        <!-- </PreConditionList> -->
+        <Text />
+        <Reward>
+          <RewardAssets>
+            <Item>
+              <Reward>1010017</Reward>
+              <Amount>6000</Amount>
+            </Item>
+          </RewardAssets>
+          <RewardReputation />
+        </Reward>
+        <Objectives>
+          <WinConditionCompletionOrder>Parallel</WinConditionCompletionOrder>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>TradeMoneyPayedObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>1500003602</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionPlayerCounter>
+                    <Context>1500003640</Context>
+                    <CounterAmount>10000</CounterAmount>
+                    <CounterScopeContext>112132</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>TradeMoneyEarnedObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>1500003605</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionPlayerCounter>
+                    <Context>1500003640</Context>
+                    <CounterAmount>10000</CounterAmount>
+                    <CounterScopeContext>112132</CounterScopeContext>
+                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    <CheckedParticipant>Africa_Ketema</CheckedParticipant>
+                  </ConditionPlayerCounter>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500003568</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500003571</GUID>
+          <Name>Quest_Trade_BUYFromMerchant2</Name>
+        </Standard>
+        <Quest>
+          <InvitationMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <NotificationTextFemale>1500003619</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationText>1500003618</NotificationText>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <Subtitle>122452</Subtitle>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </InvitationMessage>
+          <StoryText>14880</StoryText>
+          <QuestDifficulty>Medium</QuestDifficulty>
+          <NeededProgressLevel>LateMidGame;LateGame;EndGame</NeededProgressLevel>
+          <QuestHints>
+            <Item>
+              <Text>1500003616</Text>
+            </Item>
+            <Item>
+              <Text>112132</Text>
+            </Item>
+            <Item>
+              <Text>1500003609</Text>
+            </Item>
+          </QuestHints>
+        </Quest>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlockedList</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlockList>
+                <UnlockNeededList>
+                  <!-- will be filled at end of this file -->
+                </UnlockNeededList>
+                <UnlockRangeOP>Any</UnlockRangeOP>
+              </ConditionUnlockList>
+            </Values>
+          </Condition>
+        </PreConditionList>
+        <!-- <PreConditionList> -->
+          <!-- <Condition> -->
+            <!-- <Template>ConditionPlayerCounter</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionPlayerCounter> -->
+                <!-- <PlayerCounter>GoodsInStock</PlayerCounter> -->
+                <!-- <Context>1500003640</Context> -->
+                <!-- <ComparisonOp>MoreThan</ComparisonOp> -->
+                <!-- <CounterAmount>200</CounterAmount> -->
+                <!-- <CheckSpecificParticipant>1</CheckSpecificParticipant> -->
+                <!-- <CheckedParticipant>Africa_Ketema</CheckedParticipant> -->
+              <!-- </ConditionPlayerCounter> -->
+            <!-- </Values> -->
+          <!-- </Condition> -->
+        <!-- </PreConditionList> -->
+        <Text />
+        <Reward>
+          <RewardAssets>
+            <Item>
+              <Reward>1010017</Reward>
+              <Amount>60000</Amount>
+            </Item>
+          </RewardAssets>
+          <RewardReputation />
+        </Reward>
+        <Objectives>
+          <WinConditionCompletionOrder>Parallel</WinConditionCompletionOrder>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>TradeMoneyPayedObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>1500003602</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionPlayerCounter>
+                    <Context>1500003640</Context>
+                    <CounterAmount>100000</CounterAmount>
+                    <CounterScopeContext>112132</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>TradeMoneyEarnedObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>1500003605</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionPlayerCounter>
+                    <Context>1500003640</Context>
+                    <CounterAmount>100000</CounterAmount>
+                    <CounterScopeContext>112132</CounterScopeContext>
+                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    <CheckedParticipant>Africa_Ketema</CheckedParticipant>
+                  </ConditionPlayerCounter>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+      </Values>
+    </Asset>
+    
+
+  </ModOp>
+  
+
+  
+  <!-- add the preferred goods from this merchant to the PreConditionList UnlockNeededList, so this quest can only start if you have at least one of these products unlocked yourself (this way it is also compatible to mods adding more goods earlier) -->
+  <ModOp Type="merge" GUID="1500003568,1500003569" Path="/Values/PreConditionList/Condition/Values/ConditionUnlockList/UnlockNeededList"
+    Content="@1500003631/PlayerCounterContextPool/Contexts/Item/Asset/text()"
+    Condition="@1500003631/PlayerCounterContextPool/Contexts/Item/Asset">
+    <Item>
+      <UnlockNeeded>
+        <ModOpContent />
+      </UnlockNeeded>
+    </Item>
+  </ModOp>
+  <!-- same for offering goods -->
+  <ModOp Type="merge" GUID="1500003570,1500003571" Path="/Values/PreConditionList/Condition/Values/ConditionUnlockList/UnlockNeededList"
+    Content="@1500003640/PlayerCounterContextPool/Contexts/Item/Asset/text()"
+    Condition="@1500003640/PlayerCounterContextPool/Contexts/Item/Asset">
+    <Item>
+      <UnlockNeeded>
+        <ModOpContent />
+      </UnlockNeeded>
+    </Item>
+  </ModOp>
+  
+    
+</ModOps>

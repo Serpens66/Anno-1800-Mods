@@ -1,0 +1,139 @@
+<ModOps>
+
+  <!-- andere merchants nutzen untersch. schiffstypen um untersch. geschw. zu haben. -->
+   <!-- reicht also nur kahina nen speedbuff zu geben, damits bei 2 untersch. schiffstypen und 3 händeln in alter welt, alle einen anderen speed haben -->
+  <!-- und da kahina nur 1 schiff hat, kann der buff auch global sein -->
+  
+  <ModOp Type="AddNextSibling" GUID="112574">
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003068</GUID>
+          <Name>Merchant Speed Buff</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_sail.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500000041</GUID>
+            </Item>
+            <Item>
+              <GUID>1500000044</GUID>
+            </Item>
+            <Item>
+              <GUID>1500000042</GUID>
+            </Item>
+            <Item>
+              <GUID>1500000043</GUID>
+            </Item>
+            <Item>
+              <GUID>1500003063</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>12</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+          <IgnoreWeightFactorUpgrade>
+            <Value>50</Value>
+            <Percental>1</Percental>
+          </IgnoreWeightFactorUpgrade>
+        </VehicleUpgrade>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <TradeShipUpgrade>
+          <LoadingSpeedUpgrade>
+            <Value>10</Value>
+            <Percental>1</Percental>
+          </LoadingSpeedUpgrade>
+        </TradeShipUpgrade>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- for some reason the buff vanished after a while,so may need refreseh from time to time, so we reset the trigger and check ConditionIsBuffed -->
+   <!-- hm ConditionIsBuffed is useless, does not work (on ships?), so we will instead reapply it once per hour, should be ok, is not important to have it 100% of the time  -->
+  <ModOp GUID="130248" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <Name>Kahina speed buff</Name>
+          <GUID>1500003069</GUID>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_08_Kahina</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500003068</BuffAsset>
+                    <AddBuff>0</AddBuff>
+                    <AffectedParticipant>Third_party_08_Kahina</AffectedParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500003068</BuffAsset>
+                    <AddBuff>1</AddBuff>
+                    <AffectedParticipant>Third_party_08_Kahina</AffectedParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>3600000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+
+  </ModOp>
+  
+
+  
+    
+</ModOps>

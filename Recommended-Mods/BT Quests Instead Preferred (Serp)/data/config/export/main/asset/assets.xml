@@ -1,0 +1,314 @@
+<ModOps>
+  
+  <!-- verwendet Serps GUIDS von 1500003505 bis  (bis 1500003799 fuer diesen mod freigehalten) -->
+      
+  <!-- 1500003524 bis 1500003533 ist reserviert für regionwide/worldwide (jede region) alle Waren -->
+  <!-- 1500003534 bis 1500003539 ist frei, weil ich die buy quests global statt regionwide gemacht hab -->
+  <!-- 1500003540 bis 1500003575 wird für die 9 trader und deren 4 quests bzgl preferred/offering verwendet -->
+  <!-- 1500003576 / 1500003577 für Trigger Quests der Piraten zu canceln -->
+  <!-- 1500003578 bis 1500003594 ist aktuell noch frei -->
+  <!-- 1500003594 bis 1500003599 wird für die region Questpools verwendet -->
+  <!-- ab 1500003600 bis 1500003644 wird für diverse Texte und auch ein paar PlayerCounter Pools verwendet -->
+   <!-- von 1500003645 bis einschl. 1500003659 noch für texte freigehalten -->
+   <!-- Ab 1500003660 wohl bis einschl. 1500003691 nutze ich für die region-region Quests und teils worldwide (zb. Produkte aus Arktis werden in Region Europa gut bezahlt) -->
+  
+  
+  
+  <!-- Die Quests nutzen "RelativeToQuestStart" um den Handelsumsatz seit Queststart zu messen. -->
+    <!-- Komischerweise gilt als Queststart offenbar schon der Zeitpunkt zu dem die Quest mit Stern angezeigt wird, also noch nicht angenommen wurde. -->
+      <!-- Aber an sich ist das denke ich nicht so schlimm, vllt sogar gut :) -->
+      
+      
+  <!-- since we can not really change the prices of products ingame, we use a workaround that you get extra money from a quest when trading. -->
+   <!-- this is ok for trades with third party and even with 2nd party. -->
+   <!-- but can be exploited when trading with other humans, because you can simply trade back and forth and get the quest reward instantly without any effort or money loss -->
+    <!-- I see no way to prevent this, but multiplayer is seldom anyways and you dont have to exploit it this way. -->
+  <!-- There is also no way to check how much someone traded with another one.  -->
+   <!-- so we can only check if human traded with anyone and if third party traded with anyone. -->
+   <!-- So if we someone want the player to trade with a specific participant, we need to narrow the number of counted goods small, -->
+    <!-- so it is not automatically fullfilled by trading other random stuff with other people -->
+  <!-- I will still add several regionwide trade quests. you can exploit this heavily in multiplayer, but there is nothing I can do against it and I still want them to exist -->
+
+
+
+  <!-- TradeMoneyEarned / TradeMoneyPayed -->
+     <!-- sind noch besser, bei TradeProductBought gibt man die menge eines produkts an. bei TradeMoneyEarned den Warenwert des Produkts, dadurch ist das ganze unabhängig vom Preis des Produkts -->
+      <!-- am ehesten nutzbar für meine Quests die PreferedGoods ersetzen sollen, dann kann ich sagen "verkaufe ihm Uhren im Wert von 100k (zu normalen preisen), dann bekommst du 20k dazu" -->
+      <!-- kann auch PlayerCounterContextPool verwenden, es muss dann die erlössumme aus allen produkten aus dem pool erfüllt sein (bei verwendung in trigger) (also wenn Zielsumme 20 ist, dann reichen 10 davon und 10 herivon) -->
+       <!-- bei ConditionQuestStatusQuo kann man das noch finetunen. -->
+      <!-- wenn man den third parties ProfileCounter gibt, dann kann man sogar mit CheckedParticipant prüfen, was thirdparty gekauft/verkauft hat -->
+       <!-- wobei man dann wohl 2 ziele machen sollte, um sicherzugehen, dass sie auch von dem questspieler verkauft wurden -->
+        <!-- geht leider nicht ganz perfekt: -->
+         <!-- man kann nur sagen "Archibald muss Waren im Wert von 1000 kaufen" und "du musst Waren im Wert von 1000 vekraufen" -->
+          <!-- aber theoretisch kann man auch mit irgendwem anders handeln und Archibald kauft zufällig die Waren bei wem anders. -->
+          <!-- Um es ein wenig einzugrenzen können wir noch die Session definieren, in der die handelsmenge geprüft wird. -->
+          <!-- Aber ist denke ich dennoch ok. -->
+       
+   <!-- Vanilla Deliver Quests ändern wir mal nicht, sind ja zusätzlich zu meinen quests hier aktiv  -->
+  <!-- .. -->
+  <!-- man könnte noch Quests mit speziellen hardcodeden einzelnen Waren machen die angefragt werden .. aber lassen wir erstmal weg, -->
+   <!-- vorallem würde mich daran text/voice stören, dass wir da evlt nichts passendes haben. -->
+    <!-- das passendste wären dann evlt die güter für die es bereits deliver quests gibt, aber ich denke nicht, dass ich diese ersetzen will.. oder? -->
+     <!-- vllt in einem separatem mod die deliver quests mit sowas ersetzen -->
+
+
+  <!-- für die Quests mit beliebigen Waren: -->
+   <!-- besser nicht weniger als *0.4 Kosten, bzw mehr als *2.5 Erlös machen, weil man sonst Waren vom Händler an seinem Kontor einkaufen und ihm direkt zurückverkaufen könnte -->
+     <!-- und würde dabei gewinn machen. (man kauft Waren bei Merchants zu 2*BasePrice und verkauft sie zu 0.8*BasePrice) -->
+  <!-- für spezielle Waren kann man den multiplier höher setzen, sofern der händler diese nicht im aktivhandel hat -->
+
+  
+
+  
+  
+  <!-- info -->
+  <!-- QuestSessionDependencies -->
+    <!-- If not empty, the quest can only be triggered if one of the specified sessions is loaded -->
+    <!-- Es ist also "ODER", ich kann damit nicht testen ob mehrere zugleich geladen sind. -->
+     <!-- und außerdem wird diese session standardmäßig als Startort der Quest genommen, sofern nicht anderweitig definiert. -->
+      <!-- wenns mehrere gültige sessions darin gibt, dann ist es wohl zufällig -->
+  <!-- <DataType>Integer</DataType> -->
+  <!-- <Name>QuestLimit</Name> -->
+  <!-- <Description>The max number of quests that this pool can call simultaneously</Description> -->
+    <!-- legt fest wieviele quests vom pool gleichzeitg aktiv sein können. -->
+     <!-- zb. könnte ich im mainpool sagen, dass 3 quests aktiv sein dürfen, aber in den subpools jeweils nur 1, sodass im endeffekt 3 quests von je einem subpool aktiv sind, und nie mehr als1 vomselben subpool   -->
+      <!-- ABER PoolCooldown wird dennoch eingehalten nach jeder Quest!. Dh. nur wenn eine vorherige Quest nach Ablauf von PoolCooldown noch aktiv ist, kann es dann 2 oder mehr Quests durch ein höheres QuestLimit geben. -->
+  <!-- <DataType>Time</DataType> -->
+  <!-- <Name>PoolCooldown</Name> -->
+  <!-- <Description>Defines the time the pool is blocked after calling a quest</Description> -->
+   <!-- für den obersten Pool ist das am relevantesten, also wie oft er eine quest aus den anderen pools raussucht. -->
+    <!-- für die pools darunter kann es 0 sein, wenns immer eine vollständige auswahl sein soll. -->
+     <!-- man kann es für sie aber auch zb. auf den doppelten wert vom mainpool setzen, wenn man möchte, dass dieser subpool nachdem er einmal gewählt wurde bei der nächsten wahl einmal nicht zur Wahl steht -->
+  <!-- <DataType>Boolean</DataType> -->
+  <!-- <Name>CooldownOnQuestStart</Name> -->
+  <!-- <Description>Starts the pool cooldown if no pool cooldown is running and a quest started</Description> -->
+     <!-- start ist wohl sobald sie als stern annehmbar angezeigt wird! dh. wenn ich nur das an habe (und nicht CooldownOnQuestEnd), dann kann nach beendingung/ablehnung instant die nächste quest kommen, wenn der cooldown seitdem bereits abgelaufen ist -->
+  <!-- <DataType>Boolean</DataType> -->
+  <!-- <Name>CooldownOnQuestEnd</Name> -->
+  <!-- <Description>Starts the pool cooldown if no pool cooldown is running and a quest ended</Description> -->
+    <!-- startet nur neuen cooldown wenn keiner läuft, verlängert also wohl auch einen laufenden cooldown nicht! -->
+    <!-- hierbei sollte man auch QuestTimeLimit und PreActivationTimer der Quest berücksichtigen, zusammen mit dem cooldown. -->
+     <!-- wenn ich CooldownOnQuestEnd=1 setze, der cooldown des pools 1 stunde ist, die quest aber durch QuestTimeLimit/PreActivationTimer auch länger als cooldown gehen kann -->
+      <!-- dann würde kein neuer cooldown laufen, wenn ich die quest nach 59 Minuten beende, aber ich darf ne weitere stunde warten, wenn ich sie nach 61 Minuten beende -->
+  <!-- <DataType>Time</DataType> -->
+  <!-- <Name>QuestCooldown</Name> -->
+  <!-- <Description>A quest of this pool is blocked for this time when it was resolved.</Description> -->
+    <!-- Hat keine Auswikung in Pools ohne Quests (also zb. in pools mit SubPools) -->
+  <!-- <DataType>Boolean</DataType> -->
+  <!-- <Name>AffectedByCooldownFactor</Name> -->
+  <!-- <Description>When true, the cooldown will be affected by the cooldown multiplier of the quest frequencies in the difficulty settings</Description> -->
+    <!-- .. -->
+    <!-- In Profile/QuestPoolList vom QuestGiver müssen die Pools nicht. -->
+     <!-- das ist wohl nur dazu da, dass die Quests direkt beim Leuchtturmobjekt gestartet werden? das hat aber den nachteil, dass wenn da mehrere gestacked sind, man sie nicht frei wählen kann (wobei wenn man sie mit x schließt, nicht ablehnt, dann kommt die darunter) -->
+      <!-- .. aber egal, wir nutzen eh QuestOptional mit starter schiff, brauchen QuestPoolList also nicht -->
+    
+  <!-- wir nutzen einen Main Pool in den alle merchants pools reinkommen, damit nicht alle quests von allen merchants gleichzeitig aktiv sein können -->
+  <ModOp Type="addNextSibling" GUID="150725">
+    
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003595</GUID>
+          <Name>TradeQuests_NotMerchantBound_Pool</Name>
+          <IconFilename>data/ui/2kimages/main/assets/bg_om_info.png</IconFilename>
+        </Standard>
+        <QuestPool>
+          <SubPools>
+            <Item>
+              <Pool>1500003594</Pool>
+              <Weight>20</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003596</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003597</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003598</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003599</Pool>
+              <Weight>10</Weight>
+            </Item>
+          </SubPools>
+          <PoolCooldown>7200000</PoolCooldown>
+          <QuestCooldown>0</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>1</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>0</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003505</GUID>
+          <Name>TradeQuestsMAIN_Pool</Name>
+          <IconFilename>data/ui/2kimages/main/assets/bg_om_info.png</IconFilename>
+        </Standard>
+        <QuestPool>
+          <SubPools>
+            <Item>
+              <Pool>1500003506</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003507</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003508</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003509</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003510</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003511</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003512</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003513</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003514</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <!-- NotMerchantBound -->
+            <Item>
+              <Pool>1500003595</Pool>
+              <Weight>10</Weight>
+            </Item>
+          </SubPools>
+          <PoolCooldown>2700000</PoolCooldown>
+          <QuestCooldown>0</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>1</IsTopLevel>
+          <QuestLimit>2</QuestLimit>
+        </QuestPool>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <!-- ############################################################################### -->
+  <!-- ############################################################################### -->
+  <!-- order matters! -->
+  <Include File="./Archibald.include.xml" />
+  <Include File="./Kahina.include.xml" />
+  <Include File="./Eli.include.xml" />
+  <Include File="./Harlow.include.xml" />
+  <Include File="./Nate.include.xml" />
+  <Include File="./Sarmento.include.xml" />
+  <Include File="./LaFortune.include.xml" />
+  <Include File="./Ketema.include.xml" />
+  <Include File="./Inuit.include.xml" />
+  <Include File="./Moderate_Archibald.include.xml" />
+  <Include File="./America_Sarmento.include.xml" />
+  <Include File="./Africa_Ketema.include.xml" />
+  <Include File="./Arctic_Inuit.include.xml" />
+  <Include File="./GlobalBuys.include.xml" />
+  <Include File="./ReducePreferred.include.xml" />
+
+
+  
+  <!-- ############################################################################### -->
+  <!-- ############################################################################### -->
+
+  <!-- make all 3rd party usable in ConditionPlayerCounter trigger conditions if they are not already -->
+  <!-- this is needed so we can track if sth was sold/bought to/from this third party -->
+  <ModOp Type = "merge" GUID = '45,46,77,78,76,73,29,237,119051' Path = "/Values">
+    <ProfileCounter />
+  </ModOp>
+  
+  <!-- We allow RuinState for the pirates lighthouse, but still unattackable -->
+  <!--  this way we will know for sure pirate is defeated, if RuinCount of lighthouse is 1 (and then start no quest for them / cancel existing ones) -->
+  <ModOp Type="merge" GUID="100707,100708" Path="/Values">
+    <Attackable>
+      <HasRuinState>1</HasRuinState>
+      <AttackableType>[NONE]</AttackableType>
+    </Attackable>
+  </ModOp>
+
+  
+  <!-- ############################################################################### -->
+  <!-- ############################################################################### -->
+  
+  <!-- testing values: -->
+  
+
+  <!-- <ModOp Type = "merge" GUID = '1500003505' Path = "/Values"> -->
+    <!-- <QuestPool> -->
+      <!-- <PoolCooldown>6000</PoolCooldown> -->
+      <!-- <QuestCooldown>0</QuestCooldown> -->
+      <!-- <QuestLimit>100</QuestLimit> -->
+    <!-- </QuestPool> -->
+  <!-- </ModOp> -->
+  <!-- <ModOp Type = "merge" GUID = '1500003595' Path = "/Values"> -->
+    <!-- <QuestPool> -->
+      <!-- <PoolCooldown>12000</PoolCooldown> -->
+      <!-- <QuestCooldown>0</QuestCooldown> -->
+      <!-- <QuestLimit>100</QuestLimit> -->
+    <!-- </QuestPool> -->
+  <!-- </ModOp> -->
+  <!-- <ModOp Type = "merge" GUID = '1500003506,1500003507,1500003508,1500003509,1500003510,1500003511,1500003512,1500003513,1500003514,1500003594,1500003596,1500003597,1500003598,1500003599' Path = "/Values"> -->
+    <!-- <QuestPool> -->
+      <!-- <PoolCooldown>12000</PoolCooldown> -->
+      <!-- <QuestCooldown>60000</QuestCooldown> -->
+      <!-- <QuestLimit>100</QuestLimit> -->
+    <!-- </QuestPool> -->
+  <!-- </ModOp> -->
+
+  
+  
+  <!-- <ModOp Type = "merge" GUID = '1500003524,1500003525,1500003526,1500003527,1500003540,1500003541,1500003542,1500003543,1500003544,1500003545,1500003546,1500003547,1500003548,1500003549,1500003550,1500003551,1500003552,1500003553,1500003554,1500003555,1500003556,1500003557,1500003558,1500003559,1500003560,1500003561,1500003562,1500003563,1500003564,1500003565,1500003566,1500003567,1500003568,1500003569,1500003570,1500003571,1500003572,1500003573,1500003574,1500003575,1500003660,1500003661,1500003662,1500003663,1500003664,1500003665,1500003666,1500003667,1500003668,1500003669,1500003670,1500003671,1500003672,1500003673,1500003674,1500003675,1500003676,1500003677,1500003678,1500003679,1500003680,1500003681,1500003682,1500003683,1500003684,1500003685,1500003686,1500003687,1500003688,1500003689,1500003690,1500003691' Path = "/Values"> -->
+    <!-- <Quest> -->
+      <!-- <DelayTimer>1000</DelayTimer> -->
+      <!-- <NeededProgressLevel>EarlyGame;EarlyMidGame;MidGame;LateMidGame;LateGame;EndGame</NeededProgressLevel> -->
+    <!-- </Quest> -->
+  <!-- </ModOp> -->
+  
+  <!-- <ModOp Type = "replace" GUID = '1500003524,1500003525,1500003526,1500003527,1500003540,1500003541,1500003542,1500003543,1500003544,1500003545,1500003546,1500003547,1500003548,1500003549,1500003550,1500003551,1500003552,1500003553,1500003554,1500003555,1500003556,1500003557,1500003558,1500003559,1500003560,1500003561,1500003562,1500003563,1500003564,1500003565,1500003566,1500003567,1500003568,1500003569,1500003570,1500003571,1500003572,1500003573,1500003574,1500003575,1500003660,1500003661,1500003662,1500003663,1500003664,1500003665,1500003666,1500003667,1500003668,1500003669,1500003670,1500003671,1500003672,1500003673,1500003674,1500003675,1500003676,1500003677,1500003678,1500003679,1500003680,1500003681,1500003682,1500003683,1500003684,1500003685,1500003686,1500003687,1500003688,1500003689,1500003690,1500003691' Path = "/Values/PreConditionList"> -->
+    <!-- <PreConditionList> -->
+      <!-- <Condition> -->
+        <!-- <Template>ConditionAlwaysTrue</Template> -->
+        <!-- <Values> -->
+          <!-- <Condition /> -->
+          <!-- <ConditionAlwaysTrue /> -->
+        <!-- </Values> -->
+      <!-- </Condition> -->
+    <!-- </PreConditionList> -->
+  <!-- </ModOp> -->
+
+  
+</ModOps>
+
