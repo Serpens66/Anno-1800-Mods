@@ -1,0 +1,91 @@
+<ModOps>
+
+  <!-- während kamerafahrt movie läuft spiel weiter im MP. -->
+   <!-- Pause machen mit TextSources.TextSourceRoots.GUI.SetTogglePause() funzt nicht, weils entweder vor oder mit delay 1sek nach dem film pausiert. -->
+    <!-- gamespeed ändern TextSources.TextSourceRoots.GameClock.SetSetGameSpeed(1) auf langsam und TextSources.TextSourceRoots.GameClock.SetSetGameSpeed(3) für normal -->
+  <!-- .. -->
+  <!-- on ActionPlayMovie we make the game slow, since the game does not pause in background in MP -->
+  <ModOp Type="AddPrevSibling" Path="//TriggerActions/Item[TriggerAction/Values/ActionPlayMovie/Movie]">
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/gamespeed_slow.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  <ModOp Type="AddPrevSibling" Path="//Actions/Item[Action/Values/ActionPlayMovie/Movie]">
+    <Item>
+      <Action>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/gamespeed_slow.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <!-- on MovieFinished, make the gamespeed normal again -->
+  <!-- I think no need to check for specific movie, just every movie -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003813</GUID>
+          <Name>MovieFinished_normal_gamespeed</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>MovieFinished</ConditionEvent>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/gamespeed_normal.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+</ModOps>

@@ -1,0 +1,191 @@
+<ModOps>
+    
+    <!-- uses Serp GUIDS from 1500001600 and 1500001601  -->
+    
+    
+    <!-- USAGE: use the GUID from list below for the check you want and use this condition in your code: -->
+    <!-- <TriggerCondition> -->
+      <!-- <Template>ConditionUnlocked</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition /> -->
+        <!-- <ConditionUnlocked> -->
+          <!-- <UnlockNeeded>1500001601</UnlockNeeded> -->
+        <!-- </ConditionUnlocked> -->
+        <!-- <ConditionPropsNegatable /> -->
+      <!-- </Values> -->
+    <!-- </TriggerCondition> -->
+    
+    <!-- The GUIDs to use from this mod are: -->
+    <!-- 1500001600 - Is any Human -->
+    <!-- 1500001601 - Is any AI -->
+   
+    
+    
+    <!-- ############################################################################################################################################ -->
+    <!-- ############################################################################################################################################ -->
+     <!-- ##### WARNING ##### -->
+      <!-- IF you want to use ConditionPropsNegatable/NegateCondition to check "is not AI": -->
+      <!-- The "Is Any Human" and "Is any AI" can be true after 1 second of gametime. -->
+      <!-- This means: -->
+      <!-- If you want to check "is not" you should add additional Conditions to your code, eg. a ConditionTimer with ~2 seconds: -->
+      <!-- .. -->
+      <!-- example for "is not AI" Trigger condition (wait 2 seconds and only then check UnlockNeeded with NegateCondition=1.. and then you can check everything else you want to check): -->
+      <!-- (if you want to execute your trigger multiple times and dont want it to wait 2 seconds each time, you have to create 2 triggers, one for the very first execution that registers the second for multiple execution without additional delay) -->
+      <!-- .. -->
+      <!-- <TriggerCondition> -->
+        <!-- <Template>ConditionTimer</Template> -->
+        <!-- <Values> -->
+          <!-- <Condition /> -->
+          <!-- <ConditionTimer> -->
+            <!-- <TimeLimit>2000</TimeLimit> -->
+          <!-- </ConditionTimer> -->
+        <!-- </Values> -->
+      <!-- </TriggerCondition> -->
+      <!-- <SubTriggers> -->
+        <!-- <Item> -->
+          <!-- <SubTrigger> -->
+            <!-- <Template>AutoCreateTrigger</Template> -->
+            <!-- <Values> -->
+              <!-- <Trigger> -->
+                <!-- <TriggerCondition> -->
+                  <!-- <Template>ConditionUnlocked</Template> -->
+                  <!-- <Values> -->
+                    <!-- <Condition /> -->
+                    <!-- <ConditionUnlocked> -->
+                      <!-- <UnlockNeeded>1500001601</UnlockNeeded> -->
+                    <!-- </ConditionUnlocked> -->
+                    <!-- <ConditionPropsNegatable> -->
+                      <!-- <NegateCondition>1</NegateCondition> -->
+                    <!-- </ConditionPropsNegatable> -->
+                  <!-- </Values> -->
+                <!-- </TriggerCondition> -->
+              <!-- </Trigger> -->
+            <!-- </Values> -->
+          <!-- </SubTrigger> -->
+        <!-- </Item> -->
+      <!-- </SubTriggers> -->
+      <!-- ... -->
+     <!-- But you can use all of it without NegateCondition anytime, it will just take ~1 second until your trigger is executed the first time eg. for the AI -->
+    <!-- ############################################################################################################################################ -->
+    <!-- ############################################################################################################################################ -->
+    
+    
+
+    <!-- ############################################################################################################################################ -->
+    
+    
+    <!-- useful unrelated info: -->
+    <!-- <ResetTrigger> ist ein trigger der registered wird sobald die condition des haupttriggers erfuellt wurde. -->
+    <!-- sobald dann die condition des resettriggers erfuellt sit, wird der haupttrigger resettet -->
+    <!-- ein direkter unlock befehl auf den haupttrigger sorgt NICHT dafür dass ResetTrigger registered wird, auch nicht bei Template=FeatureUnlock  -->
+    
+    <!-- You should NOT use ActionResetTrigger/ActionRegisterTrigger to start a trigger again  -->
+    <!-- because this will also reset the trigger for already DEAD players (human and AI) if executing it possible! (use it if you want it to be excuted for dead players) -->
+    <!-- This problem does not happen when using ResetTrigger like this instead to reset the trigger eg. after certain time with ConditionTimer (you can use any condition you want within ResetTrigger): -->
+    <!-- <ResetTrigger> -->
+      <!-- <Template>AutoCreateTrigger</Template> -->
+      <!-- <Values> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionTimer</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionTimer> -->
+                <!-- <TimeLimit>30000</TimeLimit> -->
+              <!-- </ConditionTimer> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+        <!-- </Trigger> -->
+      <!-- </Values> -->
+    <!-- </ResetTrigger> -->
+    
+    
+    <!-- ############################################################################################################################################ -->
+
+    <!-- how this mod works: -->
+    
+    <!-- The game allows to execute scripts for "only humans" and "everyone", but not "only for AI".  -->
+    <!-- So we will simply unlock for all humans the GUID 1500001600 -->
+    <!-- and with a short delay we will check for every player (human+AI) that everyone who has not 1500001600 unlocked must be an AI. -->
+    
+  <ModOp Type="AddNextSibling" GUID="137108">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001600</GUID>
+          <Name>Is Human</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/playerlogos/small/player_logo_03.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- use a short timer for the AI check to be sure the "Is Human" Feature is already unlocked for all humans (cause everyone who does not have it unlocked is an AI) -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001601</GUID>
+          <Name>Is AI</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_01.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionTimer</Template>
+            <Values>
+              <Condition />
+              <ConditionTimer>
+                <TimeLimit>1000</TimeLimit>
+              </ConditionTimer>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001600</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+    
+</ModOps>

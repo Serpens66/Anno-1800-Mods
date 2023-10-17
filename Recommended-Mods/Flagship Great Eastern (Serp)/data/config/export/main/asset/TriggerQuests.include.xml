@@ -1,0 +1,451 @@
+<ModOps>
+  
+  <!-- Trigger/Quest to provide the steam flagship first time and also renew it for AI -->
+  
+   <!-- the AI does not use the ship if we spawn it for them. so instead we allow them to build it, up to one at once -->
+    <!-- and it must be in warfleet (tradeships must not be listed, but every ship with attacker is not a tradeship for AI, except the ship with the GUID 101121.. seems to be hardcoded outside of xml for that guid) -->
+  
+  <!-- archi gives the first to player when reaching an amount of engineers -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003502</GUID>
+          <Name>Flagship_TheGreatEastern_Trigger</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionPlayerCounter>
+                 <PlayerCounter>PopulationByLevel</PlayerCounter>
+                <Context>15000003</Context>
+                <CounterAmount>2000</CounterAmount>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          
+          <!-- test -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionPlayerCounter</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition> -->
+                <!-- <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> -->
+              <!-- </Condition> -->
+              <!-- <ConditionPlayerCounter> -->
+                 <!-- <PlayerCounter>PopulationByLevel</PlayerCounter> -->
+                <!-- <Context>15000000</Context> -->
+                <!-- <CounterAmount>20</CounterAmount> -->
+              <!-- </ConditionPlayerCounter> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001601</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions> 
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500003500</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionRegisterTrigger</Template>
+                          <Values>
+                            <Action />
+                            <ActionRegisterTrigger>
+                              <TriggerAsset>1500003802</TriggerAsset>
+                            </ActionRegisterTrigger>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001600</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions> 
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500003503</Quest>
+                              <QuestSession>180023</QuestSession>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Make sure AI only gets one of them, so lock it. and if it looses it, unlock it again -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003802</GUID>
+          <Name>New_FlagshipTheGreatEastern_for_AI</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>1500003500</Context>
+                <CounterAmount>1</CounterAmount>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500003500</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <PlayerCounter>ObjectBuilt</PlayerCounter>
+                      <Context>1500003500</Context>
+                      <CounterAmount>0</CounterAmount>
+                      <ComparisonOp>AtMost</ComparisonOp>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionUnlockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionUnlockAsset>
+                          <UnlockAssets>
+                            <Item>
+                              <Asset>1500003500</Asset>
+                            </Item>
+                          </UnlockAssets>
+                        </ActionUnlockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  
+  <ModOp GUID="269852" Type="AddNextSibling">
+    <Asset>
+      <Template>A7_QuestSelectObject</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003503</GUID>
+          <Name>Flagship_TheGreatEastern_Quest</Name>
+        </Standard>
+        <Quest>
+          <StarterMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </StarterMessage>
+          <SuccessMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <Profile>45</Profile>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationText>3542</NotificationText>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <Subtitle>250681</Subtitle>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </SuccessMessage>
+          <FailureMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </FailureMessage>
+          <SelectionReminderMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </SelectionReminderMessage>
+          <AbortedManuallyMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </AbortedManuallyMessage>
+          <AbortedAutomaticallyMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </AbortedAutomaticallyMessage>
+          <InvitationMessage>   
+            <SuppressMessage>1</SuppressMessage>
+          </InvitationMessage>
+          <EscortShipSelectedMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </EscortShipSelectedMessage>
+          <ReminderMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </ReminderMessage>
+          <ResolveConfirmationMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </ResolveConfirmationMessage>
+          <InvitationSmugglerQuestMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </InvitationSmugglerQuestMessage>
+          <SmugglerQuestTradingStationReached>
+            <SuppressMessage>1</SuppressMessage>
+          </SmugglerQuestTradingStationReached>
+          <StartInvitationGiveItemMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </StartInvitationGiveItemMessage>
+          <StartFollowShipMessage>
+            <SuppressMessage>1</SuppressMessage>
+          </StartFollowShipMessage>
+          <OnQuestStart />
+          <OnQuestDeclined />
+          <OnQuestActive>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionNotification</Template>
+                      <Values>
+                        <Action />
+                        <ActionNotification>
+                          <Notification>
+                            <Template>CharacterNotification</Template>
+                            <Values>
+                              <CharacterNotification>
+                                <Profile>45</Profile>
+                              </CharacterNotification>
+                              <BaseNotification>
+                                <NotificationText>12076</NotificationText>
+                              </BaseNotification>
+                              <NotificationSubtitle>
+                                <Subtitle>250547</Subtitle>
+                              </NotificationSubtitle>
+                            </Values>
+                          </Notification>
+                        </ActionNotification>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestActive>
+          <OnQuestAborted />
+          <OnQuestTimedOut />
+          <OnActiveQuestTimedOut />
+          <OnQuestFailed />
+          <OnQuestDiscarded />
+          <OnQuestSucceeded>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionChangeParticipant</Template>
+                      <Values>
+                        <Action />
+                        <ActionChangeParticipant>
+                          <ChangeToProcessingParticipant>1</ChangeToProcessingParticipant>
+                        </ActionChangeParticipant>
+                        <ObjectFilter>
+                          <ObjectGUID>1500003500</ObjectGUID>
+                          <CheckParticipantID>1</CheckParticipantID>
+                          <ObjectParticipantID>Third_party_02_Blake</ObjectParticipantID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                        </ObjectFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestSucceeded>
+          <OnQuestEnd />
+          <OnPhotographySuccessNewspaperAction />
+          <QuestGiver>45</QuestGiver>
+          <StoryText>268477</StoryText>
+          <MaxCallOut>1</MaxCallOut>
+          <MaxSolveCount>1</MaxSolveCount>
+          <CountForQuestLimit>0</CountForQuestLimit>
+          <QuestTimeLimit>0</QuestTimeLimit>
+          <QuestActivation>QuestStart</QuestActivation>
+          <IsAbortable>0</IsAbortable>
+          <QuestTrackerVisibility>Session</QuestTrackerVisibility>
+          <ConfirmOnReachedCondition />
+          <HasExclusiveQuestGiver>0</HasExclusiveQuestGiver>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180023</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+          <QuestBookBackground>data/ui/2kimages/main/assets16/questbackground/bg_quest_gift_photo.png</QuestBookBackground>
+          <ReputationQuestFail>
+            <ReputationFailList />
+          </ReputationQuestFail>
+          <QuestHints>
+            <Item>
+              <Text>21957</Text>
+            </Item>
+          </QuestHints>
+          <HasStarterSpeechBubble>0</HasStarterSpeechBubble>
+          <StarterSpeechBubble />
+          <SuccessSpeechBubble />
+        </Quest>
+        <PreConditionList />
+        <Text />
+        <Reward>
+          <RewardAssets />
+          <RewardReputation />
+        </Reward>
+        <Objectives>
+          <WinConditions>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>0</InheritedIndex>
+                <InheritanceMapV2>
+                  <Entry>
+                    <TemplateName>A7_QuestSelectObject</TemplateName>
+                    <Index>0</Index>
+                  </Entry>
+                </InheritanceMapV2>
+              </VectorElement>
+              <Objective>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>269944</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionQuestSelectObject>
+                    <SelectObjects>
+                      <Item>
+                        <Object>
+                          <Template>ConditionObjectSpawnedObject</Template>
+                          <Values>
+                            <ConditionObjectSpawnedObject>
+                              <ExecutionObject>1500003500</ExecutionObject>
+                              <ObjectSpawnArea>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <SpawnArea>
+                                    <SpawnContext>Object</SpawnContext>
+                                    <ContextGUID>100551</ContextGUID>
+                                    <DistanceToContext>30</DistanceToContext>
+                                  </SpawnArea>
+                                </Values>
+                              </ObjectSpawnArea>
+                              <ObjectDespawn>StayOnMap</ObjectDespawn>
+                              <ObjectOwner>Third_party_02_Blake</ObjectOwner>
+                            </ConditionObjectSpawnedObject>
+                            <ConditionScanner />
+                            <ConditionObjectiveSignsAndFeedback />
+                          </Values>
+                        </Object>
+                      </Item>
+                    </SelectObjects>
+                  </ConditionQuestSelectObject>
+                  <ConditionPropsSessionSettings />
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+        <QuestOptional />
+      </Values>
+    </Asset>
+    
+  </ModOp>
+
+
+
+</ModOps>
+
