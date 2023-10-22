@@ -1,16 +1,17 @@
 
 <ModOps>
 
-    <!-- verwendet Serps GUIDS von 1500001026+1500001029 (1500001027+1500001028 wird in shared mods genutzt) (bis einschließlich 1500001029 fuer diesen mod freigehalten) -->
+    <!-- verwendet Serps GUIDS von 25+1500001026+1500001029 (1500001027+1500001028 wird in shared mods genutzt) (bis einschließlich 1500001029 fuer diesen mod freigehalten) -->
 
     <!-- you can set -->
     <!-- ShouldBeShownInForeignObjectMenu -->
     <!-- to 0 , to not disply the Buff in the ship UI. -->
     <!-- This way the pirate portrait wont be kind of "hidden" behind the UI anymore (blame ubisoft..) -->
-
+     <!-- set ShouldBeShownInForeignObjectMenu=0 by default now. Use my mod "DisplayBuffsFromOthers" if you want it to show -->
+    <!-- outcommented the line with ShouldBeShownInForeignObjectMenu to use the default value (which is 0 from vanilla and 1 if you have my mod DisplayBuffsFromOthers active) -->
 
     <!-- Ships that reach max health higher than ~32k , eg. via items or code, will get destroyed on repairing -.- -->
-     <!-- therefore we will not increase health from ships, but give the pirate ships an item that decreases the damage they take -->
+     <!-- therefore we will not increase health from ships, but give the pirate ships an item/buff that decreases the damage they take -->
      
      <!-- MilitaryShipPoints shows the AI how strong a ship is, so we will multiply this also with 3 -->
   
@@ -22,6 +23,7 @@
     <!-- Therefore we will still add the Buff via UpgradeList/DefaultBuff too to all known pirates ships -->
      
      <!--  IgnoreDamageFactorUpgrade in VehicleUpgrade is regarding speed when damaged, so not what we are looking for -->
+     
      
      <ModOp Type="AddNextSibling" GUID="130942">
       <Asset>
@@ -41,7 +43,7 @@
             <AllowStacking>0</AllowStacking>
           </ItemEffect>
           <Buff>
-            <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+            <!-- <ShouldBeShownInForeignObjectMenu>0</ShouldBeShownInForeignObjectMenu> -->
           </Buff>
           <AttackerUpgrade>
             <BaseDamageUpgrade>
@@ -80,7 +82,10 @@
       <MetaBuffHandler />
     </ModOp>
     
-    <!-- needs some kind of reapply for the new world session Third_party_04_Pirate_LaFortune (SessionEnter with GUID 180025 does not seem to work, but does not hurt to reapply it every now an then, even if not needed) -->
+    <!-- needs some kind of reapply for the new world session Third_party_04_Pirate_LaFortune (SessionEnter with GUID 180025 does not seem to work, but does not hurt to reapply it every now an then, even if not needed and without hardcoding an guid it supports mods adding them to other sessions) -->
+      <!-- GUID 1500001601 is from my "IsAIPlayer" shared mod to make sure sth is only executed for AI (and 1500001600 only for human) -->
+      <!-- We can not execute the trigger directly for 3rd party, so renew the buff every time any human switches session, to make sure it is active in all sessions -->
+    
     <ModOp GUID="153271" Type="AddNextSibling">
       <Asset>
         <Template>Trigger</Template>
@@ -90,42 +95,151 @@
           </Standard>
           <Trigger>
             <TriggerCondition>
-              <Template>ConditionEvent</Template>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
-                <Condition/>
-                <ConditionEvent>
-                  <ConditionEvent>SessionEnter</ConditionEvent>
-                </ConditionEvent>
+                <Condition>
+                  <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                </Condition>
+                <ConditionAlwaysTrue />
               </Values>
             </TriggerCondition>
-            <TriggerActions>
+            <SubTriggers>
               <Item>
-                <TriggerAction>
-                  <Template>ActionBuff</Template>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
                   <Values>
-                    <Action />
-                    <ActionBuff>
-                      <BuffAsset>1500001026</BuffAsset>
-                      <AddBuff>1</AddBuff>
-                      <AffectedParticipant>Third_party_03_Pirate_Harlow</AffectedParticipant>
-                    </ActionBuff>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionUnlocked</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionUnlocked>
+                            <UnlockNeeded>1500001600</UnlockNeeded>
+                          </ConditionUnlocked>
+                          <ConditionPropsNegatable />
+                        </Values>
+                      </TriggerCondition>
+                      <SubTriggers>
+                        <Item>
+                          <SubTrigger>
+                            <Template>AutoCreateTrigger</Template>
+                            <Values>
+                              <Trigger>
+                                <TriggerCondition>
+                                  <Template>ConditionEvent</Template>
+                                  <Values>
+                                    <Condition />
+                                    <ConditionEvent>
+                                      <ConditionEvent>SessionEnter</ConditionEvent>
+                                    </ConditionEvent>
+                                    <ConditionPropsNegatable />
+                                  </Values>
+                                </TriggerCondition>
+                                <TriggerActions>
+                                  <Item>
+                                    <TriggerAction>
+                                      <Template>ActionBuff</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionBuff>
+                                          <BuffAsset>1500001026</BuffAsset>
+                                          <AddBuff>0</AddBuff>
+                                          <AffectedParticipant>Third_party_03_Pirate_Harlow</AffectedParticipant>
+                                        </ActionBuff>
+                                      </Values>
+                                    </TriggerAction>
+                                  </Item>
+                                  <Item>
+                                    <TriggerAction>
+                                      <Template>ActionBuff</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionBuff>
+                                          <BuffAsset>1500001026</BuffAsset>
+                                          <AddBuff>0</AddBuff>
+                                          <AffectedParticipant>Third_party_04_Pirate_LaFortune</AffectedParticipant>
+                                        </ActionBuff>
+                                      </Values>
+                                    </TriggerAction>
+                                  </Item>
+                                  <Item>
+                                    <TriggerAction>
+                                      <Template>ActionBuff</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionBuff>
+                                          <BuffAsset>1500001026</BuffAsset>
+                                          <AddBuff>1</AddBuff>
+                                          <AffectedParticipant>Third_party_03_Pirate_Harlow</AffectedParticipant>
+                                        </ActionBuff>
+                                      </Values>
+                                    </TriggerAction>
+                                  </Item>
+                                  <Item>
+                                    <TriggerAction>
+                                      <Template>ActionBuff</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionBuff>
+                                          <BuffAsset>1500001026</BuffAsset>
+                                          <AddBuff>1</AddBuff>
+                                          <AffectedParticipant>Third_party_04_Pirate_LaFortune</AffectedParticipant>
+                                        </ActionBuff>
+                                      </Values>
+                                    </TriggerAction>
+                                  </Item>
+                                </TriggerActions>
+                              </Trigger>
+                            </Values>
+                          </SubTrigger>
+                        </Item>
+                      </SubTriggers>
+                    </Trigger>
                   </Values>
-                </TriggerAction>
+                </SubTrigger>
               </Item>
               <Item>
-                <TriggerAction>
-                  <Template>ActionBuff</Template>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
                   <Values>
-                    <Action />
-                    <ActionBuff>
-                      <BuffAsset>1500001026</BuffAsset>
-                      <AddBuff>1</AddBuff>
-                      <AffectedParticipant>Third_party_04_Pirate_LaFortune</AffectedParticipant>
-                    </ActionBuff>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionUnlocked</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionUnlocked>
+                            <UnlockNeeded>1500001601</UnlockNeeded>
+                          </ConditionUnlocked>
+                          <ConditionPropsNegatable />
+                        </Values>
+                      </TriggerCondition>
+                      <SubTriggers>
+                        <Item>
+                          <SubTrigger>
+                            <Template>AutoCreateTrigger</Template>
+                            <Values>
+                              <Trigger>
+                                <TriggerCondition>
+                                  <Template>ConditionEvent</Template>
+                                  <Values>
+                                    <Condition />
+                                    <ConditionEvent>
+                                      <ConditionEvent>IslandSettled</ConditionEvent>
+                                    </ConditionEvent>
+                                    <ConditionPropsNegatable />
+                                  </Values>
+                                </TriggerCondition>
+                                <TriggerActions />
+                              </Trigger>
+                            </Values>
+                          </SubTrigger>
+                        </Item>
+                      </SubTriggers>
+                    </Trigger>
                   </Values>
-                </TriggerAction>
+                </SubTrigger>
               </Item>
-            </TriggerActions>
+            </SubTriggers>
             <ResetTrigger>
               <Template>AutoCreateTrigger</Template>
               <Values>
@@ -145,11 +259,38 @@
           </Trigger>
           <TriggerSetup>
             <AutoRegisterTrigger>1</AutoRegisterTrigger>
-            <UsedBySecondParties>0</UsedBySecondParties>
+            <UsedBySecondParties>1</UsedBySecondParties>
+          </TriggerSetup>
+        </Values>
+      </Asset>
+      <!-- starting with already settled islands does not count for IslandSettled, so we have to add the buff once at game start (or after the mod was newly added) to enable the buff first time -->
+      <Asset>
+        <Template>Trigger</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001025</GUID>
+          </Standard>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionUnlocked</Template>
+              <Values>
+                <Condition />
+                <ConditionUnlocked>
+                  <UnlockNeeded>1500001601</UnlockNeeded>
+                </ConditionUnlocked>
+                <ConditionPropsNegatable />
+              </Values>
+            </TriggerCondition>
+            <TriggerActions />
+          </Trigger>
+          <TriggerSetup>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+            <UsedBySecondParties>1</UsedBySecondParties>
           </TriggerSetup>
         </Values>
       </Asset>
     </ModOp>
+    
     
      
     <!-- Kanonenboot:  -->

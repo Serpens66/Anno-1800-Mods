@@ -1,15 +1,18 @@
 
 <ModOps>
 
-    <!-- verwendet Serps GUIDS von 1500001026+1500001029 -->
+    <!-- verwendet Serps GUIDS von 25+1500001026+1500001029 -->
 
     <!-- you can set -->
     <!-- ShouldBeShownInForeignObjectMenu -->
     <!-- to 0 , to not disply the Buff in the ship UI. -->
     <!-- This way the portrait wont be kind of "hidden" behind the UI anymore (blame ubisoft..) -->
+    <!-- set ShouldBeShownInForeignObjectMenu=0 by default now. Use my mod "DisplayBuffsFromOthers" if you want it to show -->
+    <!-- outcommented the line with ShouldBeShownInForeignObjectMenu to use the default value (which is 0 from vanilla and 1 if you have my mod DisplayBuffsFromOthers active) -->
+    
 
     <!-- Ships that reach max health higher than ~32k , eg. via items or code, will get destroyed on repairing -.- -->
-     <!-- therefore we will not increase health from ships, but give the ships an item that decreases the damage they take -->
+     <!-- therefore we will not increase health from ships, but give the ships an item/buff that decreases the damage they take -->
      
      <!-- Sometimes ships owned by General_Enemy are shown as owned by eg. Pirates (ComebackFleet) or other AIs. -->
       <!-- This is why these ships will also be affected from the Buff. -->
@@ -50,7 +53,7 @@
               <AllowStacking>0</AllowStacking>
             </ItemEffect>
             <Buff>
-              <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+              <!-- <ShouldBeShownInForeignObjectMenu>0</ShouldBeShownInForeignObjectMenu> -->
             </Buff>
             <AttackerUpgrade>
               <BaseDamageUpgrade>
@@ -85,6 +88,8 @@
       
 
       <!-- needs some kind of reapply for the new sessions -->
+        <!-- GUID 1500001601 is from my "IsAIPlayer" shared mod to make sure sth is only executed for AI (and 1500001600 only for human) -->
+        <!-- We can not execute the trigger directly for 3rd party, so renew the buff every time any human switches session, to make sure it is active in all sessions -->
       <ModOp GUID="153271" Type="AddNextSibling">
         <Asset>
           <Template>Trigger</Template>
@@ -94,15 +99,98 @@
             </Standard>
             <Trigger>
               <TriggerCondition>
-                <Template>ConditionEvent</Template>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                 <Values>
-                  <Condition/>
-                  <ConditionEvent>
-                    <ConditionEvent>SessionEnter</ConditionEvent>
-                  </ConditionEvent>
+                  <Condition>
+                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                  </Condition>
+                  <ConditionAlwaysTrue />
                 </Values>
               </TriggerCondition>
-              <TriggerActions />
+              <SubTriggers>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionUnlocked</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionUnlocked>
+                              <UnlockNeeded>1500001600</UnlockNeeded>
+                            </ConditionUnlocked>
+                            <ConditionPropsNegatable />
+                          </Values>
+                        </TriggerCondition>
+                        <SubTriggers>
+                          <Item>
+                            <SubTrigger>
+                              <Template>AutoCreateTrigger</Template>
+                              <Values>
+                                <Trigger>
+                                  <TriggerCondition>
+                                    <Template>ConditionEvent</Template>
+                                    <Values>
+                                      <Condition />
+                                      <ConditionEvent>
+                                        <ConditionEvent>SessionEnter</ConditionEvent>
+                                      </ConditionEvent>
+                                      <ConditionPropsNegatable />
+                                    </Values>
+                                  </TriggerCondition>
+                                  <TriggerActions />
+                                </Trigger>
+                              </Values>
+                            </SubTrigger>
+                          </Item>
+                        </SubTriggers>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionUnlocked</Template>
+                          <Values>
+                            <Condition />
+                            <ConditionUnlocked>
+                              <UnlockNeeded>1500001601</UnlockNeeded>
+                            </ConditionUnlocked>
+                            <ConditionPropsNegatable />
+                          </Values>
+                        </TriggerCondition>
+                        <SubTriggers>
+                          <Item>
+                            <SubTrigger>
+                              <Template>AutoCreateTrigger</Template>
+                              <Values>
+                                <Trigger>
+                                  <TriggerCondition>
+                                    <Template>ConditionEvent</Template>
+                                    <Values>
+                                      <Condition />
+                                      <ConditionEvent>
+                                        <ConditionEvent>IslandSettled</ConditionEvent>
+                                      </ConditionEvent>
+                                      <ConditionPropsNegatable />
+                                    </Values>
+                                  </TriggerCondition>
+                                  <TriggerActions />
+                                </Trigger>
+                              </Values>
+                            </SubTrigger>
+                          </Item>
+                        </SubTriggers>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
               <ResetTrigger>
                 <Template>AutoCreateTrigger</Template>
                 <Values>
@@ -122,7 +210,33 @@
             </Trigger>
             <TriggerSetup>
               <AutoRegisterTrigger>1</AutoRegisterTrigger>
-              <UsedBySecondParties>0</UsedBySecondParties>
+              <UsedBySecondParties>1</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+        <!-- starting with already settled islands does not count for IslandSettled, so we have to add the buff once at game start (or after the mod was newly added) to enable the buff first time -->
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001025</GUID>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionUnlocked</Template>
+                <Values>
+                  <Condition />
+                  <ConditionUnlocked>
+                    <UnlockNeeded>1500001601</UnlockNeeded>
+                  </ConditionUnlocked>
+                  <ConditionPropsNegatable />
+                </Values>
+              </TriggerCondition>
+              <TriggerActions />
+            </Trigger>
+            <TriggerSetup>
+              <AutoRegisterTrigger>1</AutoRegisterTrigger>
+              <UsedBySecondParties>1</UsedBySecondParties>
             </TriggerSetup>
           </Values>
         </Asset>
@@ -141,54 +255,35 @@
       </Item>
     </ModOp>
     
-    <ModOp Type="add" GUID='1500001029' Path="/Values/Trigger/TriggerActions">
-        <Item>
-          <TriggerAction>
-            <Template>ActionBuff</Template>
-            <Values>
-              <Action />
-              <ActionBuff>
-                <BuffAsset>1500001026</BuffAsset>
-                <AddBuff>0</AddBuff>
-                <AffectedParticipant>General_Enemy</AffectedParticipant>
-              </ActionBuff>
-            </Values>
-          </TriggerAction>
-        </Item>
-        <Item>
-          <TriggerAction>
-            <Template>ActionDelayedActions</Template>
-            <Values>
-              <Action />
-              <ActionDelayedActions>
-                <ExecutionDelay>100</ExecutionDelay>
-                <DelayedActions>
-                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                  <Values>
-                    <ActionList>
-                      <Actions>
-                        <Item>
-                          <Action>
-                            <Template>ActionBuff</Template>
-                            <Values>
-                              <Action />
-                              <ActionBuff>
-                                <BuffAsset>1500001026</BuffAsset>
-                                <AddBuff>1</AddBuff>
-                                <AffectedParticipant>General_Enemy</AffectedParticipant>
-                              </ActionBuff>
-                            </Values>
-                          </Action>
-                        </Item>
-                      </Actions>
-                    </ActionList>
-                  </Values>
-                </DelayedActions>
-              </ActionDelayedActions>
-            </Values>
-          </TriggerAction>
-        </Item>
-      </ModOp>
+    <!-- add the ActionBuff to the Trigger 1500001029 in the part executed from human -->
+    <ModOp Type="add" GUID='1500001029' Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger[TriggerCondition/Values/ConditionUnlocked/UnlockNeeded='1500001600']/SubTriggers/Item/SubTrigger/Values/Trigger[TriggerCondition/Values/ConditionEvent/ConditionEvent='SessionEnter']/TriggerActions">
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>0</AddBuff>
+              <AffectedParticipant>General_Enemy</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionBuff</Template>
+          <Values>
+            <Action />
+            <ActionBuff>
+              <BuffAsset>1500001026</BuffAsset>
+              <AddBuff>1</AddBuff>
+              <AffectedParticipant>General_Enemy</AffectedParticipant>
+            </ActionBuff>
+          </Values>
+        </TriggerAction>
+      </Item>
+    </ModOp>
     
     <Group Condition="#Stronger_Pirate_Ships_Serp">
       
