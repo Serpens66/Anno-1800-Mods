@@ -1,0 +1,850 @@
+<ModOps>
+
+  <!-- Portrait GUIDs der KIs (für DecisionPortrait) -->
+    <!-- siehe auch Anno1800 RDA unpacked\dataAlle\data\ui\2kimages\main\profiles -->
+    <!-- 100530,100663,100664,100665,100666,100667,100532,100531,100674,100587,110670 -->
+    <!-- third party: -->
+    <!-- queen:100668, Blake:100589, Harlow:100669, LaFortune:100670, Sarmento:100671, Eli:100631, Kahina:100673 General_Enemy:101894 -->
+    <!-- Nate:100672, Inuit:101019, africa_Ketema_portrait:120250,  Vasco Silva:112118 -->
+    <!-- Unknown_Silhouette:116746, GG_EnemyDark_Portrait:7925, campaign_character_01_demolition_expert (gefanger):101138 -->
+  
+    <!-- KI notifications als reaction: -->
+    <!-- NpcAcceptsPlayerProposal1 / NpcDeclinesPlayerProposal1 -->
+     <!-- there are no voicelines for it unfortunately. Taube used "NpcAcceptsAlliance", but I (Serp) think we should use -->
+      <!-- PlayerInvokesAlliance instead (coming to your guard like audio) -->
+      <!-- or if this is also a bit too much, using GenericConfirmation is also fine -->
+      
+      <!-- PlayerInvokesAlliance passt eher wenn man tatsächlich in allianz ist. -->
+      <!-- wenn ichs auch bei TradeRights ab und zu erlauben will, dann passt es eher nicht... -->
+      <!-- wobe wir ja nach diplmoacy state bei der reaction filtern können und dadurch dann auch zb. eine kleinere supportfleet -->
+      <!-- schicken können bei traderights! -->
+  
+  <!-- info: -->
+   <!-- ActionMoveObject bei gift ship ist auch wichtig um eventuelle vorherige befehle des humans zu überschreiben, -->
+    <!-- (bei handelsroute gibts durhc changeowner kein problem, wird dann bei spieler als zerstört gemeldet) -->
+  
+  <!-- TODO: -->
+   <!-- fürs schiffe schenken noch eine FollowUpDecision machen, die das mit Coop erklärt und fragt ob man sicher ist -->
+  
+  <!-- TODO: -->
+    <!-- denselben code in alle 16 fälle packen ist natürlich quatsch, wir müssen es unterscheiden nach ki usw. -->
+     <!-- aber erst wenn code mit bente beispiel vollständig ist -->
+  
+  
+      <!-- <DecisionNotification> -->
+        <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+        <!-- <Values> -->
+          <!-- <CharacterNotification /> -->
+          <!-- <BaseNotification /> -->
+          <!-- <NotificationSubtitle /> -->
+        <!-- </Values> -->
+      <!-- </DecisionNotification> -->
+      <!-- <HasNotification>1</HasNotification> -->
+      <!-- <DecisionOptionInfotip>0</DecisionOptionInfotip> -->
+      <!-- <UnlockRequirements> -->
+        <!-- <Item> -->
+          <!-- <RequiredUnlock>1500001173</RequiredUnlock> -->
+        <!-- </Item> -->
+      <!-- </UnlockRequirements> -->
+      <!-- <UnlockInfotipDescription>0</UnlockInfotipDescription> -->
+      <!-- <FollowUpDecisionList /> -->
+      <!-- <ShowDecisionBuffs>1</ShowDecisionBuffs> -->
+      <!-- <HasDecisionCostBehavior>1</HasDecisionCostBehavior> -->
+  
+  <!-- mal testen ob DecisionNotification iwie anders aussieht oderso als eine ActionNotification -->
+   <!-- innerhalb der actions -->
+  
+  <!-- TODO: -->
+   <!-- die optionen zufügen um eine hilfsflotte zu bitten -->
+  
+  <!-- Human0 - Decision Quest (we need one quest per Human to have it MP compatible -.-) -->
+  <ModOp Type="add" GUID="1500001246" Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestDecision/DecisionList/Item/Decision/Values/ConditionDecision/DecisionOptionList/
+      Item/DecisionOption/Values/ConditionDecisionOption/FollowUpDecisionList/Item/FollowUpDecision/Values/ConditionDecision/DecisionOptionList/
+      Item/DecisionOption/Values/ConditionDecisionOption[UnlockRequirements/Item/RequiredUnlock='1500003856']/FollowUpDecisionList/Item/FollowUpDecision/Values/ConditionDecision/DecisionOptionList">
+    <Item>
+      <DecisionOption>
+        <Template>ConditionDecisionOption</Template>
+        <Values>
+          <Condition />
+          <ConditionDecisionOption>
+            <DecisionOptionText>4039</DecisionOptionText>
+            <FollowUpDecisionList>
+              <Item>
+                <FollowUpDecision>
+                  <Template>ConditionDecision</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionDecision>
+                      <!-- TODO text wähle die Hilfsflottenoption -->
+                      <DecisionFluffText>4039</DecisionFluffText>
+                      <DecisionPortrait>100530</DecisionPortrait>
+                      <DecisionOptionList>
+                        
+                        <Item>
+                          <DecisionOption>
+                            <Template>ConditionDecisionOption</Template>
+                            <Values>
+                              <Condition>
+                                <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                              </Condition>
+                              <ConditionDecisionOption>
+                                <!-- TODO text der die handelsflottengröße beschreibt -->
+                                <DecisionOptionText>4040</DecisionOptionText>
+                                <ActionList>
+                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                  <Values>
+                                    <ActionList>
+                                      <Actions>
+                                        <!-- TODO evlt trigger/lua starten wo die chance auf akzeptanz ausgewürfelt wird? -->
+                                         <!-- oder wie wollen wir das machen? -->
+                                         <!-- alternativ einfach unlockconditino dass man handel oder verbündet ist  -->
+                                           <!-- featureunlock als unlock condition machen, welches dann auch dafür sorgt, dass man es nur einmal pro stunde machen kann -->
+                                          <!-- dazu noch geld / Ruhm Kosten und evlt ne 50:50 chance oderso (kosten bekommt man bei fail zurück) -->
+                                         <!-- und dann mit ~5 minuten delay ausführen und Notification "ich kümmere mich drum" und danch 5 Minuten dann hier bittesehr und dann spawnen usw. -->
+                                        
+                                        <!-- wobei eig wollten wir mit trigger fortschritt prüfen und dazu passendes schiff spawnen.. -->
+                                         <!-- falls wir eh noch nen extra trigger machen dann auch noch lua script wo wir erfolgschance auf reputation baisren lassen -->
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionExecuteScript</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionExecuteScript>
+                                                <ScriptFileName>data/supportfleet1_serp_human0bente.lua</ScriptFileName>
+                                              </ActionExecuteScript>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionAddGoodsToItemContainer</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionAddGoodsToItemContainer>
+                                                <Goods>
+                                                  <Item>
+                                                    <Good>1010017</Good>
+                                                    <Amount>-5000</Amount>
+                                                  </Item>
+                                                  <!-- test todo -->
+                                                  <!-- <Item> -->
+                                                    <!-- <Good>1500000240</Good> -->
+                                                    <!-- <Amount>-20</Amount> -->
+                                                  <!-- </Item> -->
+                                                </Goods>
+                                              </ActionAddGoodsToItemContainer>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                      </Actions>
+                                    </ActionList>
+                                  </Values>
+                                </ActionList>
+                                <UnlockRequirements>
+                                  <Item>
+                                    <RequiredUnlock>1500001342</RequiredUnlock>
+                                  </Item>
+                                </UnlockRequirements>
+                                 <!--TODO können offenbar nicht den text des unlock triggers als unlockinfotip verwenden.. -->
+     <!-- mal mit anderer guid testen oder obs am featureunlock allgemein liegt -->
+                                <UnlockInfotipDescription>1500001342</UnlockInfotipDescription>
+                                <HasDecisionCostBehavior>1</HasDecisionCostBehavior>
+                                <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                                
+                              </ConditionDecisionOption>
+                            </Values>
+                          </DecisionOption>
+                        </Item>
+                        
+                        <Item>
+                          <DecisionOption>
+                            <Template>ConditionDecisionOption</Template>
+                            <Values>
+                              <Condition>
+                                <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                              </Condition>
+                              <ConditionDecisionOption>
+                                <DecisionOptionText>1500001298</DecisionOptionText>
+                                <ActionList>
+                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                  <Values>
+                                    <ActionList>
+                                      <Actions>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionExecuteScript</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionExecuteScript>
+                                                <ScriptFileName>data/supportfleetgift_serp_human0.lua</ScriptFileName>
+                                              </ActionExecuteScript>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionDelayedActions</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionDelayedActions>
+                                                <ExecutionDelay>1000</ExecutionDelay>
+                                                <DelayedActions>
+                                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                  <Values>
+                                                    <ActionList>
+                                                      <Actions>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionChangeParticipant</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ActionChangeParticipant>
+                                                                <NewParticipantID>Second_ai_01_Jorgensen</NewParticipantID>
+                                                              </ActionChangeParticipant>
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001290</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                                              </ObjectFilter>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionMoveObject</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001290</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ObjectTargetFilter>
+                                                                <TargetGUID>700000</TargetGUID>
+                                                                <TargetCheckParticipantID>1</TargetCheckParticipantID>
+                                                                <TargetParticipantID>Second_ai_01_Jorgensen</TargetParticipantID>
+                                                              </ObjectTargetFilter>
+                                                              <ActionMoveObject>
+                                                                <UseDangerLayer>1</UseDangerLayer>
+                                                                <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
+                                                                <SearchMode>Closest</SearchMode>
+                                                              </ActionMoveObject>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <!-- transform them back to original guid -->
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001298</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100437</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001291</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100439</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001292</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100440</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001293</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100443</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001294</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100442</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001295</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100438</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001296</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100441</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001297</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>1010062</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                      </Actions>
+                                                    </ActionList>
+                                                  </Values>
+                                                </DelayedActions>
+                                              </ActionDelayedActions>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                      </Actions>
+                                    </ActionList>
+                                  </Values>
+                                </ActionList>
+                                <UnlockRequirements>
+                                  <Item>
+                                    <RequiredUnlock>1500001341</RequiredUnlock>
+                                  </Item>
+                                </UnlockRequirements>
+                                <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                              </ConditionDecisionOption>
+                            </Values>
+                          </DecisionOption>
+                        </Item>
+                        <Item>
+                          <DecisionOption>
+                            <Template>ConditionDecisionOption</Template>
+                            <Values>
+                              <Condition>
+                                <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                              </Condition>
+                              <ConditionDecisionOption>
+                                <DecisionOptionText>6428</DecisionOptionText>
+                                <ActionList>
+                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                  <Values>
+                                    <ActionList>
+                                      <Actions>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionDelayedActions</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionDelayedActions>
+                                                <ExecutionDelay>1000</ExecutionDelay>
+                                                <DelayedActions>
+                                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                  <Values>
+                                                    <ActionList>
+                                                      <Actions>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionStartQuest</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ActionStartQuest>
+                                                                <Quest>1500001246</Quest>
+                                                                <UseCurrentSession>1</UseCurrentSession>
+                                                              </ActionStartQuest>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                      </Actions>
+                                                    </ActionList>
+                                                  </Values>
+                                                </DelayedActions>
+                                              </ActionDelayedActions>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                      </Actions>
+                                    </ActionList>
+                                  </Values>
+                                </ActionList>
+                                <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                              </ConditionDecisionOption>
+                            </Values>
+                          </DecisionOption>
+                        </Item>
+                      </DecisionOptionList>
+                    </ConditionDecision>
+                  </Values>
+                </FollowUpDecision>
+              </Item>
+            </FollowUpDecisionList>
+          </ConditionDecisionOption>
+        </Values>
+      </DecisionOption>
+    </Item>
+  </ModOp>
+  
+  
+  
+  
+  
+  
+  <ModOp Type="add" GUID="1500001247" Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestDecision/DecisionList/Item/Decision/Values/ConditionDecision/DecisionOptionList/
+      Item/DecisionOption/Values/ConditionDecisionOption/FollowUpDecisionList/Item/FollowUpDecision/Values/ConditionDecision/DecisionOptionList/
+      Item/DecisionOption/Values/ConditionDecisionOption[UnlockRequirements/Item/RequiredUnlock='1500003856']/FollowUpDecisionList/Item/FollowUpDecision/Values/ConditionDecision/DecisionOptionList">
+    <Item>
+      <DecisionOption>
+        <Template>ConditionDecisionOption</Template>
+        <Values>
+          <Condition />
+          <ConditionDecisionOption>
+            <DecisionOptionText>4039</DecisionOptionText>
+            <FollowUpDecisionList>
+              <Item>
+                <FollowUpDecision>
+                  <Template>ConditionDecision</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionDecision>
+                      <!-- TODO text wähle die Hilfsflottenoption -->
+                      <DecisionFluffText>4039</DecisionFluffText>
+                      <DecisionPortrait>100530</DecisionPortrait>
+                      <DecisionOptionList>
+                        
+                        <Item>
+                          <DecisionOption>
+                            <Template>ConditionDecisionOption</Template>
+                            <Values>
+                              <Condition>
+                                <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                              </Condition>
+                              <ConditionDecisionOption>
+                                <!-- TODO text der die handelsflottengröße beschreibt -->
+                                <DecisionOptionText>4040</DecisionOptionText>
+                                <ActionList>
+                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                  <Values>
+                                    <ActionList>
+                                      <Actions>
+                                        <!-- TODO evlt trigger/lua starten wo die chance auf akzeptanz ausgewürfelt wird? -->
+                                         <!-- oder wie wollen wir das machen? -->
+                                         <!-- alternativ einfach unlockconditino dass man handel oder verbündet ist  -->
+                                           <!-- featureunlock als unlock condition machen, welches dann auch dafür sorgt, dass man es nur einmal pro stunde machen kann -->
+                                          <!-- dazu noch geld / Ruhm Kosten und evlt ne 50:50 chance oderso (kosten bekommt man bei fail zurück) -->
+                                         <!-- und dann mit ~5 minuten delay ausführen und Notification "ich kümmere mich drum" und danch 5 Minuten dann hier bittesehr und dann spawnen usw. -->
+                                        
+                                        <!-- wobei eig wollten wir mit trigger fortschritt prüfen und dazu passendes schiff spawnen.. -->
+                                         <!-- falls wir eh noch nen extra trigger machen dann auch noch lua script wo wir erfolgschance auf reputation baisren lassen -->
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionExecuteScript</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionExecuteScript>
+                                                <ScriptFileName>data/supportfleet1_serp_human1bente.lua</ScriptFileName>
+                                              </ActionExecuteScript>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionAddGoodsToItemContainer</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionAddGoodsToItemContainer>
+                                                <Goods>
+                                                  <Item>
+                                                    <Good>1010017</Good>
+                                                    <Amount>-5000</Amount>
+                                                  </Item>
+                                                  <!-- test todo -->
+                                                  <!-- <Item> -->
+                                                    <!-- <Good>1500000240</Good> -->
+                                                    <!-- <Amount>-20</Amount> -->
+                                                  <!-- </Item> -->
+                                                </Goods>
+                                              </ActionAddGoodsToItemContainer>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                      </Actions>
+                                    </ActionList>
+                                  </Values>
+                                </ActionList>
+                                <UnlockRequirements>
+                                  <Item>
+                                    <RequiredUnlock>1500001342</RequiredUnlock>
+                                  </Item>
+                                </UnlockRequirements>
+                                 <!--TODO können offenbar nicht den text des unlock triggers als unlockinfotip verwenden.. -->
+     <!-- mal mit anderer guid testen oder obs am featureunlock allgemein liegt -->
+                                <UnlockInfotipDescription>1500001342</UnlockInfotipDescription>
+                                <HasDecisionCostBehavior>1</HasDecisionCostBehavior>
+                                <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                                
+                              </ConditionDecisionOption>
+                            </Values>
+                          </DecisionOption>
+                        </Item>
+                        
+                        <Item>
+                          <DecisionOption>
+                            <Template>ConditionDecisionOption</Template>
+                            <Values>
+                              <Condition>
+                                <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                              </Condition>
+                              <ConditionDecisionOption>
+                                <DecisionOptionText>1500001298</DecisionOptionText>
+                                <ActionList>
+                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                  <Values>
+                                    <ActionList>
+                                      <Actions>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionExecuteScript</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionExecuteScript>
+                                                <ScriptFileName>data/supportfleetgift_serp_human1.lua</ScriptFileName>
+                                              </ActionExecuteScript>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionDelayedActions</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionDelayedActions>
+                                                <ExecutionDelay>1000</ExecutionDelay>
+                                                <DelayedActions>
+                                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                  <Values>
+                                                    <ActionList>
+                                                      <Actions>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionChangeParticipant</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ActionChangeParticipant>
+                                                                <NewParticipantID>Second_ai_01_Jorgensen</NewParticipantID>
+                                                              </ActionChangeParticipant>
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001290</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                                              </ObjectFilter>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionMoveObject</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001290</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ObjectTargetFilter>
+                                                                <TargetGUID>700000</TargetGUID>
+                                                                <TargetCheckParticipantID>1</TargetCheckParticipantID>
+                                                                <TargetParticipantID>Second_ai_01_Jorgensen</TargetParticipantID>
+                                                              </ObjectTargetFilter>
+                                                              <ActionMoveObject>
+                                                                <UseDangerLayer>1</UseDangerLayer>
+                                                                <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
+                                                                <SearchMode>Closest</SearchMode>
+                                                              </ActionMoveObject>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <!-- transform them back to original guid -->
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001298</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100437</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001291</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100439</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001292</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100440</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001293</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100443</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001294</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100442</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001295</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100438</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001296</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>100441</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionSetObjectGUID</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ObjectFilter>
+                                                                <ObjectGUID>1500001297</ObjectGUID>
+                                                                <CheckParticipantID>1</CheckParticipantID>
+                                                                <ObjectParticipantID>Second_ai_01_Jorgensen</ObjectParticipantID>
+                                                              </ObjectFilter>
+                                                              <ActionSetObjectGUID>
+                                                                <NewGUID>1010062</NewGUID>
+                                                              </ActionSetObjectGUID>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                      </Actions>
+                                                    </ActionList>
+                                                  </Values>
+                                                </DelayedActions>
+                                              </ActionDelayedActions>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                      </Actions>
+                                    </ActionList>
+                                  </Values>
+                                </ActionList>
+                                <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                              </ConditionDecisionOption>
+                            </Values>
+                          </DecisionOption>
+                        </Item>
+                        <Item>
+                          <DecisionOption>
+                            <Template>ConditionDecisionOption</Template>
+                            <Values>
+                              <Condition>
+                                <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                              </Condition>
+                              <ConditionDecisionOption>
+                                <DecisionOptionText>6428</DecisionOptionText>
+                                <ActionList>
+                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                  <Values>
+                                    <ActionList>
+                                      <Actions>
+                                        <Item>
+                                          <Action>
+                                            <Template>ActionDelayedActions</Template>
+                                            <Values>
+                                              <Action />
+                                              <ActionDelayedActions>
+                                                <ExecutionDelay>1000</ExecutionDelay>
+                                                <DelayedActions>
+                                                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                  <Values>
+                                                    <ActionList>
+                                                      <Actions>
+                                                        <Item>
+                                                          <Action>
+                                                            <Template>ActionStartQuest</Template>
+                                                            <Values>
+                                                              <Action />
+                                                              <ActionStartQuest>
+                                                                <Quest>1500001246</Quest>
+                                                                <UseCurrentSession>1</UseCurrentSession>
+                                                              </ActionStartQuest>
+                                                            </Values>
+                                                          </Action>
+                                                        </Item>
+                                                      </Actions>
+                                                    </ActionList>
+                                                  </Values>
+                                                </DelayedActions>
+                                              </ActionDelayedActions>
+                                            </Values>
+                                          </Action>
+                                        </Item>
+                                      </Actions>
+                                    </ActionList>
+                                  </Values>
+                                </ActionList>
+                                <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                              </ConditionDecisionOption>
+                            </Values>
+                          </DecisionOption>
+                        </Item>
+                      </DecisionOptionList>
+                    </ConditionDecision>
+                  </Values>
+                </FollowUpDecision>
+              </Item>
+            </FollowUpDecisionList>
+          </ConditionDecisionOption>
+        </Values>
+      </DecisionOption>
+    </Item>
+  </ModOp>
+  
+  
+  
+  
+  
+
+</ModOps>

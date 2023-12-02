@@ -1,0 +1,1056 @@
+<ModOps>
+
+  <!-- ################################################### -->
+  <!-- ##  Items  ## -->
+  <!-- ################################################### -->
+  
+  <!-- um sonar-effekt sehen zu können braucht man wohl das DLC -.- -->
+  <!-- höchstens nochmal testen was passiert, wenn ich alle sonargrafiken extrahiere und in sabotage_graphics_serp packe und in den dateien die verzeichnisse anpasse -->
+  <!-- nope, alle relevanten cfg dateien, deren inhalt und die darin verlinkten rdp dateien angepasst auf sabotage_graphics_serp ordner, -->
+   <!-- aber immernoch nichts... -->
+   <!-- Dann sunken treasures halt einfach als needed angeben -->
+  
+  <!-- info: -->
+   <!-- sowas wie ein schwimmendes harbouroffice die alle schiffe in der nähe buffed/debuffed geht wohl leider nicht. Die Buffs werden immer nur beim sockeln auf die umliegenden objekte verteilt -->
+    <!-- und nicht aktualisiert wenn der radius betreten/verlassen wird -->
+
+
+  <!-- spy das kill spy item geben, aber geringere reichweie, vllt 25 -->
+
+
+  <!-- weitere Spy Aktion Ideen: -->
+  <!-- item machen um zwietracht zwischen 2 spielern zu sähen. -->
+  <!-- ist nur die frage wie/wie man das dann einsetzen soll mit der spy unit... -->
+  <!-- evlt auch um rep zu einem selbst zu ändern. Muss dann zb. auf einen Kontor gewirkt werden -->
+  <!-- und dauert 15 Minute für 2 Rep oderso. -->
+  <!-- und evlt auch Geld stehlen? Ein KI Spy könnte evlt. pro Schuss alle 5 Minuten 1000 Gold stehlen, evlt nach Spielfortschritt -->
+  <!-- vllt bei nem Warenhaus/Bank -->
+  <!-- man könnte auch Vorräte vernichten, wobei man da sicher die Ware für definieren muss -->
+  <!-- .. -->
+  <!-- mögliche umsetzung: -->
+   <!-- bei ItemAktion zb. auf Kontor/Publicbuilding/Warehouse der KI ein neues hilfsobjekt spawnen (by impact) -->
+   <!-- und mit RelativeToQuestStart Trigger überwachen. Dann: -->
+   <!-- 0) löschen des neuen hilfsobjekt nach ~1 sek -->
+   <!-- 1) Ein sabotage helper spawnen (zb auf dem helperbuilding), weils als sabotage gelten soll (wenns geht direkt auf derselben position) -->
+   <!-- 2) Dem Human zb. 10000 Gold gutschreiben -->
+   <!-- 3) Aus Sicht der KI wissen wir bereits, dass ein landspy nearby ist und dass wir sein hilfsgebäude auf der insel haben, -->
+      <!-- wenn jetzt noch hinzu kommt, dass derselbe Human so ein neues hilfsobjekt besitzt, dann können wir der KI zb. einfach 10000 Gold abziehen. -->
+   <!-- Für die Reputation könnte man dann ein attacker und vitcim objekt in alter welt am kartenrand spawnen, damit das dann über die Reactions gemacht werden kann. -->
+    <!-- (TESTEN: Ob die reactions auch rep unter den KIs verteilen, oder ob die nur für humans sind) -->
+  <!-- .. -->
+  <!-- Umsetzung: Aktion beim Kontor von demjenigen, dessen Meinunng geändert werden soll, egal von wem. -->
+   <!-- bei Erfolg: Start einer Decisionquest wo wir auswählen können über wen wir die Meinung ändern wollen und danach ob positiv oder negativ. -->
+    <!-- decisionquest aufbau siehe WIP Ordner -->
+    <!-- Alternativ ~30 Items (Meinung über X rauf/runter) mit Projektil und helper machen die wir alle in slot packen und bei Bau von Spy mit ActionDeleteItem die dinge entfernen, zu denen kein passender spieler da ist, sodass Spion dann maximal 6 Items dazu hat. -->
+      <!-- JA so machen, ist denke ich am einfachsten. erst die Trigger schreiben, die so wie die steal money trigger arbeiten und mit vorhandenem item testen ob alles klappt. -->
+  <!-- .. -->
+  <!-- <DiplomacyAction>Insult</DiplomacyAction> scheint für KIvsKI zu funktionieren, aber scheinbar kann die KI den Human nicht beleidigen, -->
+   <!-- gibt wohl keine Textvorgabe usw. dazu.. da müsste man also was anderes nutzen oder rausfinden, wie wir das zufügen -->
+   <!-- aber auch bei KI gegen KI greift das normale sucess system, sodass man das wohl immer erfolgreich machen müsste, wenn man will dass es immer klappt, was vorallem bei Kompliment natürlich nicht sinnvoll ist -->
+  <!-- für KI gegen KI können wir ActionAddReputation nutzen, weil wir ja die Meinunung des Opfers über Target ändern wollen und keine notification brauchen -->
+  <!-- für ki meinung über human brauchts damit rep+notification klappt entweder eine quest oder eine reaction (durch fake schiffe), am besten quest -->
+  <!-- für human vs human können wir <DiplomacyAction>Insult</DiplomacyAction> nutzen, weil da der rep malus selbst ja egal ist, -->
+   <!-- wobei wir vorher gucken sollten, was/wie da gesagt wrid, ob der aufwand lohnt, oder da doch nicht geht -->
+  <!-- .. -->
+  <!-- Es gibt als Reaction darauf: -->
+  <!-- 252130 AT_ai08_PlyrFailsToInsultNpc1 : Komm schon, Schweinchen, grunz ein wenig lauter! -->
+  <!-- 252136 AT_ai08_PlyrFailsToInsultNpc2 : Quieke nur weiter so, Schweinchen, ich bekomme schon Hunger. -->
+  <!-- 252137 AT_ai08_PlyrFailsToInsultNpc3 : Ist das Ihre Diagnose, Herr Doktor? Geben Sie mir jetzt meine Medizin? -->
+  <!-- 252138 AT_ai08_PlyrFailsToInsultNpc4 : War das ein Lob? Ich bin verwirrt. Es klang wie ein Lob. -->
+  <!-- 252131 AT_ai08_PlyrFailsToFlatterNpc1 : Ich habe noch nicht einmal Lust, dir dafür die Zunge herauszuschneiden. -->
+  <!-- 252139 AT_ai08_PlyrFailsToFlatterNpc2 : Du buckelst in genau der richtigen Höhe für einen Hammerschlag ... -->
+  <!-- 252140 AT_ai08_PlyrFailsToFlatterNpc3 : Wenn du so ergeben wärst, hättest du dich mir längst geöffnet- jeder noch so kleine Einschnitt würde mir genügen. -->
+  <!-- 252141 AT_ai08_PlyrFailsToFlatterNpc4 : Kurz vor dir hat mir jemand eine Ananas gebracht. Er hatte mehr Spaß an ihr als ich ... -->
+  <!-- 252132 AT_ai08_PlyrSucceedsInInsultingNpc1 : Wüstling, ich?! Die Menschheit ist eine Wüste. Ein Haufen Hohlköpfe, die viel zu beschränkt sind, um wahre Freiheit zu erkennen. -->
+  <!-- 252142 AT_ai08_PlyrSucceedsInInsultingNpc2 : Das war lange vor meiner Erleuchtung - ein Name, der heute ohne Bedeutung für mich ist! -->
+  <!-- 252143 AT_ai08_PlyrSucceedsInInsultingNpc3 : Und jetzt bin ich dran mit Geschichtenerzählen. So wie die von dem vorlauten Kerl, den ich von innen nach außen gestülpt habe. -->
+  <!-- 252144 AT_ai08_PlyrSucceedsInInsultingNpc4 : Sag das nie wieder. Ich hasse dieses Wort! Nenn mich einfach Schwein, Schlächter oder Erlöser. -->
+  <!-- 252133 AT_ai08_PlyrSucceedsInFlatteringNpc1 : Du hast recht. Ich bin ein wahrer Künstler! Weshalb will das niemand wahrhaben? -->
+  <!-- 252145 AT_ai08_PlyrSucceedsInFlatteringNpc2 : Ja, die Geschichte stimmt tatsächlich. Ich habe das Meer auf einem Floß aus Leichen überquert. -->
+  <!-- 252146 AT_ai08_PlyrSucceedsInFlatteringNpc3 : Und du würdest dich mir wirklich völlig ausliefern? Mit Haut und Haar? Wie überaus anregend! -->
+  <!-- 252147 AT_ai08_PlyrSucceedsInFlatteringNpc4 : Und sie fingen wirklich alle an zu zittern wie Espenlaub, als du nur meinen Namen erwähntest? -->
+  
+  <!-- und Als kompliment/Beleidung selbst kann man evlt nutzen: -->
+  <!-- 252091 AT_ai08_ReactionToGenPosDipFromPlyr1 : Was für ein Fraß! -->
+  <!-- 252108 AT_ai08_ReactionToGenPosDipFromPlyr2 : Verlockend. -->
+  <!-- 252109 AT_ai08_ReactionToGenPosDipFromPlyr3 : Erfreulich. -->
+  <!-- 252110 AT_ai08_ReactionToGenPosDipFromPlyr4 : Beruhigend -->
+  <!-- 252111 AT_ai08_ReactionToGenPosDipFromPlyr5 : Ich bin ganz nervös. -->
+  <!-- 252092 AT_ai08_ReactionToGenNegDipFromPlyr1 : Hissssssssss! -->
+  <!-- 252112 AT_ai08_ReactionToGenNegDipFromPlyr2 : Schweinehund. -->
+  <!-- 252113 AT_ai08_ReactionToGenNegDipFromPlyr3 : Exkrementell. -->
+  <!-- 252114 AT_ai08_ReactionToGenNegDipFromPlyr4 : Kleingeist! -->
+  <!-- 252115 AT_ai08_ReactionToGenNegDipFromPlyr5 : Bist du noch ganz dicht? -->
+  <!-- 251863 AT_ai08_PosiFeedbackToPlayer1 : Wie schön du bist. -->
+  <!-- 251884 AT_ai08_PosiFeedbackToPlayer2 : Du versuchst so sehr, gerecht zu sein. -->
+  <!-- 251885 AT_ai08_PosiFeedbackToPlayer3 : Du bist eine Marionette, du machst, was man dir sagt. -->
+  <!-- 251886 AT_ai08_PosiFeedbackToPlayer4 : Du edle Kreatur, du. Ganz eingewebt in deinen Traum. -->
+  <!-- 251887 AT_ai08_PosiFeedbackToPlayer5 : Bleib einer von den Guten. Um den Rest kümmere ich mich. -->
+  <!-- 251888 AT_ai08_PosiFeedbackToPlayer6 : Gutes wird zu Schlechtem, wie Alchemie. -->
+  <!-- 251889 AT_ai08_PosiFeedbackToPlayer7 : Ich will dir nicht wehtun, ich will dir ... danken. -->
+  <!-- 251865 AT_ai08_NegFeedbackToPlyr1 : Du musst leiden. -->
+  <!-- 251896 AT_ai08_NegFeedbackToPlyr2 : Ich kann dir ein neues Gesicht schnitzen. -->
+  <!-- 251897 AT_ai08_NegFeedbackToPlyr3 : Ich kann dich erlösen. -->
+  <!-- 251898 AT_ai08_NegFeedbackToPlyr4 : Ich streue deine Überreste in alle vier Winde. -->
+  <!-- 251899 AT_ai08_NegFeedbackToPlyr5 : Du wirst mein neues Spielzeug. -->
+  <!-- 251900 AT_ai08_NegFeedbackToPlyr6 : Damit hast du dir einen langsamen Tod verdient. -->
+  <!-- 251901 AT_ai08_NegFeedbackToPlyr7 : Ich würde dein Hirn auslöffeln, wenn du eins hättest. -->
+  
+
+  <!-- TODO für mine platzieren mal  -->
+  <!-- <ItemAction>PLACE_MINE</ItemAction> -->
+  <!-- ausprobieren -->
+
+
+
+
+  <!-- Die Spionageitems werden mit InitSlotItems direkt in der spion-einheit gespawned. -->
+  <!-- Man könnte theoretisch auch eine Mod-Allocation zufügen und die Items erforschbar/kaufbar/questrewards machen mit untersch. stärke, -->
+   <!-- aber 1. verbrauchen wir dadurch unnötigerweise eine Mod-Allocation und zweitens bin ich kein Fan von zuvielen sinnlosen Items. -->
+  
+  <!-- TODO: Delay von allen Items noch balancen. Sabotage zb. zwischen 1 und 5 minuten. Landen/wassern so 30 sekunden -->
+  
+  <!-- TODO: für Arctic Illness ein separates Item machen? Ein Projektil kann glaube ich nicht 2 incidents verursachen -->
+  
+  
+  <!-- TODO: -->
+  <!-- als InfoDescription evlt noch eigene Text Einträge machen, das sind quasi Lore/Geschichte Dinge. -->
+   <!-- Man könnte zb. in die Hauptbeschreibung einfach nur die Buff effekte reinschreiben + Aufladung. -->
+   <!-- und in die InfoDescription schreibt man dann "Stachelt Bevölkerung gegen die zu hohen Steuern auf" oderso. -->
+  
+  
+  <!-- TODO: -->
+  <!-- in Item statistik steht, dass man die Sabotage Items durch Quests von Bewohnern der alten und neuen Welt bekommen könnte?! -->
+  
+  
+  <!-- TODO: -->
+  <!-- Die Items im Spy scheinen zu Beginn immer nach GUID sortiert zu sein, nicht wie ich sie im spy selbst reinsortiere -->
+    <!-- dh evlt eine schöne Sortierung überlegen und dann die GUIDs nochmal durchwechseln -->
+    <!-- Wassern direkt ausgerüset, daher sortierung egal -->
+    <!-- Feuer, Krankheit, Grippe, Riot, Explosion -->
+    <!-- Productiviy, Unterhalt, Health Buildings, Health Schiffe, Attraktivität -->
+    <!-- Seemine, Patrollie -->
+  
+  
+  <!-- TODO: -->
+  <!-- wenn die range von den schiffsitems feststeht, ungefähr diese range in die ConditionObjectPosition trigger packen -->
+  
+  
+  <!-- OnlyEquippableOnce macht dass man nicht 2 mal dasgleiche item aufeinmal gesockelt haben kann, nicht dass man es nicht unsockeln kann.. -->
+  
+  <!-- TODO: -->
+  <!-- ein Item um GeneralEnemy Angriff zu triggern? -->
+  <!-- man kann quasi mit spy so ein leuchtsignal platzieren durch item und das löst einen general enemy schiffspawn aus -->
+  <!-- welche dann einen move befehl zu diesem signal (owner abschießer) bekommen. Am besten ein Label pro Spieler machen -->
+   <!-- damit der zweite spieler die erste flotte nicht durch ein eigenes signal umlenken kann. -->
+    <!-- Alternativ eine DestroyObjective Quest draus machen, denn da lässt sich Objectbehavior ein wenig einstellen -->
+    <!-- bzgl quest müssen die schiffe am besten dennoch per trigger gespawned werden am kartenrand und moveto befehl geben -->
+    <!-- und dann die quest sobald sie in nähe des ziels sind mit <DestroyObject> ConditionObjectPrebuiltObject laufen lassen -->
+    <!-- Eigentliche Frage ist nur, wie wir die Quest für das Opfer starten :D Denn an sich ist ja nur der Angreifer bekannt.. -->
+    <!-- oder wie starten es für alle Humans, da General Enemy ja allen gegenüber feindlich ist. -->
+    
+  <!-- TODO TEST: -->
+  <!-- ein item welches über projektil ein Spy-Gebäude auf fremder Insel spawned. -->
+  <!-- noch nicht sicher was das können soll... aber evlt tatsächlich einfach ein gebäude wo man einen neuen spy ausbilden kann, -->
+   <!-- so ist man schneller wieder auf der feindlichen insel, als wenn man da erst hinschippern muss. -->
+  
+  
+  <!-- Eventuell ein Item für human police unit machen, welches actions bei ausführung hat (sequence) und als buff forwardspeedupgrade -->
+  <!-- sodass police unit vllt normalerweise langsam reitet, aber mit dem active item galoppiert man für ne zeit. -->
+  <!-- das einzge was problematisch sein könnte wäre, die sequence wieder zurück zu ändern, sobald wirkung nachlässt... -->
+  <!-- und evlt sits nicht soo wichtig, weil human polizist ja nicht in nähe der spies kommen muss -->
+  
+  <!-- Using a fixed "Delay" for the teleport action instead of projectile travel time, because only with delay the unit is prevented to move -->
+  <!-- Landung/wassern sollte auch ca. ne minute delay haben -->
+  
+  
+  <!-- TODO: -->
+  <!-- Kill Spy Item aufteilen in eins für Land und eins für Wasser. -->
+  <!-- Das für Land soll begrenzte Reichweite haben, vllt 10 bis 20, auch die AttackRange der human psies/police soll dann so groß sein,  -->
+   <!-- damit man sehen kan wie hoch die reichweite des feindes ist. wobei dann automatischer attack eher entfernt sein sollte..   -->
+     <!-- oder seltenen automatischen attack doch erlauben und sich einfach merken, dass item-kill range 4 mal größer ist oderso -->
+  <!-- Für Wasserspies ein anderes Item mit unendlich reichweite, da eine jagd auf dem wasser denke ich zu aufwendig wird -->
+  
+  <!-- TODO: -->
+  <!-- gucken ob wir irgendeinen effekt odder sound oderso für den itemeinsatz hinbekommen, -->
+  <!-- welcher schon bei Delay startet, damit man weiß, dass der befehl ausgeführt wird, denn aktuell ist das mit delay etwas verwirrend. -->
+  <!-- in ItemAction: ActionCompletedEffect, ActivateActionSound, DeactivateActionSound -->
+  <!-- ActivateActionSound wird direkt beim anklicken des items abgespielt, nicht wenn man das ziel wählt oder die action startet... -->
+   <!-- und ActionCompletedEffect kommt wenn action eben completed, wobei ich die aktuell gesetzte explosion nur höre und nur bei shiptospy.. -->
+  <!-- testen: VisualEffectWhenActive JA das passiert auch während Delay! -->
+  
+  <!-- TODO: -->
+  <!-- welche auswirkung hat ItemAction/<IncidentResolveRate>0.3</IncidentResolveRate> ? mal werte abändern, 0.3 ist default -->
+  <!-- wobei es vllt auch für items gedacht ist, die resolver besser machen oderso.. -->
+  <!-- bzw. evlt ists auch für ItemAction gedacht: -->
+  <!-- <ItemAction> -->
+    <!-- <ItemAction>HEAL_INCIDENT</ItemAction> -->
+    <!-- <ActionTarget>501232</ActionTarget> -->
+    <!-- <ActionScope>TargetRadius</ActionScope> -->
+    <!-- <ActionDistance>15</ActionDistance> -->
+    <!-- <ActionIncidentType>Fire;Riot;Illness;Explosion</ActionIncidentType> -->
+    <!-- <ActionCooldown>15000</ActionCooldown> -->
+    <!-- <ActionDuration>5000</ActionDuration> -->
+    <!-- <CanEndItemAction>0</CanEndItemAction> -->
+  <!-- </ItemAction> -->
+  <!-- mal testen wie das so funzt, vllt ist das besser als es über Projektil zu machen? zumindest wenn es durch IncidentResolveRate vllt langsam besser wird oderso -->
+  <!-- .. wobei das mit sichtbaren projektilen evlt eh viel cooler ist -->
+  
+  <!-- TODO: testen ob auch HealExplosion geht, bzw. ob das ruinen wieder aufbaut oder was macht das? -->
+  
+  
+  
+  <!-- TODO: evlt ActionDescription für ein paar items zufügen? (ist by default glaube ich sowas wie "wenn aktiv") -->
+  
+  
+  <!-- Game Items am besten immer mit AddNextSibling bei GUID 112574 zufügen, -->
+   <!-- weil bei diesen auch die Group-GUIDs wichtig sein können. Manche group guids werden für quest rewards genommen, -->
+    <!-- so wirds im item-statistic menu zb angezeigt, dass man das item durch resident-quests bekommen kann, wenn ich meine items bei 192168 hinzugüge -->
+      
+  
+  <ModOp Type="AddNextSibling" GUID="112574">
+  
+
+    <!-- for AI units we use a permanent pirateflag item instead of a global buff, because the buff is quite buggy and it is no problem for the AI units to waste a socket slot for that -->
+    <Asset>
+      <Template>VehicleItem</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001568</GUID>
+          <Name>Permanent Pirateflag for AI</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_pirate_flag.png</IconFilename>
+        </Standard>
+        <Item>
+          <Allocation>Warship</Allocation>
+          <Rarity>Epic</Rarity>
+          <TradePrice>1</TradePrice>
+          <TransferBlocked>1</TransferBlocked>
+          <OnlyEquippableOnce>1</OnlyEquippableOnce>
+          <Flotsam>1500001027</Flotsam>
+          <FlotsamTerrain>1500001189</FlotsamTerrain>
+        </Item>
+        <VehicleUpgrade>
+          <ActivatePirateFlag>1</ActivatePirateFlag>
+        </VehicleUpgrade>
+        <AttackerUpgrade>
+          <!-- reduce attackspeed alot for AI spies (I dont know how "ReloadTime" really works, so we will try to manage it this way) goal is one attack around every ~5 minutes -->
+          <AttackSpeedUpgrade>-98</AttackSpeedUpgrade>
+        </AttackerUpgrade>
+        <!-- infolayer wird leider nicht für andere spieler angezeigt.. -->
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    
+    <!-- Info: dont reduce the Delay for spy to ship/ship to spy below ~10 seconds (the time before the police units from AI are deleted in Trigger file, when the land spy left the AI-island) -->
+    <Asset>
+      <Template>ItemSpecialActionVisualEffect</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001171</GUID>
+          <Name>Spy to Ship</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_fishing_boat_3.png</IconFilename>
+        </Standard>
+        <SpecialAction>
+          <Delay>30000</Delay>
+          <UseEffectAsset>1</UseEffectAsset>
+          <MouseEffect>140088</MouseEffect>
+          <Projectile>1500001170</Projectile>
+          <BarrageCount>0</BarrageCount>
+          <BarrageDuration>0</BarrageDuration>
+          <ActionRadius>0</ActionRadius>
+        </SpecialAction>
+        <ItemEffect />
+        <ItemAction>
+          <ActionTarget>1500001479</ActionTarget>
+          <ActionDistance>15</ActionDistance>
+          <ActionCooldown>1</ActionCooldown>
+          <ActionDescription>1500001731</ActionDescription>
+          <CanEndItemAction>1</CanEndItemAction>
+          <StopMovementOnInteraction>1</StopMovementOnInteraction>
+          
+          <!-- TODO (bei ActivateActionSound nen spruch passend zur aktion reinpacken) -->
+          <ActivateActionSound>214788</ActivateActionSound>
+        </ItemAction>
+        <Item>
+          <Allocation>Warship</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Legendary</Rarity>
+          <HasAction>1</HasAction>
+          <TradePrice>1</TradePrice>
+          <TransferBlocked>1</TransferBlocked>
+          <OnlyEquippableOnce>1</OnlyEquippableOnce>
+          <Flotsam>1500001027</Flotsam>
+          <FlotsamTerrain>1500001189</FlotsamTerrain>
+        </Item>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <!-- ship_target_decal_01 : es erscheint ein großer Auswahlkreis um spy herum, ist eig auch ganz gut, sieht man nur wenn man recht nah dran ist -->
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001171</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001481</GUID>
+          <Name>Ship to Spy</Name>
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/specialists/pirates/icon_pirate_gunboat_151.png</IconFilename> -->
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/campaign/icon_pyrphorian.png</IconFilename> -->
+          <IconFilename>data/sabotage_graphics_serp/icons/Spy1404.png</IconFilename>
+        </Standard>
+        <SpecialAction>
+          <Projectile>1500001482</Projectile>
+        </SpecialAction>
+        <ItemAction>
+          <ActionDistance>12</ActionDistance>
+          <ActionTarget>1500001480</ActionTarget>
+        </ItemAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+
+  <!-- mindestens so große ActionDistance wie größte ActionDistance eines spy items -->
+    <Asset>
+      <Template>ItemSpecialActionVisualEffect</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001194</GUID>
+          <Name>Kill Spy</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_skull.png</IconFilename>
+        </Standard>
+        <SpecialAction>
+          <Delay>0</Delay>
+          <UseEffectAsset>1</UseEffectAsset>
+          <MouseEffect>140088</MouseEffect>
+          <Projectile>1500001174</Projectile>
+          <BarrageCount>0</BarrageCount>
+          <BarrageDuration>0</BarrageDuration>
+          <ActionRadius>0</ActionRadius>
+        </SpecialAction>
+        <ItemEffect />
+        <ItemAction>
+          <ActionTarget>1500001188</ActionTarget>
+          <ActionDistance>200</ActionDistance>
+          <ActionCooldown>5000</ActionCooldown>
+          <CanEndItemAction>1</CanEndItemAction>
+          <StopMovementOnInteraction>0</StopMovementOnInteraction>
+          <ActionDescription>1500001485</ActionDescription>
+          <!-- <ActionCompletedEffect> -->
+            <!-- <EffectAsset>101063</EffectAsset> -->
+          <!-- </ActionCompletedEffect> -->
+          <ActivateActionSound>214788</ActivateActionSound>
+          <DeactivateActionSound>214788</DeactivateActionSound>
+        </ItemAction>
+        <Item>
+          <Allocation>Warship</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Legendary</Rarity>
+          <HasAction>1</HasAction>
+          <TradePrice>1</TradePrice>
+          <TransferBlocked>1</TransferBlocked>
+          <OnlyEquippableOnce>1</OnlyEquippableOnce>
+          <Flotsam>1500001027</Flotsam>
+          <FlotsamTerrain>1500001189</FlotsamTerrain>
+        </Item>
+        <Text />
+        <ExpeditionAttribute />
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+
+    <Asset>
+      <Template>ItemSpecialActionVisualEffect</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001180</GUID>
+          <Name>Start Incident Fire</Name>
+          <IconFilename>data/ui/2kimages/main/icons/dlc_11/icon_ship_fire_armed_red.png</IconFilename>
+          <InfoDescription>1500001176</InfoDescription>
+        </Standard>
+        <SpecialAction>
+          <Delay>120000</Delay>
+          <UseEffectAsset>1</UseEffectAsset>
+          <MouseEffect>140088</MouseEffect>
+          <Projectile>1500001182</Projectile>
+          <!-- Info: BarrageCount scheint die anzahl der projektile zu sein, die geshcossen werden.  -->
+          <!-- in dem actionsradis spawnt bei 0 sonst nur an zufälliger position ein einzelnes -->
+          <!-- stattdessen sollte man lieber mehrere spawnen (sofern buff nicht stacked) -->
+          <!-- und dafür den explosionradius reduzieren, damit auch alles im angezeigten actionradius getroffen wird. -->
+          <!-- BarrageDuration ist die zeit in der er diese anzahl an projektieln verscschießt -->
+          <!-- (man kann auch 1 spawnen und Actionradius sehr klein machen, aber dann sieht man vor der aktion nicht was gertoffen werden wird) -->
+          <!-- bei BarrageDuration=0 werden alle in dieselbe richtung geschossnen,also größer 0 machen -->
+          <!-- FINAL: everything on 0 is best -->
+          <!-- <BarrageCount>20</BarrageCount> -->
+          <!-- <BarrageDuration>1000</BarrageDuration> -->
+          <!-- <ActionRadius>5</ActionRadius> -->
+          <BarrageCount>0</BarrageCount>
+          <BarrageDuration>0</BarrageDuration>
+          <ActionRadius>0</ActionRadius>
+        </SpecialAction>
+        <ItemEffect />
+        <ItemAction>
+          <ItemAction>NUKE</ItemAction>
+          <ActionScope>TargetRadius</ActionScope>
+          <ActionTarget>1500001187</ActionTarget>
+          <ActionDistance>8</ActionDistance>
+          <ActionCooldown>60000</ActionCooldown>
+          <ActionDescription>1500001544</ActionDescription>
+          <CanEndItemAction>1</CanEndItemAction>
+          <StopMovementOnInteraction>1</StopMovementOnInteraction>
+          <ActivateActionSound>233021</ActivateActionSound>
+        </ItemAction>
+        <Item>
+          <Allocation>Warship</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Legendary</Rarity>
+          <HasAction>1</HasAction>
+          <TradePrice>1</TradePrice>
+          <TransferBlocked>1</TransferBlocked>
+          <OnlyEquippableOnce>1</OnlyEquippableOnce>
+          <Flotsam>1500001027</Flotsam>
+          <FlotsamTerrain>1500001189</FlotsamTerrain>
+        </Item>
+        <Text />
+        <ExpeditionAttribute />
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <!-- fire_smoke_01: ist an sich ok, aber schon ziemlich auffällig, wäre gut wenn wir was etwas weniger auffälliges hätten -->
+        <VisualEffectWhenActive>
+          <!-- <EffectFile>data/graphics/effects/city_incidents/fire/fire_smoke_01.cfg</EffectFile> -->
+          <EffectFile>data/sabotage_graphics_serp/effects/fire_smoke_Sabotage.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001179</GUID>
+          <Name>Start Incident Illness</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/newspaper/icon_illness_chance_red.png</IconFilename>
+          <InfoDescription>1500001727</InfoDescription>
+        </Standard>
+        <SpecialAction>
+          <Projectile>1500001181</Projectile>
+        </SpecialAction>
+        <!-- ci_plague_green_01 ist gut, könnte man noch ein wenig weniger alpha nehmen und kleiner und nicht nur um dem spy drumherum, sondern auch auf ihn drauf, aber wenn zuviel arbeit, dann so lassen -->
+        <!-- kann man evlt. auch dafür sorgen, dass radius davon mit der zeit größer wird? -->
+        <VisualEffectWhenActive>
+          <!-- <EffectFile>data/graphics/effects/city_incidents/illness/ci_plague_green_01.cfg</EffectFile> -->
+          <EffectFile>data/sabotage_graphics_serp/effects/ci_plague_green_Sabotage.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001723</GUID>
+          <Name>Start Incident ArcticIllness</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/newspaper/icon_illness_chance_green.png</IconFilename>
+          <InfoDescription>1500001721</InfoDescription>
+        </Standard>
+        <SpecialAction>
+          <Projectile>1500001724</Projectile>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/city_incidents/illness/ci_plague_purple_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001184</GUID>
+          <Name>Start Incident Riot</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/newspaper/icon_newscategory_riot_bad.png</IconFilename>
+          <InfoDescription>1500001719</InfoDescription>
+        </Standard>
+        <SpecialAction>
+          <Projectile>1500001185</Projectile>
+        </SpecialAction>
+        <!-- riot_banner_vertical_long_02 ist ok, schwarzes klesines banner vor spy aufgestellt mit "Fight" drauf -->
+        <!-- riot_banner_vertical_short auch ok, ist anders gedreht und rot mit Fight -->
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/city_incidents/riot/riot_banner_vertical_short.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <!-- auch nutzen zum entschärfen von Minen, welche bis zu 7 reichweite haben, daher 10 reichweite geben. -->
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001725</GUID>
+          <Name>Start Incident Explosion</Name>
+          <IconFilename>data/ui/2kimages/main/icons/notification_icons/icon_incident_explosion_outline.png</IconFilename>
+          <InfoDescription>1500001190</InfoDescription>
+        </Standard>
+        <SpecialAction>
+          <Projectile>1500001726</Projectile>
+        </SpecialAction>
+        <ItemAction>
+          <ActionTarget>1500001728</ActionTarget>
+          <ActionDistance>10</ActionDistance>
+        </ItemAction>
+      </Values>
+    </Asset>
+    
+    <!-- TODO: targets noch anpassen -->
+    <!-- und evlt ein item für geäbude und eines für schiffe machen, weil schiffe weniger delay haben soll? -->
+     <!-- spy-ship bekommt dann nur das für schiffe, türme usw soll man dann an land sabotieren -->
+    
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001208</GUID>
+          <Name>Production/Repair-/Shipyard-/LoadingSpeed Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_workforce_2d.png</IconFilename>
+          <InfoDescription>1500001567</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionTarget>1500001474</ActionTarget>
+        </ItemAction>
+        <SpecialAction>
+          <Projectile>1500001198</Projectile>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001218</GUID>
+          <Name>Higher Maintenance / Less Taxes and Happiness</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_house_income.png</IconFilename>
+          <InfoDescription>1500001715</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionTarget>1500001471</ActionTarget>
+        </ItemAction>
+        <SpecialAction>
+          <Projectile>1500001216</Projectile>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <!-- TODO: dies als eigenständiges item so lassen? Oder doch noch iwas dazu packen? nur was? ist so allein doch recht schwach, oder nicht? -->
+     <!-- nachdem das entschieden ist noch InfoDescription wie bei allen andern durch info über targets austauschen -->
+     <!-- evlt more workers auch einfach entfernen? Weil fehlende workers ja glaube ich nur die produktivität verringern und arbeitslose haben keinen vorteil. -->
+     <!-- daher kann man dasselbe bz.w noch besser mit dem productivity debuff erreichen -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500001180</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001219</GUID> -->
+          <!-- <Name>More Workers Needed</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/icons/icon_house_income.png</IconFilename> -->
+          <!-- <InfoDescription>1500001217</InfoDescription> -->
+        <!-- </Standard> -->
+        <!-- <ItemAction> -->
+          <!-- <ActionTarget>1500001470</ActionTarget> -->
+        <!-- </ItemAction> -->
+        <!-- <SpecialAction> -->
+          <!-- <Projectile>1500001217</Projectile> -->
+        <!-- </SpecialAction> -->
+        <!-- <VisualEffectWhenActive> -->
+          <!-- <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile> -->
+        <!-- </VisualEffectWhenActive> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+
+
+
+
+    <!-- TODO: dies als eigenständiges item so lassen? Oder doch noch iwas dazu packen? nur was? ist so allein doch recht schwach, oder nicht? -->
+     <!-- nachdem das entschieden ist noch InfoDescription wie bei allen andern durch info über targets austauschen -->
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001467</GUID>
+          <Name>Less Attractivness Zoo/Garden/Museum/VisitorPier</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_monument_attractiveness.png</IconFilename>
+          <InfoDescription>1500001718</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionTarget>1500001472</ActionTarget>
+        </ItemAction>
+        <SpecialAction>
+          <Projectile>1500001468</Projectile>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001569</GUID>
+          <Name>Health/Attack Buildings Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/icons/achievement/icon_achievement_category_military.png</IconFilename>
+          <InfoDescription>1500001556</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionTarget>1500001473</ActionTarget>
+          <ActionDistance>25</ActionDistance>
+          <ActionCooldown>120000</ActionCooldown>
+          <ActionDescription>1500001705</ActionDescription>
+        </ItemAction>
+        <SpecialAction>
+          <Projectile>1500001571</Projectile>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001463</GUID>
+          <Name>Health/Attack/Speed Ships Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/icons/ship_info/icon_ship_moving.png</IconFilename>
+          <InfoDescription>1500001574</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionTarget>1500001213</ActionTarget>
+          <ActionDistance>15</ActionDistance>
+          <ActionCooldown>120000</ActionCooldown>
+          <ActionDescription>1500001705</ActionDescription>
+        </ItemAction>
+        <SpecialAction>
+          <Projectile>1500001469</Projectile>
+          <Delay>5000</Delay>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001489</GUID>
+          <Name>Steal Money</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/consumables/icon_moneybag_rare.png</IconFilename>
+          <InfoDescription>1500001594</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionTarget>1500001490</ActionTarget>
+          <ActionCooldown>300000</ActionCooldown>
+          <ActionDescription>1500001573</ActionDescription>
+        </ItemAction>
+        <SpecialAction>
+          <Projectile>1500001491</Projectile>
+          <Delay>300000</Delay>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <!-- Reputation projectile in <RelevantProjectiles> packen, dann reagiert KI darauf mit +-5 für Propaganda/Hilfe und wir könnten für Rep change zwischen 2 spielern einen unsichtbaren spy spawnen der einmal damit angreift und dann geöscht wird -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500001180</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001208</GUID> -->
+          <!-- <Name>Rep +</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/icons/icon_workforce_2d.png</IconFilename> -->
+          <!-- <InfoDescription>1500001567</InfoDescription> -->
+        <!-- </Standard> -->
+        <!-- <ItemAction> -->
+          <!-- <ActionTarget>1500001471</ActionTarget> -->
+        <!-- </ItemAction> -->
+        <!-- <SpecialAction> -->
+          <!-- <Projectile>1050</Projectile> -->
+        <!-- </SpecialAction> -->
+        <!-- <VisualEffectWhenActive> -->
+          <!-- <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile> -->
+        <!-- </VisualEffectWhenActive> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001572</GUID>
+          <Name>Drop Mine</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/drop_goods/icon_dropgood_seamines.png</IconFilename>
+          <InfoDescription>853</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionTarget>1500001479</ActionTarget>
+          <ActionDistance>7</ActionDistance>
+          <ActionCooldown>60000</ActionCooldown>
+          <ActionDescription>1500001573</ActionDescription>
+        </ItemAction>
+        <SpecialAction>
+          <Projectile>1500001706</Projectile>
+          <Delay>300000</Delay>
+        </SpecialAction>
+        <Locked>
+          <DLCDependency>24962</DLCDependency>
+        </Locked>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500001180</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID></GUID> -->
+          <!-- <Name>Destroy Mine</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/drop_goods/icon_dropgood_seamines.png</IconFilename> -->
+          <!-- <InfoDescription></InfoDescription> -->
+        <!-- </Standard> -->
+        <!-- <ItemAction> -->
+          <!-- <ActionTarget></ActionTarget> -->
+          <!-- <ActionDistance>10</ActionDistance> -->
+          <!-- <ActionCooldown>60000</ActionCooldown> -->
+        <!-- </ItemAction> -->
+        <!-- <SpecialAction> -->
+          <!-- <Projectile></Projectile> -->
+          <!-- <Delay>300000</Delay> -->
+        <!-- </SpecialAction> -->
+        <!-- <Locked> -->
+          <!-- <DLCDependency>24962</DLCDependency> -->
+        <!-- </Locked> -->
+        <!-- <VisualEffectWhenActive> -->
+          <!-- <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile> -->
+        <!-- </VisualEffectWhenActive> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+      
+    <!-- Add a Patrol Item, because the Vehicle GUID to have the patrol button is too dangerous for land units (because we can not disable sessiontransfer-button) -->
+    <Asset>
+      <Template>ActiveItem</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001535</GUID>
+          <Name>PatrolItem</Name>
+          <IconFilename>data/ui/2kimages/main/icons/ship_info/icon_ship_patrolling.png</IconFilename>
+          <InfoDescription>6417</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ItemAction>START_PATROL</ItemAction>
+          <ActionTarget>140561</ActionTarget>
+          <ActionScope>Target</ActionScope>
+          <ActionDistance>5000</ActionDistance>
+          <ActionCooldown>0</ActionCooldown>
+          <CanEndItemAction>0</CanEndItemAction>
+          <StopMovementOnInteraction>0</StopMovementOnInteraction>
+          <ActionDescription>1500001535</ActionDescription>
+        </ItemAction>
+        <Item>
+          <Allocation>Warship</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Legendary</Rarity>
+          <HasAction>1</HasAction>
+          <TradePrice>1</TradePrice>
+          <TransferBlocked>1</TransferBlocked>
+          <OnlyEquippableOnce>1</OnlyEquippableOnce>
+          <Flotsam>1500001027</Flotsam>
+          <FlotsamTerrain>1500001189</FlotsamTerrain>
+        </Item>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    
+
+  
+  
+
+  
+  
+  
+  <!-- ##################################################################### -->
+  <!-- heal items -->
+  
+  <!-- TODO: beim balancing dann noch gucken ob delay/cooldwon genauso sein sollen wie bei spy-start-fire oder evlt. anders -->
+  
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001514</GUID>
+          <Name>Heal Fire</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/city_institution/icon_fire_brigade.png</IconFilename>
+          <InfoDescription>4377</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionCooldown>300000</ActionCooldown>
+          <ActionDescription>1500001573</ActionDescription>
+        </ItemAction>
+        <SpecialAction>
+          <Delay>300000</Delay>
+          <Projectile>1500001510</Projectile>
+        </SpecialAction>
+        <!-- fog_3 an sich guter effekt, aber sehr durchsichtig, eventuell ein wenig dichter machen. Aber noch nicht sicher, zu welchem item das am ehesten passt.. -->
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/water/waterfall_01_bttm.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <!-- <Template>ShipSpecialist</Template> -->
+      <Values>
+        <Standard>
+          <GUID>1500001515</GUID>
+          <Name>Heal Illness</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/city_institution/icon_hospital.png</IconFilename>
+          <InfoDescription>14576</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionCooldown>300000</ActionCooldown>
+          <ActionDescription>1500001573</ActionDescription>
+        </ItemAction>
+        <SpecialAction>
+          <Delay>300000</Delay>
+          <Projectile>1500001511</Projectile>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/city_incidents/illness/ci_plague_purple_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+        
+        <!-- <ItemAction> -->
+          <!-- <ItemAction>HEAL_INCIDENT</ItemAction> -->
+          <!-- <ActionTarget>1500001187</ActionTarget> -->
+          <!-- <ActionScope>TargetRadius</ActionScope> -->
+          <!-- <ActionDistance>15</ActionDistance> -->
+          <!-- <ActionIncidentType>Fire;Riot;Illness;Explosion</ActionIncidentType> -->
+          <!-- <ActionCooldown>5000</ActionCooldown> -->
+          <!-- <ActionDuration>5000</ActionDuration> -->
+          <!-- <CanEndItemAction>0</CanEndItemAction> -->
+        <!-- </ItemAction> -->
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001516</GUID>
+          <Name>Heal Riot</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/city_institution/icon_police.png</IconFilename>
+          <InfoDescription>14575</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionCooldown>300000</ActionCooldown>
+          <ActionDescription>1500001573</ActionDescription>
+        </ItemAction>
+        <SpecialAction>
+          <Delay>300000</Delay>
+          <Projectile>1500001512</Projectile>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001517</GUID>
+          <Name>Heal ArcticIllness</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/city_institution/icon_ranger_station.png</IconFilename>
+          <InfoDescription>117470</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionCooldown>300000</ActionCooldown>
+          <ActionDescription>1500001573</ActionDescription>
+        </ItemAction>
+        <SpecialAction>
+          <Delay>300000</Delay>
+          <Projectile>1500001513</Projectile>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/city_incidents/illness/ci_plague_purple_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001180</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001581</GUID>
+          <Name>Remove Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/icons/goods_categories/icon_goods_categories_health_dark.png</IconFilename>
+          <InfoDescription>1500001437</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ActionTarget>2001744</ActionTarget>
+          <ActionCooldown>60000</ActionCooldown>
+          <ActionDistance>30</ActionDistance>
+          <ActionDescription>1500001544</ActionDescription>
+        </ItemAction>
+        <SpecialAction>
+          <Projectile>1500001579</Projectile>
+          <Delay>120000</Delay>
+        </SpecialAction>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  
+  
+   <!-- Flotsam that sinks instantly, so players can not collect it when unit is destroyed -->
+   <!-- (using None, 0 or [NONE] instead does not work unfortunately) -->
+   <ModOp Type="AddNextSibling" GUID='4764'>
+      <Asset>
+        <BaseAssetGUID>4764</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500001189</GUID>
+            <Name>Flotsam land instant removed</Name>
+          </Standard>
+          <Lifetime>
+            <Time>1</Time>
+          </Lifetime>
+        </Values>
+      </Asset>
+   </ModOp>
+   
+   
+   
+  <!-- Detect Spies (and seamines..) 1000 Range is half of the old world map, so use ~200 (200 from the middle of Cape Island is enough to cover the whole island)  -->
+  <!-- Alternativ das QuestTreasure Wert nehmen, die Farbe können wir hier ja weitehrin auf Rot festlegen -->
+  <!-- ich denke questtreasures sind seltener als Seamines und lenken daher weniger oft von spies ab? -->
+  <!-- dazu spy anstelle des Seamine Properties, das hier geben (nicht sicher ob das funzt): -->
+  <!-- <DivingBellObject> -->
+    <!-- <TreasureType>QuestTreasure</TreasureType> -->
+    <!-- <TreasureVisibility>Always</TreasureVisibility> -->
+    <!-- <TreasureDetectionRange>500</TreasureDetectionRange> -->
+  <!-- </DivingBellObject> -->
+  <!-- hm no... does not work with QuestTreasure... -->
+  <!-- use "custom" sonar_wave_01.cfg files with AdaptTerrainHeight=1, otherwise they are below terrain and therefore not visible and mine_detected_01 double scale so you see it better -->
+  <ModOp Type="AddNextSibling" GUID='112553'>
+    <Asset>
+      <Template>ActiveItem</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001496</GUID>
+          <Name>Detect Spies and Seamines</Name>
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/consumables/icon_telescope_3.png</IconFilename> -->
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/empireofskies/icon_radar_c.png</IconFilename>
+          <InfoDescription>113748</InfoDescription>
+        </Standard>
+        <Text />
+        <Item>
+          <Allocation>Warship</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Legendary</Rarity>
+          <HasAction>1</HasAction>
+          <ExclusiveGroup>Sonar</ExclusiveGroup>
+          <TradePrice>1</TradePrice>
+          <TransferBlocked>1</TransferBlocked>
+          <OnlyEquippableOnce>1</OnlyEquippableOnce>
+          <Flotsam>1500001027</Flotsam>
+          <FlotsamTerrain>1500001189</FlotsamTerrain>
+        </Item>
+        <Cost />
+        <ItemAction>
+          <!-- to balance it, only have a short duration and then a cooldown. Aim is that you have a chance to find a spy eg. after his first sabotage by getting the direction from the first usage. If the direction is enough to spot it manually, this is fine, but the duration should not be enough to move closer to that direction to get the exact location of the spy yet. -->
+          <ActionCooldown>60000</ActionCooldown>
+          <ActionDuration>30000</ActionDuration>
+          <CanEndItemAction>1</CanEndItemAction>
+          <ItemAction>SONARPING</ItemAction>
+          <ActiveBuff>1500001498</ActiveBuff>
+          <StopMovementOnInteraction>0</StopMovementOnInteraction>
+          <ActivateActionSound>214788</ActivateActionSound>
+          <DeactivateActionSound>214788</DeactivateActionSound>
+        </ItemAction>
+        <ExpeditionAttribute />
+        <SpecialAction>
+          <Delay>0</Delay>
+          <SonarDetector>
+            <Item>
+              <Target>SeaMine</Target>
+              <Range>200</Range>
+              <MaxDetectedUnits>1</MaxDetectedUnits>
+              <InnerRange>15</InnerRange>
+              <ScanColor>-386791</ScanColor>
+              <LineDist>3</LineDist>
+              <LineStrength>1</LineStrength>
+              <DetectionEffect>data/sabotage_graphics_serp/sonar_radar/sonar_wave_01.cfg</DetectionEffect>
+              <InnerDetectionEffect>data/sabotage_graphics_serp/sonar_radar/mine_detected_01.cfg</InnerDetectionEffect>
+              <DetectionRangeEffects>
+                <Item>
+                  <DetectionEffectFile>data/sabotage_graphics_serp/sonar_radar/sonar_wave_01_small.cfg</DetectionEffectFile>
+                  <MaxRange>75</MaxRange>
+                </Item>
+                <Item>
+                  <DetectionEffectFile>data/sabotage_graphics_serp/sonar_radar/sonar_wave_01_medium.cfg</DetectionEffectFile>
+                  <MaxRange>125</MaxRange>
+                </Item>
+              </DetectionRangeEffects>
+            </Item>
+          </SonarDetector>
+          <SonarRepeat>2000</SonarRepeat>
+          <SonarEffect>data/sabotage_graphics_serp/sonar_radar/sonar_activated_01.cfg</SonarEffect>
+          <DisableSonarDebugVisuals>1</DisableSonarDebugVisuals>
+        </SpecialAction>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+          <DLCDependency>410040</DLCDependency>
+        </Locked>
+      </Values>
+    </Asset>
+    
+
+  </ModOp>
+   
+
+   
+   
+   
+   
+  
+    
+</ModOps>

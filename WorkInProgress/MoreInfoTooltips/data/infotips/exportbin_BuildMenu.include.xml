@@ -1,0 +1,822 @@
+<ModOps>
+  
+  <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+    <!-- to export the tooltips from the game use FileDBReader and the FileFormat "infotip.xml" and unpack "data\infotips\export.bin" -->
+    <!-- or download it in anno modding discord here: -->
+    <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
+
+  <!-- guid 25000020 is responsilbe for tooltips when hovering over buildings in the build menu -->
+   <!-- (500038 for productionchains) -->
+   
+  
+  <!-- show all info even if building is not unlocked yet -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement/VisibilityElement/VisibilityElement[VisibilityElement[Condition='[Unlock IsUnlocked([RefGuid])]' and (not(ExpectedValueBool) or ExpectedValueBool='True')]]" />
+
+  <!-- remove the condition "needs no permit or you have a permit" to display the influence costs and more -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement/VisibilityElement/VisibilityElement[VisibilityElement[Condition='[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(0) ProductGUID])]' and ExpectedValueBool='False'] and VisibilityElement[Condition='[BuildPermits BuildPermits([RefGuid])]' and CompareOperator/CompareOperator='5'] and ChildCount='2' and OperatorType/OperatorType='1']" />
+  <!-- duplicate "nur eins pro insel erlaubt" -> dennoch baukosten usw anzeigen -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement/VisibilityElement/VisibilityElement[Condition='[Area Current IsDuplicate([RefGuid])]' and ExpectedValueBool='False']" />
+
+  <!-- wenn gebäude nicht in region erlaubt ist, dann soll tatsächlich keine baukosten usw angezeigt werden, denn das macht sinn denke ich. kann also unverändert bleiben -->
+  
+  <!-- fehlende Fruchtbarkeit versteckt keine infos in vanilla, kann also unverändert bleiben -->
+
+  <!-- add hitpoints to description, we can not check if sth is HarbourBuilding or not, but I think it is fine to display it for all buildings in buildmenu -->
+  <!-- vanilla game uses StaticData for Attacker/DPS for whatever reason instead of ToolOneHelper which is used for ships in shipyard. But ToolOneHelper also seems to work fine here (StaticData has no HitPoints) -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000020']//InfoElement[Text/TextGUID='1151']">
+    <InfoElement>
+      <ElementType>4</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>2</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>5</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[ToolOneHelper HitPoints([RefGuid])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[StaticData Building IsAllowedInCurrentRegion([RefGuid])]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconGUID>1154</IconGUID>
+        <Style />
+      </Icon>
+      <Text>
+        <TextGUID>1154</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[ToolOneHelper HitPoints([RefGuid])]</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  
+  
+  <!-- unfortunately there is no way to fetch the attack range to display this... -->
+  
+  <!-- ########################################################################################## -->
+
+  <!-- replace the buildcost display when we can not afford a cost with the "0/30" tooltip we also know from shipyard, so you directly see how much you have compared to what is needed -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement/InfoElement[VisibilityElement/VisibilityElement[Condition='[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]' and ExpectedValueBool='False'] and Text/Text='[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]']/Text/Text">
+    <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+  </ModOp>
+  
+  <!-- Display permit-buildcosts for godlike permit buildings also if we can not afford it (in vanilla it does not show the permit buildcost and instead only that warning "you need research thing" -->
+   <!-- with this code it will disaply the vanilla warning and a 0/1 for the permit) -->
+   <!-- the vanilla game hardcodes the icons for the vanilla godlike permit buildings (which is very stupid, they should have added a new getgodlike fuction instead..) -->
+     <!-- so we will also hardcode it for these to not break the style... -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement/InfoElement[VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID])]' and ExpectedValueBool='False'] and VisibilityElement/VisibilityElement[Condition='[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]' and ExpectedValueBool='False'] and VisibilityElement/VisibilityElement[not(Condition='[RefGuid]')]]">
+    <!-- first for everything that is not vanilla godlike building -->
+    <InfoElement>
+      <ElementType>11</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>1</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>1010190</ExpectedValueInt>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>3</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>1</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <ExpectedValueInt>124737</ExpectedValueInt>
+              <Condition>[RefGuid]</Condition>
+            </VisibilityElement>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>1</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <ExpectedValueInt>124738</ExpectedValueInt>
+              <Condition>[RefGuid]</Condition>
+            </VisibilityElement>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>1</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <ExpectedValueInt>124739</ExpectedValueInt>
+              <Condition>[RefGuid]</Condition>
+            </VisibilityElement>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>1</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <ExpectedValueInt>114445</ExpectedValueInt>
+              <Condition>[RefGuid]</Condition>
+            </VisibilityElement>
+          </VisibilityElement>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconText>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Icon]</IconText>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Style />
+      </Text>
+      <WarningType>
+        <WarningType>2</WarningType>
+      </WarningType>
+    </InfoElement>
+    <!-- now the hardcoded icons for the vanilla godlike buildings -->
+    <InfoElement>
+      <ElementType>11</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>1</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>1010190</ExpectedValueInt>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>124739</ExpectedValueInt>
+          <Condition>[RefGuid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconGUID>124850</IconGUID>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Style />
+      </Text>
+      <WarningType>
+        <WarningType>2</WarningType>
+      </WarningType>
+    </InfoElement>
+    <InfoElement>
+      <ElementType>11</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>1</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>1010190</ExpectedValueInt>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>124737</ExpectedValueInt>
+          <Condition>[RefGuid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconGUID>124849</IconGUID>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Style />
+      </Text>
+      <WarningType>
+        <WarningType>2</WarningType>
+      </WarningType>
+    </InfoElement>
+    <InfoElement>
+      <ElementType>11</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>1</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>1010190</ExpectedValueInt>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>124738</ExpectedValueInt>
+          <Condition>[RefGuid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconGUID>124845</IconGUID>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Style />
+      </Text>
+      <WarningType>
+        <WarningType>2</WarningType>
+      </WarningType>
+    </InfoElement>
+    <InfoElement>
+      <ElementType>11</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>1</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>1010190</ExpectedValueInt>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>114445</ExpectedValueInt>
+          <Condition>[RefGuid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconGUID>125340</IconGUID>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Style />
+      </Text>
+      <WarningType>
+        <WarningType>2</WarningType>
+      </WarningType>
+    </InfoElement>
+    
+    
+  </ModOp>
+  
+  
+  <!-- ############################################################################################## -->
+   <!-- input output amounts -->
+  <!-- ############################################################################################## -->
+  
+  <!-- evlt als shared mod machen, weils auch von mods benögtigt werden könnte, die mengen ändern -->
+          
+  <!-- BUGS mit den input/outputmengen: -->
+   <!-- wenn man zb. einstellt man braucht input 2 A und 1 B um output 2 C herzustellen, -->
+    <!-- dann ist das ergebnis leider inkonsistent, je nach dem welche Mengen die Karren aufeinmal zu ihm geliefert haben... -->
+     <!-- wenn exakt diese mengen geliefert werden gehts auf. Wenn andere menge gelifert werden, dann gehts aufeinmal nicht mehr auf -->
+    <!-- deswegen ist es leider unwahrscheinlich, dass mods die inputmengen direkt ändern,  -->
+     <!-- stattdessen nehmen sie wie kurila workarounds, dass das gebäude einen extra buff bekommt mit additiongoods jeden 2ten zyklus, -->
+      <!-- damit effektiv nur halbe verbraucht wird, doch das können wir leider nicht anzeigen... -->
+  
+  <ModOp Type="AddPrevSibling" Path="//InfoTipData[Guid='25000020']//InfoElement[VisibilityElement/VisibilityElement[Condition='[FactoryAssetData([RefGuid]) HasProduction]'] and InfoElement/InfoElement[Value/Text='[StaticData Factory CycleTimeRespectElectricity([RefGuid]) &gt;&gt; time]' and Text/Text='[FactoryAssetData([RefGuid]) Production AT(#index0#) Text]']]">
+    
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>1</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[FactoryAssetData([RefGuid]) HasProduction]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+    
+    
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>8</ElementType>
+          <ChildCount>2</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <InfoElement>
+            <ElementType>4</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconGUID>500452</IconGUID>
+              <Style />
+            </Icon>
+            <Text>
+              <TextGUID>11143</TextGUID>
+              <Style />
+            </Text>
+            <Value>
+              <Text>[StaticData Factory CycleTimeRespectElectricity([RefGuid]) &gt;&gt; time]</Text>
+              <Style />
+            </Value>
+            <WarningType />
+            <BackgroundType />
+          </InfoElement>
+        </InfoElement>
+      </InfoElement>
+
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>2</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[StaticData Factory Inputs([RefGuid]) AT(0)]</Condition>
+          </VisibilityElement>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[StaticData Factory Inputs([RefGuid]) AT(0) Amount]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>100007</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        
+        <!-- input in 2 spalten wie baumaterial, ohne name, nur icon und menge -->
+        <!-- <InfoElement> -->
+          <!-- <ElementType>10</ElementType> -->
+          <!-- <ChildCount>4</ChildCount> -->
+          <!-- <VisibilityElement> -->
+            <!-- <ElementType> -->
+              <!-- <ElementType>2</ElementType> -->
+            <!-- </ElementType> -->
+            <!-- <OperatorType /> -->
+          <!-- </VisibilityElement> -->
+          <!-- <InfoElement> -->
+            <!-- <ElementType>11</ElementType> -->
+            <!-- <VisibilityElement> -->
+              <!-- <ElementType> -->
+                <!-- <ElementType>2</ElementType> -->
+              <!-- </ElementType> -->
+              <!-- <OperatorType /> -->
+            <!-- </VisibilityElement> -->
+            <!-- <Icon> -->
+              <!-- <IconText>[StaticData Factory Inputs([RefGuid]) At(#index0#) Product Icon]</IconText> -->
+              <!-- <Style /> -->
+            <!-- </Icon> -->
+            <!-- <Text> -->
+              <!-- <Text>[StaticData Factory Inputs([RefGuid]) At(#index0#) Amount &gt;&gt; storagegood]</Text> -->
+              <!-- <Style /> -->
+            <!-- </Text> -->
+            <!-- <WarningType /> -->
+            <!-- <BackgroundType /> -->
+          <!-- </InfoElement> -->
+          <!-- <Columns>2</Columns> -->
+          <!-- <Source>[StaticData Factory Inputs([RefGuid]) Count]</Source> -->
+        <!-- </InfoElement> -->
+        
+        <!-- input untereinander mit namen und menge -->
+        <InfoElement>
+          <ElementType>7</ElementType>
+          <ChildCount>4</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <InfoElement>
+            <ElementType>4</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconText>[StaticData Factory Inputs([RefGuid]) AT(#index0#) Product Icon]</IconText>
+              <Style />
+            </Icon>
+            <Text>
+              <Text>[StaticData Factory Inputs([RefGuid]) AT(#index0#) Product Text]</Text>
+              <Style />
+            </Text>
+            <Value>
+              <Text>[StaticData Factory Inputs([RefGuid]) AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+              <Style />
+            </Value>
+            <WarningType />
+            <BackgroundType />
+          </InfoElement>
+          <Source>[StaticData Factory Inputs([RefGuid]) Count]</Source>
+        </InfoElement>
+      
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[StaticData Factory Outputs([RefGuid]) AT(0)]</Condition>
+          </VisibilityElement>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[StaticData Factory Outputs([RefGuid]) AT(0) Amount]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>100006</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>7</ElementType>
+          <ChildCount>4</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <InfoElement>
+            <ElementType>4</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconText>[StaticData Factory Outputs([RefGuid]) AT(#index0#) Product Icon]</IconText>
+              <Style />
+            </Icon>
+            <Text>
+              <Text>[StaticData Factory Outputs([RefGuid]) AT(#index0#) Product Text]</Text>
+              <Style />
+            </Text>
+            <Value>
+              <Text>[StaticData Factory Outputs([RefGuid]) AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+              <Style />
+            </Value>
+            <WarningType />
+            <BackgroundType />
+          </InfoElement>
+          <Source>[StaticData Factory Outputs([RefGuid]) COUNT]</Source>
+        </InfoElement>
+      </InfoElement>
+    </InfoElement>
+    
+  </ModOp>
+  
+  <!-- remove the not anymore needed cycletime entry from vanilla now (we can not use "replace" with modloader11 because replace does revert the order of elements we put into) -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']//InfoElement[VisibilityElement/VisibilityElement[Condition='[FactoryAssetData([RefGuid]) HasProduction]']]/InfoElement/InfoElement[Value/Text='[StaticData Factory CycleTimeRespectElectricity([RefGuid]) &gt;&gt; time]' and Text/Text='[FactoryAssetData([RefGuid]) Production AT(#index0#) Text]']" />
+
+  
+  
+  
+  <!-- move the "Needs Electricity" tooltip from the bottom at the same location like the "can be boosted with Electricity" -->
+   <!-- it makes zero sense zo have this even below the construction materials -->
+  <!-- remove the vanilla "Needs Electricity" part -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']//InfoElement[InfoElement/Text/TextGUID='12508']" />
+   
+   <!-- (copy pasted the vanilla NeedsElectricity entry but of course removed the permit requirement for showing this) -->
+  <!-- And add a parting line after the prodcution part below it, to kind of finsih the "production" part of the tooltip -->
+   <!-- (they are quite buggy even the ones from vanilla, sometimes they who up and sometimes not, even changing during the game) -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000020']//InfoElement[InfoElement/Text/TextGUID='13659']">
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>1</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>2</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[StaticData Electricity NeedsElectricity([RefGuid])]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>120022</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>12508</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+    </InfoElement>
+    
+    <InfoElement>
+      <ElementType>6</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <Style />
+      </Text>
+    </InfoElement>
+  </ModOp>
+  
+  
+  
+  
+  
+  
+  
+  
+</ModOps>

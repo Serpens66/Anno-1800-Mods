@@ -1,0 +1,1729 @@
+<ModOps>
+    
+    
+  <!-- FeatureUnlock to test if a player is discovered and alive -->
+  <!-- uses Serp GUIDS from 1500003850 to 1500003867 (up to 1500003869 is reserved) -->
+    <!-- 1500003867 im shared mod CP_KontorShips -->
+    
+    
+  <!-- USAGE: use the GUID from FeatureUnlock below, to check if executing player discovered the other and if the other is still alive: -->
+  <!-- <TriggerCondition> -->
+    <!-- <Template>ConditionUnlocked</Template> -->
+    <!-- <Values> -->
+      <!-- <Condition /> -->
+      <!-- <ConditionUnlocked> -->
+        <!-- <UnlockNeeded>1500003850</UnlockNeeded> -->
+      <!-- </ConditionUnlocked> -->
+      <!-- <ConditionPropsNegatable /> -->
+    <!-- </Values> -->
+  <!-- </TriggerCondition> -->
+    
+  <!-- to check if the processing player is alive you can simply use: -->
+  
+  <!-- <TriggerCondition> -->
+    <!-- <Template>ConditionPlayerCounter</Template> -->
+    <!-- <Values> -->
+      <!-- <Condition /> -->
+      <!-- <ConditionPlayerCounter> -->
+        <!-- <Context>1500003867</Context> -->
+        <!-- <CounterAmount>1</CounterAmount> -->
+      <!-- </ConditionPlayerCounter> -->
+    <!-- </Values> -->
+  <!-- </TriggerCondition> -->
+  
+  
+  <!-- ########################################################################################################################################## -->
+  
+  
+    
+  
+  <!-- ACHTUNG: ConditionIsParticipantInGame ist nicht zuverlässig (bei Piraten-zerstört und auch bei Spielern die nicht in start session sind, wie lafortune) und ConditionMetagameLoaded/HumanPlayerCount zählt auch coop player mit! -->
+    <!-- stattdessen prüfen wir bei humans/KI ob sie einen Kontor/Schiff besitzen -->
+    <!-- und bei Piraten ob der Leuchtturm kaputt ist oder nicht -->
+  
+  
+  <!-- We allow RuinState for the pirate lighthouse, but still unattackable -->
+  <!--  this way we will know for sure pirate is defeated, if RuinCount of lighthouse is 1 -->
+  <ModOp Type="merge" GUID="100707,100708" Path="/Values">
+    <Attackable>
+      <HasRuinState>1</HasRuinState>
+      <AttackableType>[NONE]</AttackableType>
+    </Attackable>
+  </ModOp>
+  
+  <!-- FeatureUnlock to check if a specific Participant is still in game and discovered by the processing player -->
+  <ModOp Type="AddNextSibling" GUID="137108">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003850</GUID>
+          <Name>Harlow in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_03.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>100707</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>RuinCount</PlayerCounter>
+                                    <Context>100707</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition>
+                      <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                    </Condition>
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+                <SubTriggers>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionPlayerCounter</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionPlayerCounter>
+                                <PlayerCounter>RuinCount</PlayerCounter>
+                                <Context>100707</Context>
+                                <CounterAmount>1</CounterAmount>
+                                <ComparisonOp>AtLeast</ComparisonOp>
+                                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                              </ConditionPlayerCounter>
+                            </Values>
+                          </TriggerCondition>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionPlayerCounter</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionPlayerCounter>
+                                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                                <Context>100707</Context>
+                                <CounterAmount>1</CounterAmount>
+                                <ComparisonOp>LessThan</ComparisonOp>
+                                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                              </ConditionPlayerCounter>
+                            </Values>
+                          </TriggerCondition>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003850</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003851</GUID>
+          <Name>LaFortune in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_04.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_04_Pirate_LaFortune</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>100708</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>RuinCount</PlayerCounter>
+                                    <Context>100708</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition>
+                      <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                    </Condition>
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+                <SubTriggers>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionPlayerCounter</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionPlayerCounter>
+                                <PlayerCounter>RuinCount</PlayerCounter>
+                                <Context>100708</Context>
+                                <CounterAmount>1</CounterAmount>
+                                <ComparisonOp>AtLeast</ComparisonOp>
+                                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                              </ConditionPlayerCounter>
+                            </Values>
+                          </TriggerCondition>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionPlayerCounter</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionPlayerCounter>
+                                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                                <Context>100708</Context>
+                                <CounterAmount>1</CounterAmount>
+                                <ComparisonOp>LessThan</ComparisonOp>
+                                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                              </ConditionPlayerCounter>
+                            </Values>
+                          </TriggerCondition>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003851</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003852</GUID>
+          <Name>Human0 in Game and alive</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Human0</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Human0</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Human0</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003852</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003853</GUID>
+          <Name>Human1 in Game and alive</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Human1</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Human1</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Human1</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003853</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003854</GUID>
+          <Name>Human2 in Game and alive</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Human2</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Human2</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Human2</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003854</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003855</GUID>
+          <Name>Human3 in Game and alive</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Human3</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Human3</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Human3</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003855</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003856</GUID>
+          <Name>Jorgensen in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_01.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_01_Jorgensen</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003856</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003857</GUID>
+          <Name>Qing in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_02.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_02_Qing</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_02_Qing</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_02_Qing</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003857</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003858</GUID>
+          <Name>Wibblesock in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_03.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_03_Wibblesock</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_03_Wibblesock</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_03_Wibblesock</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003858</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003859</GUID>
+          <Name>Smith in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_04.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_04_Smith</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_04_Smith</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_04_Smith</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003859</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003860</GUID>
+          <Name>OMara in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_05.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_05_OMara</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_05_OMara</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_05_OMara</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003860</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003861</GUID>
+          <Name>Gasparov in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_06.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_06_Gasparov</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_06_Gasparov</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_06_Gasparov</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003861</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003862</GUID>
+          <Name>Malching in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_07.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_07_von_Malching</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_07_von_Malching</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_07_von_Malching</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003862</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003863</GUID>
+          <Name>Gravez in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_08.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_08_Gravez</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_08_Gravez</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_08_Gravez</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003863</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003864</GUID>
+          <Name>Silva in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_09.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_09_Silva</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_09_Silva</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_09_Silva</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003864</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003865</GUID>
+          <Name>Hunt in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/enemy_02.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_10_Hunt</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_10_Hunt</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_10_Hunt</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003865</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003866</GUID>
+          <Name>Mercier in Game and alive</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_11.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500003867</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckedParticipant>Second_ai_11_Mercier</CheckedParticipant>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsDiscovered</Template>
+                      <Values>
+                        <Condition />
+                        <ParticipantRelation>
+                          <SourceIsOwner>1</SourceIsOwner>
+                          <TargetParticipant>Second_ai_11_Mercier</TargetParticipant>
+                        </ParticipantRelation>
+                        <ConditionIsDiscovered />
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500003867</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CheckedParticipant>Second_ai_11_Mercier</CheckedParticipant>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003866</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+          <AutoSelfUnlock>1</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+      
+
+  </ModOp>
+      
+  
+    
+    
+</ModOps>

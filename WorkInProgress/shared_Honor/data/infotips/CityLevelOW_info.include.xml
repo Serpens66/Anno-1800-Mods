@@ -1,0 +1,1202 @@
+<ModOps>
+  
+  <!-- ################################################################################################## -->
+  <!-- CityLevel -->
+  <!-- ################################################################################################## -->
+  
+  <!-- I see no vanilla display of it how much is needed to reach it and there also seems to be no function to get the needed amount. -->
+  <!-- so we will add this display here and hardcode the vanilla values found in guid 142358 CityLevelBanners -->
+  
+  <!-- CityLevel TODO: in population anforderungen unterteilen, weil sie ja untersch. viel ruhm geben. daher am besten in die obige struktur mit conditions einbinden -->
+  
+  <!-- neue welt: -->
+  <!-- <Text> -->
+    <!-- <GUID>16989</GUID> -->
+    <!-- <Text>KLEINSTADT</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>16990</GUID> -->
+    <!-- <Text>KOLONIE</Text> -->
+  <!-- </Text> -->
+  
+  <!-- Die citystati werden in Afrika/arktis auch nicht angezeigt. -->
+  <!-- liegt wohl daran, dass es keine attracktivität gibt und die citystatus abfrage nur was kann.. -->
+  <!-- Wobei CityStatus bei beiden erstmal 19260 gewöhnliche Sieldung anzegit -->
+  <!-- ABER dieser damit abgefragt CityStatus updated nicht, es bleibt 19260 im gegensatz zu alter/neuer Welt wo das updated. -->
+  <!-- das erklärt warums nicht angezeigt wird... -->
+  
+  
+  <!-- Afrika: -->
+  <!-- <Text> -->
+    <!-- <GUID>125536</GUID> -->
+    <!-- <Text>STADTTEIL</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>125537</GUID> -->
+    <!-- <Text>GROSSER STADTTEIL</Text> -->
+  <!-- </Text> -->
+  
+  <!-- Arktis: -->
+  <!-- <Text> -->
+    <!-- <GUID>117086</GUID> -->
+    <!-- <Text>LAGER</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>117087</GUID> -->
+    <!-- <Text>AUSSENPOSTEN</Text> -->
+  <!-- </Text> -->
+  
+  <!-- Mit [Area Current Economy CityStatus] bekommt man diese GUIDs in die auch attraktivität mit einfließt: -->
+    <!-- <GUID>19262</GUID> -->
+    <!-- <Text>Originelle Siedlung</Text> -->
+    <!-- und die GUIDs gehen auf wild durchainender, also ein größer kleiner check der guid um alle "siedlungen2 oder "Dorf" zu erfassen -->
+    <!-- klappt auch nicht. -->
+  
+  <!-- stattdessen also mit highest pop und der anzahl der pop rausfinden, welche stadtstatus man wohl zurzeit haben könnte? -->
+  <!-- doof nur, dass man den status ja eigentlich nicht mehr verliert, sobald man ihn einmal erreciht hat... egal was die pop dann sagt -->
+  
+  <ModOp Type="add" Path="//InfoTipData[Guid='501255']">
+    <InfoElement>
+      <ElementType>1</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconText>[AssetData(163053) Icon]</IconText>
+        <Style />
+      </Icon>
+      <Text>
+        <TextGUID>10681</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Style />
+      </Value>
+      <BackgroundType />
+    </InfoElement>
+    
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>3</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>15000000</ExpectedValueInt>
+          <Condition>[AreaPopulation HighestPopulationLevel Guid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>2</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>100</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>16983</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(16983) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+          <IconText>[AreaPopulation HighestPopulationLevel Icon]</IconText>
+          <Style />
+        </Icon>
+        <Text>
+          <Text>[AreaPopulation HighestPopulationLevel Text]</Text>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid]) &gt;&gt; storagegood] / 100</Text>
+          <Style />
+        </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+20</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>4</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>100</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>16984</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(16984) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>15000001</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>15000001</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[AreaManager AreaPopulation PopulationCount(15000001) &gt;&gt; storagegood] / 150</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+40</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+    </InfoElement>
+    
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>3</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>15000001</ExpectedValueInt>
+          <Condition>[AreaPopulation HighestPopulationLevel Guid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>2</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>150</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>16984</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(16984) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+          <IconText>[AreaPopulation HighestPopulationLevel Icon]</IconText>
+          <Style />
+        </Icon>
+        <Text>
+          <Text>[AreaPopulation HighestPopulationLevel Text]</Text>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid]) &gt;&gt; storagegood] / 150</Text>
+          <Style />
+        </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+40</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>4</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>150</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>16985</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(16985) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>15000002</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>15000002</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[AreaManager AreaPopulation PopulationCount(15000002) &gt;&gt; storagegood] / 500</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+80</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+    </InfoElement>
+    
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>3</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>15000002</ExpectedValueInt>
+          <Condition>[AreaPopulation HighestPopulationLevel Guid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>2</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>500</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>16985</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(16985) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+          <IconText>[AreaPopulation HighestPopulationLevel Icon]</IconText>
+          <Style />
+        </Icon>
+        <Text>
+          <Text>[AreaPopulation HighestPopulationLevel Text]</Text>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid]) &gt;&gt; storagegood] / 500</Text>
+          <Style />
+        </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+80</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>4</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>500</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>16986</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(16986) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>15000003</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>15000003</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[AreaManager AreaPopulation PopulationCount(15000003) &gt;&gt; storagegood] / 500</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+160</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+    </InfoElement>
+    
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>3</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>15000003</ExpectedValueInt>
+          <Condition>[AreaPopulation HighestPopulationLevel Guid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>2</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>500</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>16986</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(16986) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+          <IconText>[AreaPopulation HighestPopulationLevel Icon]</IconText>
+          <Style />
+        </Icon>
+        <Text>
+          <Text>[AreaPopulation HighestPopulationLevel Text]</Text>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid]) &gt;&gt; storagegood] / 500</Text>
+          <Style />
+        </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+160</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>4</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>500</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>16987</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(16987) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>15000004</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>15000004</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[AreaManager AreaPopulation PopulationCount(15000004) &gt;&gt; storagegood] / 1750</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+320</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+    </InfoElement>
+    
+    <!-- kleiner sonderfall für letzte stufe: zufügen von unserer MEGACITY und dafür sorgen dass nichts angezeigt wird wenn diese allerletzte stufe erreicht wurde -->
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>3</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>15000004</ExpectedValueInt>
+          <Condition>[AreaPopulation HighestPopulationLevel Guid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>2</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>1750</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>16987</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(16987) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+          <IconText>[AreaPopulation HighestPopulationLevel Icon]</IconText>
+          <Style />
+        </Icon>
+        <Text>
+          <Text>[AreaPopulation HighestPopulationLevel Text]</Text>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid]) &gt;&gt; storagegood] / 1750</Text>
+          <Style />
+        </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+320</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>2</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>4</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>1750</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>2</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>50000</ExpectedValueInt>
+            <Condition>[AreaManager AreaPopulation PopulationCount([AreaPopulation HighestPopulationLevel Guid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <!-- <TextGUID>1500000232</TextGUID> -->
+            <Text>[AssetData(163099) Text]: [AssetData(1500000232) Text]</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>15000004</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>15000004</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[AreaManager AreaPopulation PopulationCount(15000004) &gt;&gt; storagegood] / 50000</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Text>[AssetData(1500000234) Text] / [AssetData(163099) Text]:</Text>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1500000240</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <Text>[AssetData(1500000240) Text]</Text>
+            <Style />
+          </Text>
+          <Value>
+            <Text>+750</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+    </InfoElement>
+  </ModOp>
+  
+    
+</ModOps>

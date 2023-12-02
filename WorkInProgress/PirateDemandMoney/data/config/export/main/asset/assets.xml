@@ -1,0 +1,199 @@
+<ModOps>
+
+  <!-- uses Serp GUIDs from 1500003820 to (reserved up to 1500003849) -->
+
+  <!-- evlt ein Stronger Pirates Addon Mod odersowas draus machen (wobei mans auch ohne nutzen kann) -->
+   <!-- Sinn ist, dass ich hier sinnvolle Dinge reinpacke, die standalone aber auch mit stronger pirates ODER combat overhaul -->
+    <!-- zusammen verwendbar sind -->
+    <!-- Hier evlt auch das CeaseFireDiscover.include.xml aus stronger pirates reinverscheiebn? -->
+    <!-- und auch alle changes von Diplomacy vom stronger pirates mod entweder hierhin verschieben, oder evlt rückgängig machen oderso -->
+      <!-- weil einiges davon ja nun hier über quests gelöst wird -->
+    
+
+  <!-- alle vanilla normalen piratenquests sollten wir ein rewardmalus geben, wenn man sie nicht erfüllt (falls das nicht schon der Fall ist) -->
+  <!-- ReputationQuestFail / ReputationQuestDeclined -->
+   <!-- (vanilla quests nurzen ReputationQuestFail mit -2 aber nicht ReputationQuestDeclined. ist für vanilla denke ich ok) -->
+
+  <!-- KeepCheckingPreconditionsWhenRunning für quests von piraten nutzen -->
+
+  <!-- hier können wir quests mit untersch. Folgen machen, -->
+   <!-- eine Art wo man nur -5 bis -10 rep bekommt, wenn mans nicht erledigt. -->
+   <!-- und eine Art wo der aktuelle vertrag gekündigt wird und es eine stufe niedriger geht (mit trigger resiteren und der rpüft dann akuellen status und lässt piraten das nächst niedrigere starten) -->
+
+  <!-- also Aufgaben müssen wir nicht nur Geldforderungen machen, sondern auch andere Dinge die zum Piraten passen könnten, -->
+   <!-- zb. dass man ihnen ein Schiff verkauft (wenn möglich iwie so, dass es dann auch in ihre flotte mit changeowner und changeguid übergeht) -->
+  <!-- <PlayerCounter>ShipsSoldToParticipant</PlayerCounter> -->
+
+    <!-- wobei man diese schiffverkaufsquest auch machen sollte, -->
+     <!-- wenn pirat nur wenig schiffe hat und man mit ihm allianz/handel hat, dann gibt sie mehr + Ruf und nur wenig -Ruf, -->
+      <!-- weils dann dabei hilft den Piraten wieder stärker zu machen, quasi als unterstützung -->
+
+  <!-- wenn man dem piraten so schiffe verkauft, dann werden sie neutral und verlassen die karte -->
+   <!-- aber dann per trigger alle neutralen schiffe dem piraten zu geben ist auch nicht genua genug... -->
+
+<!-- ich glaub das Beste was wir bzgl "dem piraten sciffe geben" machen können, -->
+ <!-- wäre dass der Pirat das Baumaterial und ein wenig Geld für ein Schiff anfragt -->
+ <!-- und wir dann ein piratenschiff durch die Quest spawnen. Dadurch dass es durch die Quest spawned  -->
+  <!-- kann man es direkt targeten mit actions. -->
+
+
+  <!-- man kann auch Piraten-Buffs an solche Zahlungen, oder auch den Handel mit den Piraten knüpfen, -->
+   <!-- sodass schiffe und Türme stärker werden (baumaterial und waffen bringen) -->
+   <!-- Ist halt die Frage ob man das als Quests machen will, wenn man alliiert ist, oder ob jeder die bekommen soll.. -->
+    <!-- vermutlich ähnlich wie bei den schiffen, wenn alliiert, dann gibts dafür ne Belohnung und wenn nicht alliiert gibts keine nur Malus -->
+
+  <!-- Bei den Buffs, also quasi Ausbau der Basis/Verstärkung der Flotte: -->
+   <!-- wie im multiplayer handhaben? buffs stackable machen und dann wird pirat halt noch stärker, was ok ist -->
+     <!-- wobei ich glaube mit ActionBuff kann man buffs nicht stackable machen =/ -->
+
+  <!-- anstatt schiff per trigger zu spawnen kann man auch lua: -->
+   <!-- ts.SessionParticipants.GetParticipant(17).Trader.ForceBuild() -->
+   <!-- funzt und spawnt das nächste schiff der WarFleet sofort, unabhängig von cooldown und Craftingtime. -->
+    <!-- spawned kein schiff, wenn alle schiffe der warfleet bereits gespawned sind -->
+   <!-- leider kenne ich keine condition um zu prüfen ob schiffe zur vollstnädigen warlfeet fehlen.. -->
+    <!-- man könnte höchstens eine neue schiffsguid immer ans ende der warfleet packen um das zu prüfen (mod lädt nach anderen mods und fügt mit add eins zu) -->
+    <!-- und wenn pirat das hat, dann sind alle da... Wobei stimmt NICHT! es können ja auch oben von der liste schiffe versenkt werden usw. -->
+  <!-- .. -->
+  <!-- man könnte das instant ship spawn auch an ShipSold und Trademoney counter heften, sodass das handeln und schiff verkaufen mit ihm dafür sorgt, -->
+   <!-- dass pirat schneller die manximale flotte erreicht (wenn befehl dann eh lua ist, kann man auch bei shipsold direkt lua skript starten und dort dann zb prüfen welches progresslevel es ist, -->
+    <!-- und dort kann man auch sich für die partie die gesamthandelsmenge abspeichern und wenn das seit letztem trade um zb 100k zugenommen hat, direkt 5 schiffe spawnen (wenn man pro 20k spawnen will) -->
+      <!-- und progresslevel des auslösenden spielers prüfen und daran den handelsumsatz orienterien. zb 2500*Progresslevel für ein schiff -->
+  <!-- .. shipsold aber evlt doch lieber an einen actionspawn trigger binden, damits über die warfleet hinaus geht UND derselbe schiffstyp -->
+   <!-- gespawned wird (wenn unbekannte schiffsguid oder kein kriegschiff, dann nichts machen?) -->
+  
+  
+  <!-- evlt auch trigger machen, der prüft ob pirat über 1 stunde lang konstant weniger als  -->
+    <!-- x schiffe (je nach progress?) hatte und wenn ja, dann gleich ~3 mal ForceBuild aufrufen (pro menschlichen spieler), -->
+    <!-- um eine eventulee blockade der insel zu durchbrechen -->
+  
+  <!-- kann man piraten nur mit handelsvertraag schiffe verkaufen? ja geht nur mit handelsvertrag -->
+   <!-- BringVehicleToObjectObjective wenn nur Frieden ist als workaround um auch bei frieden nach schiffenzu fragen? -->
+    <!-- man kann nur sagen "bringe irgendein vehicle zum Zielobjekt"... -->
+   <!-- SellObjectToParticipantObjective -->
+   <!-- bei diesen objectives mal testen ob man danach in successaction ObjectRestrictToQuestObjects im objectfilter nutzen kann -->
+    <!-- evlt auch in einer "OnSuccessActions" die direkt im Objective drinsteht -->
+   
+   
+   <!-- man kann auch piratenquests geben, dass man fremde schiffe zerstören soll (zur not halt die des jeweils anderen piraten) -->
+  
+
+  <!-- evlt auch einige Quests nur geben, wenn man verbündet mit piraten ist, evtl so ne art questline, wovon die letzte nur kommt wenn man verbündet ist -->
+   <!-- und welche dann diverse Items aus dem Piratenpool als belohnung haben? -->
+      <!-- einfach damit man auch einen positiven anreiz dazu hat den piraten zu helfen und nicht nur bestrafung wenn nicht -->
+      <!-- (wobei man die piratenpool items glaube ich auch schon bei ihnen kaufen kann.. also mal gucken ob ich nen neuen itempool dafür mache oderso.. wenn ja dann diesen auch bei priate rewrads bei destryo zufügen) -->
+
+<!-- mit changeskin/changevariation könnte man auch aussehen der gebuffden türme/schiffe ändern, aber dazu braucht man erstmal entsprechende grafiekn :D -->
+
+
+  <!-- mal testen: -->
+  <!-- Participants Current Highscore HighscoreData MilitaryShipScore -->
+  <!-- bzw. ts.Participants.GetParticipant(ID).Highscore.HighscoreData.GetMilitaryShipScore() -->
+  <!-- vllt kann man dies dann in lua scripten prüfen und basierend darauf trigger starten -->
+  <!-- ohne dass man alle schiffe durchloopen muss.. -->
+  <!-- und evlt dann über quests lösen? eine Quest die dem menschlichen spieler dann gegeben wird -->
+   <!-- in der x Geld verlangt wird und wenn nicht bezahlt wird, dann krieg usw. -->
+  <!-- mit DeliveryObjective und <ObjectiveScaling> passt sich die eldforderung dann sogar dem spielfortschritt an -->
+
+  <!-- ts.Participants.GetParticipant(25).Highscore.HighscoreData.MilitaryShipScore()^ -->
+
+  <!-- überlegen ob wir das als extra mod machen, -->
+   <!-- damits auch mit combat overhaul kompatibel ist -->
+
+  <!-- im lua sript können wir auch chancen einbauen. -->
+  <!-- zb wenn pirat zwischen 1.01 und 2 mal so hohe schiffsstärke wie human hat, -->
+   <!-- dann starten wir an sich die normal-teure Quest. -->
+   <!-- Aber bei 1.01 nur mit einer chance von 50% -->
+   <!-- und bei 2 mit einer chance von 75% oderso. -->
+  <!-- von 2 bis 5 dann teure quest -->
+   <!-- und alles über 10 dann sehr teure quest. -->
+
+
+
+  <!-- give pirates this property so we can check their MilitaryShipScore in lua to find out how strong their ships only are compared to the players ships  -->
+   <!-- (MilitaryStrength also counts all miltiary buildings, but the pirates dont care for them, it does not matter if you own thousand towers for them to destroy your ships ) -->
+  <ModOp Type="merge" GUID='73,47' Path="/Values">
+    <Highscore />
+  </ModOp>
+  <!-- We allow RuinState for the lighthouse, but still unattackable -->
+  <!--  this way we will know for sure pirate is defeated, if RuinCount of lighthouse is 1 -->
+  <ModOp Type="merge" GUID="100707,100708" Path="/Values">
+    <Attackable>
+      <HasRuinState>1</HasRuinState>
+      <AttackableType>[NONE]</AttackableType>
+    </Attackable>
+  </ModOp>
+
+
+  
+  
+  
+  <!-- <ModOp Type="addNextSibling" GUID="150725"> -->
+    <!-- <Asset> -->
+      <!-- <Template>QuestPool</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>000000000000</GUID> -->
+          <!-- <Name>HelpPiratesQuests_Harlow</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/assets/bg_om_info.png</IconFilename> -->
+        <!-- </Standard> -->
+        <!-- <QuestPool> -->
+          <!-- <PoolCooldown>2700000</PoolCooldown> -->
+          <!-- <QuestCooldown>0</QuestCooldown> -->
+          <!-- <CooldownOnQuestStart>1</CooldownOnQuestStart> -->
+          <!-- <CooldownOnQuestEnd>0</CooldownOnQuestEnd> -->
+          <!-- <AffectedByCooldownFactor>0</AffectedByCooldownFactor> -->
+          <!-- <IsMainStoryPool>0</IsMainStoryPool> -->
+          <!-- <IsTopLevel>1</IsTopLevel> -->
+          <!-- <QuestLimit>1</QuestLimit> -->
+        <!-- </QuestPool> -->
+        <!-- <Locked> -->
+          <!-- <DefaultLockedState>0</DefaultLockedState> -->
+        <!-- </Locked> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+    <!-- <Asset> -->
+      <!-- <Template>QuestPool</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>000000000000</GUID> -->
+          <!-- <Name>HelpPiratesQuests_LaFortune</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/assets/bg_om_info.png</IconFilename> -->
+        <!-- </Standard> -->
+        <!-- <QuestPool> -->
+          <!-- <PoolCooldown>2700000</PoolCooldown> -->
+          <!-- <QuestCooldown>0</QuestCooldown> -->
+          <!-- <CooldownOnQuestStart>1</CooldownOnQuestStart> -->
+          <!-- <CooldownOnQuestEnd>0</CooldownOnQuestEnd> -->
+          <!-- <AffectedByCooldownFactor>0</AffectedByCooldownFactor> -->
+          <!-- <IsMainStoryPool>0</IsMainStoryPool> -->
+          <!-- <IsTopLevel>1</IsTopLevel> -->
+          <!-- <QuestLimit>1</QuestLimit> -->
+        <!-- </QuestPool> -->
+        <!-- <Locked> -->
+          <!-- <DefaultLockedState>0</DefaultLockedState> -->
+        <!-- </Locked> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+  
+  <!-- In Profile/QuestPoolList vom QuestGiver müssen die Pools nicht unbedingt. -->
+   <!-- das ist wohl nur dazu da, dass die Quests direkt beim Leuchtturmobjekt gestartet werden? das hat aber den nachteil, dass wenn da mehrere gestacked sind, man sie nicht frei wählen kann (wobei wenn man sie mit x schließt, nicht ablehnt, dann kommt die darunter) -->
+  <!-- <ModOp Type = "add" GUID = '73' Path = "/Values/Profile/QuestPoolList"> -->
+    <!-- <Item> -->
+      <!-- <QuestPool>000000000000</QuestPool> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  <!-- <ModOp Type = "add" GUID = '76' Path = "/Values/Profile/QuestPoolList"> -->
+    <!-- <Item> -->
+      <!-- <QuestPool>000000000000</QuestPool> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  
+  
+  
+  <Include File="./SpawnShipsIfWeak.include.xml" />
+  <Include File="./DemandIfStronger.include.xml" />
+    
+    
+</ModOps>

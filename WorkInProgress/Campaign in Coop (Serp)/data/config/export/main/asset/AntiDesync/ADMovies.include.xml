@@ -1,0 +1,1258 @@
+<ModOps>
+
+   
+  
+  <!-- play movie when clicking on the letter item -->
+  <ModOp Type="replace" GUID='102328' Path="/Values/ItemWithUI/ItemActions/Values/ActionList/Actions">
+    <Actions>
+      <Item>
+        <Action>
+          <Template>ActionExecuteScript</Template>
+          <Values>
+            <Action />
+            <ActionExecuteScript>
+              <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+            </ActionExecuteScript>
+          </Values>
+        </Action>
+      </Item>
+      <Item>
+        <Action>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>1000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>31</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <Icon>5392</Icon>
+                                        <!-- directly starting the movie with FullscreenMovieQueueManager EnqueueMovieGUID causes desync, but starting with an action in another trigger is fine -->
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004301)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>105833</Infotip>
+                                      </Item>
+                                      <Item>
+                                        <Icon>500108</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004331)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>6049</Infotip>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004331)]</ThirdpartyDefaultCommand>
+                                  </CharacterNotification>
+                                  <BaseNotification>
+                                    <NotificationText>16781</NotificationText>
+                                    <IsUnique>1</IsUnique>
+                                    <DisplayTimeout>600000</DisplayTimeout>
+                                    <NotificationAudioAsset>9818768</NotificationAudioAsset>
+                                    <NotificationPriority>400</NotificationPriority>
+                                    <NotificationMinDisplayTime>1000</NotificationMinDisplayTime>
+                                  </BaseNotification>
+                                  <NotificationSubtitle>
+                                    <Subtitle>266391</Subtitle>
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </Action>
+      </Item>
+    </Actions>
+  </ModOp>
+  <!-- PrologueIntroPlayed -->
+  <ModOp Type="replace" GUID='152656' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004301</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <!-- CQ001_DynamiteFishingQuest / CQ001_DynamiteFishingQuest_CONSOLE -->
+  <ModOp Type="replace" GUID='150810,8452' Path="/Values/PreConditionList/SubConditions/Item/SubCondition/Values/PreConditionList/Condition[Values/ConditionEvent[ConditionEvent='MovieFinished' and ContextAsset='300000']]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004301</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+  
+  
+  <!-- DynamiteFishingSuccess -->
+  <ModOp Type="merge" GUID="150810,8452" Path="/Values/Quest/SuccessMessage/Notification/Values[BaseNotification/NotificationLabel='DynamiteFishingSuccess']/CharacterNotification">
+    <ThirdpartyNotificationButtons>
+      <Item>
+        <Icon>5392</Icon>
+        <!-- directly starting the movie with FullscreenMovieQueueManager EnqueueMovieGUID causes desync, but starting with an action in another trigger is fine -->
+        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004302)]</Command>
+        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+        <Infotip>105834</Infotip>
+      </Item>
+      <Item>
+        <Icon>500108</Icon>
+        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004332)]</Command>
+        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+        <Infotip>6049</Infotip>
+      </Item>
+    </ThirdpartyNotificationButtons>
+    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004332)]</ThirdpartyDefaultCommand>
+  </ModOp>
+  <!-- save the game after quest is done, so before we decide if we want to play the next movie or not -->
+  <ModOp Type="replace" GUID="150810,8452" Path="/Values/Quest/OnQuestSucceeded">
+    <OnQuestSucceeded>
+      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+      <Values>
+        <ActionList>
+          <Actions>
+            <Item>
+              <Action>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </Action>
+            </Item>
+          </Actions>
+        </ActionList>
+      </Values>
+    </OnQuestSucceeded>
+  </ModOp>
+  
+
+  <!-- ActionPlayMovie 600170 -->
+   <!-- movie itself is played in 1500004302 instead -->
+  <ModOp Type="replace" GUID='150721' Path="/Values/Trigger/TriggerActions">
+    <TriggerActions>
+      <Item>
+        <TriggerAction>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>1000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionEnterSession</Template>
+                          <Values>
+                            <ActionEnterSession>
+                              <TargetSession>180023</TargetSession>
+                            </ActionEnterSession>
+                            <Action />
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>142310</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionSetObjectVisibility</Template>
+                          <Values>
+                            <Action />
+                            <ActionSetObjectVisibility>
+                              <ShowEffect>0</ShowEffect>
+                            </ActionSetObjectVisibility>
+                            <ObjectFilter>
+                              <ObjectLabel>BrightSands_pyroFlags</ObjectLabel>
+                              <ObjectIslands>
+                                <Item>
+                                  <Island>160008</Island>
+                                </Item>
+                              </ObjectIslands>
+                            </ObjectFilter>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </TriggerAction>
+      </Item>
+    </TriggerActions>
+  </ModOp>
+  <!-- 600170 Chapter100_Banner CQ103_TownFoundations_Intro_DialogTrigger -->
+  <ModOp Type="replace" GUID='150594,150836' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004302</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  
+  <!-- ActionPlayMovie 600198 -->
+  <!-- make ship not despawn after quest is done, but "LeaveMap", so it does not instantly disappear after player selected it to decide if he wants to play the movie or not -->
+  <ModOp Type="merge" GUID='150841' Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestEscort">
+    <EscortObjectDespawn>LeaveMap</EscortObjectDespawn>
+  </ModOp>
+  <ModOp Type="replace" GUID='150841' Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions">
+    <Actions>
+      <Item>
+        <Action>
+          <Template>ActionExecuteScript</Template>
+          <Values>
+            <Action />
+            <ActionExecuteScript>
+              <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+            </ActionExecuteScript>
+          </Values>
+        </Action>
+      </Item>
+      <Item>
+        <Action>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>3000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>91</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <Icon>5392</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004303)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>150848</Infotip>
+                                      </Item>
+                                      <Item>
+                                        <Icon>500108</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004333)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>6049</Infotip>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004333)]</ThirdpartyDefaultCommand>
+                                  </CharacterNotification>
+                                  <BaseNotification>
+                                    <NotificationText>150848</NotificationText>
+                                    <IsUnique>1</IsUnique>
+                                    <DisplayTimeout>600000</DisplayTimeout>
+                                    <NotificationAudioAsset>9818768</NotificationAudioAsset>
+                                    <NotificationPriority>400</NotificationPriority>
+                                    <NotificationMinDisplayTime>1000</NotificationMinDisplayTime>
+                                  </BaseNotification>
+                                  <NotificationSubtitle>
+                                    <Subtitle />
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </Action>
+      </Item>
+    </Actions>
+  </ModOp>
+  <!-- MovieFinished 600198 -->
+  <ModOp Type="replace" GUID='150847' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004303</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <ModOp Type="replace" GUID='150848' Path="/Values/PreConditionList/Condition[Values/ConditionEvent[ConditionEvent='MovieFinished' and ContextAsset='600198']]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004303</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+  
+  <!-- ActionPlayMovie 300001 (has no MovieFinished, but we will create one and put the newspaper stuff in there, so it does not happen before the movie..) -->
+   <!-- I think RegisterTrigger and ActionForceNewspaper should not be exeuted multiple times (once per coop player), so we can not put the code into the other triggers. Instead we will call all these actions still in here, but with a small delay to allow the user some time to choose if he wants to see the movie or not. should be ok, if actions are done while user is watching the movie -->
+  <ModOp Type="replace" GUID='150750' Path="/Values/Quest/OnQuestSucceeded/Values/ActionList/Actions">
+    <Actions>
+      <Item>
+        <Action>
+          <Template>ActionExecuteScript</Template>
+          <Values>
+            <Action />
+            <ActionExecuteScript>
+              <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+            </ActionExecuteScript>
+          </Values>
+        </Action>
+      </Item>
+      <Item>
+        <Action>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>3000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>109</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <Icon>5392</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004304)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>150750</Infotip>
+                                      </Item>
+                                      <Item>
+                                        <Icon>500108</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004334)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>6049</Infotip>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004334)]</ThirdpartyDefaultCommand>
+                                  </CharacterNotification>
+                                  <BaseNotification>
+                                    <NotificationText>150750</NotificationText>
+                                    <IsUnique>1</IsUnique>
+                                    <DisplayTimeout>600000</DisplayTimeout>
+                                    <NotificationAudioAsset>9818768</NotificationAudioAsset>
+                                    <NotificationPriority>400</NotificationPriority>
+                                    <NotificationMinDisplayTime>1000</NotificationMinDisplayTime>
+                                  </BaseNotification>
+                                  <NotificationSubtitle>
+                                    <Subtitle />
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </Action>
+                      </Item>
+                      <Item>
+                        <Action>
+                          <Template>ActionRegisterTrigger</Template>
+                          <Values>
+                            <Action />
+                            <ActionRegisterTrigger>
+                              <TriggerAsset>1500004330</TriggerAsset>
+                            </ActionRegisterTrigger>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </Action>
+      </Item>
+    </Actions>
+  </ModOp>
+  <!-- add our own MovieFinished trigger to show the newspaper to make sure it is shown after the movie -->
+  <ModOp Type="AddNextSibling" GUID='150750'>
+    <Asset>
+      <Template>TriggerCampaign</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004330</GUID>
+          <Name>MovieFinished 300001</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004304</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceNewspaper</Template>
+                <Values>
+                  <Action />
+                  <ActionForceNewspaper>
+                    <Articles>
+                      <Item>
+                        <Article>141419</Article>
+                      </Item>
+                    </Articles>
+                    <OpenNewspaperUI>1</OpenNewspaperUI>
+                    <OpenNewspaperType>SpecialEdition</OpenNewspaperType>
+                    <PamsyWelcomeRequiredAsset>142376</PamsyWelcomeRequiredAsset>
+                  </ActionForceNewspaper>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>151064</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <EmptyAutoCreateValue />
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <!-- ActionPlayMovie 300013 -->
+  <ModOp Type="replace" GUID='150745' Path="/Values/Quest/OnQuestSucceeded/Values/ActionList/Actions">
+    <Actions>
+      <Item>
+        <Action>
+          <Template>ActionExecuteScript</Template>
+          <Values>
+            <Action />
+            <ActionExecuteScript>
+              <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+            </ActionExecuteScript>
+          </Values>
+        </Action>
+      </Item>
+      <Item>
+        <Action>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>3000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>177</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <Icon>5392</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004305)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>150745</Infotip>
+                                      </Item>
+                                      <Item>
+                                        <Icon>500108</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004335)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>6049</Infotip>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004335)]</ThirdpartyDefaultCommand>
+                                  </CharacterNotification>
+                                  <BaseNotification>
+                                    <NotificationText>150745</NotificationText>
+                                    <IsUnique>1</IsUnique>
+                                    <DisplayTimeout>600000</DisplayTimeout>
+                                    <NotificationAudioAsset>9818768</NotificationAudioAsset>
+                                    <NotificationPriority>400</NotificationPriority>
+                                    <NotificationMinDisplayTime>1000</NotificationMinDisplayTime>
+                                  </BaseNotification>
+                                  <NotificationSubtitle>
+                                    <Subtitle />
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </Action>
+      </Item>
+    </Actions>
+  </ModOp>
+  <!-- MovieFinished 300013 -->
+  <ModOp Type="replace" GUID='150668' Path="/Values/PreConditionList/SubConditions/Item/SubCondition/Values/PreConditionList/Condition[Values/ConditionEvent[ConditionEvent='MovieFinished' and ContextAsset='300013']]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004305</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+    
+  <!-- ActionPlayMovie 300002 -->
+  <ModOp Type="replace" GUID='150784' Path="/Values/Trigger/TriggerActions">
+    <TriggerActions>
+      <Item>
+        <TriggerAction>
+          <Template>ActionExecuteScript</Template>
+          <Values>
+            <Action />
+            <ActionExecuteScript>
+              <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+            </ActionExecuteScript>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>3000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>29</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <Icon>5392</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004306)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>105825</Infotip>
+                                      </Item>
+                                      <Item>
+                                        <Icon>500108</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004336)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>6049</Infotip>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004336)]</ThirdpartyDefaultCommand>
+                                  </CharacterNotification>
+                                  <BaseNotification>
+                                    <NotificationText>105825</NotificationText>
+                                    <IsUnique>1</IsUnique>
+                                    <DisplayTimeout>600000</DisplayTimeout>
+                                    <NotificationAudioAsset>9818768</NotificationAudioAsset>
+                                    <NotificationPriority>400</NotificationPriority>
+                                    <NotificationMinDisplayTime>1000</NotificationMinDisplayTime>
+                                  </BaseNotification>
+                                  <NotificationSubtitle>
+                                    <Subtitle />
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </TriggerAction>
+      </Item>
+    </TriggerActions>
+  </ModOp>
+  <!-- MovieFinished 300002 -->
+  <!-- we move most actions from 150784 into 150695 because it makes sure the session is successfully loaded -->
+  <ModOp Type="AddPrevSibling" GUID='150695' Path="/Values/Trigger/TriggerActions/Item[1]">
+    <Item>
+      <TriggerAction>
+        <Template>ActionDiscoverIsland</Template>
+        <Values>
+          <Action />
+          <ActionDiscoverIsland>
+            <TargetIsland>160007</TargetIsland>
+          </ActionDiscoverIsland>
+        </Values>
+      </TriggerAction>
+    </Item>
+    <Item>
+      <TriggerAction>
+        <Template>ActionDiscoverIsland</Template>
+        <Values>
+          <Action />
+          <ActionDiscoverIsland>
+            <TargetIsland>160005</TargetIsland>
+          </ActionDiscoverIsland>
+        </Values>
+      </TriggerAction>
+    </Item>
+    <Item>
+      <TriggerAction>
+        <Template>ActionRegisterTrigger</Template>
+        <Values>
+          <Action />
+          <ActionRegisterTrigger>
+            <TriggerAsset>153242</TriggerAsset>
+          </ActionRegisterTrigger>
+        </Values>
+      </TriggerAction>
+    </Item>
+    <Item>
+      <TriggerAction>
+        <Template>ActionEnterSession</Template>
+        <Values>
+          <ActionEnterSession>
+            <TargetSession>180025</TargetSession>
+          </ActionEnterSession>
+          <Action />
+        </Values>
+      </TriggerAction>
+    </Item>
+    <Item>
+      <TriggerAction>
+        <Template>ActionHostileTakeover</Template>
+        <Values>
+          <Action />
+          <ActionHostileTakeover>
+            <IslandSession>180025</IslandSession>
+            <TakeoverIsland>160005</TakeoverIsland>
+          </ActionHostileTakeover>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  <!-- MovieFinished 300002 -->
+  <ModOp Type="replace" GUID='150695' Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition[Values/ConditionEvent[ConditionEvent='MovieFinished' and ContextAsset='300002']]">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004306</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <ModOp Type="replace" GUID='153242' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004306</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  
+  
+  <!-- ActionPlayMovie 300003 -->
+   <!-- do the ActionRegisterTrigger here after some seconds, and the rest in the unlocktriggers  -->
+  <ModOp Type="replace" GUID='150929' Path="/Values/Trigger/TriggerActions">
+    <TriggerActions>
+      <Item>
+        <TriggerAction>
+          <Template>ActionExecuteScript</Template>
+          <Values>
+            <Action />
+            <ActionExecuteScript>
+              <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+            </ActionExecuteScript>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>3000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>75</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <Icon>5392</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004307)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>151407</Infotip>
+                                      </Item>
+                                      <Item>
+                                        <Icon>500108</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004337)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>6049</Infotip>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004337)]</ThirdpartyDefaultCommand>
+                                  </CharacterNotification>
+                                  <BaseNotification>
+                                    <NotificationText>151407</NotificationText>
+                                    <IsUnique>1</IsUnique>
+                                    <DisplayTimeout>600000</DisplayTimeout>
+                                    <NotificationAudioAsset>9818768</NotificationAudioAsset>
+                                    <NotificationPriority>400</NotificationPriority>
+                                    <NotificationMinDisplayTime>1000</NotificationMinDisplayTime>
+                                  </BaseNotification>
+                                  <NotificationSubtitle>
+                                    <Subtitle />
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </Action>
+                      </Item>
+                      
+                      <Item>
+                        <Action>
+                          <Template>ActionDelayedActions</Template>
+                          <Values>
+                            <Action />
+                            <ActionDelayedActions>
+                              <ExecutionDelay>10000</ExecutionDelay>
+                              <DelayedActions>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ActionList>
+                                    <Actions>
+                                      <Item>
+                                        <Action>
+                                          <Template>ActionDelayedActions</Template>
+                                          <Values>
+                                            <Action />
+                                            <ActionDelayedActions>
+                                              <ExecutionDelay>10000</ExecutionDelay>
+                                              <DelayedActions>
+                                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                <Values>
+                                                  <ActionList>
+                                                    <Actions>
+                                                      <Item>
+                                                        <Action>
+                                                          <Template>ActionRegisterTrigger</Template>
+                                                          <Values>
+                                                            <Action />
+                                                            <ActionRegisterTrigger>
+                                                              <TriggerAsset>150807</TriggerAsset>
+                                                            </ActionRegisterTrigger>
+                                                          </Values>
+                                                        </Action>
+                                                      </Item>
+                                                    </Actions>
+                                                  </ActionList>
+                                                </Values>
+                                              </DelayedActions>
+                                            </ActionDelayedActions>
+                                          </Values>
+                                        </Action>
+                                      </Item>
+                                      <Item>
+                                        <Action>
+                                          <Template>ActionRegisterTrigger</Template>
+                                          <Values>
+                                            <Action />
+                                            <ActionRegisterTrigger>
+                                              <TriggerAsset>151440</TriggerAsset>
+                                            </ActionRegisterTrigger>
+                                          </Values>
+                                        </Action>
+                                      </Item>
+                                    </Actions>
+                                  </ActionList>
+                                </Values>
+                              </DelayedActions>
+                            </ActionDelayedActions>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </TriggerAction>
+      </Item>
+    </TriggerActions>
+  </ModOp>
+  <!-- MovieFinished 300003 -->
+  <ModOp Type="replace" GUID='151440' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004307</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <!-- also add it to banner trigger 150807, to make sure it is displayed after movie -->
+  <ModOp Type="replace" GUID='150807' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004307</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  
+  <!-- ActionPlayMovie 300014 -->
+  <ModOp Type="replace" GUID='151407' Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions">
+    <Actions>
+      <Item>
+        <Action>
+          <Template>ActionExecuteScript</Template>
+          <Values>
+            <Action />
+            <ActionExecuteScript>
+              <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+            </ActionExecuteScript>
+          </Values>
+        </Action>
+      </Item>
+      <Item>
+        <Action>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>3000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>7</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <Icon>5392</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004308)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>151411</Infotip>
+                                      </Item>
+                                      <Item>
+                                        <Icon>500108</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004338)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>6049</Infotip>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004338)]</ThirdpartyDefaultCommand>
+                                  </CharacterNotification>
+                                  <BaseNotification>
+                                    <NotificationText>151411</NotificationText>
+                                    <IsUnique>1</IsUnique>
+                                    <DisplayTimeout>600000</DisplayTimeout>
+                                    <NotificationAudioAsset>9818768</NotificationAudioAsset>
+                                    <NotificationPriority>400</NotificationPriority>
+                                    <NotificationMinDisplayTime>1000</NotificationMinDisplayTime>
+                                  </BaseNotification>
+                                  <NotificationSubtitle>
+                                    <Subtitle />
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </Action>
+      </Item>
+    </Actions>
+  </ModOp>
+  <!-- MovieFinished 300014 -->
+  <ModOp Type="replace" GUID='151408' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004308</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <ModOp Type="replace" GUID='151411' Path="/Values/PreConditionList/Condition[Values/ConditionEvent[ConditionEvent='MovieFinished' and ContextAsset='300014']]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004308</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+  
+  
+  <!-- ActionPlayMovie 300004 -->
+  <ModOp Type="replace" GUID='151422' Path="/Values/Trigger/TriggerActions">
+    <TriggerActions>
+      <Item>
+        <TriggerAction>
+          <Template>ActionExecuteScript</Template>
+          <Values>
+            <Action />
+            <ActionExecuteScript>
+              <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+            </ActionExecuteScript>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>3000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>214</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <Icon>5392</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004309)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>151425</Infotip>
+                                      </Item>
+                                      <Item>
+                                        <Icon>500108</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004339)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>6049</Infotip>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004339)]</ThirdpartyDefaultCommand>
+                                  </CharacterNotification>
+                                  <BaseNotification>
+                                    <NotificationText>151425</NotificationText>
+                                    <IsUnique>1</IsUnique>
+                                    <DisplayTimeout>600000</DisplayTimeout>
+                                    <NotificationAudioAsset>9818768</NotificationAudioAsset>
+                                    <NotificationPriority>400</NotificationPriority>
+                                    <NotificationMinDisplayTime>1000</NotificationMinDisplayTime>
+                                  </BaseNotification>
+                                  <NotificationSubtitle>
+                                    <Subtitle />
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </TriggerAction>
+      </Item>
+    </TriggerActions>
+  </ModOp>
+  <!-- MovieFinished 300004 -->
+  <ModOp Type="replace" GUID='151425' Path="/Values/PreConditionList/Condition[Values/ConditionEvent[ConditionEvent='MovieFinished' and ContextAsset='300004']]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004309</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+  
+  
+  <!-- ActionPlayMovie 300008 -->
+  <!-- 151427 is disabled so no need to change this -->
+  <ModOp Type="replace" GUID='151810' Path="/Values/Trigger/TriggerActions">
+    <TriggerActions>
+      <Item>
+        <TriggerAction>
+          <Template>ActionExecuteScript</Template>
+          <Values>
+            <Action />
+            <ActionExecuteScript>
+              <ScriptFileName>data/savethegame_serp.lua</ScriptFileName>
+            </ActionExecuteScript>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
+          <Template>ActionDelayedActions</Template>
+          <Values>
+            <Action />
+            <ActionDelayedActions>
+              <ExecutionDelay>3000</ExecutionDelay>
+              <DelayedActions>
+                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                <Values>
+                  <ActionList>
+                    <Actions>
+                      <Item>
+                        <Action>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>75</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <Icon>5392</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004310)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>151427</Infotip>
+                                      </Item>
+                                      <Item>
+                                        <Icon>500108</Icon>
+                                        <Command>[Conditions RegisterTriggerForCurrentParticipant(1500004340)]</Command>
+                                        <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
+                                        <Infotip>6049</Infotip>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                    <ThirdpartyDefaultCommand>[Conditions RegisterTriggerForCurrentParticipant(1500004340)]</ThirdpartyDefaultCommand>
+                                  </CharacterNotification>
+                                  <BaseNotification>
+                                    <NotificationText>151427</NotificationText>
+                                    <IsUnique>1</IsUnique>
+                                    <DisplayTimeout>600000</DisplayTimeout>
+                                    <NotificationAudioAsset>9818768</NotificationAudioAsset>
+                                    <NotificationPriority>400</NotificationPriority>
+                                    <NotificationMinDisplayTime>1000</NotificationMinDisplayTime>
+                                  </BaseNotification>
+                                  <NotificationSubtitle>
+                                    <Subtitle />
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </Action>
+                      </Item>
+                    </Actions>
+                  </ActionList>
+                </Values>
+              </DelayedActions>
+            </ActionDelayedActions>
+          </Values>
+        </TriggerAction>
+      </Item>
+    </TriggerActions>
+  </ModOp>
+  <!-- MovieFinished 300008 -->
+  <ModOp Type="replace" GUID='152281,151428,151509,151532' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004310</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <ModOp Type="replace" GUID='153231' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition>
+          <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
+        </Condition>
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004310</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  
+      
+   
+</ModOps>

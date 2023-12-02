@@ -1,0 +1,1724 @@
+<ModOps>
+  
+  <!-- TODO WICHTIG: -->
+   <!-- NotificationRemoved ist nicht MP kompatibel, darf also nicht genutzt werden -.- -->
+   <!-- Alternative Möglichkeiten: -->
+    <!-- Trigger mit Conditions machen, die über ModOPContent die Bedingung aus automatisch 142358 auslesen -->
+    <!-- Problem: das klappt nur mit AgeLevel, weil einmalig pro Spiel, -->
+     <!-- aber jedesmal pro Insel wie CityLevel wüsste ich nicht wie ich das per Trigger hinbekomme... -->
+      <!-- auch für Attractivness gibts glaube ich keine chance das selbst zu machen, weil ja auch das nur einmal pro level pro insel triggern soll..      -->
+  <!-- Vllt ThirdPartyButton ThirdpartyDefaultCommand zur hilfe nehmen. gibts nicht bei MainNotification, aber man könnte ja vllt in -->
+   <!-- BannerConfig/CityLevelBanners zb. noch beimselben Level noch ne CharacterNotification eintragen, die quasi nie angezeigt wird? -->
+    <!-- wobei selbst wenn das klappt, geht das nicht bei BaseAttractivenessBanner, weil da nur eine notification erlaubt ist.. -->
+     <!-- wobei man da dann die CharacterNotification eintragen kann, welche dann die main notification in eigenen trigger startet -->
+  
+  
+  
+  <!-- Wenn ich hier die Ruhmwerte in den Triggern ändere, oder die RequiredValue von den cityleveln, -->
+   <!-- muss ich das auch in tooltip anpassen, teils als anzeige und teils als condition! -->
+  
+  <!-- Also contains in the trigger at the end "MonumentConstructionUpdate" to credit honro for every monument phase -->
+  <!-- And ExpeditionSolved -->
+  
+  <!-- das was als "nächste Bevölkerungsstufe" mit MaxPopulationNeededForUnlocks angezeigt wird, -->
+  <!-- zeigt an wieviele der aktuellen bevlkerung man braucht, bis man die darauffolgende unlocken kann. -->
+   <!-- dafür gibt es soweit ich sehe kein eigenen trigger, vllt prüft das spiel alle relevanten trigger dazu selbst oderso. -->
+   <!-- aber das ist nicht schlimm, weil wir einfach nur new age und new citiylevel machen, das ist genug -->
+  
+
+  <!-- rausfinden wo da hier steht ingame: -->
+      <!-- <GUID>3006</GUID> -->
+      <!-- <Text>Bevölkerung, die Sie benötigen, um den nächsten Stadtstatus zu erreichen.</Text> -->
+  <!-- allerdings steht dabei im infotip wieder  -->
+  <!-- <Text>[Area Current Economy PopulationCount([RefGuid])] / [ToolOneHelper MaxPopulationNeededForUnlocks([RefGuid])]</Text> -->
+  <!-- was doch nicht der stadtstatus ist ?! -->
+  <!-- sofern man hier eine populationguid übergibt und es da nichts beonsderes gibt, ist das defintiv nicht der Stadtstatus -->
+  <!-- und ich glaub der tooltip ist auch ungenutzt -->
+  
+    
+  
+  <!-- TODO: -->
+  <!-- HighestPop kann auch Touristen und Gelehrte sein... -->
+  <!-- evlt code so schreiben, dass dann beides bei hovern angezeigt wird? -->
+  <!-- wobei es kein "zweithöchstes" zum prüfen gibt, müsste man dann jede pop einmal testen -->
+  <!-- Auch für vanilla anzeige "Nächste Bevölkerungsstufe" die anzeige in dem Fall für ingenreure/investeoren machen -->
+   <!-- wenn toursiten/Gelehrte da sind.. -->
+   <!-- also zb. "ist höchstes Gelehrter und gibt es weniger als mxcitylevel investoren? dann zeige nächsten citylevel an" -->
+   <!-- "ist höchstes Gelehrte und gibt es 0 investoren, aber mehr als x ingeneure, dann zeige aufstig und citiylevel von ingenueren an" -->
+    <!-- das meiste ist dann copy paste -->
+  
+  
+  <!-- AgeLevels werden nur einmalig für das erreichen einer neuen polulation getriggert (könnte man an sich auch selbst mit ConditionPlayercounter prüfen) -->
+    <!-- dass sie nur einmal kommen könnte mit LockableNotification zusammenhängen -->
+  <ModOp Type="merge" GUID="501389" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_15000000</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501390" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_15000001</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501391" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_15000002</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501392" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_15000003</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501393" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_15000004</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501416" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_15000005</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501418" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_15000006</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501950" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_112642</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501951" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_112643</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="125530" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_114329</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="125531" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_114330</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="125543" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_118745</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="8966" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AgeLevelBanners_5403</NotificationLabel>
+  </ModOp>
+
+  <!-- CityLevel gibt es pro Insel einmal und einmal für jede Bevölkerungsstufe. diesen "pro Insel" check können wir glaube ich nicht selbst mit anderen conditions erreichen, weshalb wir hier in die notification muessen -->
+  <ModOp Type="merge" GUID="501400" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_15000000</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501401" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_15000001</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501402" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_15000002</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501403" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_15000003</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501404" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_15000004</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501423" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_15000005</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501424" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_15000006</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501952" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_112642</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="501953" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_112643</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="125533" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_114329</NotificationLabel>
+  </ModOp>
+  <ModOp Type="merge" GUID="125534" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>CityLevelBanners_114330</NotificationLabel>
+  </ModOp>
+  
+  
+  
+  <!-- there are no city levels for artistas and scholars in vanilla, so add fitting ones -->
+  <!-- we have not BackgroundAnimation file, so use the one from another fitting civlevel -->
+  <ModOp Type="AddNextSibling" GUID="501424">
+    <Asset>
+      <Template>Notification</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000230</GUID>
+          <Name>NewCityState_Artista_Notification</Name>
+        </Standard>
+        <Notification>
+          <NotificationType>
+            <Template>MainNotification</Template>
+            <Values>
+              <MainNotification>
+                <Title>16981</Title>
+                <NotificationMainIconAsset>6264</NotificationMainIconAsset>
+                <Icon01>5382</Icon01>
+                <Icon02>5458</Icon02>
+                <Icon03>1500000240</Icon03>
+                <Icon04>1500000240</Icon04>
+                <BackgroundAnimation>data\ui\video\ui_alpha\main_banner\mainbanner_obrero_a.bk2</BackgroundAnimation>
+              </MainNotification>
+              <BaseNotification>
+                <NotificationText>16990</NotificationText>
+                <NotificationAudioAsset>201846</NotificationAudioAsset>
+                <NotificationLabel>CityLevelBanners_5403</NotificationLabel>
+              </BaseNotification>
+              <NotificationSubtitle>
+                <Subtitle>265159</Subtitle>
+              </NotificationSubtitle>
+            </Values>
+          </NotificationType>
+        </Notification>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>Notification</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000232</GUID>
+          <Name>NewCityState_Megacity_Moderate_Notification</Name>
+        </Standard>
+        <Notification>
+          <NotificationType>
+            <Template>MainNotification</Template>
+            <Values>
+              <MainNotification>
+                <Title>16981</Title>
+                <NotificationMainIconAsset>15000004</NotificationMainIconAsset>
+                <Icon01>1500000240</Icon01>
+                <Icon02>1500000240</Icon02>
+                <BackgroundAnimation>data\ui\video\ui_alpha\main_banner\mainbanner_investors_a.bk2</BackgroundAnimation>
+              </MainNotification>
+              <BaseNotification>
+                <NotificationText>1500000232</NotificationText>
+                <NotificationAudioAsset>201844</NotificationAudioAsset>
+                <NotificationLabel>CityLevelBannersMEGA_15000004</NotificationLabel>
+              </BaseNotification>
+              <NotificationSubtitle>
+                <Subtitle>265159</Subtitle>
+              </NotificationSubtitle>
+            </Values>
+          </NotificationType>
+        </Notification>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>Notification</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000233</GUID>
+          <Name>NewCityState_Megacity_Colony01_Notification</Name>
+        </Standard>
+        <Notification>
+          <NotificationType>
+            <Template>MainNotification</Template>
+            <Values>
+              <MainNotification>
+                <Title>16981</Title>
+                <NotificationMainIconAsset>5403</NotificationMainIconAsset>
+                <Icon01>1500000240</Icon01>
+                <Icon02>1500000240</Icon02>
+                <BackgroundAnimation>data\ui\video\ui_alpha\main_banner\mainbanner_obrero_a.bk2</BackgroundAnimation>
+              </MainNotification>
+              <BaseNotification>
+                <NotificationText>1500000232</NotificationText>
+                <NotificationAudioAsset>201846</NotificationAudioAsset>
+                <NotificationLabel>CityLevelBannersMEGA_5403</NotificationLabel>
+              </BaseNotification>
+              <NotificationSubtitle>
+                <Subtitle>265159</Subtitle>
+              </NotificationSubtitle>
+            </Values>
+          </NotificationType>
+        </Notification>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>Notification</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000234</GUID>
+          <Name>NewCityState_Megacity_Africa_Notification</Name>
+        </Standard>
+        <Notification>
+          <NotificationType>
+            <Template>MainNotification</Template>
+            <Values>
+              <MainNotification>
+                <Title>16981</Title>
+                <NotificationMainIconAsset>114330</NotificationMainIconAsset>
+                <Icon01>1500000240</Icon01>
+                <Icon02>1500000240</Icon02>
+                <BackgroundAnimation>data\ui\video\ui_alpha\main_banner\africa_tier2_a.bk2</BackgroundAnimation>
+              </MainNotification>
+              <BaseNotification>
+                <NotificationText>1500000232</NotificationText>
+                <NotificationAudioAsset>202372</NotificationAudioAsset>
+                <NotificationLabel>CityLevelBannersMEGA_114330</NotificationLabel>
+              </BaseNotification>
+              <NotificationSubtitle>
+                <Subtitle>265159</Subtitle>
+              </NotificationSubtitle>
+            </Values>
+          </NotificationType>
+        </Notification>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>Notification</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000235</GUID>
+          <Name>NewCityState_Megacity_Arctic_Notification</Name>
+        </Standard>
+        <Notification>
+          <NotificationType>
+            <Template>MainNotification</Template>
+            <Values>
+              <MainNotification>
+                <Title>16981</Title>
+                <NotificationMainIconAsset>112643</NotificationMainIconAsset>
+                <Icon01>1500000240</Icon01>
+                <Icon02>1500000240</Icon02>
+                <BackgroundAnimation>data\ui\video\ui_alpha\main_banner\mainbanner_arctic_a.bk2</BackgroundAnimation>
+              </MainNotification>
+              <BaseNotification>
+                <NotificationText>1500000232</NotificationText>
+                <NotificationAudioAsset>202372</NotificationAudioAsset>
+                <NotificationLabel>CityLevelBannersMEGA_112643</NotificationLabel>
+              </BaseNotification>
+              <NotificationSubtitle>
+                <Subtitle>265159</Subtitle>
+              </NotificationSubtitle>
+            </Values>
+          </NotificationType>
+        </Notification>
+      </Values>
+    </Asset>
+
+  </ModOp>
+  
+  <!-- Attractivness, seems this base notification is enough, the others are not used or at least not directly -->
+  <!-- that means we have to give the same amount for all levels -->
+  <!-- not too much honor for attractivitiy -->
+  <ModOp Type="merge" GUID="502094" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationLabel>AttrLevelBanners_Base</NotificationLabel>
+  </ModOp>
+  
+  
+  <!-- just rough values, may be subject to better balance. But I want MEGA achievable without lifestyle needs and skyscrapers and dlcs, but not on too many islands -->
+  <!-- Achtung: Diese Levels sind in infotips hardcoded, wenn man die werte ändert, oder so wie ich welche zufüge, dann muss der wert im tooltip auch geändert werden (das x/150 steht da korrekt drin, aber es gibt ein condition check of man weniger oder mehr als 150 hat und je nach dem wird das eine oder andere angezeigt) -->
+  <!-- GUID 501255 in infotips, da füg ich auch alles zu -->
+  <!-- scholar 118745 können wir nicht sinnvoll zufügen, weil das citylevel ein kreis ist der sich füllt und nur eine sache gleichzeitig anzeigen kann, was halt investoren sein sollen -->
+  <!-- Achtung, diese level sind offenbar auch nochmal in guid 2001173 als citysize definiert (für attraktivität) -->
+    <!-- allerdings sind dort dataset hardcodede werte verwendet worden, kann also nicht einfach welche zufügen, daher bleibt das unverändert -->
+  
+  
+  <ModOp Type="add" GUID="142358" Condition="!/Values/BannerConfig/CityLevelBanners/Item[PopulationGUID='5403' and RequiredValue!='1']" Path="/Values/BannerConfig/CityLevelBanners">
+    <Item>
+      <RequiredValue>1800</RequiredValue>
+      <PopulationGUID>5403</PopulationGUID>
+      <Notification>1500000230</Notification>
+    </Item>
+  </ModOp>
+  <ModOp Type="add" GUID="142358" Path="/Values/BannerConfig/CityLevelBanners">
+    <Item>
+      <RequiredValue>50000</RequiredValue>
+      <PopulationGUID>15000004</PopulationGUID>
+      <Notification>1500000232</Notification>
+    </Item>
+    <Item>
+      <RequiredValue>30000</RequiredValue>
+      <PopulationGUID>5403</PopulationGUID>
+      <Notification>1500000233</Notification>
+    </Item>
+    <Item>
+      <RequiredValue>4000</RequiredValue>
+      <PopulationGUID>114330</PopulationGUID>
+      <Notification>1500000234</Notification>
+    </Item>
+    <Item>
+      <RequiredValue>2000</RequiredValue>
+      <PopulationGUID>112643</PopulationGUID>
+      <Notification>1500000235</Notification>
+    </Item>
+  </ModOp>
+  <!-- reduce citylevel from arctic technican from 1000 to 750 because: -->
+  <!-- 1) 1000 is very much, compared to the very easy citylevels of other regions. -->
+  <!-- 2) other citylevels show in their banner usually what now is unlocked, while everything from arctic is already unlocked at 750, so the banner makes no sense at 1000 at all -->
+  <ModOp Type="merge" GUID="142358" Path="/Values/BannerConfig/CityLevelBanners/Item[PopulationGUID='112643' and RequiredValue='1000']">
+      <RequiredValue>750</RequiredValue>
+  </ModOp>
+
+  
+  <!-- some banner notification are using the wrong sound ?! eg. the journaleros are using workers sound, althoug there is a journaleros sound -->
+  <!-- africa is using the old world sound, but there is no mainbanner named sound for them, so I guesss it is ok -->
+  <!-- TODO testen wie der sound sich anhört und obs funzt, nicht dass die evtl. verbuggt sind oderso -->
+  <ModOp Type="merge" GUID="501416,501423" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationAudioAsset>201845</NotificationAudioAsset>
+  </ModOp>
+  <ModOp Type="merge" GUID="501418,501424" Path="/Values/Notification/NotificationType/Values/BaseNotification">
+    <NotificationAudioAsset>201846</NotificationAudioAsset>
+  </ModOp>
+  
+
+  
+  
+  <!-- add honor icon as 4th icon if there is none yet defined for this MainNotification: -->
+  <ModOp Type="merge" GUID="501389,501390,501391,501392,501393,501416,501418,501950,501951,125530,125531,125543,8966,501400,501401,501402,501403,501404,501423,501424,501952,501953,125533,125534" Path="/Values/Notification/NotificationType/Values/MainNotification"
+    Condition="/Values/Notification/NotificationType/Values/MainNotification[not(Icon04)]">
+    <!-- Condition="/Values/Notification/NotificationType/Values/MainNotification[Icon03 and not(Icon04)]"> -->
+    <Icon04>1500000240</Icon04>
+  </ModOp>
+  <ModOp Type="merge" GUID="501389,501390,501391,501392,501393,501416,501418,501950,501951,125530,125531,125543,8966,501400,501401,501402,501403,501404,501423,501424,501952,501953,125533,125534" Path="/Values/Notification/NotificationType/Values/MainNotification"
+    Condition="/Values/Notification/NotificationType/Values/MainNotification[not(Icon03)]">
+    <Icon03>1500000240</Icon03>
+  </ModOp>
+  
+  
+  <!-- ###################################################################################################### -->
+  <!-- TRIGGER -->
+  <!-- ###################################################################################################### -->
+  
+  <!-- NotificationTriggered/NotificationOnScreenAdded/NotificationOnScreenRemoved scheint nicht zu triggern, aber NotificationRemoved -->
+  <!-- add Honor distribution for population -->
+  <!-- CompanyLevel steps is defined in <GUID>2002447</GUID> and counts the worldpopulation -->
+    <!-- siehe auch properties-toolone.xml <Name>CompanyLevel</Name> -->
+    <!-- Formel für die Level ist: PopulationCountOffset + PopulationFactor * Level^Exponent -->
+    <!-- wobei in vanilla PopulationCountOffset = -400, PopulationFactor=400 und Exponent = 1 für die ersten 40 level ist -> alle 400 steigts. -->
+    <!-- Ab level 40 (16k pop) ist Formel dann PopulationCountOffset + SecondPopulationFactor * Level^SecondExponent -->
+    <!-- wobeis in vanilla SecondPopulationFactor = 200 und SecondExponent = 2.1 ist ->  -->
+    <!-- wobei ich nicht sicher bin wie das funzt, weil damit völlig überzogene werte rauskommen.. in der praxis wirds von ~24k auf ~27 erhöht von lvl 45 auf lvl 46 -->
+  <!-- also for new age and new city state (also based on pop) -->
+  
+  <!-- if several things are triggered on the same time, eg. multiple company levels at once or so, then only one time is triggered. -->
+  <!-- but in a normal game I think this will not happen and I don't know a good solution anyway -->
+  
+  <ModOp Type="AddNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000241</GUID>
+          <Name>On next Company/Age/City/Attractivness Level</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>CorporationLevelUp</ConditionEvent>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>50</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_15000000</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>100</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_15000001</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>150</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_15000002</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>200</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_15000003</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>300</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_15000004</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>500</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_15000005</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>100</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_15000006</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>200</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_5403</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>350</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_114329</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>150</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_114330</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>250</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_118745</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>350</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_112642</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>150</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AgeLevelBanners_112643</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>250</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_15000000</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>20</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_15000001</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>40</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_15000002</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>80</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_15000003</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>160</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_15000004</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>320</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBannersMEGA_15000004</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>750</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_15000005</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>25</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_15000006</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>75</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_5403</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>200</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBannersMEGA_5403</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>750</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_112642</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>40</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_112643</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>200</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBannersMEGA_112643</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>750</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_114329</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>30</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBanners_114330</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>200</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>CityLevelBannersMEGA_114330</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>750</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>NotificationRemoved</ConditionEvent>
+                          <ContextData>AttrLevelBanners_Base</ContextData>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>20</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>MonumentConstructionUpdate</ConditionEvent>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>30</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ExpeditionSolved</PlayerCounter>
+                          <Context>4252</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>50</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ExpeditionSolved</PlayerCounter>
+                          <Context>1500000236</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>35</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ExpeditionSolved</PlayerCounter>
+                          <Context>1500000237</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500000240</Resource>
+                              <ResourceAmount>25</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            
+            
+            
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- no citylevel for several scholars possible, so do it via a simple trigger instead -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000231</GUID>
+          <Name>Scholar City</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>PopulationByLevel</PlayerCounter>
+                <Context>118745</Context>
+                <CounterAmount>2400</CounterAmount>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000240</Resource>
+                    <ResourceAmount>90</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <NotificationType>
+                        <Template>MainNotification</Template>
+                        <Values>
+                          <MainNotification>
+                            <Title>16981</Title>
+                            <NotificationMainIconAsset>118736</NotificationMainIconAsset>
+                            <Icon01>114428</Icon01>
+                            <Icon02>114430</Icon02>
+                            <Icon03>1500000240</Icon03>
+                            <BackgroundAnimation>data\ui\video\ui_alpha\main_banner\mainbanner_city_culture_a.bk2</BackgroundAnimation>
+                          </MainNotification>
+                          <BaseNotification>
+                            <NotificationText>116789</NotificationText>
+                            <NotificationAudioAsset>201836</NotificationAudioAsset>
+                          </BaseNotification>
+                          <NotificationSubtitle>
+                            <Subtitle>265159</Subtitle>
+                          </NotificationSubtitle>
+                        </Values>
+                      </NotificationType>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    
+    
+  </ModOp>
+  
+  
+  
+    
+</ModOps>

@@ -1,0 +1,1574 @@
+<ModOps>
+
+  
+  <!-- ################################################### -->
+  <!-- ##  Buffs  ## -->
+  <!-- ################################################### -->
+  
+  
+  <!-- evlt interessant: -->
+  <!-- <VisualEffectWhenActive> -->
+    <!-- <EffectFile>data/graphics/effects/particles/special/fireworks/guild_house_01.cfg</EffectFile> -->
+  <!-- </VisualEffectWhenActive> -->
+  
+  <!-- TODO allgemein nal nach Debuff suchen und gucken was es da in assets.xml so gibt, auch an buffideen -->
+    
+    <!-- Leider kann man keine MatcherGUID für die EffectTarget nutzen, richtig dumm... -->
+    
+  <!-- bei einigen effekt-vanilla bezeichnungen könnte man das hardcodede "+" entfernen, damit da nicht "+-10%" steht (suche nach "<Text>+") -->
+    <!-- bzw. man könnte in infotips bei verwendung dieser strings eine condition davor schlaten, obs positiv oder negativ ist (falls man das abfragen kann) -->
+  
+  <!-- Using ActionBuff to provide this PirateFlag buff, because UpgradeList-DefaultBuff does not work for pirate mode,because it tries to add it before object is completely initialized (same for alwaystrue trigger) -->
+  <!-- pirate mode is very important, so the projectile can target non-enemies -->
+  <!-- AttackSpeedUpgrade reduced, because I have no clue how the ReloadTime value works and we want slow attackrate for all spies/police -->
+  <!-- For AI spies we do this with an equipped item instead. -->
+
+  <!-- police units also get the pirateflag so they are easily visible from and to all players by the infolayer (I dont know how else show the infolayer also for other players, "ShouldBeShownInForeignObjectMenu" only works for the buff icon) -->
+  <ModOp Type="AddPrevSibling" GUID="190605">
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001186</GUID>
+          <Name>PirateFlag Buff</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_pirate_flag.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500001435</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001534</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <VehicleUpgrade>
+          <ActivatePirateFlag>1</ActivatePirateFlag>
+        </VehicleUpgrade>
+        <AttackerUpgrade>
+          <AttackSpeedUpgrade>-80</AttackSpeedUpgrade>
+        </AttackerUpgrade>
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001201</GUID>
+          <Name>faster AI police units</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/animals/icon_horse.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500001560</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>180</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+        </VehicleUpgrade>
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001498</GUID>
+          <Name>Sonar3BuffDetectSpy</Name>
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/consumables/icon_telescope_3.png</IconFilename> -->
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/empireofskies/icon_radar_c.png</IconFilename>
+        </Standard>
+        <Text />
+        <VehicleUpgrade />
+        <Buff />
+        <AttackerUpgrade>
+          <UseProjectile>1500001497</UseProjectile>
+          <!-- can not shoot while using radar -->
+          <AttackSpeedUpgrade>-100</AttackSpeedUpgrade>
+        </AttackerUpgrade>
+        <AttackableUpgrade />
+        <ProjectileUpgrade />
+        <TradeShipUpgrade />
+        <UpgradeList />
+        <ItemEffect />
+        <DivingBellUpgrade />
+      </Values>
+    </Asset>
+  
+  <!-- TODO: wenn alle buffs mit zielen fertig sind, dann sicherstellen, dass alle Ziele in 1500001209 als effecttarget gelistet sind -->
+  <!-- a buff to display a building/ship was sabotaged added to all buildings in range even if they are not affected by the particular debuff. it does nothing on its own, except on resolver buildings, making the units slower. -->
+  <!-- only used for the incident sabotage, the others have their own debuffs which can show this directly -->
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001209</GUID>
+          <Name>Incident Sabotiert</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_warning.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500001733</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001476</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001211</GUID>
+            </Item>
+            <Item>
+              <GUID>601445</GUID>
+            </Item>
+            <Item>
+              <GUID>193666</GUID>
+            </Item>
+            <Item>
+              <GUID>25674</GUID>
+            </Item>
+            <Item>
+              <GUID>191501</GUID>
+            </Item>
+            <Item>
+              <GUID>190783</GUID>
+            </Item>
+            <Item>
+              <GUID>102492</GUID>
+            </Item>
+            <Item>
+              <GUID>114544</GUID>
+            </Item>
+            <Item>
+              <GUID>24829</GUID>
+            </Item>
+            <Item>
+              <GUID>10284</GUID>
+            </Item>
+            <Item>
+              <GUID>368</GUID>
+            </Item>
+            <Item>
+              <GUID>191563</GUID>
+            </Item>
+            <Item>
+              <GUID>249947</GUID>
+            </Item>
+            <Item>
+              <GUID>191443</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001575</GUID>
+            </Item>
+            <Item>
+              <GUID>191887</GUID>
+            </Item>
+            <Item>
+              <GUID>193897</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001734</GUID>
+            </Item>
+            <Item>
+              <GUID>1512</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001713</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001209</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001709</GUID>
+          <Name>Incident Sabotiert-Helper</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <!-- effectchain is very buggy, it is better to have multiple different guids.. -->
+    <Asset>
+      <BaseAssetGUID>1500001209</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001722</GUID>
+          <Name>Remove Debuff</Name>
+        </Standard>
+      </Values>
+    </Asset>
+
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001461</GUID>
+          <Name>Incident Resolver Sabotiert</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_warning.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>190775</GUID>
+            </Item>
+            <Item>
+              <GUID>190776</GUID>
+            </Item>
+            <Item>
+              <GUID>190777</GUID>
+            </Item>
+            <Item>
+              <GUID>112669</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+        <BuildingUpgrade>
+          <ResolverUnitDecreaseUpgrade>
+            <Value>-30</Value>
+            <Percental>1</Percental>
+          </ResolverUnitDecreaseUpgrade>
+          <ResolverUnitMovementSpeedUpgrade>
+            <Value>-10</Value>
+            <Percental>1</Percental>
+          </ResolverUnitMovementSpeedUpgrade>
+        </BuildingUpgrade>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001461</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001536</GUID>
+          <Name>Incident Resolver Sabotiert Helper</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <!-- ProductivityUpgrade trifft auch monument baustellen die dann langsamer gebaut werden -->
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001207</GUID>
+          <Name>Less Productivity</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_workforce_2d.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500001733</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001476</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <FactoryUpgrade>
+          <ProductivityUpgrade>
+            <Value>-50</Value>
+            <Percental>1</Percental>
+          </ProductivityUpgrade>
+        </FactoryUpgrade>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001207</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001538</GUID>
+          <Name>Less Productivity</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <!-- <Asset> -->
+      <!-- <Template>GuildhouseBuff</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001477</GUID> -->
+          <!-- <Name>Less Irrigation</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/icon_canal.png</IconFilename> -->
+        <!-- </Standard> -->
+        <!-- <ItemEffect> -->
+          <!-- <EffectTargets> -->
+            <!-- <Item> -->
+              <!-- <GUID>114544</GUID> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <GUID>24829</GUID> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <GUID>10284</GUID> -->
+            <!-- </Item> -->
+          <!-- </EffectTargets> -->
+          <!-- <AllowStacking>0</AllowStacking> -->
+        <!-- </ItemEffect> -->
+        <!-- <Buff> -->
+          <!-- <AddedInfolayer>1500001212</AddedInfolayer> -->
+          <!-- <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu> -->
+        <!-- </Buff> -->
+        <!-- <IrrigationUpgrade> -->
+          <!-- <PipeCapacityUpgrade> -->
+            <!-- <Value>-20</Value> -->
+          <!-- </PipeCapacityUpgrade> -->
+          <!-- <MaxDynamicFillCapacityUpgrade> -->
+            <!-- <Value>-20</Value> -->
+          <!-- </MaxDynamicFillCapacityUpgrade> -->
+        <!-- </IrrigationUpgrade> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+
+    <!-- <Asset> -->
+      <!-- <Template>GuildhouseBuff</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001214</GUID> -->
+          <!-- <Name>More Workers needed 1</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/icons/icon_workforce_2d.png</IconFilename> -->
+        <!-- </Standard> -->
+        <!-- <ItemEffect> -->
+          <!-- <EffectTargets> -->
+            <!-- <Item> -->
+              <!-- <GUID>1500001733</GUID> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <GUID>1500001476</GUID> -->
+            <!-- </Item> -->
+          <!-- </EffectTargets> -->
+          <!-- <AllowStacking>0</AllowStacking> -->
+        <!-- </ItemEffect> -->
+        <!-- <BuildingUpgrade> -->
+          <!-- <WorkforceAmountUpgrade> -->
+            <!-- <Value>40</Value> -->
+            <!-- <Percental>1</Percental> -->
+          <!-- </WorkforceAmountUpgrade> -->
+        <!-- </BuildingUpgrade> -->
+        <!-- <Buff> -->
+          <!-- <AddedInfolayer>1500001212</AddedInfolayer> -->
+          <!-- <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu> -->
+        <!-- </Buff> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500001214</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001540</GUID> -->
+          <!-- <Name>More Workers needed 2</Name> -->
+        <!-- </Standard> -->
+        <!-- <BuildingUpgrade> -->
+          <!-- <WorkforceAmountUpgrade> -->
+            <!-- <Value>70</Value> -->
+            <!-- <Percental>1</Percental> -->
+          <!-- </WorkforceAmountUpgrade> -->
+        <!-- </BuildingUpgrade> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500001214</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001541</GUID> -->
+          <!-- <Name>More Workers needed 3</Name> -->
+        <!-- </Standard> -->
+        <!-- <BuildingUpgrade> -->
+          <!-- <WorkforceAmountUpgrade> -->
+            <!-- <Value>100</Value> -->
+            <!-- <Percental>1</Percental> -->
+          <!-- </WorkforceAmountUpgrade> -->
+        <!-- </BuildingUpgrade> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001215</GUID>
+          <Name>More Maintenance buildings/ships</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_house_income.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>368</GUID>
+            </Item>
+            <Item>
+              <GUID>102492</GUID>
+            </Item>
+            <Item>
+              <GUID>1512</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <BuildingUpgrade>
+          <MaintenanceUpgrade>
+            <Value>200</Value>
+            <Percental>1</Percental>
+          </MaintenanceUpgrade>
+        </BuildingUpgrade>
+        <VehicleUpgrade>
+          <MaintainanceUpgrade>
+            <Value>200</Value>
+            <Percental>1</Percental>
+          </MaintainanceUpgrade>
+        </VehicleUpgrade>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001215</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001542</GUID>
+          <Name>More Maintenance</Name>
+        </Standard>
+      </Values>
+    </Asset>
+
+
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001462</GUID>
+          <Name>Less Taxes and Happiness</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_house_income.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500001211</GUID>
+            </Item>
+            <Item>
+              <GUID>601445</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <ResidenceUpgrade>
+          <AdditionalHappiness>-20</AdditionalHappiness>
+          <TaxModifierInPercent>-60</TaxModifierInPercent>
+        </ResidenceUpgrade>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001462</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001591</GUID>
+          <Name>Less Taxes and Happiness</Name>
+        </Standard>
+      </Values>
+    </Asset>
+
+    
+    <!-- AttractivenessUpgrade -100% reduziert auch die negative auf 0, was positiver effekt wäre (und text ist "Negative Attraktivität -100%"), daher gehen nur absolute werte sinnvoll -->
+    <!-- weshalb dieser buff besser ist je mehr gebäude er trifft, und nicht wenige gebäude mit viel Attractivness -->
+    <!-- aber wir machen, dass er nur für das hauptgebäude der drei culture gebäude wirkt, dann lässt sich die wirkung ein wenig kontrollieren -->
+    <!-- die 6 gültigen GUIDs siehe 193666 -->
+    <!-- Palast als EffectTarget scheint nicht zu klappen -->
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001466</GUID>
+          <Name>Less Attractivness big culture buildings (eg. Zoo/Garden/Museum/VisitorPier)</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_monument_attractiveness.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>193666</GUID>
+            </Item>
+            <Item>
+              <GUID>191563</GUID>
+            </Item>
+            <Item>
+              <GUID>249947</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <CultureUpgrade>
+          <AttractivenessUpgrade>
+            <Value>-1000</Value>
+          </AttractivenessUpgrade>
+        </CultureUpgrade>
+        <VisitorHarborUpgrade>
+          <SpawnProbabilityFactor>
+            <Value>-90</Value>
+            <Percental>1</Percental>
+          </SpawnProbabilityFactor>
+        </VisitorHarborUpgrade>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001466</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001593</GUID>
+          <Name>Less Attractivness</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <!-- a small buff that affects all buildings with culutre (eg. factories also have culture property), so it is best to hit as many buildings as possible with this -->
+    <!-- hm... einen effectpool zu erstellen, in dem alles drin ist was Culture property hat ist scheiße viel arbeit... -->
+    <!-- <Asset> -->
+      <!-- <Template>GuildhouseBuff</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID></GUID> -->
+          <!-- <Name>Less Attractivness all culture buildings</Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/icons/icon_monument_attractiveness.png</IconFilename> -->
+        <!-- </Standard> -->
+        <!-- <ItemEffect> -->
+          <!-- <EffectTargets> -->
+            <!-- <Item> -->
+              <!-- <GUID>193666</GUID> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <GUID>191563</GUID> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <GUID>249947</GUID> -->
+            <!-- </Item> -->
+          <!-- </EffectTargets> -->
+          <!-- <AllowStacking>0</AllowStacking> -->
+        <!-- </ItemEffect> -->
+        <!-- <CultureUpgrade> -->
+          <!-- <AttractivenessUpgrade> -->
+            <!-- <Value>-10</Value> -->
+          <!-- </AttractivenessUpgrade> -->
+        <!-- </CultureUpgrade> -->
+        <!-- <Buff> -->
+          <!-- <AddedInfolayer>1500001212</AddedInfolayer> -->
+          <!-- <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu> -->
+        <!-- </Buff> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+    
+    
+    <!-- Instead of hitpoints we change DamageReceiveFactor so you get more damage, because changing max health is never a good idea (integer overflow and display problems) -->
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001557</GUID>
+          <Name>Buildings Military Health/Attack Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_mercier_flag.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>191443</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001575</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001713</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <AttackableUpgrade>
+          <DamageReceiveFactor>
+            <Cannon>
+              <Factor>1.25</Factor>
+            </Cannon>
+            <Normal>
+              <Factor>1.25</Factor>
+            </Normal>
+            <Torpedo>
+              <Factor>1.25</Factor>
+            </Torpedo>
+            <BigBertha>
+              <Factor>1.25</Factor>
+            </BigBertha>
+          </DamageReceiveFactor>
+        </AttackableUpgrade>
+        <AttackerUpgrade>
+          <BaseDamageUpgrade>
+            <Value>-20</Value>
+            <Percental>1</Percental>
+          </BaseDamageUpgrade>
+        </AttackerUpgrade>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001557</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001595</GUID>
+          <Name>Buildings Military</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001570</GUID>
+          <Name>Ships Health/Attack/Walking/Loading-Speed Debuff 1</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_mercier_flag.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1512</GUID>
+            </Item>
+            <Item>
+              <GUID>102492</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <AttackableUpgrade>
+          <DamageReceiveFactor>
+            <Cannon>
+              <Factor>1.10</Factor>
+            </Cannon>
+            <Normal>
+              <Factor>1.10</Factor>
+            </Normal>
+            <Torpedo>
+              <Factor>1.10</Factor>
+            </Torpedo>
+            <BigBertha>
+              <Factor>1.10</Factor>
+            </BigBertha>
+          </DamageReceiveFactor>
+        </AttackableUpgrade>
+        <AttackerUpgrade>
+          <BaseDamageUpgrade>
+            <Value>-10</Value>
+            <Percental>1</Percental>
+          </BaseDamageUpgrade>
+        </AttackerUpgrade>
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>-15</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+        </VehicleUpgrade>
+        <TradeShipUpgrade>
+          <LoadingSpeedUpgrade>
+            <Value>-50</Value>
+            <Percental>1</Percental>
+          </LoadingSpeedUpgrade>
+        </TradeShipUpgrade>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001570</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001597</GUID>
+          <Name>Ships Health/Attack/Walking/Loading-Speed Debuff</Name>
+        </Standard>
+      </Values>
+    </Asset>
+
+    
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001576</GUID>
+          <Name>Repairer-Speed Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_mercier_flag.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>191887</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <RepairCraneUpgrade>
+          <HealPerMinuteUpgrade>
+            <Value>-60</Value>
+            <Percental>1</Percental>
+          </HealPerMinuteUpgrade>
+          <HealBuildingsPerMinuteUpgrade>
+            <Value>-60</Value>
+            <Percental>1</Percental>
+          </HealBuildingsPerMinuteUpgrade>
+        </RepairCraneUpgrade>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001576</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001599</GUID>
+          <Name>Repairer-Speed Debuff</Name>
+        </Standard>
+      </Values>
+    </Asset>
+
+    
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001577</GUID>
+          <Name>Loadingpier Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_mercier_flag.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>193897</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <PierUpgrade>
+          <PierSpeedUpgrade>
+            <Value>-60</Value>
+            <Percental>1</Percental>
+          </PierSpeedUpgrade>
+        </PierUpgrade>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001577</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001701</GUID>
+          <Name>Loadingpier Debuff</Name>
+        </Standard>
+      </Values>
+    </Asset>
+
+    
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001578</GUID>
+          <Name>shipyards Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_mercier_flag.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>190783</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001734</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <ShipyardUpgrade>
+          <ConstructionCostInPercent>100</ConstructionCostInPercent>
+          <ConstructionTimeInPercent>200</ConstructionTimeInPercent>
+        </ShipyardUpgrade>
+        <Buff>
+          <AddedInfolayer>1500001212</AddedInfolayer>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001578</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001703</GUID>
+          <Name>shipyards Debuff</Name>
+        </Standard>
+      </Values>
+    </Asset>
+
+
+    
+  </ModOp>
+  
+  <ModOp Type="AddNextSibling" GUID="501732">
+    <Asset>
+      <Template>InfoLayerIcon</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001212</GUID>
+          <Name>Sabotiert-Hinweis-Infolayer</Name>
+        </Standard>
+        <InfoLayerIcon>
+          <Config>data/graphics/ui/infolayer3d/infolayer_a7_feedback_unhappy.cfg</Config>
+          <!-- alert.cfg ist rot-weißen dreieckausrufezeichen, wie wenn warentransporterqueue voll. -->
+          <!-- <Config>data/graphics/ui/infolayer3d/alert.cfg</Config> -->
+          <!-- blaues ausrufezeichen wie bei den africa quests, ist aber denke ich ok? -->
+          <!-- <Config>data/graphics/ui/infolayer3d/exclamation_mark.cfg</Config> -->
+          <!-- blau weißer stern, erinnert an polizei, passt also eher nicht -->
+          <!-- <Config>data/graphics/ui/infolayer3d/security.cfg</Config> -->
+          <!-- .. show this with a ~1 minute delay, so the spy can leave the location before the victim really notices it -->
+          <!-- todo test . ich denke 1 minute ist gut fürs infolayer -->
+          <PopupDelay>10000</PopupDelay>
+          <!-- <PopupDelay>60000</PopupDelay> -->
+          <!-- IsQuestInfolayer bestimmt ob es auch angezeigt werden soll, wenn Spieler in den Optionen Infolayers ausgeschaltet hat. -->
+          <IsQuestInfolayer>1</IsQuestInfolayer>
+          <ShowInCreativeMode>1</ShowInCreativeMode>
+        </InfoLayerIcon>
+        <Text />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>InfoLayerIcon</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001220</GUID>
+          <Name>Police Unit</Name>
+        </Standard>
+        <InfoLayerIcon>
+          <!-- weißer stern auf blauem grund, erinnert an polizei -->
+          <Config>data/graphics/ui/infolayer3d/security.cfg</Config>
+          <!-- send_police_a7 police icon mit krone oben drauf -->
+          <!-- <Config>data/graphics/ui/infolayer3d/send_police_a7.cfg</Config> -->
+          <PopupDelay>0</PopupDelay>
+          <!-- IsQuestInfolayer bestimmt ob es auch angezeigt werden soll, wenn Spieler in den Optionen Infolayers ausgeschaltet hat. -->
+          <IsQuestInfolayer>1</IsQuestInfolayer>
+          <ShowInCreativeMode>1</ShowInCreativeMode>
+        </InfoLayerIcon>
+        <Text />
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- high priority to show this infolayer, directly after the quests infolayers -->
+  <ModOp Type="AddPrevSibling" GUID="140695" Path="/Values/InfolayerConfig/InfoLayerPriority/Item[Icon='501194']">
+    <Item>
+      <Icon>1500001212</Icon>
+    </Item>
+    <Item>
+      <Icon>1500001220</Icon>
+    </Item>
+  </ModOp>
+  
+
+  
+
+  
+  <ModOp Type="AddNextSibling" GUID="1410">
+    <Asset>
+        <Template>EffectExclusiveTag</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001518</GUID>
+            <Name>Production_EffectExclusiveGroup</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>EffectExclusiveTag</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001580</GUID>
+            <Name>Maintenance_EffectExclusiveGroup</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <!-- <Asset> -->
+        <!-- <Template>EffectExclusiveTag</Template> -->
+        <!-- <Values> -->
+          <!-- <Standard> -->
+            <!-- <GUID>1500001582</GUID> -->
+            <!-- <Name>Workers_EffectExclusiveGroup</Name> -->
+          <!-- </Standard> -->
+        <!-- </Values> -->
+      <!-- </Asset> -->
+      <Asset>
+        <Template>EffectExclusiveTag</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001583</GUID>
+            <Name>TaxHappiness_EffectExclusiveGroup</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>EffectExclusiveTag</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001584</GUID>
+            <Name>Attractivness_EffectExclusiveGroup</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>EffectExclusiveTag</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001585</GUID>
+            <Name>Health/Attack_EffectExclusiveGroup</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>EffectExclusiveTag</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001586</GUID>
+            <Name>Speed_EffectExclusiveGroup</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>EffectExclusiveTag</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001590</GUID>
+            <Name>Resolver_EffectExclusiveGroup</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>EffectExclusiveTag</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001708</GUID>
+            <Name>RecentlySabotage_EffectExclusiveGroup</Name>
+          </Standard>
+        </Values>
+      </Asset>
+  </ModOp>
+  
+  
+  <!-- ##################################################################################################### -->
+  <!-- ##################################################################################################### -->
+  
+  <!-- Add some ItemEffectTargetPool for filtering -->
+    <ModOp Type="AddNextSibling" GUID="190041">
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001210</GUID>
+              <Name>all residences arctic</Name>
+              <IconFilename>data/ui/2kimages/main/icons/icon_session_passage.png</IconFilename>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <Item>
+                  <GUID>112091</GUID>
+                </Item>
+                <Item>
+                  <GUID>112652</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001211</GUID>
+              <Name>all residences all regions</Name>
+              <IconFilename>data/ui/2kimages/main/icons/icon_arrowpoint_right.png</IconFilename>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <Item>
+                  <GUID>190762</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001210</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        <!-- 1500001436/1500001206 is invisible spy killer unit of AI -->
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001435</GUID>
+              <Name>All Spy Units</Name>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <Item>
+                  <GUID>1500001173</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001478</GUID>
+                </Item>
+                
+                <Item>
+                  <GUID>1500001438</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001440</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001441</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001442</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001443</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001444</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001445</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001446</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001447</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001448</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001449</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001450</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001451</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001452</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001453</GUID>
+                </Item>
+                
+                <Item>
+                  <GUID>1500001436</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001206</GUID>
+                </Item>
+                
+                <Item>
+                  <GUID>1500001519</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001520</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001521</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001522</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001523</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001524</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001525</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001526</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001527</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001528</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001529</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001530</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001531</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001532</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001533</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001534</GUID>
+              <Name>All Police Units</Name>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <Item>
+                  <GUID>1500001499</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001507</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001508</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001509</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001476</GUID>
+              <Name>all monument constructions</Name>
+              <IconFilename>data/ui/2kimages/main/icons/icon_electricity.png</IconFilename>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <!-- World's Fair-->
+                <Item>
+                  <GUID>1010489</GUID>
+                </Item>
+                <Item>
+                  <GUID>1010490</GUID>
+                </Item>
+                <Item>
+                  <GUID>101336</GUID>
+                </Item>
+                <Item>
+                  <GUID>1010491</GUID>
+                </Item>
+              <!-- Skyline Tower -->
+                <Item>
+                  <GUID>403</GUID>
+                </Item>
+                <Item>
+                  <GUID>404</GUID>
+                </Item>
+                <Item>
+                  <GUID>135709</GUID>
+                </Item>
+              <!-- The Iron Tower -->
+                <Item>
+                <GUID>132765</GUID>
+                </Item>
+                <Item>
+                  <GUID>132766</GUID>
+                </Item>
+              <!-- Research Institute -->
+                <Item>
+                  <GUID>118938</GUID>
+                </Item>
+                <Item>
+                  <GUID>118939</GUID>
+                </Item>
+              <!-- OW-Airship-Hangar -->
+                <Item>
+                  <GUID>648</GUID>
+                </Item>
+                <Item>
+                <GUID>649</GUID>
+                </Item>
+                <Item>
+                  <GUID>651</GUID>
+                </Item>
+              <!-- NW-Airship-Hangar -->
+                <Item>
+                  <GUID>692</GUID>
+                </Item>
+                <Item>
+                  <GUID>693</GUID>
+                </Item>
+                <Item>
+                  <GUID>695</GUID>
+                </Item>
+              <!-- Arctic-Airship-Hangar -->
+                <Item>
+                  <GUID>112685</GUID>
+                </Item>
+                <Item>
+                  <GUID>112687</GUID>
+                </Item>
+                <Item>
+                  <GUID>112688</GUID>
+                </Item>
+              <!-- Monument New World Tourism -->
+                <Item>
+                  <GUID>1440134430</GUID>
+                </Item>
+                <Item>
+                  <GUID>1440134431</GUID>
+                </Item>
+                <Item>
+                  <GUID>1440134432</GUID>
+                </Item>
+              <!-- Fischboss Monuments -->
+                <Item>
+                  <GUID>850026</GUID>
+                </Item>
+                <Item>
+                  <GUID>850027</GUID>
+                </Item>
+                <Item>
+                  <GUID>850031</GUID>
+                </Item>
+                <Item>
+                  <GUID>850032</GUID>
+                </Item>
+                <Item>
+                  <GUID>850032</GUID>
+                </Item>
+                <Item>
+                  <GUID>850057</GUID>
+                </Item>
+                <Item>
+                  <GUID>850058</GUID>
+                </Item>
+                <Item>
+                  <GUID>850078</GUID>
+                </Item>
+                <Item>
+                  <GUID>850079</GUID>
+                </Item>
+                <Item>
+                  <GUID>850082</GUID>
+                </Item>
+                <Item>
+                  <GUID>850083</GUID>
+                </Item>
+                <Item>
+                  <GUID>850087</GUID>
+                </Item>
+                <Item>
+                  <GUID>850088</GUID>
+                </Item>
+                <Item>
+                  <GUID>850089</GUID>
+                </Item>
+                <Item>
+                  <GUID>850093</GUID>
+                </Item>
+                <Item>
+                  <GUID>850094</GUID>
+                </Item>
+                <Item>
+                  <GUID>850095</GUID>
+                </Item>
+                <Item>
+                  <GUID>850099</GUID>
+                </Item>
+                <Item>
+                  <GUID>850100</GUID>
+                </Item>
+                <Item>
+                  <GUID>850101</GUID>
+                </Item>
+                <Item>
+                  <GUID>850106</GUID>
+                </Item>
+                <Item>
+                  <GUID>850107</GUID>
+                </Item>
+                <Item>
+                  <GUID>850122</GUID>
+                </Item>
+                <Item>
+                  <GUID>850123</GUID>
+                </Item>
+              <!-- New World Dam -->
+                <Item>
+                  <GUID>6003</GUID>
+                </Item>
+                <Item>
+                  <GUID>6004</GUID>
+                </Item>
+                <Item>
+                  <GUID>6005</GUID>
+                </Item>
+              <!-- New World Stadium -->
+                <Item>
+                  <GUID>6117</GUID>
+                </Item>
+                <Item>
+                  <GUID>6118</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001575</GUID>
+              <Name>all kontors all sessions</Name>
+              <IconFilename>data/ui/2kimages/main/icons/icon_arrowpoint_right.png</IconFilename>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <!-- all kontors except arctic -->
+                <Item>
+                  <GUID>190797</GUID>
+                </Item>
+                <!-- all arcitc kontors -->
+                <Item>
+                  <GUID>112659</GUID>
+                </Item>
+                <Item>
+                  <GUID>112660</GUID>
+                </Item>
+                <Item>
+                  <GUID>112661</GUID>
+                </Item>
+                <Item>
+                  <GUID>112865</GUID>
+                </Item>
+                <Item>
+                  <GUID>112866</GUID>
+                </Item>
+                <Item>
+                  <GUID>112867</GUID>
+                </Item>
+                <Item>
+                  <GUID>112726</GUID>
+                </Item>
+                <Item>
+                  <GUID>116003</GUID>
+                </Item>
+                <Item>
+                  <GUID>116004</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001713</GUID>
+              <Name>Pirate Buildings</Name>
+              <IconFilename>data/ui/2kimages/main/icons/icon_threat_pirates.png</IconFilename>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <Item>
+                  <GUID>100681</GUID>
+                </Item>
+                <Item>
+                  <GUID>100682</GUID>
+                </Item>
+                <Item>
+                  <GUID>102448</GUID>
+                </Item>
+                <Item>
+                  <GUID>102449</GUID>
+                </Item>
+                <Item>
+                  <GUID>102450</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001031</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001037</GUID>
+                </Item>
+                <Item>
+                  <GUID>80038</GUID>
+                </Item>
+                <Item>
+                  <GUID>80036</GUID>
+                </Item>
+                <Item>
+                  <GUID>80035</GUID>
+                </Item>
+                <!-- other neutral towers -->
+                <Item>
+                  <GUID>102666</GUID>
+                </Item>
+                <Item>
+                  <GUID>80037</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001733</GUID>
+              <Name>All production buildings</Name>
+              <IconFilename>data/ui/2kimages/main/icons/icon_arrowpoint_right.png</IconFilename>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <Item>
+                  <GUID>6000018</GUID>
+                </Item>
+                <Item>
+                  <GUID>193856</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001734</GUID>
+              <Name>Alle Luftschiffhangars</Name>
+              <IconFilename>data/ui/2kimages/main/icons/icon_arrowpoint_right.png</IconFilename>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <Item>
+                  <GUID>636</GUID>
+                </Item>
+                <Item>
+                  <GUID>635</GUID>
+                </Item>
+                <Item>
+                  <GUID>112689</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        
+        
+        
+    </ModOp>
+    
+    
+    <!-- Vannilla Bugfixes: -->
+    <!-- add arctic kontors to 193897 "All kontors and piers" -->
+    <ModOp Type="add" GUID='193897' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+      Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='112659']">
+      <Item>
+        <GUID>112659</GUID>
+      </Item>
+      <Item>
+        <GUID>112660</GUID>
+      </Item>
+      <Item>
+        <GUID>112661</GUID>
+      </Item>
+      <Item>
+        <GUID>112865</GUID>
+      </Item>
+      <Item>
+        <GUID>112866</GUID>
+      </Item>
+      <Item>
+        <GUID>112867</GUID>
+      </Item>
+      <Item>
+        <GUID>112726</GUID>
+      </Item>
+      <Item>
+        <GUID>116003</GUID>
+      </Item>
+      <Item>
+        <GUID>116004</GUID>
+      </Item>
+    </ModOp>
+    <!-- Add arctic canon gun to the "all military buildings" effectpool -->
+   <ModOp Type="add" GUID='191443' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+     Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='112671']">
+      <Item>
+        <GUID>112671</GUID>
+      </Item>
+    </ModOp>
+    <!-- Add flagship to flameable wooden ships 1398, so it is also included in all ships for combat effects 1512  -->
+    <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+      Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='101121']">
+      <Item>
+        <GUID>101121</GUID>
+      </Item>
+    </ModOp>
+    
+</ModOps>

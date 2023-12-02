@@ -1,0 +1,929 @@
+<ModOps>
+
+  <!-- Trigger to spawn and move AI police units for the AI if a human land spy is on their island. -->
+  <!-- And also to catch human Ship-Spies near AI ships indirectly, if the human recently did sabotage anything. -->
+    
+    
+    <!-- TODO: -->
+    <!-- bei piraten catch noch ne kontrolle dazu packen, dass Pirat nur catchen kann, wenn er auch zurzeit aktiv ist. -->
+    <!-- dazu evlt den piratehlepers mod als submod zufügen und dann ruincount prüfen -->
+    
+
+    
+  <!-- I use the ConditionPlayerCounter/CounterScope=Area technique to get the relevant Area and Session for the spawn triggers to work, regardless of the relevant session (so no need to hardcode them). -->
+    <!-- Unfortunately this only iterates through all islands of the processing player and can only check for buildings (that is why we spawn the helper building) -->
+    <!-- and LimitToQuestArea only seems to work when combined with a Quest (eg. start the quest from the trigger and either put the spawn code in the quest or start another trigger from within the quest). -->
+    <!-- but quests can only be started for human players and only for the processing player. -->
+   <!-- So we need a quest to process the area to make LimitToQuestArea work, but we only get the AI-area (island) if AI is the processing player. -->
+   <!-- So I see no way for now to make LimitToQuestArea work.. -->
+   <!-- The downside from this is, that the move helper objects will be spawned in the whole session on every island, and the more targetbuildings the island has, the more likely it is that they spawn on such an island. -->
+   <!-- That means that on islands with only few buildings the AI police units will move much less frequently... -->
+    
+  <ModOp GUID="130248" Type="AddNextSibling">
+    
+    <!-- changing the animation speed from walk to run does not seem to work with "ActionStartObjectSequence", because this only affects the animation when standing still.. -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001574</GUID>
+          <Name>AI Police Units change Speed sometimes (if ai police exists)</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500001601</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500001560</Context>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteActionByChance</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteActionByChance>
+                    <ChanceValue>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <VariableValue>
+                          <FloatValue>80</FloatValue>
+                        </VariableValue>
+                      </Values>
+                    </ChanceValue>
+                    <ActionListChanceSuccess>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionBuff</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionBuff>
+                                    <BuffAsset>1500001201</BuffAsset>
+                                    <AddBuff>0</AddBuff>
+                                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                                  </ActionBuff>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </ActionListChanceSuccess>
+                    <ActionListChanceFailure>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionBuff</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionBuff>
+                                    <BuffAsset>1500001201</BuffAsset>
+                                    <AddBuff>1</AddBuff>
+                                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                                  </ActionBuff>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </ActionListChanceFailure>
+                  </ActionExecuteActionByChance>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>55000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  
+    
+    <!-- aus sicht jedes humans für sich selbst machen und matcher dann processing owner -->
+    <!-- Pirates will only catch you when near ships/buildings if you recently did sabotage anything (1500001716). -->
+     <!-- but then a quite high chance every ~1 minute -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001717</GUID>
+          <IconFilename>data/ui/2kimages/main/icons/icon_stance_attack.png</IconFilename>
+          <Name>Pirate Harlow catch Spies when near ships/buildings 180023</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100707</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500001716</Context>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionObjectPosition</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPropsSessionSettings />
+                                  <ConditionObjectPosition>
+                                    <Radius>30</Radius>
+                                    <ExpectObjectExists>0</ExpectObjectExists>
+                                    <ExpectTargetExists>0</ExpectTargetExists>
+                                  </ConditionObjectPosition>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                    <ObjectSession>180023</ObjectSession>
+                                  </ObjectFilter>
+                                  <ObjectTargetFilter>
+                                    <TargetGUID>1500001714</TargetGUID>
+                                    <TargetCheckParticipantID>1</TargetCheckParticipantID>
+                                    <TargetParticipantID>Third_party_03_Pirate_Harlow</TargetParticipantID>
+                                    <TargetObjectSession>180023</TargetObjectSession>
+                                  </ObjectTargetFilter>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>30</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionSpawnObjects</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionSpawnObjects>
+                                                        <SpawnGUID>1500001206</SpawnGUID>
+                                                        <Amount>1</Amount>
+                                                        <Owner>Third_party_03_Pirate_Harlow</Owner>
+                                                      </ActionSpawnObjects>
+                                                      <SpawnArea>
+                                                        <SpawnContext>ForceContextPosition</SpawnContext>
+                                                        <MatcherGUID>1500001195</MatcherGUID>
+                                                      </SpawnArea>
+                                                      <SessionFilter>
+                                                        <AllowParentConditionSession>0</AllowParentConditionSession>
+                                                        <Sessions>
+                                                          <Item>
+                                                            <Session>180023</Session>
+                                                          </Item>
+                                                        </Sessions>
+                                                      </SessionFilter>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionDelayedActions</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionDelayedActions>
+                                                        <ExecutionDelay>3000</ExecutionDelay>
+                                                        <DelayedActions>
+                                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                          <Values>
+                                                            <ActionList>
+                                                              <Actions>
+                                                                <Item>
+                                                                  <Action>
+                                                                    <Template>ActionChangeParticipant</Template>
+                                                                    <Values>
+                                                                      <Action />
+                                                                      <ActionChangeParticipant>
+                                                                        <NewParticipantID>Neutral</NewParticipantID>
+                                                                      </ActionChangeParticipant>
+                                                                      <ObjectFilter>
+                                                                        <ObjectGUID>1500001206</ObjectGUID>
+                                                                        <CheckParticipantID>1</CheckParticipantID>
+                                                                        <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID>
+                                                                      </ObjectFilter>
+                                                                    </Values>
+                                                                  </Action>
+                                                                </Item>
+                                                                <Item>
+                                                                  <Action>
+                                                                    <Template>ActionDelayedActions</Template>
+                                                                    <Values>
+                                                                      <Action />
+                                                                      <ActionDelayedActions>
+                                                                        <ExecutionDelay>1000</ExecutionDelay>
+                                                                        <DelayedActions>
+                                                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                                          <Values>
+                                                                            <ActionList>
+                                                                              <Actions>
+                                                                                <Item>
+                                                                                  <Action>
+                                                                                    <Template>ActionDeleteObjects</Template>
+                                                                                    <Values>
+                                                                                      <Action />
+                                                                                      <ActionDeleteObjects />
+                                                                                      <ObjectFilter>
+                                                                                        <ObjectGUID>1500001206</ObjectGUID>
+                                                                                        <CheckParticipantID>1</CheckParticipantID>
+                                                                                        <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                                                                      </ObjectFilter>
+                                                                                    </Values>
+                                                                                  </Action>
+                                                                                </Item>
+                                                                              </Actions>
+                                                                            </ActionList>
+                                                                          </Values>
+                                                                        </DelayedActions>
+                                                                      </ActionDelayedActions>
+                                                                    </Values>
+                                                                  </Action>
+                                                                </Item>
+                                                              </Actions>
+                                                            </ActionList>
+                                                          </Values>
+                                                        </DelayedActions>
+                                                      </ActionDelayedActions>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>55000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- ConditionIsParticipantInGame funzt nicht für LaFortune, also stattdessen lighthouse checken -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001718</GUID>
+          <Name>Pirate LaFortune catch Spies when near ships/buildings 180025</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100708</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500001716</Context>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionObjectPosition</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPropsSessionSettings />
+                                  <ConditionObjectPosition>
+                                    <Radius>30</Radius>
+                                    <ExpectObjectExists>0</ExpectObjectExists>
+                                    <ExpectTargetExists>0</ExpectTargetExists>
+                                  </ConditionObjectPosition>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                    <ObjectSession>180025</ObjectSession>
+                                  </ObjectFilter>
+                                  <ObjectTargetFilter>
+                                    <TargetGUID>1500001714</TargetGUID>
+                                    <TargetCheckParticipantID>1</TargetCheckParticipantID>
+                                    <TargetParticipantID>Third_party_04_Pirate_LaFortune</TargetParticipantID>
+                                    <TargetObjectSession>180025</TargetObjectSession>
+                                  </ObjectTargetFilter>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>30</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionSpawnObjects</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionSpawnObjects>
+                                                        <SpawnGUID>1500001206</SpawnGUID>
+                                                        <Amount>1</Amount>
+                                                        <Owner>Third_party_04_Pirate_LaFortune</Owner>
+                                                      </ActionSpawnObjects>
+                                                      <SpawnArea>
+                                                        <SpawnContext>ForceContextPosition</SpawnContext>
+                                                        <MatcherGUID>1500001195</MatcherGUID>
+                                                      </SpawnArea>
+                                                      <SessionFilter>
+                                                        <AllowParentConditionSession>0</AllowParentConditionSession>
+                                                        <Sessions>
+                                                          <Item>
+                                                            <Session>180025</Session>
+                                                          </Item>
+                                                        </Sessions>
+                                                      </SessionFilter>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionDelayedActions</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionDelayedActions>
+                                                        <ExecutionDelay>3000</ExecutionDelay>
+                                                        <DelayedActions>
+                                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                          <Values>
+                                                            <ActionList>
+                                                              <Actions>
+                                                                <Item>
+                                                                  <Action>
+                                                                    <Template>ActionChangeParticipant</Template>
+                                                                    <Values>
+                                                                      <Action />
+                                                                      <ActionChangeParticipant>
+                                                                        <NewParticipantID>Neutral</NewParticipantID>
+                                                                      </ActionChangeParticipant>
+                                                                      <ObjectFilter>
+                                                                        <ObjectGUID>1500001206</ObjectGUID>
+                                                                        <CheckParticipantID>1</CheckParticipantID>
+                                                                        <ObjectParticipantID>Third_party_04_Pirate_LaFortune</ObjectParticipantID>
+                                                                      </ObjectFilter>
+                                                                    </Values>
+                                                                  </Action>
+                                                                </Item>
+                                                                <Item>
+                                                                  <Action>
+                                                                    <Template>ActionDelayedActions</Template>
+                                                                    <Values>
+                                                                      <Action />
+                                                                      <ActionDelayedActions>
+                                                                        <ExecutionDelay>1000</ExecutionDelay>
+                                                                        <DelayedActions>
+                                                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                                          <Values>
+                                                                            <ActionList>
+                                                                              <Actions>
+                                                                                <Item>
+                                                                                  <Action>
+                                                                                    <Template>ActionDeleteObjects</Template>
+                                                                                    <Values>
+                                                                                      <Action />
+                                                                                      <ActionDeleteObjects />
+                                                                                      <ObjectFilter>
+                                                                                        <ObjectGUID>1500001206</ObjectGUID>
+                                                                                        <CheckParticipantID>1</CheckParticipantID>
+                                                                                        <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                                                                      </ObjectFilter>
+                                                                                    </Values>
+                                                                                  </Action>
+                                                                                </Item>
+                                                                              </Actions>
+                                                                            </ActionList>
+                                                                          </Values>
+                                                                        </DelayedActions>
+                                                                      </ActionDelayedActions>
+                                                                    </Values>
+                                                                  </Action>
+                                                                </Item>
+                                                              </Actions>
+                                                            </ActionList>
+                                                          </Values>
+                                                        </DelayedActions>
+                                                      </ActionDelayedActions>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>55000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <!-- money substractio from victim code can be found eg. in GUID 1500001425 -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001594</GUID>
+          <Name>Anyone add money sabotage</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500001720</Context>
+                <CounterAmount>1</CounterAmount>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <Context>1500001492</Context>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <!-- add money amount based on main progresslevel, starting with endgame, because order matters (first one that matches will be executed) -->
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>142932</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddResource</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddResource>
+                                        <Resource>1010017</Resource>
+                                        <ResourceAmount>100000</ResourceAmount>
+                                      </ActionAddResource>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>140505</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddResource</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddResource>
+                                        <Resource>1010017</Resource>
+                                        <ResourceAmount>50000</ResourceAmount>
+                                      </ActionAddResource>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>140504</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddResource</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddResource>
+                                        <Resource>1010017</Resource>
+                                        <ResourceAmount>25000</ResourceAmount>
+                                      </ActionAddResource>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>140503</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddResource</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddResource>
+                                        <Resource>1010017</Resource>
+                                        <ResourceAmount>15000</ResourceAmount>
+                                      </ActionAddResource>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>140500</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddResource</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddResource>
+                                        <Resource>1010017</Resource>
+                                        <ResourceAmount>10000</ResourceAmount>
+                                      </ActionAddResource>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionAlwaysTrue</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionAlwaysTrue />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddResource</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddResource>
+                                        <Resource>1010017</Resource>
+                                        <ResourceAmount>5000</ResourceAmount>
+                                      </ActionAddResource>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>1500001489</IconAsset>
+                          <FilterType>Military</FilterType>
+                          <Infotip>0</Infotip>
+                          <HasJumpLocation>0</HasJumpLocation>
+                          <IsWarning>0</IsWarning>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>1500001493</NotificationText>
+                          <NotificationAudioAsset>9818763</NotificationAudioAsset>
+                          <NotificationPriority>300</NotificationPriority>
+                          <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
+                          <DisplayTimeout>330000</DisplayTimeout>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDeleteObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionDeleteObjects />
+                  <ObjectFilter>
+                    <ObjectGUID>1500001492</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500001492</Context>
+                      <CounterAmount>0</CounterAmount>
+                      <ComparisonOp>AtMost</ComparisonOp>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+  </ModOp>
+
+    
+</ModOps>

@@ -1,0 +1,102 @@
+<ModOps>
+  
+  <!-- general code to replace all ConditionIsMultiplayer. might be incompatible to mods relying on it for their triggers, -->
+   <!-- so they should load after this mod if this is a problem. -->
+   <!-- See assets.xml include to enable compatible code instead -->
+  
+  <!-- replace "not multiplayer" with "is single human slot" -->
+  <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003811</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <!-- replace "is multiplayer" with "is not single human slot" (must also replace these, otherwise both "is multiplayer" and "is single human slot" will be true, leading to double the quests or so) -->
+  <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003812</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  <!-- mod compatibility -->
+  <Group Condition="!#Change GameSpeed">
+    <!-- in case we overwrote this mod, change it back to a proper MP check -->
+    <ModOp Condition="@1500001011" Type="replace" GUID="1500001011,1500001012,1500001013,1500001014,1500001015" Path="/Values/Trigger/TriggerCondition">
+      <TriggerCondition>
+        <Template>ConditionIsMultiplayer</Template>
+        <Values>
+          <Condition />
+          <ConditionIsMultiplayer />
+          <ConditionPropsNegatable />
+        </Values>
+      </TriggerCondition>
+    </ModOp>
+  </Group>
+  
+  
+  <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->
+  
+  <!-- Quests PreConditionList -->
+  
+  <!-- SPECIAL case because it needs SubConditionCompletionOrder -->
+    <!-- Not Multiplayer == IsSingleHumanSlot -->
+    <ModOp Type="replace" GUID="128541" Path="/Values/PreConditionList/Condition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
+      <Condition>
+        <Template>ConditionUnlocked</Template>
+        <Values>
+          <Condition>
+            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+          </Condition>
+          <ConditionUnlocked>
+            <UnlockNeeded>1500003811</UnlockNeeded>
+          </ConditionUnlocked>
+          <ConditionPropsNegatable />
+        </Values>
+      </Condition>
+    </ModOp>
+  
+  <!-- Not Multiplayer == IsSingleHumanSlot -->
+  <ModOp Type="replace" Path="//Condition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003811</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+  <!-- Multiplayer == Not IsSingleHumanSlot -->
+  <ModOp Type="replace" Path="//Condition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003812</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+    
+  
+
+</ModOps>
+

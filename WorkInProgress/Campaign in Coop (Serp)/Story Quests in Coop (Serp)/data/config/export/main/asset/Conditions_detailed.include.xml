@@ -1,0 +1,177 @@
+<ModOps>
+  
+  <!-- by default this file is not enabled (see assets.xml include), because it loads much slower than the Conditions file -->
+   <!-- but it is more compatible to other mods, since the GUIDs to change are hardcoded to only change vanilla conditions   -->
+
+
+  <!-- I search the assets.xml for ConditionIsMultiplayer and decide if it is good to replace this with my condition IsSingleHumanSlot. -->
+   <!-- we will use 1500003811 for IsSingleHumanSlot and 1500003812 for NOTIsSingleHumanSlot, because these do wait ~1 second to make sure everything is init -->
+  
+
+  
+  <!-- replace "not multiplayer" with "is single human slot" -->
+  <!-- (die ganzen 601.. einträge sind von scenarien.. aber dennoch erstmal aufnehmen, vllt gibts da ja doch iwann coop..) -->
+  <ModOp Type="replace" GUID="10000108,10000135,10000136,116823,116022,116024,270018,270037,130831,601142,601164,601143,601165,601150,601166,601171,601172,601163,601167,601173,601174,601169,601168,601170,601184,601185,601144,601148,601153,601154,601155,601156,601157,601158,601159,601160,601175,601176,601177,601178,601179,601180,601182,601183,601016,601017,601018,601146,601181,601147,130465,18257,18255,18250,127562,127583,127551,127553,128017,127815,127816,130834,130835,130836,130837,132409,132410,132411,132412,127818,127819,127820,127810,132149,137833,133922,135680,135904" Path="/Values/Trigger/TriggerCondition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003811</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <!-- replace "is multiplayer" with "is not single human slot" (must also replace these, otherwise both "is multiplayer" and "is single human slot" will be true, leading to double the quests or so) -->
+  <ModOp Type="replace" GUID="114064,114618,114116,116025,270175,270176,130977,130969,130970,130971,130972,130973,130974,124756,132147,134838,133921,135903,135761" Path="/Values/Trigger/TriggerCondition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003812</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  <!-- SUBTRIGGERS -->
+  <!-- since we dont use //TriggerCondition because it is too slow, we also have to define the SubTriggers path for some -->
+  <!-- replace "not multiplayer" with "is single human slot" -->
+  <ModOp Type="replace" GUID="114078,114079,114080,114081,114211,269184,119865,133542,135021" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
+  <!-- <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]"> -->
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003811</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <!-- replace "is multiplayer" with "is not single human slot" (must also replace these, otherwise both "is multiplayer" and "is single human slot" will be true, leading to double the quests or so) -->
+  <ModOp Type="replace" GUID="113867,117259,133541,134765,134766,134768,135728,135749,135751" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+  <!-- <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]"> -->
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003812</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <!-- SPECIAL CASE, double SubTriggers -->
+    <ModOp Type="replace" GUID="135685" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
+      <TriggerCondition>
+        <Template>ConditionUnlocked</Template>
+        <Values>
+          <Condition />
+          <ConditionUnlocked>
+            <UnlockNeeded>1500003811</UnlockNeeded>
+          </ConditionUnlocked>
+          <ConditionPropsNegatable />
+        </Values>
+      </TriggerCondition>
+    </ModOp>
+    <!-- replace "is multiplayer" with "is not single human slot"  -->
+    <ModOp Type="replace" GUID="135685" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+      <TriggerCondition>
+        <Template>ConditionUnlocked</Template>
+        <Values>
+          <Condition />
+          <ConditionUnlocked>
+            <UnlockNeeded>1500003812</UnlockNeeded>
+          </ConditionUnlocked>
+          <ConditionPropsNegatable />
+        </Values>
+      </TriggerCondition>
+    </ModOp>
+  
+  <!-- ####################### -->
+  
+  <!-- Quests PreConditionList -->
+  <!-- Not Multiplayer == IsSingleHumanSlot -->
+  <ModOp Type="replace" GUID="123599,119219,119231,119227,123803,128543,128540,128094,128093,129518,131236,131356,131577,124329,128715,129831,129836,125349,125350,125351,125352,125353,131093,131094,131095,131096,131097,131098,131551,134144,134156,135708,135818,135819,135820,103687" Path="/Values/PreConditionList/Condition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
+  <!-- <ModOp Type="replace" Path="//Condition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]"> -->
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003811</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+  <!-- Multiplayer == Not IsSingleHumanSlot -->
+  <ModOp Type="replace" GUID="113868" Path="/Values/PreConditionList/Condition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+  <!-- <ModOp Type="replace" Path="//Condition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]"> -->
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003812</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+  <!-- SPECIAL case because it needs SubConditionCompletionOrder -->
+    <!-- Not Multiplayer == IsSingleHumanSlot -->
+    <ModOp Type="replace" GUID="128541" Path="/Values/PreConditionList/Condition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
+      <Condition>
+        <Template>ConditionUnlocked</Template>
+        <Values>
+          <Condition>
+            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+          </Condition>
+          <ConditionUnlocked>
+            <UnlockNeeded>1500003811</UnlockNeeded>
+          </ConditionUnlocked>
+          <ConditionPropsNegatable />
+        </Values>
+      </Condition>
+    </ModOp>
+  
+  <!-- SUBCONDITIONS -->
+  <!-- since we dont use //Condition because it is too slow, we also have to define the SubConditions path for some quests -->
+  <!-- Not Multiplayer == IsSingleHumanSlot -->
+  <ModOp Type="replace" GUID="112116,114119,269868,270007,119045,119046,118867,119875,122786,124003,128539,124328,124427,129832,129833,129834,129835,129838,132110,133926,135901,105396,105612" Path="/Values/PreConditionList/SubConditions/Item/SubCondition/Values/PreConditionList/Condition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003811</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+  <!-- Multiplayer == Not IsSingleHumanSlot -->
+  <ModOp Type="replace" GUID="114307,114774,117260,114906,114913,115075,115177,115178,115024,115028,115156,115161,117079,117115,117119,117120" Path="/Values/PreConditionList/SubConditions/Item/SubCondition/Values/PreConditionList/Condition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003812</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+    
+  
+
+</ModOps>
+

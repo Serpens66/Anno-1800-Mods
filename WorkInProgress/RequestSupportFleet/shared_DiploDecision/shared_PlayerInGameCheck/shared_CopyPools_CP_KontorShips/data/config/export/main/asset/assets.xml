@@ -1,0 +1,66 @@
+<ModOps>
+    
+  
+  <!-- Uses Serp GUID 1500003867 from shared mod PlayerInGameCheck -->
+  
+  <!-- bugfix FlakMonitor and Fire Monitor to All PlayerShips -->
+  <ModOp Type="add" GUID='700151' Path="/Values/AssetPool/AssetList"
+    Condition="!~/Values/AssetPool/AssetList/Item[Asset='720']">
+    <Item>
+      <Asset>720</Asset>
+    </Item>
+  </ModOp>
+  <ModOp Type="add" GUID='700151' Path="/Values/AssetPool/AssetList"
+    Condition="!~/Values/AssetPool/AssetList/Item[Asset='968']">
+    <Item>
+      <Asset>968</Asset>
+    </Item>
+  </ModOp>
+  
+  
+  <!-- a new PlayerCounterContextPool with all kontors and all playerships. if AI does own anything from it, it is most likely still alive -->
+  <ModOp Type="AddNextSibling" GUID="700000">
+    <Asset>
+      <Template>PlayerCounterContextPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003867</GUID>
+          <Name>AP - All Kontors All Regions and all Player Ships</Name>
+        </Standard>
+        <PlayerCounterContextPool>
+          <Contexts />
+          <IgnoreSerializedPool>1</IgnoreSerializedPool>
+        </PlayerCounterContextPool>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- add all kontors -->
+  <ModOp Type="add" Path="@1500003867/PlayerCounterContextPool/Contexts"
+    Content="@700000/PlayerCounterContextPool/Contexts/Item/Asset/text()">
+    <Item>
+      <Asset>
+        <ModOpContent />
+      </Asset>
+    </Item>
+  </ModOp>
+  <!-- add all playerships -->
+  <ModOp Type="add" Path="@1500003867/PlayerCounterContextPool/Contexts"
+    Content="@700151/AssetPool/AssetList/Item/Asset/text()">
+    <Item>
+      <Asset>
+        <ModOpContent />
+      </Asset>
+    </Item>
+  </ModOp>
+  <!-- all airships -->
+  <ModOp Type="add" Path="@1500003867/PlayerCounterContextPool/Contexts"
+    Content="@102180/AssetPool/AssetList/Item/Asset/text()">
+    <Item>
+      <Asset>
+        <ModOpContent />
+      </Asset>
+    </Item>
+  </ModOp>
+
+
+</ModOps>

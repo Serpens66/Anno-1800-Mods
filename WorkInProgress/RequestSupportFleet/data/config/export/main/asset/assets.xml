@@ -1,0 +1,192 @@
+<ModOps>
+
+  <!-- TODO: -->
+   <!-- wird in coop jeder lua code mehrach ausgeführt?! ja.. -->
+
+
+    <!-- test buffs: -->
+    <!-- wir schiff korrekt von globalen buffs erfasst wenn nur neue guid itemeffecttarget ist? -->
+    <!-- andernfalls muss ich die fakeships auch in buffliste zufügen -->
+
+
+
+
+
+
+
+  <!-- Serp GUIDs: 1500001290 bis 1500001399 und 1500003870 bis einschließlich 1500004199 freigehalten -->
+
+    <!-- wenn von KI angefordert können sie direkt bei deren Werft spawnen und bei neutral trader bei denen denke ich -->
+    <!-- allerdings eben mit verzögerung, damit man das nicht abusen kann -->
+    
+    <!-- bei traderights kann es ne chance auf ablehnung geben -->
+    
+     <!-- Hilfsflotte: -->
+    
+    <!-- <GUID>10151</GUID> -->
+      <!-- <Text>[AssetData([NotificationContext CharacterGUID]) Text] stimmt zu, eine Hilfsflotte zu schicken.</Text> -->
+      <!-- AT_3rdParty02_GenericConfirmation -->
+      <!-- oder bei KI: PlayerInvokesAlliance , auch wenns ab und zu ein wenig übertrieben ist -->
+      <!-- man könnte evlt. auch die optionen anbieten von der KI hilfsflotte zu fordern, die ist dann bisschen größer als von 3rd, geht aber nur -->
+       <!-- wenn sie dich mag (allianz als bedingung ist denke ich zuviel? oder wir machen ne noch bessere option bei allianz) -->
+       <!-- und jede KI könnte eine eigene konstellation an schiffen senden, wobei man aufpassen muss, dass es nicht wieder zuviele optionen werden.. -->
+    
+    <!-- Königin aduio: -->
+    <!-- AT_3rdParty01  AT_3rdParty01_Generic Confirmation1 --> 
+    <!-- party_01 -->
+    
+       <!-- pirate: AT_3rd_party_03_Generic Confirmation1  -->
+
+
+  <!-- ohne allianz nur kleine Flotte anfordern möglich -->
+
+
+  <!-- ncah der decision müssen wir eh einen trigger starten um zu prüfen wieviel reputation man hat  -->
+  <!-- (am besten in 10er schritten prüfen, also if reputation between 100 and 90 then do actionbychance mit 95% usw. -->
+  <!-- diese info dann auch in tooltip, dass chance ungefähr von reputation abhängt, also ungefährt gleich rep ist, aber maximal 95%) -->
+   
+  <!-- und da kann man dann auch die accepted/declined notification reinpacken (bei accepted und traderights eine andere nehmen als bei acepted und allianz) -->
+
+
+  <!-- schiffe immer in old world session spawnen (da für trigger session fest definiert werden muss) -->
+  <!-- wenn KI shipyard hat, dann dort, wenn nicht dann am kartenrand -->
+    <!-- bzw. mit ConditionPlayerCounter der Area von Werft fetched ? wobeis auch fürs finden der schiffe für spieler einfacher ist, wenns immer selbe session ist -->
+
+  <!-- Fragen: -->
+  <!-- - wo zum Fick kommt SupportFleetNotification_Base usw her?! Die Quelle dafür brauch ich auch! -->
+   <!-- man kann selbst ein NotificationLabel in der Notification angeben! -->
+  <!-- - 14710021 und paar weitere gibts nicht im original, ist evlt eine guid aus Taubes mods -->
+
+  <!-- Anpassungen: -->
+  <!-- SpawnShips: -->
+    <!-- Den Code evlt mit meinen Content Befehlen reduzieren, anstatt Inherit usw. zu verwenden. -->
+      <!-- dh. eventuell könnte dann auch ein einziger base trigger ausreichen -->
+    <!-- - ActionMoveObject: wieso jeden Kontor auflisten, geht pool nicht? -->
+     <!-- wobei wir Move evlt weglassen und sie schiffe stattdessen im hafen der ki spawnen mit ping, weil mensch sie evlt selbst sicher steuern will und nicht, dass sie autoamtisch durch feinde fahren (usedangerlayer funzt nicht) -->
+      <!-- Und Owner Human0 ist natürlich ein Problem... ersetzen durch  -->
+      <!-- <CheckParticipantID>1</CheckParticipantID> -->
+      <!-- <CheckProcessingParticipantID>1</CheckProcessingParticipantID> -->
+     <!-- Evlt MapPing und notification zufügen, falls es ein delay zwischen anfrage und spawn gab -->
+     <!-- owner beim spawn und beim move/ActionSetObjectGUID befehl zufügen, damits nicht Human0 ist  -->
+     <!-- evtl. anstelle von conditionevent das unlockassets von reaction nehmen und daher also UnlockNeeded als bedingung nehmen -->
+     <!-- das wäre sicherer für mods die unnötige reactions entfernen und evlt. sogar auch bei vanilla wichtig, wenn reactions abgeschaltet sind, weil es dann keine notification gibt -->
+  <!-- FakeShips: -->
+    <!-- - Alle properties entfernen, denke das ist nicht nötig -->
+    <!-- - Evlt sogar nur ein trade und ein handelschiffstyp für den fake nehmen... wobei game crashed wenn properties nicht stimmen, also lieber auf nummer sicher gehen, falls andere mod properties zufügen -->
+  <!-- ProgressTrigger: -->
+    <!-- Falls wir diese behalten und nicht in conditionevent mit aufnehmen, sollte man da (oder in conditionevent) -->
+    <!-- stattdessen UnlockNeeded=earlygame usw. prüfen als populationcount -->
+  <!-- DiploScene: successchance usw zufügen und auch schon bei TradeRights mit niedrigeer chance -->
+      <!-- reactions Rejected muss auch noch dazu -->
+    <!-- die anfrage auf die andere seite packen, also zu aufgabe ersuchen usw. -->
+ 
+ 
+ 
+ <!-- Ideen für aufbua: -->
+ 
+ <!-- wir machen nur eine decisionquest pro KI die kein geld kostet und unabhängig vom fortschritt ist. -->
+ <!-- da hat man dann die 5 auswahlmöglichkeiten, klein/groß Handel/Krieg und Spezial, evlt mit grober Beschreibung -->
+ <!-- wie 2 handelschiffe des aktuellen fortschritts. vllt auch eine gemishte option. -->
+ <!-- Wenn man dann eins davon wählt, startet ein Trigger der jeweiligen KI. -->
+  <!-- da prüfen wir dann ob verbündet oder nur handelskontrakt, bei verbündet immer 90% chance, bei Handel vllt 60% chance. -->
+  <!-- beim gucken welche schiffe wir senden, gehen wir nicht nach progresslevel, sondern prüfen mit mutualexplsuve -->
+  <!-- jedes in frage kommende schiff, ob die KI das freigeschaltet hat und nehmen entsprechend das höchste freigeschaltete -->
+   <!-- schiff. (bei spezial mit nicht-normal-baubaren schiffen machen wirs evlt anders) -->
+ 
+ <!-- bei spezialflotte könnte man sonst auch normale schiffe nehmen, die typische reward items der ki dabei haben -->
+  <!-- (mit action zufügen, um keine eigene guid draus amcehn zu müssen) -->
+ 
+ 
+ <!-- für neutrale händler evlt stattdessen die zahl der schiffe die sie verkaufen erhöhen -->
+  <!-- oder einfach die Trade1 und War1 option (also wenige schiffe) und ein klein wenig teurer als bei KI -->
+ 
+ 
+  <!-- TODO:  -->
+    <!-- verbündete KIs/Piraten können einem ne Quest geben, dass man ihnen eine Hilfsflotte schicken soll -->
+    <!-- <GUID>10153</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] bittet Sie, eine Hilfsflotte zu schicken.</Text> -->
+    <!-- <GUID>10149</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] bittet Sie, eine Hilfsflotte zu schicken.</Text> -->
+    <!-- und wenns faile dann bündnis auflösen -->
+    <!-- schwierig wirds nur das als wincondition zu tracken ... -->
+    
+    <!-- <GUID>10151</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] stimmt zu, eine Hilfsflotte zu schicken.</Text> -->
+    <!-- <GUID>10152</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] lehnt es ab, eine Hilfsflotte zu schicken.</Text> -->
+    <!-- <GUID>10154</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] stimmt zu, eine Hilfsflotte zu schicken.</Text> -->
+    <!-- <GUID>10155</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] lehnt es ab, eine Hilfsflotte zu schicken.</Text> -->
+ 
+    <!-- <GUID>4040</GUID> <Text>Um militärische Verstärkung ersuchen</Text> -->
+ 
+  
+  <!-- Wahl zwischen klein/große Handels/Kriegsflotte und Spezialflotte -->
+  <!-- erstere sind bei jder KI gleich (zumindest jeder der gleichen Stufe) -->
+  <!-- Und Spezialflotte ist unique für die KI -->
+ 
+  <!-- muss kein AssetPool sein, können wir auch in PlayerCounter umwandeln, falls nötig , hauptsache es funzt in ObjectFilter -->
+  <!-- TODO: pool vervollständigen -->
+  <ModOp Type="AddNextSibling" GUID="700047">
+    <Asset>
+      <Template>AssetPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001290</GUID>
+          <Name>All FakeShips</Name>
+        </Standard>
+        <AssetPool>
+          <AssetList>
+            <Item>
+              <Asset>1500001298</Asset>
+            </Item>
+            <Item>
+              <Asset>1500001291</Asset>
+            </Item>
+            <Item>
+              <Asset>1500001292</Asset>
+            </Item>
+            <Item>
+              <Asset>1500001293</Asset>
+            </Item>
+            <Item>
+              <Asset>1500001294</Asset>
+            </Item>
+            <Item>
+              <Asset>1500001295</Asset>
+            </Item>
+            <Item>
+              <Asset>1500001296</Asset>
+            </Item>
+            <Item>
+              <Asset>1500001297</Asset>
+            </Item>
+          </AssetList>
+        </AssetPool>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp Type="addNextSibling" GUID="116915">
+    <!-- security lock that is used for the decisionoption to gift ships, that is locked while AI sends supportfleet to player. because they both use the same fakeships as helper and it should not happen at the same time -->
+    <Asset>
+      <Template>UnlockableAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001341</GUID>
+          <Name>NoShipGiftWhileReceiving</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+ 
+ 
+ 
+  <!-- <Include File="/data/config/export/main/asset/Taube_orig.include.xml" /> -->
+ 
+  <Include File="/data/config/export/main/asset/FakeShips.include.xml" />
+  <Include File="/data/config/export/main/asset/SpawnShips_Base.include.xml" />
+  <Include File="/data/config/export/main/asset/SpawnShips_Fill.include.xml" />
+  <Include File="/data/config/export/main/asset/ProgressUnlock.include.xml" />
+  <Include File="/data/config/export/main/asset/Decisions.include.xml" />
+  <Include File="/data/config/export/main/asset/Triggers.include.xml" />
+
+</ModOps>

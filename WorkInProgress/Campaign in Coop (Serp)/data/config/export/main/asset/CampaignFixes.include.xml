@@ -1,0 +1,97 @@
+<ModOps>
+
+  <!-- Fixes for the Campaign that also might be used in singleplayer -->
+  
+  <!-- increase the DiplayTimeout from several notifications, otherwise they are nearly never shown (DiplayTimeout means how long a notification is queued and waiting for other notificatons to finish. if not shown after that time, it is never shown) -->
+  <!-- if not defined, default is 30 seconds, while for many here it is set 1 or 3 seconds. -->
+  <!-- Newspaper guy GUID 162 -->
+  <!-- hm... we could do the same for everything else in the game, but I'm not entirely sure what I miss. -->
+   <!-- vanilla has many notifications with DiplayTimeout=0 or 1000 or 2000 or 3000 or 5000 , while all of these in practice will exactly be the same -> not shown if there currently is another notification. -->
+  <!-- hm.. since in the campaign we are interested in every word anyone says, I will simply increase the value for all of them with values lower than 10 seconds -->
+  <ModOp Type="replace" Path="//Values/ParticipantMessages/MessageTriggers/*/Reactions/Item/Notification/Values/BaseNotification[DisplayTimeout&lt;=10000]/DisplayTimeout">
+    <DisplayTimeout>30000</DisplayTimeout>
+  </ModOp>
+
+
+  <!-- letzte campaign quest <GUID>153232</GUID> sollte nötig sein, bevor Cape Quest (verschwundene Königin) startet, weil königin in mainquest vorkommt -->
+  <!-- only start the "queen missing"-Cape Quest after the last campaign quest is finished -->
+  <ModOp Type="merge" GUID="113443" Path="/Values/Trigger">
+    <SubTriggers />
+  </ModOp>
+  <ModOp Type="add" GUID="113443" Path="/Values/Trigger/SubTriggers">
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Reached</ConditionQuestStateStates>
+                  <ConditionQuestStateQuestGUID>153232</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+  </ModOp>
+  
+  <!-- Enbesa unlock also only after campaign? -->
+  <ModOp Type="add" GUID="119863" Path="/Values/Trigger/SubTriggers">
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Reached</ConditionQuestStateStates>
+                  <ConditionQuestStateQuestGUID>153232</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+  </ModOp>
+  
+  <!-- Arctic unlock also only after campaign? -->
+  <ModOp Type="add" GUID="114115" Path="/Values/Trigger/SubTriggers">
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Reached</ConditionQuestStateStates>
+                  <ConditionQuestStateQuestGUID>153232</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+  </ModOp>
+  
+  <!-- make the monument "Court of Justice" moveable. I think location does not matter and this way it does not stand in your way. Maybe test if any camera movement from vanilla wants you to look at this position, but not a big problem. -->
+  <ModOp Type="merge" GUID="101951,101953,102035,101952" Path="/Values">
+    <Building>
+      <Movable>1</Movable>
+    </Building>
+  </ModOp>
+  
+
+</ModOps>

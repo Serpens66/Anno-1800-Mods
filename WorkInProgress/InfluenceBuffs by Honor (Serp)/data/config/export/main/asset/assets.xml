@@ -1,0 +1,922 @@
+<ModOps>
+
+
+    <!-- TODO -->
+    <!-- nochmal testen ob propagande nicht doch iwie geht... -->
+     <!-- vermutlich nicht, aber dann einen check machen ob der mod Influence Removed [Spice It Up] aktiv ist, -->
+      <!-- und wenn ja, dann für diesen evtl. durch einfluss gutschrift propaganda aktivieren falls das iwie geht? -->
+        <!-- zur not für propagana influence reaktivieren, sollte ja kein problem sein, wenn das dann das einzige ist was einfluss kostet -->
+
+
+
+    
+    <!-- verwendet Serps GUIDS von 1500000100 bis 1500000214 (bis 1500000219 fuer diesen mod (1500000245 im Submod to remove AI lighthouse) freigehalten) -->
+    <!-- teilt GUIDrange mit Attainments by Honor und shared_Honor Mod -->
+     <!-- 1500000121, 1500000122, 1500000123, 1500000124 sind wieder frei -->
+     <!-- 1500000166 bis 1500000167 sind auch wieder frei -->
+
+    <!-- Kosten aller 6 Buffs zurzeit 10500 Ruhm, was ungefähr dem derzeitigem maximum an ruhm entspricht, den man so durchscnittlich bekommt -->
+     <!-- (~6k durch sideln in allen sessions + attraktivität + quests, wobei quests unbegrenzt sind) -->
+
+    <!-- add palace to attracitivy culture effect -->
+    <!-- TODO: test ob attraktivität wirklich dadurch erhöht wird -->
+    <ModOp Type="add" GUID="193666" Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+      Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='249947']">
+      <Item>
+        <GUID>249947</GUID>
+      </Item>
+    </ModOp>
+
+
+    
+    <!--
+    ########################################################################################################################################################### -->
+    <!-- Preperation -->
+    <!--
+    ########################################################################################################################################################### -->
+    <!-- make all influence buffs unreachable by spending influence -->
+    <!-- Propaganda does not work with AddBuff, so we leave it untouched... -->
+    <ModOp Type="replace" GUID="140797"
+      Path="/Values/InfluenceFeature/InfluenceCategories/*[self::Trade or self::Military or self::Optimisation or self::Culture or self::Expansion]/CategoryBuffs/Item[MinSpentInfluence='300']/MinSpentInfluence">
+        <MinSpentInfluence>100000</MinSpentInfluence>
+    </ModOp>
+    <ModOp Type="replace" GUID="140797"
+      Path="/Values/InfluenceFeature/InfluenceCategories/*[self::Trade or self::Military or self::Optimisation or self::Culture or self::Expansion]/CategoryBuffs/Item[MinSpentInfluence='150']/MinSpentInfluence">
+        <MinSpentInfluence>99998</MinSpentInfluence>
+    </ModOp>
+    <ModOp Type="replace" GUID="140797"
+      Path="/Values/InfluenceFeature/InfluenceCategories/*[self::Trade or self::Military or self::Optimisation or self::Culture or self::Expansion]/CategoryBuffs/Item[MinSpentInfluence='50']/MinSpentInfluence">
+        <MinSpentInfluence>99996</MinSpentInfluence>
+    </ModOp>
+    <ModOp Type="replace" GUID="140797"
+      Path="/Values/InfluenceFeature/InfluenceCategories/*[self::Trade or self::Military or self::Optimisation or self::Culture or self::Expansion]/CategoryBuffs/Item[MaxSpentInfluence='299']/MaxSpentInfluence">
+        <MaxSpentInfluence>99999</MaxSpentInfluence>
+    </ModOp>
+    <ModOp Type="replace" GUID="140797"
+      Path="/Values/InfluenceFeature/InfluenceCategories/*[self::Trade or self::Military or self::Optimisation or self::Culture or self::Expansion]/CategoryBuffs/Item[MaxSpentInfluence='149']/MaxSpentInfluence">
+        <MaxSpentInfluence>99997</MaxSpentInfluence>
+    </ModOp>
+
+    
+
+
+    <!--
+    ########################################################################################################################################################### -->
+    <!-- add 18 dummy ships that representate the 18 different buffs (6 categories, each 3
+    buff-levels) you can get -->
+    <!--
+    ########################################################################################################################################################### -->
+    <!-- Expansion -->
+    <ModOp GUID="114166" Type="addNextSibling">
+
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000100</GUID>
+            <Name>Expansion Buff Mod 1</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_expansion_bronce.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>250</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>300000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000101</GUID>
+            <Name>Expansion Buff Mod 2</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_expansion_silver.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>500</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>600000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000102</GUID>
+            <Name>Expansion Buff Mod 3</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_expansion_gold.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>1000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>900000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+
+      <!-- Trade -->
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000103</GUID>
+            <Name>Trade Buff Mod 1</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_trade_bronce.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>250</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>300000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000104</GUID>
+            <Name>Trade Buff Mod 2</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_trade_silver.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>500</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>600000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000105</GUID>
+            <Name>Trade Buff Mod 3</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_trade_gold.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>1000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>900000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+
+
+      <!-- Military -->
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000106</GUID>
+            <Name>Military Buff Mod 1</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_military_bronce.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>250</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>300000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000107</GUID>
+            <Name>Military Buff Mod 2</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_military_silver.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>500</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>600000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000108</GUID>
+            <Name>Military Buff Mod 3</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_military_gold.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>1000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>900000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+
+      <!-- Optimisation -->
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000109</GUID>
+            <Name>Optimisation Buff Mod 1</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_optimisation_bronce.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>250</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>300000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000110</GUID>
+            <Name>Optimisation Buff Mod 2</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_optimisation_silver.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>500</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>600000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000111</GUID>
+            <Name>Optimisation Buff Mod 3</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_optimisation_gold.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>1000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>900000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+
+
+      <!-- Culture -->
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000115</GUID>
+            <Name>Culture Buff Mod 1</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_culture_bronce.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>250</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>300000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000116</GUID>
+            <Name>Culture Buff Mod 2</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_culture_silver.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>500</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>600000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000117</GUID>
+            <Name>Culture Buff Mod 3</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/influence/icon_buff_culture_gold.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>1500000240</Ingredient>
+                <Amount>1000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>900000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+        </Values>
+      </Asset>
+
+    </ModOp>
+
+
+  <!-- Add the buffs properties to these dummy ships, -->
+   <!-- so our modified tooltip can automatically display them -->
+  
+  
+  <ModOp Type="add" GUID="1500000100" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@191296/ItemEffect" />
+  <ModOp Type="add" GUID="1500000100" Path="/Values"
+    Condition="!/Values/DistributionUpgrade"
+    Content="@191296/DistributionUpgrade" />
+  <ModOp Type="add" GUID="1500000101" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@191301/ItemEffect" />
+  <ModOp Type="add" GUID="1500000101" Path="/Values"
+    Condition="!/Values/DistributionUpgrade"
+    Content="@191301/DistributionUpgrade" />
+  <ModOp Type="add" GUID="1500000102" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@191302/ItemEffect" />
+  <ModOp Type="add" GUID="1500000102" Path="/Values"
+    Condition="!/Values/DistributionUpgrade"
+    Content="@191302/DistributionUpgrade" />
+
+  <!-- for expansion we also have to add the effect of the other-session buffs (new world) -->
+  
+  <ModOp Type="add" GUID="1500000100" Path="/Values/ItemEffect/EffectTargets"
+    Content="@191299/ItemEffect/EffectTargets/Item" />
+  <ModOp Type="add" GUID="1500000100" Path="/Values/DistributionUpgrade/AddDeltas"
+    Content="@191299/DistributionUpgrade/AddDeltas/Item" />
+  <ModOp Type="add" GUID="1500000101" Path="/Values/ItemEffect/EffectTargets"
+    Content="@191300/ItemEffect/EffectTargets/Item" />
+  <ModOp Type="add" GUID="1500000101" Path="/Values/DistributionUpgrade/AddDeltas"
+    Content="@191300/DistributionUpgrade/AddDeltas/Item" />
+  <ModOp Type="add" GUID="1500000102" Path="/Values/ItemEffect/EffectTargets"
+    Content="@191303/ItemEffect/EffectTargets/Item" />
+  <ModOp Type="add" GUID="1500000102" Path="/Values/DistributionUpgrade/AddDeltas"
+    Content="@191303/DistributionUpgrade/AddDeltas/Item" />
+  
+
+
+  <ModOp Type="add" GUID="1500000103" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@7088/ItemEffect" />
+  <ModOp Type="add" GUID="1500000103" Path="/Values"
+    Condition="!/Values/VehicleUpgrade"
+    Content="@7088/VehicleUpgrade" />
+  <ModOp Type="add" GUID="1500000104" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@7089/ItemEffect" />
+  <ModOp Type="add" GUID="1500000104" Path="/Values"
+    Condition="!/Values/VehicleUpgrade"
+    Content="@7089/VehicleUpgrade" />
+  <ModOp Type="add" GUID="1500000105" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@7090/ItemEffect" />
+  <ModOp Type="add" GUID="1500000105" Path="/Values"
+    Condition="!/Values/VehicleUpgrade"
+    Content="@7090/VehicleUpgrade" />
+  
+  <ModOp Type="add" GUID="1500000106" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@193987/ItemEffect" />
+  <ModOp Type="add" GUID="1500000106" Path="/Values"
+    Condition="!/Values/AttackerUpgrade"
+    Content="@193987/AttackerUpgrade" />
+  <ModOp Type="add" GUID="1500000107" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@193988/ItemEffect" />
+  <ModOp Type="add" GUID="1500000107" Path="/Values"
+    Condition="!/Values/AttackerUpgrade"
+    Content="@193988/AttackerUpgrade" />
+  <ModOp Type="add" GUID="1500000108" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@193989/ItemEffect" />
+  <ModOp Type="add" GUID="1500000108" Path="/Values"
+    Condition="!/Values/AttackerUpgrade"
+    Content="@193989/AttackerUpgrade" />
+  
+  <ModOp Type="add" GUID="1500000109" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@369/ItemEffect" />
+  <ModOp Type="add" GUID="1500000109" Path="/Values"
+    Condition="!/Values/BuildingUpgrade"
+    Content="@369/BuildingUpgrade" />
+  <ModOp Type="add" GUID="1500000110" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@372/ItemEffect" />
+  <ModOp Type="add" GUID="1500000110" Path="/Values"
+    Condition="!/Values/BuildingUpgrade"
+    Content="@372/BuildingUpgrade" />
+  <ModOp Type="add" GUID="1500000111" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@374/ItemEffect" />
+  <ModOp Type="add" GUID="1500000111" Path="/Values"
+    Condition="!/Values/BuildingUpgrade"
+    Content="@374/BuildingUpgrade" />
+  
+  <ModOp Type="add" GUID="1500000115" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@190607/ItemEffect" />
+  <ModOp Type="add" GUID="1500000115" Path="/Values"
+    Condition="!/Values/CultureUpgrade"
+    Content="@190607/CultureUpgrade" />
+    <ModOp Type="add" GUID="1500000116" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@191363/ItemEffect" />
+  <ModOp Type="add" GUID="1500000116" Path="/Values"
+    Condition="!/Values/CultureUpgrade"
+    Content="@191363/CultureUpgrade" />
+  <ModOp Type="add" GUID="1500000117" Path="/Values"
+    Condition="!/Values/ItemEffect"
+    Content="@191364/ItemEffect" />
+  <ModOp Type="add" GUID="1500000117" Path="/Values"
+    Condition="!/Values/CultureUpgrade"
+    Content="@191364/CultureUpgrade" />
+
+
+   <!-- add InfoDescription "worldwide effect" to the vanilla influence buffs, if they have none yet  -->
+  <ModOp Type="merge" GUID="191296,191299,191301,191300,191302,191303,7088,7089,7090,193987,193988,193989,369,372,374,190607,191363,191364" Path="/Values/Standard"
+    Condition="!/Values/Standard/InfoDescription">
+    <InfoDescription>22076</InfoDescription>
+  </ModOp>
+
+  
+  
+  <!-- ########################################################################################################################################################### -->
+    <!-- use a shipyard like building, where we can obtain the influence buffs instead via dummy ships -->
+  
+    <ModOp Type="add" GUID="1500000200" Path="/Values/Shipyard/AssemblyOptions">
+      <Item>
+        <Vehicle>1500000100</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000101</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000102</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000103</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000104</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000105</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000106</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000107</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000108</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000109</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000110</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000111</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000115</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000116</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500000117</Vehicle>
+      </Item>
+    </ModOp>
+    <!-- <ModOp Type="add" GUID="1500000201" Path="/Values/Shipyard/AssemblyOptions"> -->
+      
+    <!-- </ModOp> -->
+  
+  
+    
+  <!-- add start permits -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000153</GUID>
+          <Name>distribute start permits</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000100</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000101</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000102</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000103</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000104</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000105</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000106</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000107</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000108</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000109</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000110</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000111</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000115</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000116</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000117</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>
+    
+  </ModOp>
+    
+  
+
+  <Include File="./BuffsBought.include.xml" />
+  <Include File="./BuffsUnlock.include.xml" />
+  <Include File="./BuffsAI.include.xml" />
+  <Include File="./BuffsReapplySession.include.xml" />
+  
+  <!-- enable this line for testmode, eg. fast/cheap -->
+  <Include File="./TestMode.include.xml" />
+  
+  
+
+</ModOps>

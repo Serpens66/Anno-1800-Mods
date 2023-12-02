@@ -1,0 +1,172 @@
+<ModOps>
+   
+   <!-- Also: -->
+    <!-- an sich reicht IsStrategicResource=0 und zufügen zu ProductList 502065,502067,502068,502080,502049,502050,502051,502075 -->
+    <!-- sowie natürlich in GoodsProduction/GoodSets vom Händler, damits handelbar ist. -->
+    <!-- Mit nur diesen beiden Änderungen muss Handelspartner, also zb. Archibald aber einen Ölhafen besitzen -->
+     <!-- Gebäude mit  -->
+    <!-- <Warehouse> -->
+      <!-- <WarehouseStorage> -->
+        <!-- <StorageMax>500</StorageMax> -->
+      <!-- </WarehouseStorage> -->
+      <!-- <StorageType>StrategicKontor</StorageType> -->
+    <!-- </Warehouse> -->
+    <!-- <StorageBase> -->
+      <!-- <ProductStorageList>120056</ProductStorageList> -->
+    <!-- </StorageBase> -->
+   <!-- Dem Händler so ein Gebäude zuzufügen ist ziemlich schwer, Leuchtturm das geben crasht und wenn man Kontor gibt, dann geht da nichts andres als Öl mehr -->
+     <!-- weil Ölhandelsrouten nur zu StrategicKontor gehen und normale Handelsrouten nur zu normalen Kontor -->
+   <!-- Mit diesen beiden Änderungen ist Öl auch bereits manuell mit normalen Schiffen transportierbar, lässt sich leider nicht vermeiden -->
+  <!-- Man könnte noch diverse andere Änderungen machen, damit Öl letzlich wie jedes andere Gut transportiert wird und es keine Ölrouten mehr braucht. -->
+    <!-- Aber das ist auch iwie doof. -->
+   
+   <!-- ölhandel: -->
+  <ModOp Type="add" GUID='45' Path="/Values/Trader/Progression/*/GoodsProduction">
+    <Item>
+      <Good>1010566</Good>
+      <ProductionPerMinute>100</ProductionPerMinute>
+    </Item>
+  </ModOp>
+  <ModOp Type="add" GUID='45' Path="/Values/Trader/Progression/*/OfferingGoods/Item/GoodSets">
+    <Item>
+      <Good>1010566</Good>
+    </Item>
+  </ModOp>
+  
+  <!-- make traders rerorll their offer fast so we see the change in offered products -->
+  <ModOp Type='merge' GUID='45' Path='/Values/Trader'>
+      <TraderRerollInterval>30000</TraderRerollInterval>
+  </ModOp>
+  
+  <!-- IsStrategicResource = 0 und zufügen zu 120055 ist notwendig, damits im handelsmenü der ki angezeigt wird. -->
+  <!-- ProductCategory ist nicht noetig, vermutlich nur text -->
+  <ModOp Type='merge' GUID='1010566' Path='/Values/Product'>
+    <IsStrategicResource>0</IsStrategicResource>
+  </ModOp>
+  
+  <!-- 120055 notwendig damit händler es anzeigt und auch passiv verkaufen kann -->
+  <!-- zu den normalen gütern zufügen, dadurch zeigt händler es an und depot lagergröße wirkt fuer die produkte der liste 1010566 -->
+  <!-- <ModOp Type="add" GUID='120055' Path="/Values/ProductStorageList/ProductList"> -->
+    <!-- <Item> -->
+      <!-- <Product>1010566</Product> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  <!-- aus StandardOilHarborStorageList entfernen? nicht noetig glaub ich. wenn nicht entfernt, dann wirds auch weiterhin im olhafen angezeigt -->
+  <!-- 120056 sorgt auch dafür, dass lagergröße des ölhafens auf produkte wirkt -->
+  <!-- <ModOp Type="remove" GUID='120056' Path="/Values/ProductStorageList/ProductList/Item" /> -->
+  
+  <!-- öltanker muss handelsmenü bei kontor öffenen können? 100853 oder einfach auf diese schiffsart verzichten? denn jetzt koennen alle es transportieren -->
+  <!-- muss FixedSlotContent bleiben, damit es für öl handelsrouten verwendet werden kann (oder wir erlauben öl auf normalen handelsrouten, siehe TradeRouteBalancing) -->
+  <!-- aber öltanker kann dan vermutlich nicht bei archibald öl holen, auch nicht als handelsroute... also alternativ ölroute entfernen und öl da wie jedes andere Gut behandeln und FixedSlotContent von Öltanker entfernen -->
+  <!-- doch über handelsroute kann öltanker öl bei archibald einladen -->
+  <!-- <ModOp Type="remove" GUID='100853' Path="/Values/ItemContainer/FixedSlotContent" /> -->
+  <!-- TradeRouteBalancing -->
+  <!-- <ModOp Type="remove" GUID='140011' Path="/Values/TradeRouteFeature/TransportationTypes/*[self::Normal or self::Charter]/ExcludingGoods/Item[Good='1010566']" /> -->
+  <!-- Wenn wir Öl zu der ProductList 120055 zufügen, dann muss es aus ExcludingGoods entfernt werden, da sonst alle handelsrouten nicht mehr funktionieren. -->
+  
+  
+  <!-- Anzeige/Sortierung: -->
+  <!-- zufügen zu "Alle" und "Rohmaterial" von allen Regions -->
+  <!-- damit es in eigenem kontor angezeigt und verladen werden kann und in den passiven handel eingestellt werden kann -->
+  <ModOp Type="add" GUID='502065,502067,502068,502080,502049,502050,502051,502075' Path="/Values/ProductList/List">
+    <Item>
+      <Product>1010566</Product>
+    </Item>
+  </ModOp>
+  
+  <!-- aus strategic good liste entfernen? nicht noetig glaub ich, wobei ich auch nicht weiß wo diese liste angezeigt wird -->
+  <!-- <ModOp Type="remove" GUID='501961' Path="/Values/ProductList/List/Item[Product='1010566']" /> -->
+
+  
+  <!-- aus archibalds leuchtturm 100551 ein Ölhafen machen und gucken ob handel funzt (spiel crashed nur..) -->
+  <!-- bei hafen gehts, aber ist dann halt die frage ob der rest noch funzt... -->
+  <!-- <ModOp Type='merge' GUID='100680' Path='/Values'> -->
+    <!-- <Warehouse> -->
+      <!-- <WarehouseStorage> -->
+        <!-- <StorageMax>500</StorageMax> -->
+      <!-- </WarehouseStorage> -->
+      <!-- <StorageType>StrategicKontor</StorageType> -->
+    <!-- </Warehouse> -->
+    <!-- <StorageBase> -->
+      <!-- <ProductStorageList>120056</ProductStorageList> -->
+    <!-- </StorageBase> -->
+  <!-- </ModOp> -->
+  
+  
+  
+  
+  <!-- archiblad braucht ein gebäude mit vanilla StorageType und eins mit StrategicKontor, damit sowohl normale, als auch ölschiffe anlegen können -->
+  <!-- kam iwie kein öltanker, kann aber auch an creativemode liegen?! -->
+  <!-- <ModOp Type="add" GUID="45" Path="/Values/Trader/Progression/*/TradeFleet"> -->
+    <!-- <Item> -->
+      <!-- <ShipAsset>100853</ShipAsset> -->
+      <!-- <Amount>1</Amount> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+
+
+
+  <!-- Alternativer Gedanke war, Öltransport fast unverändert zu lassen und stattdessen den thrid party händlern einen ölhafen zu und ölfrachter zu geben -->
+   <!-- aber dazu muss man dann dennoch für den passiven Handel den Einkauf/Verkauf einstellen können. Doch das geht im Ölhafen leider nicht, selbst wenn wir -->
+    <!-- <GUIType>Warehouse</GUIType> verwenden. -->
+  <!-- the StrategicKontor type from oil harbor is most likely hardcoded to display strategic ressources from 120056 ... -->
+  <!-- so we have to add it to kontor 502066 and so on to be able to use passive trade for oil -->
+  <!-- we could not add oil to 502066 and so on lists, so it wont be displayed at kontor and active trade would still work (and normal ships can still transport it) -->
+   
+   <!-- IsStrategicResource=1 sorgt dafür, dass Öl nicht in den passiven Kauf/Verkauf gestellt werden kann (und auch nicht auf normalen schiffen transportiert), daher muss das dafür 0 sein -->
+    <!-- wobei man dafür zum <GUIType>Warehouse</GUIType> wechseln muss, damit das UI korrekt für dne handel funzt (bzw. man kann das auch fürs Öldepot verwenden -->
+  
+  <!-- change <GUIType>Warehouse</GUIType> for oil depot, so you can set up passive trading there -->
+  <!-- <ModOp Type='merge' GUID='100784' Path='/Values'> -->
+    <!-- <Selection> -->
+      <!-- <GUIType>Warehouse</GUIType> -->
+    <!-- </Selection> -->
+    <!-- <Warehouse> -->
+      <!-- <StorageType>Depot</StorageType> -->
+    <!-- </Warehouse> -->
+    <!-- <StorageBase> -->
+      <!-- <ProductStorageList>120056</ProductStorageList> -->
+    <!-- </StorageBase> -->
+  <!-- </ModOp> -->
+  <!-- Seems <GUIType>Warehouse</GUIType> and Kontor both always display the goods from 502065 list, regardless what ProductStorageList of the building is -->
+    <!-- defined in ObjectmenuKontorScene/Regions/Moderate/ProductFilter and SessionTradeRoutesScene/GoodFilter/Normal/FilterPerRegion/Moderate -->
+    <!-- so we can not make a building that only displays oil to make it passive tradeable, we have to add oil to the big list of all goods in kontor/warehouse... -->
+     <!-- because kontor/warehouse screen seems to be the only one that allows us to add sth to passive trade -->
+  
+  <!-- <ModOp Type='merge' GUID='100783,101403,101404' Path='/Values'> -->
+    <!-- <Selection> -->
+      <!-- <GUIType>Warehouse</GUIType> -->
+    <!-- </Selection> -->
+    <!-- <Warehouse> -->
+      <!-- <StorageType>Warehouse</StorageType> -->
+    <!-- </Warehouse> -->
+    <!-- <StorageBase> -->
+      <!-- <ProductStorageList>120056</ProductStorageList> -->
+    <!-- </StorageBase> -->
+  <!-- </ModOp> -->
+  
+  <!-- <Template>HarborWarehouseStrategic</Template> -->
+    <!-- <Values> -->
+      <!-- <Standard> -->
+        <!-- <GUID>100783</GUID> -->
+        <!-- <Name>harbor_14a (Oil Harbor I)</Name> -->
+        <!-- <IconFilename>data/ui/2kimages/main/3dicons/icon_oil_habour_01.png</IconFilename> -->
+        <!-- <InfoDescription>10951</InfoDescription> -->
+      <!-- </Standard> -->
+      <!-- <Warehouse> -->
+        <!-- <StorageType>StrategicKontor</StorageType> -->
+      <!-- </Warehouse> -->
+    
+  <!-- info: -->
+  <!-- https://discord.com/channels/578443209940926465/578443576552325143/1141432028303216752 -->
+  <!-- When modding TradeRouteBalancing GUID 140011 to add a good to the Oil trade route there must be a building in the island with a storage list that contains both products -->
+  
+  
+  <!-- TODO: -->
+   <!-- <Text> -->
+      <!-- <GUID>23210</GUID> -->
+      <!-- <Text>Öl kann nicht gehandelt werden.</Text> -->
+    <!-- </Text> -->
+  <!-- umwandeln in: im Kontor/Markthaus gehen um handel einzustellen -->
+
+</ModOps>

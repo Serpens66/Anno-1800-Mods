@@ -1,0 +1,1916 @@
+<ModOps>
+
+  
+  <!-- ################################################### -->
+  <!-- ##  Units  ## -->
+  <!-- ################################################### -->
+  
+  <!-- Landeinheiten könnte man so umsetzen wenn man wollte (LandSpy template oder siehe auch mein Sabotage mod): -->
+  <!-- <Collectable> -->
+    <!-- <DestroyOnCollect>1</DestroyOnCollect> -->
+    <!-- <CollectOnSelection>0</CollectOnSelection> -->
+    <!-- <DragDistanceFromCollector>10</DragDistanceFromCollector> -->
+    <!-- <DragDistanceFromCollectable>10</DragDistanceFromCollectable> -->
+    <!-- <CollectableType>WaterCollectable</CollectableType> -->
+    <!-- <CheckOwner>1</CheckOwner> -->
+    <!-- <NotCollactableIfTargetStoragePartiallyFull>0</NotCollactableIfTargetStoragePartiallyFull> -->
+    <!-- <OnCollect/> -->
+  <!-- <Collectable> -->
+  <!-- und OnCollect noch füllen mit ActionAddGoodsToItemContainer ohne Objectfilter, geht dann direkt ins einsammelnde schiff -->
+  <!-- Und um aus dem Item wieder eine Landeinheit zu machen kööönnte man Flotsam/FlotsamTerrain direkt wieder die Unit selbst eintragen, allerdings gehört die dann leider Neutral, auch egal was ich bei DefaultParticipant eintrage. -->
+  <!-- Aber es funktioniert aus dem Item ein Schuss-Item zu machen, welches die Unit dann mit Projektil und SpawnImpactObject neu spawnt. -->
+  <!-- GUIType=Generic oder Military ist allgemein für Landeinheit sinnvoll, zeigt halt nur keine Items -->
+  <!-- Kleinere Probleme: -->
+  <!-- - Items können nur einen einzigen Allocation Typ haben, dh. wenn man den zb auf Ship setzt, es aber mit Airship einsammelt, kann das Airship die einheit durch Projektil nicht spawnen, weil es das Item nicht sockeln kann. Ist lösbar durch eine Mod1 Allocation die sowohl Schiffe als auch Airships haben. -->
+  <!-- - Die Units sind beschränkt was ihren ItemContainer angeht: Dinge in Slots werden auch vom Collector aufgesammelt und hat unit sogar Dinge gesockelt, wird Unit nicht destroyed. Aber für normale Attacker Units sollte das nicht relevant sein (mein Spy soll aktuell selbst Items sockeln können und da ist das problematischer) -->
+  <!-- - Ich würde gerne die Units limitieren mit BuildPermit, aber wenn diese sich in ein Item verwandelt wird das natürlich wieder freigegeben und SpawnImpactObject ignoriert das natürlich. Idee für eine Lösung wäre ein Fake Object in OnCollect zu spawnen was solange den Permit verbraucht, nur gibts keine Action bei SpawnImpactObject und auch wenn das Transportschiff versenkt wird ist schwer zu erkennen, daher nicht ganz klar wann man das Fake Objekt wieder entfernt oder obs ne andere Lösung gibt. -->
+  <!--     man kann prüfen ob man ein Item besitzt evtl mit InStorageGoods (als ObjectGUID kann ein AssetPool genommen werden der alle Kontore und alle schiffe enthält) -->
+  <!--     ob das auch gesockelte items sieht muss man testen.. und man müsste vermutlich die Zahlen hardcoden, ala "wenn du 1 item besitzt, dann sorge dafür dass es 1 Fake einheit gibt" und das für jede zahl die möglich ist an buildpermits -->
+  <!-- Aufgrund dieser Probleme nutze ich Collectable für Sabotage Mod nicht, aber für normale landeinheiten ohne BuildPermit und ohne Sockets sollte das gut klappen -->
+  <!-- Für Sabotage nutzen wir SpawnImpactObject und nutzen aus, dass jeder nur einmalig die Spy-GUID haben kann und löschen den LandSpy sobald der WasserSpy erscheint. -->
+  <!-- Info: über SpawnImpactObject kann man auch Gebäude spawnen, auch auf fremden Inseln. Könnte also ne Art Festung spawnen, die schießt und wo man weitere truppen ausbilden kann -->
+  
+  <!-- TODO: -->
+  <!-- movebefehl sound, wo kann ich den ändern? ist aktuell wassergeräscu bei befehligen -->
+  
+  
+  <!-- bzgl damage: -->
+   <!-- man könnte auch allen projektilen ein Effectivities geben, sodass sie *0 schaden an allem außer spies machen (zb für police units), -->
+    <!-- braucht dann leider eine liste wo alles drin ist, aber geht theoretisch -->
+    <!-- allerdings gehts denke ich auch so wies bisher ist, also niedriger schaden und police kann eh nicht auf fremde inseln -->
+  
+  <!-- police unit evlt <ItemAction>REPAIR</ItemAction> geben? -->
+  
+  <!-- Skins: -->
+  <!-- evlt noch "verstecken" skin zufügen, also z.b fass oderso? Wobei es nicht zu schwer für opfer werden sollte.. und gegen KI bringt das ja eh nichts -->
+  <!-- Für KI Spies könnte man mit ActionChangeSkin sie schwerer manuell sichtbar machen (human kann jederzeit skin wechseln, die der human spy hat) -->
+  
+  <!-- info: -->
+   <!-- mit AttackerUpgrade/DamageFactor kann man noch einstellen ob eine unit gegen Building/SailShip/SteamShip mehr/weniger Schaden machen soll. -->
+    <!-- TODO: dies evlt mit UpgradeList/DefaultBuff den police units geben mit wert 0, damit sie sicher keinen Schaden an diesen machen können? (testen ob spy als eines von diesen dingen gilt) -->
+  
+  
+  <!-- ObjectDummy Templates are from my submod shared_ObjectDummies (ObjectDummies_Serp) -->
+  
+  <!-- Die Feuer KI Spies zünden KI residences noch nicht zuverlässig an... -->
+  <!-- aktuell sogar garnicht mehr, meine residences zünden sie aber an und auch Holzfäller/werft der KI... -->
+  <!-- sehr merkwürdig... den angriffbefehl haben sie, aber sie schießen nicht? -->
+  <!-- ja liegt am angriffswinkel odersowas, es wird kein projektil abgeschossen, manchmal funzt es aber auch problemlos, komisch.. -->
+  <!-- ja ist immernoch aktuell... -->
+  <!-- TODO... keine ahnung warum... -->
+  
+  
+  <!-- TODO Grafik: -->
+  <!-- jemand der Ahnung von Grafik hat, kann noch gucken ob man Todesanimation für spy hinbekommt und evlt noch animationsgeschwindigkeit auf ForwardSpeed abstimmen usw.  -->
+  <!-- TODO: deleten der gespawnden unit hat aktuell keine death animation, aber haben bestimmt einige oder man muss es in cfg einbauen -->
+   <!-- <DeathEffectDuration>20000</DeathEffectDuration> (gilt global?) ist ok, sofern es eine death animation gibt.. -->
+   
+      
+      
+   <!-- Spy Ship zusammen mit anderen schiffen (insg drei) bewegen resultiert in teils reiseigen abstand, während nur normale schiffe kleineren abtsnd haben. -->
+   <!-- also muss es schon iwie einen problematischen wert im spy ship geben... -->
+   <!-- und scheinbar egal was ich in drifting reinschreibe, es passt durch recht große wege zwischen türmen nicht durch... -->
+   <!-- mal mit 7 schiffen multimove testen, ob die nah aneinander sind -->
+   <!-- der 7 schiffe test zeigt, dass drifting OverrideAssetWidthAndLength=0 oder 1 mit werten schon auswirkungen hat, aber offenbar nicht bzgl gebäude und wie nah schiff dran kann... -.- -->
+   <!-- vllt doch mal ifo von gunboat mit der von small boat vergleichen, ob man da noch was machen kann (oder graifkmodder fragen) -->
+   <!-- Ähnliches Problem gibt es mit Patrollieren, da wird auch großer abstand zu den eigentlichen patrolpunkten gehalten -->
+   
+   
+   <!-- gibt noch gute schiff grafik als feedbackunit vom reparaturkran alte und neue welt (ist leicht andere skin) gibt wohl mind 2 schiffe -->
+    <!-- data/graphics/vehicle/fishing_boat/fishing_boat.cfg -->
+
+  
+  <!-- TODO überlegen: -->
+  <!-- eventuell doch nur weltweit eine police unit so wie spy. -->
+  <!-- und als verteilten passiven Inselschutz kann man ~20 Wachtürme pro Region bauen oderso? -->
+  <!-- wäre evlt schöner, wenn polizist auch in schiffsleiste wäre und Kaserne verlassen würde. -->
+  <!-- muss man aber schauen ob das sinnvoll ist oder nicht.. -->
+  
+
+  
+  
+  <!-- evlt zufügen falls wir passenden sound finden für move befehl: -->
+  <!-- <SoundEmitterCommandBarks> -->
+    <!-- <BarkMapping> -->
+      <!-- <Selection> -->
+        <!-- <AudioPool>700094</AudioPool> -->
+      <!-- </Selection> -->
+      <!-- <SelectionDamaged> -->
+        <!-- <AudioPool>700125</AudioPool> -->
+      <!-- </SelectionDamaged> -->
+      <!-- <MoveCommand> -->
+        <!-- <AudioPool>700095</AudioPool> -->
+      <!-- </MoveCommand> -->
+      <!-- <EscortCommand> -->
+        <!-- <AudioPool>700127</AudioPool> -->
+      <!-- </EscortCommand> -->
+      <!-- <PatrolCommand> -->
+        <!-- <AudioPool>700126</AudioPool> -->
+      <!-- </PatrolCommand> -->
+    <!-- </BarkMapping> -->
+  <!-- </SoundEmitterCommandBarks> -->
+  <!-- eventuell sowas?: -->
+  <!-- <Name>PyrphorianAcolyte_ -->
+  <!-- <Name>PyrphorianGrandmaster_ (die sätze vom Grandmaster passen nicht und sind zu lang) -->
+  <!-- für CommandBarks nimmt man Audiopools wie zb 268197 -->
+  <!-- Für Item ActivateActionSound nimmt man in den AudioText Dateien die AudioAsset GUID, z.b. 233021 -->
+  <!-- Die Pyrphorian Sätze sind wohl: -->
+  <!-- <Text> -->
+    <!-- <GUID>266980</GUID> -->
+    <!-- <Text>Sie werden euch holen, euch alle.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>266981</GUID> -->
+    <!-- <Text>Deinen Vater zu töten, war einfach ...</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>266982</GUID> -->
+    <!-- <Text>Ich sehe, du willst deinem Vater folgen ...</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>266983</GUID> -->
+    <!-- <Text>Die Flammen wüten ... sie wüten!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>266984</GUID> -->
+    <!-- <Text>Das sechste Zeitalter der Menschheit rückt näher!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>266985</GUID> -->
+    <!-- <Text>Wir bringen das Feuer!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>266986</GUID> -->
+    <!-- <Text>Wir, die Sterblichen, werden die Welt zurückerobern!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267178</GUID> -->
+    <!-- <Text>Brenne. Brenne!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267183</GUID> -->
+    <!-- <Text>Für jedes Glied, das du uns abschlägst, wächst ein neues nach.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267184</GUID> -->
+    <!-- <Text>Dieses Königreich wird mit den ersten Strahlen der Dämmerung in sich zusammenfallen!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267185</GUID> -->
+    <!-- <Text>Drohnen bauen das Nest. Die Königin wird kommen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267186</GUID> -->
+    <!-- <Text>Es braucht nur einen Funken!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267187</GUID> -->
+    <!-- <Text>Wir sind viele.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267188</GUID> -->
+    <!-- <Text>Der Kopf des Empire muss rollen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267189</GUID> -->
+    <!-- <Text>Das Ur-Feuer brennt ewig!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267190</GUID> -->
+    <!-- <Text>Du hast hier keine Macht.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267191</GUID> -->
+    <!-- <Text>Misch dich nicht in unsere Angelegenheiten ein!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267192</GUID> -->
+    <!-- <Text>Wer sich in Gefahr begibt, kommt darin um ...</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267193</GUID> -->
+    <!-- <Text>Die Büßer hier arbeiten für uns!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267194</GUID> -->
+    <!-- <Text>Wir ließen sie nur am Leben, damit sie uns zu Diensten sind.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267195</GUID> -->
+    <!-- <Text>Die Leibeigenen werden unserem Großmeister dienen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267196</GUID> -->
+    <!-- <Text>Es endet hier. Isabel und ihre Verbündeten haben sich zum letzten Mal widersetzt!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267197</GUID> -->
+    <!-- <Text>Wir müssen jetzt das Urteil vollstrecken, das für später vorgesehen war.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267198</GUID> -->
+    <!-- <Text>Isabel hat wohl vergessen, welche Strafe auf Ungehorsam steht.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267199</GUID> -->
+    <!-- <Text>Feuer verlängert die Qual des Sterbens.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267238</GUID> -->
+    <!-- <Text>Du weißt nicht, mit wem du dich da eingelassen hast. Verschwinde, wenn dir dein Leben lieb ist oder brenne!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267479</GUID> -->
+    <!-- <Text>Igne Natura Renovatur</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267498</GUID> -->
+    <!-- <Text>In lumine tuo videbimus lumen</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267499</GUID> -->
+    <!-- <Text>Die Erde muss brennen, bevor sie sich weiterdreht.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267500</GUID> -->
+    <!-- <Text>Die Räder drehen sich und nichts kann sie aufhalten.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267501</GUID> -->
+    <!-- <Text>Alles muss sich den Flammen beugen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267502</GUID> -->
+    <!-- <Text>Es ist noch nicht vorbei!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267503</GUID> -->
+    <!-- <Text>Das Feuer wird für immer brennen!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267863</GUID> -->
+    <!-- <Text>Märtyrer für die heilige Sache!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267870</GUID> -->
+    <!-- <Text>Für jeden abgetrennten Kopf wächst ein neuer nach!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267871</GUID> -->
+    <!-- <Text>Herr, das Instrument deiner Rache schwindet ...</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267872</GUID> -->
+    <!-- <Text>Du sagtest, wir würden niemals scheitern, Meister.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267873</GUID> -->
+    <!-- <Text>All die Versprechen, die Herrschaft, der Sieg ...</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267874</GUID> -->
+    <!-- <Text>Für jeden der fällt, stehen zwei Neue auf.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267875</GUID> -->
+    <!-- <Text>Licht des Prometheus!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>267876</GUID> -->
+    <!-- <Text>Ihr seid das Stroh auf unserem Scheiterhaufen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>266949</GUID> -->
+    <!-- <Text>Ja, Großmeister!</Text> -->
+  <!-- </Text> -->
+  <!-- .. -->
+  <!-- Am besten daraus einen passenden eigenen AudioPool zusammenstellen für die Commands. Evlt auch einen leeren Sound zufügen, damit nicht ständig was gesagt wird -->
+  <!-- Evlt auch aus ActivationSound für Items was nehmen, weiß nicht ob da auch ein Pool geht, allerdings passt da wohl nur was zu Feuer... -->
+  
+  
+  
+
+  <!-- TODO: evlt SocketCount reduzieren, jetzt wo man die Fähigkeiten durchschalten kann, evlt auf 2 slots, wobei die items nen cooldown von zb. 20 minuten haben -->
+  <!-- außer das teleportitem, das hat 5 minuten oderso. -->
+  <!-- PROBLEM: durch ins schiff und wieder an Land werden cooldowns der Items resetted... hm... -->
+   <!-- dann evlt doch weniger durch cooldown, als durch Delay der Itemaction steuern... -->
+   
+   <!-- Auch bei Polizist überlegen socketcount zu reduzieren, zb auch 2. -->
+   <!-- wenn du dann ein incident healsed mit cooldown, dann kannst du entweder sonar oder killspy ne weile nicht einsetzen -->
+
+
+  <!-- TODO: spy ship noch eigenes template machen ohne TradeRouteVehicle und dies dann nutzen. -->
+  <!-- sinnvolle werte vom warship/gunboat übernehmen, aber halt nicht alles -->
+  
+  <!-- Drifting ist für schiffe auch sowas wie Blocking bei gebäuden, also enthalt (neben driften) auch wieviel platz sie einnehmen, wobei  -->
+  <!-- ifo file defines lenght/width of object or we can override it here (but I think ifo is fine). eg used when moving multiple uints at once for (at least 7) for the formation distance between them -->
+
+  
+  <!-- TODO: -->
+   <!-- evlt gucken ob man abschalten kann, dass die spies einen Kontor bauen könnten? -->
+  
+  
+  <!-- TODO  -->
+  <!-- testen: InsecurityAttractiveness . angeblich wirkt es so, dass wenn eine feindliche unit mit dem wert nahe der eigenen insel ist, dass dann die attarkvitiät der insel leidet. -->
+   <!-- also evlt kann man so auch erkennen ob ein spy auf/nahe der eigenen insel ist? -->
+  <!-- wobei quasi alle schiffe, sogar handelschiffe so einen wert haben.. mal gucken. -->
+  
+  <!-- TODO testen: -->
+  <!-- was passiert wenn wir spy dieses property geben? -->
+  <!-- <Dying> -->
+    <!-- <DeathEffectDuration>20000</DeathEffectDuration> -->
+  <!-- </Dying> -->
+  
+  
+  <!-- Balancing: -->
+  <!-- Bauzeit Polizist so um die 5 bis 10 minuten machen. Soll schon ne weile dauern, damit Spy auf einer insel ohne polizist schaden anrichten kann -->
+  <!-- bevor einer spawnen kann. Aber soll auch nicht so sien, dass spy die ganze insel abfacken kann bevor ein polizist kommt -->
+  
+  <!-- PathPlannerLayer=Street was interesting and spies easier to spot for victims. But now that we have the police unit with sonar, this is no longer needed -->
+   <!-- and we change the PathPlannerLayer=Land -->
+
+  <!-- CommandQueue is needed for being able to use item -->
+  <!-- Attacker is needed to attack and also for pirate buff to work to apply debuffs/fire -->
+  <!-- IsPlayerControllableVehicle only decides if it is put into the shiplist or not (but also if to automatically leave the spawned building, instead of standing within it) -->
+     <!-- <Description>This flag should be set true for all human-controllable ships (controllable vehicles are visible in ship list, game loose condition checks existance of a ship, only controllable ships can increase influence costs of other ships)</Description> -->
+  <!-- Collector ist important for the detection item to work -->
+  <!-- Rentable is needed for Vehicle GUIType to work. But we can not disable the Sessiontransfer-Button and this teleports land units which is a too big exploit... -->
+   <!-- so we wont use Vehicle GUIType for the land units, but add a patrol-item so we can use the patrol action. -->
+  <ModOp Type="AddNextSibling" GUID="124970">
+    <Asset>
+      <Template>LandSpy_Serp</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001173</GUID>
+          <Name>Spy</Name>
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/specialists/pirates/icon_pirate_gunboat_151.png</IconFilename> -->
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/campaign/icon_pyrphorian.png</IconFilename> -->
+          <IconFilename>data/sabotage_graphics_serp/icons/Spy1404.png</IconFilename>
+          <InfoDescription>1500001501</InfoDescription>
+        </Standard>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/sabotage_graphics_serp/units/pyrphorian_arsonist_01.cfg</Filename>
+            </Item>
+          </Variations>
+          <Skins>
+            <DefaultSkinName>1500001173</DefaultSkinName>
+            <DefaultSkinDescription>23853</DefaultSkinDescription>
+            <DefaultSkinCategoryName>7312</DefaultSkinCategoryName>
+            <!-- <OverrideDefaultIcon>data/ui/2kimages/main/3dicons/specialists/pirates/icon_pirate_gunboat_151.png</OverrideDefaultIcon> -->
+            <!-- <OverrideDefaultIcon>data/ui/2kimages/main/3dicons/campaign/icon_pyrphorian.png</OverrideDefaultIcon> -->
+            <OverrideDefaultIcon>data/sabotage_graphics_serp/icons/Spy1404.png</OverrideDefaultIcon>
+            <SkinList>
+              <Item>
+                <SkinAssetGuid>1500001183</SkinAssetGuid>
+              </Item>
+            </SkinList>
+          </Skins>
+        </Object>
+        <Mesh>
+          <!-- TODO TEST, ändert leider nichts an der todeslänge und allgemein sehe ich keinen unterschied... -->
+          <!-- <ConstructionEffectDuration>0</ConstructionEffectDuration> -->
+          <!-- <DeconstructionEffectDuration>0</DeconstructionEffectDuration> -->
+          <!-- <MoveEffectDuration>0</MoveEffectDuration> -->
+          <!-- <ForbidCollapseEffect>1</ForbidCollapseEffect> -->
+          <!-- <GridHighlightEffect>1</GridHighlightEffect> -->
+        </Mesh>
+        <Selection>
+          <GUIType>Guildhouse</GUIType>
+          <MultiSelectable>0</MultiSelectable>
+          <SelectionPriority>5</SelectionPriority>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+          <InfoCorner>0</InfoCorner>
+          <DetectionCfg>data/sabotage_graphics_serp/sonar_radar/mine_detected_01.cfg</DetectionCfg>
+          <DetectionToken>501779</DetectionToken>
+        </Selection>
+        <Nameable>
+          <!-- <OverwriteNameWithTextAsset>143873</OverwriteNameWithTextAsset> -->
+        </Nameable>
+        <Walking>
+          <!-- TODO testen ob wir nen unterscheid sehen mit ForcePrimitiveMovement/DisableSmoothing. mir ist bisher keiner aufgefallen -->
+          <WalkSequence>walk01</WalkSequence>
+          <IdleSequence2>idle01</IdleSequence2>
+          <DiscoverRadius>10</DiscoverRadius>
+          <ReservationLength>0</ReservationLength>
+          <ReservationWidth>0</ReservationWidth>
+          <!-- <ForcePrimitiveMovement>1</ForcePrimitiveMovement> -->
+          <TurnAroundRadius>0</TurnAroundRadius>
+          <Acceleration>6</Acceleration>
+          <TurnRadius>0.1</TurnRadius>
+          <TurnSpeed>240</TurnSpeed>
+          <TurnDeceleration>0</TurnDeceleration>
+          <TurnMovement>80</TurnMovement>
+          <LeaningSpeed>0.01</LeaningSpeed>
+          <LeaningDamping>0.01</LeaningDamping>
+          <ForwardSpeed>1.25</ForwardSpeed>
+          <WindMinSlowdownFactor>1</WindMinSlowdownFactor>
+          <WindMaxSpeedupFactor>1</WindMaxSpeedupFactor>
+          <MinSlowdownFactor>1</MinSlowdownFactor>
+          <!-- <DisableSmoothing>1</DisableSmoothing> -->
+          <CurveSegmentDensity>High</CurveSegmentDensity>
+          <PathPlannerLayer>Land</PathPlannerLayer>
+        </Walking>
+        <Text />
+        <CommandQueue>
+          <IsPlayerControllableVehicle>1</IsPlayerControllableVehicle>
+          <InsecurityAttractiveness>-10</InsecurityAttractiveness>
+        </CommandQueue>
+        <SoundEmitter />
+        <UpgradeList />
+        <!-- hide Infolayer pirate flag under the earth, because it is also visible to other players and at least for human spies, we dont want it to be visible -->
+        <Infolayer>
+          <AdditionalYOffset>-10</AdditionalYOffset>
+        </Infolayer>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <MetaPersistent />
+        <QuestObject />
+        <ShipMaintenance>
+          <Maintenance>500</Maintenance>
+        </ShipMaintenance>
+        <Drifting>
+          <OverrideAssetWidthAndLength>0</OverrideAssetWidthAndLength>
+          <FactorMovement>1</FactorMovement>
+          <FactorRotation>1</FactorRotation>
+          <AffectedByDriftingWhileIdle>0</AffectedByDriftingWhileIdle>
+          <AffectedByDriftingWhileMoving>0</AffectedByDriftingWhileMoving>
+          <CausesDrifting>0</CausesDrifting>
+          <UseSlowDownTactic>1</UseSlowDownTactic>
+        </Drifting>        
+        <ItemContainer>
+          <CanStoreProducts>0</CanStoreProducts>
+          <UnlimitedSlotCount>1</UnlimitedSlotCount>
+          <!-- <SlotCount>20</SlotCount> -->
+          <UnlimitedStack>1</UnlimitedStack>
+          <SocketAllocation>Warship</SocketAllocation>
+          <SocketScope>None</SocketScope>
+          <SocketScopeRadius>[NONE]</SocketScopeRadius>
+          <SocketScopeRadiusOverlapCategory>None</SocketScopeRadiusOverlapCategory>
+          <SocketCount>4</SocketCount>
+          <SpawnsFlotsam>0</SpawnsFlotsam>
+          <FlotsamNoRadius>1</FlotsamNoRadius>
+          <UnsocketSound>247106</UnsocketSound>
+          <SocketSound>203866</SocketSound>
+          <InitSlotItems>
+            <Item>
+              <Item>1500001535</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001180</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001179</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001723</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001725</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001184</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001208</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001218</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001467</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001569</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001463</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001489</Item>
+              <StackSize>1</StackSize>
+            </Item>
+          </InitSlotItems>
+          <!-- nur maximal 3 direkt sockeln, damit man erkennt, dass man draufklicken kann um große auswahl zu öffnen -->
+          <InitSocketItems>
+            <Item>
+              <Item>1500001171</Item>
+            </Item>
+          </InitSocketItems>
+        </ItemContainer>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>Front</ShootingTracking>
+          <BaseDamage>0</BaseDamage>
+          <AttackRange>0</AttackRange>
+          <!-- <AttackRange>7</AttackRange> -->
+          <LineOfSightRange>0</LineOfSightRange>
+          <ProjectileAsset>1500001439</ProjectileAsset>
+          <TargetAngleVariation>30</TargetAngleVariation>
+          <ReloadTime>500</ReloadTime>
+          <AttackRangeApproachPercentage>0.95</AttackRangeApproachPercentage>
+          <MaxDistanceToPatrolRouteToBeAggressiveIn>15</MaxDistanceToPatrolRouteToBeAggressiveIn>
+        </Attacker>
+        <Attackable>
+          <AttackableType>IslandBuilding</AttackableType>
+          <MaximumHitPoints>1</MaximumHitPoints>
+          <SelfHealPerHealTick>0</SelfHealPerHealTick>
+        </Attackable>
+        <ShipIncident>
+          <InfectableByIncident>
+            <Fire>
+              <Infectable>0</Infectable>
+            </Fire>
+            <Illness>
+              <Infectable>0</Infectable>
+            </Illness>
+            <Riot>
+              <Infectable>0</Infectable>
+            </Riot>
+          </InfectableByIncident>
+          <FireDamagePerFireTick>0</FireDamagePerFireTick>
+        </ShipIncident>
+        <Craftable>
+          <CraftingTime>600000</CraftingTime>
+        </Craftable>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1010017</Ingredient>
+              <Amount>5000</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <BuildPermit>
+          <VisibleWithoutPermits>1</VisibleWithoutPermits>
+        </BuildPermit>
+        <Collector>
+          <AllowedToCollect>[NONE]</AllowedToCollect>
+          <MaxDragShips>0</MaxDragShips>
+        </Collector>
+        <Seamine>
+          <TriggerRadius>0</TriggerRadius>
+        </Seamine>
+        <SoundEmitterCommandBarks>
+          <BarkMapping>
+            <Selection>
+              <!-- todo test -->
+              <!-- <AudioPool>268197</AudioPool> -->
+              <AudioPool>1500001999</AudioPool>
+            </Selection>
+            <SelectionDamaged>
+              <AudioPool>268197</AudioPool>
+            </SelectionDamaged>
+            <AttackCommand>
+              <!-- <AudioPool>268197</AudioPool> -->
+              <AudioPool>1500001999</AudioPool>
+            </AttackCommand>
+            <MoveCommand>
+              <!-- <AudioPool>268197</AudioPool> -->
+              <AudioPool>1500001999</AudioPool>
+            </MoveCommand>
+            <EscortCommand>
+              <AudioPool>268197</AudioPool>
+            </EscortCommand>
+            <PatrolCommand>
+              <AudioPool>268197</AudioPool>
+            </PatrolCommand>
+          </BarkMapping>
+        </SoundEmitterCommandBarks>
+      </Values>
+    </Asset>
+    
+    
+    <!-- KI Spies: -->
+    <!-- BaseDamage muss größer 0 sein, damit KI Autoattack macht. ok, mit BaseDamage=1 und projhectil explosiondamage=0 bekomme ich keine attacked-Meldung. und ich glaub spy würden sie dann nur direkt angreifen, wenn er das erste ziel ist, doch das wird in der regel ein gebäude sein und da es nicht zerstört werden kann, wechseln sie es auch nicht (außer vllt wenn feuer es zerstört hat) -->
+    <!-- nach dem geäbude ruinen sind schießen sie tatsächlich auf meinen spy, aber aus inem grund bekommt dieser auch keinen Damage. Keine Ahnung was BaseDamage also macht, vllt ists ein multiplier von explosiondamage? -->
+    
+    <!-- ReloadTime ist ein absolutes rätsel, bei 10 schießt er noch recht schnell, bei 20 garnicht mehr -->
+    <!-- vermtulch dann einfach auf 10 lassen und weiter reduzieren mit Buff der AttackSpeedUpgrade macht -->
+    
+    <!-- TODO: irgendwie hinbekommen, dass sie 360° um sich herum schießen können ohne sich zu drehen. Vermutlich mit TurretFixed, aber offenbar fehlt dazu was, denn damit schießen sie sonst garnicht -->
+    <!-- denn sonst kommt es zuoft vo, dass sie ein gebäude anvisieren, was sie ohne drehen nicht treffen können und sie drehen sich halt nicht und machen daher nichts -->
+    <!-- Wenn ich nem KanonenBoot TargetAngleVariation=360 gebe, kann es in alle Richtungen schießen, also eig sollte das problemlos gehen.. -->
+    <!-- also liegt vllt einfach nur daran, dass es manchmal aus inem grund ein gebäude targeted, wo ein anderes im Weg ist und dadurch einfach nie schießt -->
+    
+    
+    <!-- Lifetime property does not work, so we have to use ActionDeleteObjects.. and Lifetime can cause crash when combined with ActionSetObjectGUID ... -->
+    
+    <!-- Mit ReloadTime=30 und AttackSpeedUpgrade=-98 with the pirateflag item they have, the AI spies are shooting every ~2.5 Minutes. -->
+    <!-- This is ok, but maybe it should be a bit higher, like 5 minutes, because the "recently sabotaged infolayer" is only showing up after 1 minute after latest attack and the buffs last 15 minutes  -->
+    <!-- test mit ReloadTime=60 -> ja jetzr sinds 5 Minuten so ists ok. -->
+    
+
+    <!-- muss IsPlayerControllableVehicle=1 sein, damit spy sich aus gebäude in dem es spawned rausbewegt -->
+     <!-- für KI Spies <PathPlannerLayer>Street</PathPlannerLayer> nutzen? evtl. sinnvoll, damit ki spies liechter zu finden sind und nicht iwo zwischen den gebäuden stehen bei denen sie spawnen -->
+    <Asset>
+      <BaseAssetGUID>1500001173</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001438</GUID>
+          <Name>Spy AI Fire</Name>
+        </Standard>
+        <ItemContainer>
+          <InitSocketItems>
+            <Item>
+              <Item>1500001568</Item>
+            </Item>
+          </InitSocketItems>
+          <InitSlotItems/>
+          <SlotCount>0</SlotCount>
+          <SocketCount>1</SocketCount>
+          <SpawnsFlotsam>0</SpawnsFlotsam>
+          <FlotsamNoRadius>1</FlotsamNoRadius>
+        </ItemContainer>
+        <Walking>
+          <ForwardSpeed>0.05</ForwardSpeed>
+          <PathPlannerLayer>Street</PathPlannerLayer>
+          <!-- <PathPlannerLayer>Land</PathPlannerLayer> -->
+        </Walking>
+        <Infolayer>
+          <AdditionalYOffset>-10</AdditionalYOffset>
+        </Infolayer>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>Front</ShootingTracking>
+          <BaseDamage>1</BaseDamage>
+          <AttackRange>5</AttackRange>
+          <LineOfSightRange>5</LineOfSightRange>
+          <ProjectileAsset>1500001182</ProjectileAsset>
+          <TargetAngleVariation>360</TargetAngleVariation>
+          <ReloadTime>60</ReloadTime>
+          <AttackRangeApproachPercentage>0.95</AttackRangeApproachPercentage>
+          <MaxDistanceToPatrolRouteToBeAggressiveIn>15</MaxDistanceToPatrolRouteToBeAggressiveIn>
+          <MuzzleEffectAssets />
+          <AccuracyBase>0</AccuracyBase>
+          <AccuracyIncreaseOverDistance>0</AccuracyIncreaseOverDistance>
+        </Attacker>
+        <ShipMaintenance>
+          <Maintenance>0</Maintenance>
+          <DisableShipDestructionTracking>1</DisableShipDestructionTracking>
+          <DisableEscort>1</DisableEscort>
+        </ShipMaintenance>
+      </Values>
+    </Asset>
+
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001440</GUID>
+          <Name>Spy AI Illness</Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001181</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001441</GUID>
+          <Name>Spy AI Riot</Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001185</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001442</GUID>
+          <Name>Spy AI Debuff Production</Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001198</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001443</GUID>
+          <Name>Spy AI Debuff Maintenance</Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001216</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500001438</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001444</GUID> -->
+          <!-- <Name>Spy AI Debuff Workers</Name> -->
+        <!-- </Standard> -->
+        <!-- <Attacker> -->
+          <!-- <ProjectileAsset>1500001217</ProjectileAsset> -->
+        <!-- </Attacker> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001445</GUID>
+          <Name>Spy AI Debuff Taxes and Happiness</Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001216</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001446</GUID>
+          <Name>Spy AI Debuff Attractivness</Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001468</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001450</GUID>
+          <Name>Spy AI Debuff </Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001181</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001451</GUID>
+          <Name>Spy AI Debuff </Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001181</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001452</GUID>
+          <Name>Spy AI Debuff </Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001181</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001453</GUID>
+          <Name>Spy AI Debuff </Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001181</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001519</GUID>
+          <Name>Spy AI Fire - no attack</Name>
+        </Standard>
+        <Walking>
+          <ForwardSpeed>0.15</ForwardSpeed>
+        </Walking>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>Front</ShootingTracking>
+          <BaseDamage>0</BaseDamage>
+          <AttackRange>0</AttackRange>
+          <LineOfSightRange>0</LineOfSightRange>
+          <ProjectileAsset>1500001439</ProjectileAsset>
+          <TargetAngleVariation>0</TargetAngleVariation>
+          <ReloadTime>500</ReloadTime>
+          <AttackRangeApproachPercentage>0.95</AttackRangeApproachPercentage>
+          <MaxDistanceToPatrolRouteToBeAggressiveIn>15</MaxDistanceToPatrolRouteToBeAggressiveIn>
+          <MuzzleEffectAssets />
+        </Attacker>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001520</GUID>
+          <Name>Spy AI Illness - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001521</GUID>
+          <Name>Spy AI Riot - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001522</GUID>
+          <Name>Spy AI  - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001523</GUID>
+          <Name>Spy AI  - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500001519</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001524</GUID> -->
+          <!-- <Name>Spy AI  - no attack</Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001525</GUID>
+          <Name>Spy AI  - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001526</GUID>
+          <Name>Spy AI  - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001530</GUID>
+          <Name>Spy AI  - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001531</GUID>
+          <Name>Spy AI  - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001532</GUID>
+          <Name>Spy AI  - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001519</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001533</GUID>
+          <Name>Spy AI  - no attack</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001438</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001436</GUID>
+          <Name>Spy KILLER AI (invisible)</Name>
+        </Standard>
+        <Object>
+          <Variations />
+          <Skins />
+        </Object>
+        <Mesh>
+          <MeshPlacement>IgnoreTerrain</MeshPlacement>
+        </Mesh>
+        <Walking>
+          <ForwardSpeed>0</ForwardSpeed>
+          <PathPlannerLayer>Air</PathPlannerLayer>
+        </Walking>
+        <Attacker>
+          <ProjectileAsset>1500001174</ProjectileAsset>
+          <BaseDamage>1</BaseDamage>
+          <AttackRange>5</AttackRange>
+          <LineOfSightRange>5</LineOfSightRange>
+          <ReloadTime>1</ReloadTime>
+          <AccuracyBase>0</AccuracyBase>
+          <AccuracyIncreaseOverDistance>0</AccuracyIncreaseOverDistance>
+        </Attacker>
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+          <MaximumHitPoints>10000</MaximumHitPoints>
+        </Attackable>
+      </Values>
+    </Asset>
+    
+    
+    <!-- Police -->
+    
+    <!-- Wachturm gebäude mit sonar item funzt nicht so gut, weil man das belieibig bauen und abreißen kann und es keine möglichkeit des delays gibt. -->
+    <!-- und bei abriss geht item in kontor, was auch dumm ist. -->
+    <!-- daher doch eine polizei unit mit dem sonar item die ein wenig zum buaen braucht und langsam über die insel laufen kann -->
+    
+    <!-- TODO: police unit noch kleiner machen, ist aktuell größer als andere units, iwie auf 80% oderso skalieren, -->
+    <!-- glaube das geht in der cfg oder ifo datei? -->
+    
+    
+    <!-- als DefaultInfoLayer der police verscuhen: -->
+    <!-- 2001104 policing_done.cfg -->
+    <!-- eigenes mit security.cfg -->
+    <!-- eigenes mit send_police_a7.cfg -->
+    <!-- Grafiken: -->
+    <!-- horse_drawn_carriage_police (sind 2 einzelne grafiken, wagen und pferde, keine ahnung wie ich das kombiniere) -->
+    <!-- police_officer_with_lantern -->
+    <!-- mounted_police -->
+    <!-- police_officer -->
+    <Asset>
+      <Template>LandSpy_Serp</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001499</GUID>
+          <Name>Police Moderate</Name>
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/specialists/icon_police_officer_uncommon.png</IconFilename> -->
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/specialists/systemic/icon_police_officer_201.png</IconFilename> -->
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_mounted_police.png</IconFilename>
+          <InfoDescription>1500001502</InfoDescription>
+        </Standard>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/sabotage_graphics_serp/units/mounted_police.cfg</Filename>
+            </Item>
+          </Variations>
+          <Skins />
+        </Object>
+        <Mesh>
+          <MeshPlacement>OnTerrainPhysics</MeshPlacement>
+          <ObjectPosition>Dynamic</ObjectPosition>
+        </Mesh>
+        <Selection>
+          <GUIType>Guildhouse</GUIType>
+          <MultiSelectable>1</MultiSelectable>
+          <SelectionPriority>5</SelectionPriority>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+          <InfoCorner>0</InfoCorner>
+        </Selection>
+        <Nameable>
+          <!-- <OverwriteNameWithTextAsset>143873</OverwriteNameWithTextAsset> -->
+        </Nameable>
+        <Walking>
+          <!-- <WalkSequence>walk01</WalkSequence> -->
+          <WalkSequence>run01</WalkSequence>
+          <IdleSequence2>idle01</IdleSequence2>
+          <DiscoverRadius>10</DiscoverRadius>
+          <ReservationLength>0</ReservationLength>
+          <ReservationWidth>0</ReservationWidth>
+          <!-- <ForcePrimitiveMovement>1</ForcePrimitiveMovement> -->
+          <TurnAroundRadius>0</TurnAroundRadius>
+          <Acceleration>6</Acceleration>
+          <TurnRadius>0.1</TurnRadius>
+          <TurnSpeed>240</TurnSpeed>
+          <TurnDeceleration>0</TurnDeceleration>
+          <TurnMovement>80</TurnMovement>
+          <LeaningSpeed>0.01</LeaningSpeed>
+          <LeaningDamping>0.01</LeaningDamping>
+          <ForwardSpeed>2.0</ForwardSpeed>
+          <!-- <ForwardSpeed>2.5</ForwardSpeed> -->
+          <WindMinSlowdownFactor>1</WindMinSlowdownFactor>
+          <WindMaxSpeedupFactor>1</WindMaxSpeedupFactor>
+          <MinSlowdownFactor>1</MinSlowdownFactor>
+          <!-- <DisableSmoothing>1</DisableSmoothing> -->
+          <CurveSegmentDensity>High</CurveSegmentDensity>
+          <PathPlannerLayer>Land</PathPlannerLayer>
+        </Walking>
+        <Text />
+        <CommandQueue>
+          <IsPlayerControllableVehicle>0</IsPlayerControllableVehicle>
+          <InsecurityAttractiveness>-10</InsecurityAttractiveness>
+        </CommandQueue>
+        <SoundEmitter />
+        <UpgradeList />
+        <Infolayer>
+          <DefaultInfoLayer>1500001220</DefaultInfoLayer>
+        </Infolayer>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <MetaPersistent />
+        <QuestObject />
+        <ShipMaintenance>
+          <Maintenance>100</Maintenance>
+        </ShipMaintenance>
+        <Drifting>
+          <OverrideAssetWidthAndLength>0</OverrideAssetWidthAndLength>
+          <FactorMovement>1</FactorMovement>
+          <FactorRotation>1</FactorRotation>
+          <AffectedByDriftingWhileIdle>0</AffectedByDriftingWhileIdle>
+          <AffectedByDriftingWhileMoving>0</AffectedByDriftingWhileMoving>
+          <CausesDrifting>0</CausesDrifting>
+          <UseSlowDownTactic>1</UseSlowDownTactic>
+        </Drifting>        
+        <ItemContainer>
+          <CanStoreProducts>0</CanStoreProducts>
+          <UnlimitedSlotCount>1</UnlimitedSlotCount>
+          <!-- <SlotCount>8</SlotCount> -->
+          <UnlimitedStack>1</UnlimitedStack>
+          <SocketAllocation>Warship</SocketAllocation>
+          <SocketScope>None</SocketScope>
+          <SocketScopeRadius>[NONE]</SocketScopeRadius>
+          <SocketScopeRadiusOverlapCategory>None</SocketScopeRadiusOverlapCategory>
+          <SocketCount>4</SocketCount>
+          <SpawnsFlotsam>0</SpawnsFlotsam>
+          <FlotsamNoRadius>1</FlotsamNoRadius>
+          <UnsocketSound>247106</UnsocketSound>
+          <SocketSound>203866</SocketSound>
+          <InitSlotItems>
+            <Item>
+              <Item>1500001535</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001514</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001515</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001516</Item>
+              <StackSize>1</StackSize>
+            </Item>
+          </InitSlotItems>
+          <InitSocketItems>
+            <Item>
+              <Item>1500001496</Item>
+            </Item>
+            <Item>
+              <Item>1500001194</Item>
+            </Item>
+            <Item>
+              <Item>1500001581</Item>
+            </Item>
+          </InitSocketItems>
+        </ItemContainer>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>Front</ShootingTracking>
+          <BaseDamage>1</BaseDamage>
+          <AttackRange>10</AttackRange>
+          <LineOfSightRange>10</LineOfSightRange>
+          <ProjectileAsset>1500001174</ProjectileAsset>
+          <TargetAngleVariation>360</TargetAngleVariation>
+          <ReloadTime>20</ReloadTime>
+          <AttackRangeApproachPercentage>0.95</AttackRangeApproachPercentage>
+          <MaxDistanceToPatrolRouteToBeAggressiveIn>15</MaxDistanceToPatrolRouteToBeAggressiveIn>
+          <MuzzleEffectAssets>
+            <Item>
+              <MuzzleEffectAsset>101975</MuzzleEffectAsset>
+            </Item>
+          </MuzzleEffectAssets>
+          <AccuracyBase>10</AccuracyBase>
+          <AccuracyIncreaseOverDistance>0</AccuracyIncreaseOverDistance>
+        </Attacker>
+        <Attackable>
+          <!-- darf offenbar nicht AttackableType=[NONE] sein, sonst funzt Radar nicht mehr -->
+          <AttackableType>IslandBuilding</AttackableType>
+          <MaximumHitPoints>20000</MaximumHitPoints>
+          <SelfHealPerHealTick>0</SelfHealPerHealTick>
+        </Attackable>
+        <ShipIncident>
+          <InfectableByIncident>
+            <Fire>
+              <Infectable>0</Infectable>
+            </Fire>
+            <Illness>
+              <Infectable>0</Infectable>
+            </Illness>
+            <Riot>
+              <Infectable>0</Infectable>
+            </Riot>
+          </InfectableByIncident>
+          <FireDamagePerFireTick>0</FireDamagePerFireTick>
+        </ShipIncident>
+        <Craftable>
+          <CraftingTime>300000</CraftingTime>
+        </Craftable>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1010017</Ingredient>
+              <Amount>500</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <BuildPermit>
+          <VisibleWithoutPermits>1</VisibleWithoutPermits>
+        </BuildPermit>
+        <Collector>
+          <AllowedToCollect>[NONE]</AllowedToCollect>
+          <MaxDragShips>0</MaxDragShips>
+        </Collector>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001499</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001507</GUID>
+          <Name>Police new world</Name>
+        </Standard>
+        <!-- <Object> -->
+          <!-- <Variations> -->
+            <!-- <Item> -->
+              <!-- <Filename>data/sabotage_graphics_serp/units/mounted_police.cfg</Filename> -->
+            <!-- </Item> -->
+          <!-- </Variations> -->
+          <!-- <Skins /> -->
+        <!-- </Object> -->
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001499</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001508</GUID>
+          <Name>Police Africa</Name>
+        </Standard>
+        <!-- <Object> -->
+          <!-- <Variations> -->
+            <!-- <Item> -->
+              <!-- <Filename>data/sabotage_graphics_serp/units/mounted_police.cfg</Filename> -->
+            <!-- </Item> -->
+          <!-- </Variations> -->
+          <!-- <Skins /> -->
+        <!-- </Object> -->
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001499</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001509</GUID>
+          <Name>Police Arctic</Name>
+        </Standard>
+        <!-- <Object> -->
+          <!-- <Variations> -->
+            <!-- <Item> -->
+              <!-- <Filename>data/sabotage_graphics_serp/units/mounted_police.cfg</Filename> -->
+            <!-- </Item> -->
+          <!-- </Variations> -->
+          <!-- <Skins /> -->
+        <!-- </Object> -->
+        <ItemContainer>
+          <InitSlotItems>
+            <Item>
+              <Item>1500001514</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001517</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001516</Item>
+              <StackSize>1</StackSize>
+            </Item>
+          </InitSlotItems>
+        </ItemContainer>
+      </Values>
+    </Asset>
+    
+    <!-- für walk01 ist ~0.8 als ForwardSpeed sinnvoll (bzgl animationsgeschindigkeit). Für run01 ists 2 bis 2.5 -->
+    <!-- TODO: evlt noch rausfinden welche werte dfür sorgen, dass das pferd mehr auf der stelle drehen muss und nicht halb rückwärts losläuft -->
+    <Asset>
+      <Template>LandSpy_Serp</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001560</GUID>
+          <Name>Police AI</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_mounted_police.png</IconFilename>
+          <InfoDescription>1500001502</InfoDescription>
+        </Standard>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/sabotage_graphics_serp/units/mounted_police.cfg</Filename>
+            </Item>
+          </Variations>
+          <Skins />
+        </Object>
+        <Mesh>
+          <MeshPlacement>OnTerrainPhysics</MeshPlacement>
+          <ObjectPosition>Dynamic</ObjectPosition>
+        </Mesh>
+        <Selection>
+          <GUIType>Guildhouse</GUIType>
+          <MultiSelectable>1</MultiSelectable>
+          <SelectionPriority>5</SelectionPriority>
+          <OnSelection>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList />
+            </Values>
+          </OnSelection>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+          <InfoCorner>0</InfoCorner>
+        </Selection>
+        <Nameable>
+          <!-- <OverwriteNameWithTextAsset>143873</OverwriteNameWithTextAsset> -->
+        </Nameable>
+        <Walking>
+          <WalkSequence>run01</WalkSequence>
+          <!-- <WalkSequence>walk01</WalkSequence> -->
+          <IdleSequence2>idle01</IdleSequence2>
+          <DiscoverRadius>10</DiscoverRadius>
+          <ReservationLength>0</ReservationLength>
+          <ReservationWidth>0</ReservationWidth>
+          <!-- <ForcePrimitiveMovement>1</ForcePrimitiveMovement> -->
+          <TurnAroundRadius>0</TurnAroundRadius>
+          <Acceleration>6</Acceleration>
+          <TurnRadius>0.1</TurnRadius>
+          <TurnSpeed>240</TurnSpeed>
+          <TurnDeceleration>0</TurnDeceleration>
+          <TurnMovement>80</TurnMovement>
+          <LeaningSpeed>0.01</LeaningSpeed>
+          <LeaningDamping>0.01</LeaningDamping>
+          <ForwardSpeed>1.3</ForwardSpeed>
+          <WindMinSlowdownFactor>1</WindMinSlowdownFactor>
+          <WindMaxSpeedupFactor>1</WindMaxSpeedupFactor>
+          <MinSlowdownFactor>1</MinSlowdownFactor>
+          <!-- <DisableSmoothing>1</DisableSmoothing> -->
+          <CurveSegmentDensity>High</CurveSegmentDensity>
+          <PathPlannerLayer>Land</PathPlannerLayer>
+        </Walking>
+        <Text />
+        <CommandQueue>
+          <IsPlayerControllableVehicle>0</IsPlayerControllableVehicle>
+          <InsecurityAttractiveness>-10</InsecurityAttractiveness>
+        </CommandQueue>
+        <SoundEmitter />
+        <UpgradeList />
+        <Infolayer>
+          <DefaultInfoLayer>1500001220</DefaultInfoLayer>
+        </Infolayer>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <MetaPersistent />
+        <QuestObject />
+        <ShipMaintenance>
+          <Maintenance>0</Maintenance>
+          <DisableShipDestructionTracking>1</DisableShipDestructionTracking>
+          <DisableEscort>1</DisableEscort>
+        </ShipMaintenance>
+        <Drifting>
+          <OverrideAssetWidthAndLength>0</OverrideAssetWidthAndLength>
+          <FactorMovement>1</FactorMovement>
+          <FactorRotation>1</FactorRotation>
+          <AffectedByDriftingWhileIdle>0</AffectedByDriftingWhileIdle>
+          <AffectedByDriftingWhileMoving>0</AffectedByDriftingWhileMoving>
+          <CausesDrifting>0</CausesDrifting>
+          <UseSlowDownTactic>1</UseSlowDownTactic>
+        </Drifting>
+        <ItemContainer>
+          <SocketAllocation>Warship</SocketAllocation>
+          <SocketScope>None</SocketScope>
+          <SocketScopeRadius>[NONE]</SocketScopeRadius>
+          <SocketScopeRadiusOverlapCategory>None</SocketScopeRadiusOverlapCategory>
+          <InitSocketItems>
+            <Item>
+              <Item>1500001568</Item>
+            </Item>
+          </InitSocketItems>
+          <InitSlotItems/>
+          <SlotCount>0</SlotCount>
+          <SocketCount>1</SocketCount>
+          <SpawnsFlotsam>0</SpawnsFlotsam>
+          <FlotsamNoRadius>1</FlotsamNoRadius>
+        </ItemContainer>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>Front</ShootingTracking>
+          <BaseDamage>1</BaseDamage>
+          <AttackRange>10</AttackRange>
+          <LineOfSightRange>10</LineOfSightRange>
+          <ProjectileAsset>1500001174</ProjectileAsset>
+          <TargetAngleVariation>360</TargetAngleVariation>
+          <ReloadTime>1</ReloadTime>
+          <AttackRangeApproachPercentage>0.95</AttackRangeApproachPercentage>
+          <MaxDistanceToPatrolRouteToBeAggressiveIn>15</MaxDistanceToPatrolRouteToBeAggressiveIn>
+          <MuzzleEffectAssets>
+            <Item>
+              <MuzzleEffectAsset>101975</MuzzleEffectAsset>
+            </Item>
+          </MuzzleEffectAssets>
+          <AccuracyBase>2</AccuracyBase>
+          <AccuracyIncreaseOverDistance>0</AccuracyIncreaseOverDistance>
+        </Attacker>
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+          <MaximumHitPoints>20000</MaximumHitPoints>
+          <SelfHealPerHealTick>0</SelfHealPerHealTick>
+        </Attackable>
+        <ShipIncident>
+          <InfectableByIncident>
+            <Fire>
+              <Infectable>0</Infectable>
+            </Fire>
+            <Illness>
+              <Infectable>0</Infectable>
+            </Illness>
+            <Riot>
+              <Infectable>0</Infectable>
+            </Riot>
+          </InfectableByIncident>
+          <FireDamagePerFireTick>0</FireDamagePerFireTick>
+        </ShipIncident>
+        <Craftable />
+        <Cost />
+      </Values>
+    </Asset>
+    
+    
+  </ModOp>
+  
+  <!-- FischerbootSpy -->
+  <!-- sollten nur 8 items zugewiesen werden, weil 8 der maximale SlotCount ist in Vehicle GUI. -->
+  <!-- Man kann zwar noch 4 SocketCounts dazu packen, aber wenn ich rechtsklick auf socket item mache während allso slots voll sind, wirds über bord geworfen, was nciht sein soll -->
+  <!-- ist aber ok auf 12 limitiert zu sein, einfach nur die items reinpacken, die via schiff sinnvoll sind, zb. residences sabotieren macht als schiff keinen sinn -->
+  <ModOp Type="AddNextSibling" GUID="100437">
+    <Asset>
+      <BaseAssetGUID>100437</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001478</GUID>
+          <Name>Ship Spy</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_fishing_boat_3.png</IconFilename>
+          <InfoDescription>1500001501</InfoDescription>
+        </Standard>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/sabotage_graphics_serp/units/small_feedback_ship_02.cfg</Filename>
+            </Item>
+          </Variations>
+          <Skins>
+            <DefaultSkinName>1500001478</DefaultSkinName>
+            <DefaultSkinCategoryName>7312</DefaultSkinCategoryName>
+            <SkinList>
+              <Item>
+                <SkinAssetGuid>1500001202</SkinAssetGuid>
+              </Item>
+            </SkinList>
+          </Skins>
+        </Object>
+        <Selection>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+          <InfoCorner>0</InfoCorner>
+          <DetectionCfg>data/sabotage_graphics_serp/sonar_radar/mine_detected_01.cfg</DetectionCfg>
+          <DetectionToken>501779</DetectionToken>
+        </Selection>
+        <Nameable>
+          <!-- <OverwriteNameWithTextAsset>143873</OverwriteNameWithTextAsset> -->
+        </Nameable>
+        <Walking>
+          <SessionTransferSpeedFactor>10</SessionTransferSpeedFactor>
+          <ForwardSpeed>10</ForwardSpeed>
+          <Deceleration>8</Deceleration>
+        </Walking>
+        <Drifting>
+          <OverrideAssetWidthAndLength>0</OverrideAssetWidthAndLength>
+        </Drifting>
+        <MinimapToken>
+          <TokenAsset>0</TokenAsset>
+          <StrategicMapAsset>0</StrategicMapAsset>
+        </MinimapToken>
+        <ShipIncident>
+          <InfectableByIncident>
+            <Fire>
+              <Infectable>0</Infectable>
+            </Fire>
+            <Illness>
+              <Infectable>0</Infectable>
+            </Illness>
+            <Riot>
+              <Infectable>0</Infectable>
+            </Riot>
+          </InfectableByIncident>
+          <FireDamagePerFireTick>0</FireDamagePerFireTick>
+        </ShipIncident>
+        <ItemContainer>
+          <CanStoreProducts>0</CanStoreProducts>
+          <SocketAllocation>Warship</SocketAllocation>
+          <SocketScope>None</SocketScope>
+          <SocketScopeRadius>[NONE]</SocketScopeRadius>         
+          <SocketScopeRadiusOverlapCategory>None</SocketScopeRadiusOverlapCategory>
+          <SocketCount>4</SocketCount>
+          <SlotCount>8</SlotCount>
+          <SpawnsFlotsam>0</SpawnsFlotsam>
+          <FlotsamNoRadius>1</FlotsamNoRadius>
+          <UnsocketSound>247106</UnsocketSound>
+          <SocketSound>203866</SocketSound>
+          <InitSlotItems>
+            <Item>
+              <Item>1500001180</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001463</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001569</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <!-- <Item> -->
+              <!-- <Item></Item> -->
+              <!-- <StackSize>1</StackSize> -->
+            <!-- </Item> -->
+            <Item>
+              <Item>1500001725</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001535</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001208</Item>
+              <StackSize>1</StackSize>
+            </Item>
+
+          </InitSlotItems>
+          <InitSocketItems>
+            <Item>
+              <Item>1500001481</Item>
+            </Item>
+            <Item>
+              <Item>1500001496</Item>
+            </Item>
+            <Item>
+              <Item>1500001572</Item>
+            </Item>
+          </InitSocketItems>
+        </ItemContainer>
+        <CommandQueue>
+          <IsPlayerControllableVehicle>1</IsPlayerControllableVehicle>
+          <FollowRadius>0.2</FollowRadius>
+          <CommandChainLength>3</CommandChainLength>
+          <FormationPriority>1</FormationPriority>
+          <InsecurityAttractiveness>-10</InsecurityAttractiveness>
+          <MilitaryShipPoints>0</MilitaryShipPoints>
+          <TradeShipPoints>0</TradeShipPoints>
+        </CommandQueue>
+        <!-- hide Infolayer pirate flag under the earth, because it is also visible to other players -->
+        <Infolayer>
+          <AdditionalYOffset>-10</AdditionalYOffset>
+        </Infolayer>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <ShipMaintenance>
+          <Maintenance>500</Maintenance>
+        </ShipMaintenance>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>Front</ShootingTracking>
+          <BaseDamage>0</BaseDamage>
+          <AttackRange>0</AttackRange>
+          <LineOfSightRange>0</LineOfSightRange>
+          <ProjectileAsset>1500001439</ProjectileAsset>
+          <TargetAngleVariation>30</TargetAngleVariation>
+          <ReloadTime>500</ReloadTime>
+          <AttackRangeApproachPercentage>0.95</AttackRangeApproachPercentage>
+          <MaxDistanceToPatrolRouteToBeAggressiveIn>15</MaxDistanceToPatrolRouteToBeAggressiveIn>
+          <MuzzleEffectAssets />
+        </Attacker>
+        <Attackable>
+          <AttackableType>IslandBuilding</AttackableType>
+          <MaximumHitPoints>1</MaximumHitPoints>
+          <SelfHealPerHealTick>0</SelfHealPerHealTick>
+        </Attackable>
+        <Craftable>
+          <CraftingTime>300000</CraftingTime>
+        </Craftable>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1010017</Ingredient>
+              <Amount>5000</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+        <BuildPermit>
+          <VisibleWithoutPermits>1</VisibleWithoutPermits>
+        </BuildPermit>
+        <Collector>
+          <AllowedToCollect>[NONE]</AllowedToCollect>
+          <MaxDragShips>0</MaxDragShips>
+        </Collector>
+        <Seamine>
+          <TriggerRadius>0</TriggerRadius>
+        </Seamine>
+        <Stance />
+        <TradeRouteVehicle />
+      </Values>
+    </Asset>
+    
+    
+    
+    <!-- KI spy ship: -->
+    <!-- Ship Unit to attack attackerbuildings -->
+    <Asset>
+      <BaseAssetGUID>1500001478</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001447</GUID>
+          <Name>Spy Ship AI Debuff Health/Attack</Name>
+        </Standard>
+        <Mesh>
+          <MeshPlacement>OnWaterSlope</MeshPlacement>
+          <ObjectPosition>Dynamic</ObjectPosition>
+        </Mesh>
+        <ItemContainer>
+          <InitSocketItems>
+            <Item>
+              <Item>1500001568</Item>
+            </Item>
+          </InitSocketItems>
+          <InitSlotItems/>
+          <SlotCount>0</SlotCount>
+          <SocketCount>1</SocketCount>
+          <SpawnsFlotsam>0</SpawnsFlotsam>
+          <FlotsamNoRadius>1</FlotsamNoRadius>
+        </ItemContainer>
+        <Walking>
+          <WindMinSlowdownFactor>1</WindMinSlowdownFactor>
+          <WindMaxSpeedupFactor>1</WindMaxSpeedupFactor>
+          <MinSlowdownFactor>1</MinSlowdownFactor>
+          <ForwardSpeed>0.0</ForwardSpeed>
+          <PathPlannerLayer>Water</PathPlannerLayer>
+        </Walking>
+        <Infolayer>
+          <AdditionalYOffset>-10</AdditionalYOffset>
+        </Infolayer>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>Front</ShootingTracking>
+          <BaseDamage>1</BaseDamage>
+          <AttackRange>10</AttackRange>
+          <LineOfSightRange>10</LineOfSightRange>
+          <ProjectileAsset>1500001571</ProjectileAsset>
+          <TargetAngleVariation>360</TargetAngleVariation>
+          <ReloadTime>60</ReloadTime>
+          <AttackRangeApproachPercentage>0.95</AttackRangeApproachPercentage>
+          <MaxDistanceToPatrolRouteToBeAggressiveIn>15</MaxDistanceToPatrolRouteToBeAggressiveIn>
+          <MuzzleEffectAssets />
+          <AccuracyBase>0</AccuracyBase>
+          <AccuracyIncreaseOverDistance>0</AccuracyIncreaseOverDistance>
+        </Attacker>
+        <ShipMaintenance>
+          <Maintenance>0</Maintenance>
+          <DisableShipDestructionTracking>1</DisableShipDestructionTracking>
+          <DisableEscort>1</DisableEscort>
+        </ShipMaintenance>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <BaseAssetGUID>1500001447</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001448</GUID>
+          <Name>Spy Ship AI Debuff Coastal Production-/Repair-/Loading-Speed Debuff</Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001198</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    
+    <!-- we will only spawn this near coastal buiuldings of the player, because I dont want them to be scatter all over the whole water, when they would spawn near ships -->
+    <Asset>
+      <BaseAssetGUID>1500001447</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001449</GUID>
+          <Name>Spy Ship AI Debuff Ships</Name>
+        </Standard>
+        <Attacker>
+          <ProjectileAsset>1500001469</ProjectileAsset>
+        </Attacker>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001447</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001527</GUID>
+          <Name>Spy AI ship - no attack Health/Attack</Name>
+        </Standard>
+        <Walking>
+          <WindMinSlowdownFactor>1</WindMinSlowdownFactor>
+          <WindMaxSpeedupFactor>1</WindMaxSpeedupFactor>
+          <MinSlowdownFactor>1</MinSlowdownFactor>
+          <ForwardSpeed>0.15</ForwardSpeed>
+        </Walking>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>Front</ShootingTracking>
+          <BaseDamage>0</BaseDamage>
+          <AttackRange>0</AttackRange>
+          <LineOfSightRange>0</LineOfSightRange>
+          <ProjectileAsset>1500001439</ProjectileAsset>
+          <TargetAngleVariation>0</TargetAngleVariation>
+          <ReloadTime>500</ReloadTime>
+          <AttackRangeApproachPercentage>0.95</AttackRangeApproachPercentage>
+          <MaxDistanceToPatrolRouteToBeAggressiveIn>15</MaxDistanceToPatrolRouteToBeAggressiveIn>
+          <MuzzleEffectAssets />
+        </Attacker>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001527</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001528</GUID>
+          <Name>Spy AI ship - no attack Debuff Coastal Production-/Repair-/Loading-Speed Debuff</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001527</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001529</GUID>
+          <Name>Spy AI ship - no attack Debuff Ships</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001447</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001206</GUID>
+          <Name>Spy Ship KILLER AI (invisible)</Name>
+        </Standard>
+        <Object>
+          <Variations />
+          <Skins />
+        </Object>
+        <Mesh>
+          <MeshPlacement>IgnoreTerrain</MeshPlacement>
+        </Mesh>
+        <Walking>
+          <ForwardSpeed>0</ForwardSpeed>
+          <PathPlannerLayer>Air</PathPlannerLayer>
+        </Walking>
+        <Attacker>
+          <ProjectileAsset>1500001174</ProjectileAsset>
+          <BaseDamage>1</BaseDamage>
+          <AttackRange>20</AttackRange>
+          <LineOfSightRange>20</LineOfSightRange>
+          <ReloadTime>1</ReloadTime>
+          <AccuracyBase>0</AccuracyBase>
+          <AccuracyIncreaseOverDistance>0</AccuracyIncreaseOverDistance>
+        </Attacker>
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+          <MaximumHitPoints>20000</MaximumHitPoints>
+        </Attackable>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+
+  <ModOp Type="AddNextSibling" GUID="80154">
+    <Asset>
+      <Template>Skin</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001183</GUID>
+          <Name>skin Land</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/ships/icon_ship_commandship_variation.png</IconFilename>
+        </Standard>
+        <Skin>
+          <SkinName>1500001183</SkinName>
+          <SkinVariations>
+            <Item>
+              <FileName>data/dlc06/graphics/quest/quest_unit_groups/council_member_with_prostitutes/councilmember.cfg</FileName>
+            </Item>
+          </SkinVariations>
+        </Skin>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Text />
+      </Values>
+    </Asset>
+
+    <Asset>
+      <Template>Skin</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001202</GUID>
+          <Name>skin Ship</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_fishing_boat_3.png</IconFilename>
+        </Standard>
+        <Skin>
+          <SkinName>1500001202</SkinName>
+          <SkinVariations>
+            <Item>
+              <FileName>data/graphics/vehicle/small_feedback_ship_01/small_feedback_ship_01_a.cfg</FileName>
+            </Item>
+          </SkinVariations>
+        </Skin>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Text />
+      </Values>
+    </Asset>
+  </ModOp>
+
+
+  
+    
+
+  <ModOp Type="addNextSibling" GUID='1654'>
+		<Asset>
+      <Template>ObjectDummyWithoutOwner</Template>
+      <!-- <BaseAssetGUID>1654</BaseAssetGUID> -->
+			<Values>
+				<Standard>
+					<GUID>1500001559</GUID>
+          <Name>MoveHelper-Dummy</Name>
+				</Standard>
+      </Values>
+		</Asset>
+    
+    <Asset>
+      <Template>ObjectDummyWithOwner_FastMove</Template>
+      <!-- <BaseAssetGUID>1654</BaseAssetGUID> -->
+			<Values>
+				<Standard>
+					<GUID>1500001565</GUID>
+          <Name>SpawnPointHelper-Dummy</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    
+    <Asset>
+      <Template>ObjectDummyWithOwner</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001716</GUID>
+          <Name>Recently sabotage Helper</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    
+    
+    <Asset>
+      <Template>ObjectDummyWithOwner</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001424</GUID>
+          <Name>Steal Money Helper</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001492</GUID>
+          <Name>Steal Money Confirmation Helper</Name>
+				</Standard>
+			</Values>
+		</Asset>
+  </ModOp>
+  
+  <!-- TODO: Testen ob dieses victim/Attacker system auch bei verdeckten Karten klappt, wenn die Helper Objekte <DiscoverRadius>0</DiscoverRadius> haben! -->
+  <ModOp Type="addNextSibling" GUID='1731'>
+    <Asset>
+      <Template>ObjectDummyWithOwner_Victim</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001545</GUID>
+          <Name>PositiveReputationHelper_Victim</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner_Attacker</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001546</GUID>
+          <Name>PositiveReputationHelper_Attacker</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner_Victim</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001547</GUID>
+          <Name>NegativeReputationHelper_Victim</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner_Attacker</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001548</GUID>
+          <Name>NegativeReputationHelper_Attacker</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    
+    
+  </ModOp>
+  
+  <!-- zur DefaultSequence: -->
+  <!-- ohne Blender: In der jeweiligen cfg. Dein saboteur_final verweist in der cfg auf eine quest_worker_m_01.cfg, die dann sämtliche Sequences dieser Figur enthält. Was in der assets.xml protestwalk03 heißt, wird in der cfg mit revoltwalk01 bezeichnet. Diese Bezeichnungen sind also nicht sehr verlässlich. In der assets.xml gibt´s aber eine schöne Liste mit Zuordnung zur SequenceID (suche nach <SequenceIDs>), protestwalk03 ist dort ID 5302. Die zulässigen IDs sind in der cfg des quest_worker_m01 ganz unten gelistet (wenn du die im Outline anklickst, dann siehst du dort unter TrackElement eine AnimationID. In diesem Fall '34'. In der cfg unter Animations ist nun Nr. 34 (Index startet bei 0!) die zugehörige Trivialbezeichnung der Animation). -->
+  <!-- In deiner saboteur_final.cfg steht nun nur die 5302 als zulässige Sequence drin, d.h. Änderungen an der DefaultSequence dürften keinen Effekt haben. Entweder du referenzierst nun in der assets.xml unter deinem saboteur direkt die quest_worker_m01.cfg (mit neuer GUID) oder du fügst deine gewünschten Sequences zur saboteur_final.cfg hinzu -->
+  
+  
+  <!-- gucken ob man den movepoint-marker ändern kann, vermutlich schon iwie luftschiffe haben ja auch nen andern -->
+  <!-- gibt nur einen für land/wasser und einen für Luft in properties.xml: -->
+  <!-- <CfgWaterMarker>data/graphics/ui/3d_objects/pointer_ground/pointer_ground.cfg</CfgWaterMarker> -->
+  <!-- <CfgAirMarker>data/dlc03/graphics/props/waypoint_markers/zeppelin_waypoint_marker/zeppelin_waypoint_marker_01.cfg</CfgAirMarker> -->
+  <!-- man könnte den für wasser/land durch einen neutraleren marker ersetzen, aber das wäre zuviel arbeit... -->
+  
+  
+  
+    
+</ModOps>

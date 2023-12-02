@@ -1,0 +1,45 @@
+<ModOps>
+
+<!-- MovieFinished, NotificationRemoved, LeaveUIState/EnterUIState and such Conditions are causing desync in Multiplayer. -->
+<!-- Here we will go through every single quest/trigger and replace these conditions with alternatives that are MP compatible ... -.- -->
+
+<!-- Info: -->
+<!-- Tutorial Quests are not started for whatever reason, even when I set EnableTutorial=1 in GameSetup and even unlocking the Questpools for tutorial quests 150902,151339,151353,151382,151383,151384,151385,151386 -->
+<!-- But I think they are not that helpful in MP anyways, because they are not clientside, so if one player eg. closes the popups, the others also can not read it and so on. -->
+<!-- And it saves us ALOT of work, since we don't have to make them Desync-free here. -->
+  <!-- (for the tutorial in intro session I still did the code, but it is not used by the game with disabled tutorial) -->
+<!-- .. -->
+<!-- .. -->
+<!-- anstatt NotificationRemoved könnte ich auch ThirdpartyDefaultCommand mit RegisterTrigger/startquest/unlock nutzen -->
+  <!-- ThirdpartyDefaultCommand wird automatisch ausgeführt, wenn die notification verschwindet (ohne dass der spiele eine Auswahl getroffen hat, aber wir bieten einfach keine auswahl an) -->
+    <!-- JA ThirdpartyDefaultCommand in notifications funktioniert um dinge zu unlocken oder triger zu starten und das ohne desync! -->
+     <!-- ich glaub am einfachsten ists wohl wenn wir darin dann ein neues unlockableassset unlock und unlockneeded dann als ersatz für NotificationRemoved nehmen -->
+  <!-- .. -->
+  <!-- bei Leave/Enter UIState müssen wir vermutlich einfach ein ConditionTimer reinpacken, nachdem zb. der zeitungsartikel erschienen ist. -->
+  <!-- und auch bei MovieFinished evtl. zeit stoppen wie lang der ungefähr ist und dann im trigger wo ActionPlayMovie gemacht wird, -->
+   <!-- dann mit delay die weiteren folgen starten -->
+  <!-- .. -->
+   <!-- anstatt unlocks zu nehmen könnte man ntürlich auch RegisterTrigger/startquest direkt aufrufen, aber dann müsste man deutlich mehr umschreiben, -->
+    <!-- also zb. trigger condition auf alwaystrue packen und NICHT von beginn an registeren. -->
+    <!-- und quests NICHT über pool automatisch starten und die ganzen preconditions berücksichtigen usw. -->
+   <!-- Es ist also deutlich weniger arbeit es 1:1 mit unlocks zu ersetzen, auch wenn wir dafür GUIDs verschwenden -->
+   
+   
+  <!-- TODO: evlt auch CameraSequenceEnd ? vermutlich nur bei scenarien genutzt? -->
+
+   <!-- Das Savegame vor der film entscheidung ist vermutlich nicht genug dealy danach? -->
+    <!-- wenn ich game lade, dann kommt entscheidung nicht mehr und es wird als film-nicht-ansehen gewertet -->
+    <!-- evlt mal auf 5 sek erhöhen? habs mal auf 3 gemacht -->
+   
+   
+  <Include File="./UnlockableAssets.include.xml" />
+  <Include File="./MovieCopies.include.xml" />
+  <Include File="./MovieUnlocks.include.xml" />
+  
+  <Include File="./ADLeaveUI.include.xml" />
+  <Include File="./ADMovies.include.xml" />
+  <Include File="./ADNotifications.include.xml" />
+  
+   
+   
+</ModOps>

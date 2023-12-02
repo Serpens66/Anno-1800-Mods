@@ -1,0 +1,568 @@
+<ModOps>
+  
+  <!-- nutzt Serp GUID 1500004200 (reserviert bis einschließlich 1500004499) -->
+  
+  <!-- es gibt ca 30 Movies. Von diesen müssen wir wahrscheinlich je eine Kopie machen und ein unlock, dh. dafü ~60 GUIDs -->
+  <!-- Es gibt ca. 100 NotificationLabel für die wir je einen unlock brauchen, dh. dafür ca. 100 GUIDs -->
+  <!-- Bei LeaveUIState ist noch nicht sicher, ob wir dafür unlocks brauchen, evtl reichts auch diese 1:1 durch ConditionTimer mit 10-30 sek oderseo zu ersetzen. -->
+  <!-- 1500004201 bis 1500004229 ist reseviert für die Movie Kopien. -->
+  <!-- 1500004230 bis 1500004299 ist reseviert für die Notification unlocks -->
+  <!-- 1500004300 bis 1500004329 ist reserviert für die play(ed) movie trigger/unlocks -->
+  <!-- 1500004330 bis 1500004359 für die dont play movie trigger -->
+  <!-- 1500004360 bis 1500004379 für ein paar unlocks LeaveUIState -->
+  <!-- 1500004380 bis 1500004389 für diverse trigger -->
+  
+  <!-- TODO im finale 151422 rausfinden was ActionEnableTicks macht (evlt auch in testmod mal ausführen) um zu wissen ob das wichtig und obs MP kompatibel ist -->
+    <!-- sehe im singleplayer mit ActionEnableTicks keinen unterschied... keine ahnung was das macht.. -->
+  
+  
+  <!-- WIP basiert aktuell auf Story Quests in coop und nutzt dieselben GUIDs, falls es funzt, diese noch ersetzen -->
+  <!-- Wobei man beide vermutlich zusammen nutzen muss, denn ich hab das gefühl, dass die DLC Story Qeusts sowohl in kampagne als auch sandbox eingebaut wurden -->
+  <!-- TODO: dafür sorgen, dass sie zusammenarbeiten und sich nicht gegenseitig behindern -->
+    <!-- oder braucht man das andere garnicht, da kampagne eh schon mit ingeneuren endet und man eben garkeine arktis/enbesa usw hat? -->
+  
+  
+  
+
+  
+  <!-- TODO -->
+  <!-- bei Quest 150900 funktioniert der spawn in vanilla wohl nicht zuverlässig, auch wenn ich nicht sehe warum , spawnt in der nähe von player_kontor_colony was der spieler durch die mapfile haben sollte -->
+    <!-- evlt gucken ob man ein fallback einbauen kann, also einen trigger der prüft ob objecte erfolgreich gespawned wurden und wenn nicht, dann nochmal mit forcecontextposition und einem residence matcher oderso -->
+    <!-- bzw. alternativ bei allen solcher Quests die menge der objekte die spawned verdoppeln, aber die anzahl die gefunden werden muss gleich halten -->
+      <!-- indem wir AdditionalAmount auf Amount setzen (bzw amount draufaddieren, falls es den wert schon gibt) -->
+    <!-- bei der quest mal testen, wopran es liegen könnte, ob die vllt im wasser spawnen würden und deshalb nicht alle spawnen oderso -->
+  
+  
+    
+  
+  
+  
+  <!-- Probleme: -->
+    <!-- die notification dass man fischer bauen soll von hannah kommt 2 mal? alleine im MP kams nicht 2mal, nochmal zu2t testen -->
+
+
+
+  
+  <!-- [GameSetup IsNextCampaignActive] in infotip braucht nicht ersetzt werden ist wohl nur hinweis, dass man zb kartengröße usw nicht frei festlegen kann -->
+  
+   <!-- genaugenommen gibts noch in <MapGeneratorInput> <SetGameType> wo standardmäßig SinglePlayer (properties.xml) -->
+   <!-- drinsteht. Man könnte diese automatisiert durch single+multiplayer ersetzen, -->
+    <!-- aber vom vanilla spiel wird MapGeneratorInput bisher eh nur 2 mal bei nicht verwendeten maps verwendet, weshalb es eigentlich egal ist. -->
+  
+  <!-- Templates -->
+  <!-- TriggerCampaign, CampaignFeatureUnlock, CampaignNotification, CampaignUncleMansion und CampaignQuestObject muss man denke ich nicht abändern, oder? -->
+  <!-- QuestMain/CampaignProgress? -->
+  <!-- CampaignSetupUnlocks ? ich denke das müssen wir manuell in eien eigenen trigger packen bzw. alternativ DefaultLockedState abändern   -->
+    <!-- EnableCampaign reicht wohl nicht, damit das automatisch gemacht wird =/ -->
+  
+  <!-- CampaignAutoParticipants und <FixedForCampaign> in <Name>DifficultySettings</Name> -->
+  
+  <!-- <CampaignQuestPool>150032</CampaignQuestPool> in <GUID>140496</GUID> <Name>QuestBalancing</Name> -->
+  <!-- <CampaignChapter>Chapter0</CampaignChapter> in Quests -->
+  
+  <!-- ########### -->
+  
+  
+  <!-- load all campaign profiles, eg. quests don't work properly otherwise (especially StarterMessage and so on) -->
+  <ModOp Type="replace" Path="//Profile[CreateModeMeta='AutoCreate_OnlyCampaign']/CreateModeMeta">
+    <CreateModeMeta>AutoCreate_Always</CreateModeMeta>
+  </ModOp>
+  <ModOp Type="replace" Path="//Profile[CreateModeSession='AutoCreate_OnlyCampaign']/CreateModeSession">
+    <CreateModeSession>AutoCreate_Always</CreateModeSession>
+  </ModOp>
+  
+  <!-- replace GameWon music with CampaignEnd. not sure though when exactly CampaignEnd is played or if they both play in campagin -->
+  <ModOp Type="replace" GUID="240000" Path="/Values/MusicSoundConfig/MusicStateTypeMapping/GameWon/MusicChoice" Content="/Values/MusicSoundConfig/MusicStateTypeMapping/CampaignEnd/MusicChoice" />
+  
+  <!-- reactions, only Sandbox and Campaign exist. -->
+  <ModOp Type="replace" Path="//Reactions/Item/DisabledForGameType[contains(.,'Campaign')]">
+    <DisabledForGameType>Sandbox;Campaign</DisabledForGameType>
+  </ModOp>
+  <ModOp Type="replace" Path="//Reactions/Item[DisabledForGameType='Sandbox']/DisabledForGameType">
+    <DisabledForGameType />
+  </ModOp>
+  
+  
+  <!-- ####################### -->
+
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/NormalAutoParticipants/Item" Content="/Values/DifficultySettings/CampaignAutoParticipants/Item" />
+  
+  <!-- some settings are fixed in campaign, so we only allow them -->
+    <!-- <EntryType>Empty</EntryType> removes the whole entry, so we can also remove the code of it with same result -->
+  <ModOp Type="remove" GUID='500679' Path="/Values/DifficultySettingsScene/AdvancedPages/Item/Options/Item[DifficultySetting='StartSession' or DifficultySetting='MapType' or DifficultySetting='StartShips' or DifficultySetting='StartWithKontor' or DifficultySetting='VictoryConditionMonuments' or DifficultySetting='VictoryConditionInvestors' or DifficultySetting='VictoryConditionPopulation' or DifficultySetting='VictoryConditionWealth' or DifficultySetting='VictoryConditionIncome' or DifficultySetting='VictoryConditionAllOrOne' or DifficultySetting='VictoryConditionDiplomacy']" />
+
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/StartSession">
+    <StartSession>
+      <Large>
+        <ValueName>11063</ValueName>
+      </Large>
+    </StartSession>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/MapType">
+    <MapType>
+      <Archipelago>
+        <ValueName>17079</ValueName>
+      </Archipelago>
+    </MapType>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/StartShips">
+    <StartShips>
+      <None>
+        <ValueName>11073</ValueName>
+      </None>
+    </StartShips>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/StartWithKontor">
+    <StartWithKontor>
+      <Standard>
+        <ValueName>11078</ValueName>
+        <StartGoods>
+          <Item>
+            <Product>1010196</Product>
+            <Amount>40</Amount>
+          </Item>
+          <Item>
+            <Product>1010200</Product>
+            <Amount>10</Amount>
+          </Item>
+        </StartGoods>
+      </Standard>
+    </StartWithKontor>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/VictoryConditionMonuments">
+    <VictoryConditionMonuments>
+      <None>
+        <ValueName>11055</ValueName>
+      </None>
+    </VictoryConditionMonuments>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/VictoryConditionInvestors">
+    <VictoryConditionInvestors>
+      <None>
+        <ValueName>11055</ValueName>
+      </None>
+    </VictoryConditionInvestors>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/VictoryConditionPopulation">
+    <VictoryConditionPopulation>
+      <None>
+        <ValueName>11055</ValueName>
+      </None>
+    </VictoryConditionPopulation>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/VictoryConditionWealth">
+    <VictoryConditionWealth>
+      <None>
+        <ValueName>11055</ValueName>
+      </None>
+    </VictoryConditionWealth>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/VictoryConditionIncome">
+    <VictoryConditionIncome>
+      <None>
+        <ValueName>11055</ValueName>
+      </None>
+    </VictoryConditionIncome>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/VictoryConditionAllOrOne">
+    <VictoryConditionAllOrOne>
+      <Off>
+        <ValueName>11055</ValueName>
+      </Off>
+    </VictoryConditionAllOrOne>
+  </ModOp>
+  <ModOp Type="replace" GUID='2002450' Path="/Values/DifficultySettings/VictoryConditionDiplomacy">
+    <VictoryConditionDiplomacy>
+      <Off>
+        <ValueName>11055</ValueName>
+      </Off>
+    </VictoryConditionDiplomacy>
+  </ModOp>
+  
+  <!-- ############################# -->
+  
+  <!-- CampaignSetupUnlocks: ich glaub die dinge mit trigger zu locken/unlocken könnte bereits zu spät sein, -->
+  <!-- stattdessen DefaultLockedState ändern -->
+  <ModOp Type="merge" GUID='150032,150637' Path="/Values">
+    <Locked>
+      <DefaultLockedState>0</DefaultLockedState>
+    </Locked>
+  </ModOp>
+  <ModOp Type="merge" GUID='1010520,1010344,140807,101040,101135,180039,141488,141568,141571,142310,142604,142791' Path="/Values">
+    <Locked>
+      <DefaultLockedState>1</DefaultLockedState>
+    </Locked>
+  </ModOp>
+   
+  <!-- we dont start the movie here directly, because this often causes desync after movie finished. it seems to be important to only start the movie after all players completely loaded the game -->
+    <!-- so we will play the movie when clicking on the letter instead and this trigger is no longer needed -->
+  <!-- <ModOp Type="addNextSibling" GUID="130248"> -->
+    <!-- <Asset> -->
+      <!-- <Template>Trigger</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500004200</GUID> -->
+          <!-- <Name>InitCampaign</Name> -->
+        <!-- </Standard> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionAlwaysTrue /> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <!-- <TriggerActions>  -->
+            <!-- <Item> -->
+              <!-- <TriggerAction> -->
+                <!-- <Template>ActionDelayedActions</Template> -->
+                <!-- <Values> -->
+                  <!-- <Action /> -->
+                  <!-- <ActionDelayedActions> -->
+                    <!-- <ExecutionDelay>5000</ExecutionDelay> -->
+                    <!-- <DelayedActions> -->
+                      <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                      <!-- <Values> -->
+                        <!-- <ActionList> -->
+                          <!-- <Actions> -->
+                            <!-- <Item> -->
+                              <!-- <Action> -->
+                                <!-- <Template>ActionNotification</Template> -->
+                                <!-- <Values> -->
+                                  <!-- <Action /> -->
+                                  <!-- <ActionNotification> -->
+                                    <!-- <Notification> -->
+                                      <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                                      <!-- <Values> -->
+                                        <!-- <SideNotification> -->
+                                          <!-- <IconAsset>102328</IconAsset> -->
+                                          <!-- <NotificationSideTitle>102328</NotificationSideTitle> -->
+                                          <!-- <FilterType>Progress</FilterType> -->
+                                          <!-- <Infotip>0</Infotip> -->
+                                          <!-- <HasJumpLocation>0</HasJumpLocation> -->
+                                          <!-- <IsWarning>0</IsWarning> -->
+                                        <!-- </SideNotification> -->
+                                        <!-- <BaseNotification> -->
+                                          <!-- <NotificationText>102328</NotificationText> -->
+                                          <!-- <NotificationAudioAsset>9818768</NotificationAudioAsset> -->
+                                          <!-- <NotificationPriority>300</NotificationPriority> -->
+                                          <!-- <NotificationMinDisplayTime>8000</NotificationMinDisplayTime> -->
+                                          <!-- <DisplayTimeout>330000</DisplayTimeout> -->
+                                        <!-- </BaseNotification> -->
+                                        <!-- <NotificationSubtitle /> -->
+                                      <!-- </Values> -->
+                                    <!-- </Notification> -->
+                                  <!-- </ActionNotification> -->
+                                <!-- </Values> -->
+                              <!-- </Action> -->
+                            <!-- </Item> -->
+                          <!-- </Actions> -->
+                        <!-- </ActionList> -->
+                      <!-- </Values> -->
+                    <!-- </DelayedActions> -->
+                  <!-- </ActionDelayedActions> -->
+                <!-- </Values> -->
+              <!-- </TriggerAction> -->
+            <!-- </Item> -->
+          <!-- </TriggerActions> -->
+        <!-- </Trigger> -->
+        <!-- <TriggerSetup> -->
+          <!-- <AutoRegisterTrigger>1</AutoRegisterTrigger> -->
+          <!-- <UsedBySecondParties>0</UsedBySecondParties> -->
+        <!-- </TriggerSetup> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+  
+  
+  
+   <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->   
+  <!-- ############################################################################################ -->
+  
+  
+
+  
+  <!-- replace "is ConditionIsCampaign" with "is single human slot" -->
+  <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsCampaign and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003811</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <!-- replace "not ConditionIsCampaign" with "is not single human slot" (must also replace these, otherwise both "is ConditionIsCampaign" and "is single human slot" will be true, leading to double the quests or so) -->
+  <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsCampaign and ConditionPropsNegatable/NegateCondition='1']]">
+    <TriggerCondition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003812</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  
+  <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->
+  
+  <!-- Quests PreConditionList -->
+    
+  <!-- ConditionIsCampaign == IsSingleHumanSlot -->
+  <ModOp Type="replace" Path="//Condition[Values[ConditionIsCampaign and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003811</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+  <!-- Not ConditionIsCampaign == Not IsSingleHumanSlot -->
+  <ModOp Type="replace" Path="//Condition[Values[ConditionIsCampaign and ConditionPropsNegatable/NegateCondition='1']]">
+    <Condition>
+      <Template>ConditionUnlocked</Template>
+      <Values>
+        <Condition />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500003812</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+
+  <!-- ################## -->
+  <!-- GameSetup -->
+  
+  <!-- add the campaign GameSetup to Multiplayer GUID ... muss ID ersetzt werden? <ID>MultiplayerSandbox</ID> <ID>SinglePlayerCampaign</ID> -->
+    <!-- Tutorial Quests are not started for whatever reason, even when I set EnableTutorial=1 in GameSetup and even unlocking the Questpools for tutorial quests 150902,151339,151353,151382,151383,151384,151385,151386 -->
+    <!-- But I think they are not that helpful in MP anyways, because they are not clientside, so if one player eg. closes the popups, the others also can not read it and so on. -->
+    <!-- And it saves us work, since we don't have to make them Desync-free -->
+    <!-- not really sure what Customizable does.. see no difference -->
+      <!-- also adding ActiveDLCs or Peers here and change it does not seem to have an effect.. (eg. to allow only AI in some slots) -->
+  <ModOp Type="merge" GUID='140988' Path="/Values">
+    <GameSetup>
+      <GameSetupDifficulty>NormalMultiplayer</GameSetupDifficulty>
+      <Customizable>1</Customizable>
+      <AllowInvites>1</AllowInvites>
+      <EnableCampaign>1</EnableCampaign>
+      <EnableTutorial>0</EnableTutorial>
+      <Maps>
+        <Item>
+          <Asset>180014</Asset>
+        </Item>
+        <Item>
+          <Asset>180023</Asset>
+        </Item>
+      </Maps>
+    </GameSetup>
+  </ModOp>
+  
+  <!-- DifficultySetup, campaign seems to use the same like singleplayer and there does not seem to be anything special in the multiplayer settings, so simply replace it -->
+  <ModOp Type="replace" GUID='142754' Path="/Values/DifficultySetup" Content="@141148/DifficultySetup"/>
+  <ModOp Type="replace" GUID='142755' Path="/Values/DifficultySetup" Content="@141149/DifficultySetup"/>
+  <ModOp Type="replace" GUID='142756' Path="/Values/DifficultySetup" Content="@141150/DifficultySetup"/>
+  <!-- empty prechosen secondparties, because irrelevant for multiplayer and fixes bug that the AIs are wrong -->
+  <ModOp Type="replace" GUID='142754,142755,142756' Path="/Values/DifficultySetup/SecondParties">
+    <SecondParties />
+  </ModOp>
+  
+  <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->
+  
+  
+  <!-- No way to differentiate between MP with multiple or with single human slot for MapTemplate MapTemplateForMultiplayer !! -->
+   <!-- So only activate this mod if you play with a single human slot! -->  
+  
+  <!-- campaign MapTemplate are not added anywhere in xml, they just work, most likely because of the <Campaign>1</Campaign> entry. -->
+   <!-- for MP we have to add them to the sessions instead -->
+    
+  <!-- <Template>MapTemplate</Template> <GUID>140735</GUID> <Name>moderate_01 (campaign)</Name> mit <Campaign>1</Campaign> -->
+  <!-- <GUID>141420</GUID> <Name>SouthAmerica 01 (campaign)</Name> -->
+  <ModOp Type="merge" GUID='180023' Path="/Values/Session">
+    <!-- <MapTemplate>140735</MapTemplate> -->
+    <MapTemplateForMultiplayer>140735</MapTemplateForMultiplayer>
+  </ModOp>
+  <ModOp Type="merge" GUID='180025' Path="/Values/Session">
+    <!-- <MapTemplate>141420</MapTemplate> -->
+    <MapTemplateForMultiplayer>141420</MapTemplateForMultiplayer>
+  </ModOp>
+  
+
+  
+  
+  <!-- map fertilites, mines. yes it is called "SandboxMultilayer"... -->
+  <ModOp AllowNoMatch="1" Type="replace" Path="//ResourceSetCondition/AllowedGameTypes[contains(.,'CampaignMode') and not(contains(.,'SandboxMultilayer'))]">
+    <AllowedGameTypes>SandboxSingleplayer;SandboxMultilayer;CampaignMode</AllowedGameTypes>
+  </ModOp>
+  <ModOp AllowNoMatch="1" Type="replace" Path="//ResourceSetCondition[AllowedGameTypes='SandboxMultilayer']/AllowedGameTypes">
+    <AllowedGameTypes>None</AllowedGameTypes>
+  </ModOp>
+  <ModOp AllowNoMatch="1" Type="replace" Path="//ResourceSetCondition/AllowedGameTypes[not(contains(.,'CampaignMode')) and contains(.,'SandboxMultilayer')]">
+    <AllowedGameTypes>None</AllowedGameTypes>
+  </ModOp>
+  <!-- RandomIslands, here it is AllowedGameType so without the s at the end.. -->
+  <!-- allow islands that are allowed in Campaign -->
+  <ModOp AllowNoMatch="1" Type="replace" Path="//RandomIsland/AllowedGameType[contains(.,'CampaignMode') and not(contains(.,'SandboxMultilayer'))]">
+    <AllowedGameType>SandboxSingleplayer;SandboxMultilayer;CampaignMode</AllowedGameType>
+  </ModOp>
+  <!-- dont allow islands that are only allowed in MP  -->
+  <ModOp AllowNoMatch="1" Type="replace" Path="//RandomIsland[AllowedGameType='SandboxMultilayer']/AllowedGameType">
+    <AllowedGameType>None</AllowedGameType>
+  </ModOp>
+  <!-- dont allow islands that are not allowed in campaign -->
+  <ModOp AllowNoMatch="1" Type="replace" Path="//RandomIsland/AllowedGameType[not(contains(.,'CampaignMode')) and contains(.,'SandboxMultilayer')]">
+    <AllowedGameType>None</AllowedGameType>
+  </ModOp>
+  
+  <!-- wenn wir bei der Map eh nicht unterscheiden können, -->
+   <!-- dann könnten wir das auch für alle trigger/quests festmachen, -->
+    <!-- indem wir da einfach AlwaysTrue und AlwaysFalse verwenden. -->
+    <!-- Das hätte auch den Vorteil, dass Quests auch mit mehreren menschlichen Spielern funzen, wobei da Bugs natürlich wahrscheinlicher sind -->
+   <!-- wobei, lieber nicht, denn das funktioniert sehr sicher alles nicht, also lieber den Schaden gering halten, indem da echte MP spiele wie gewohnt funktionieren -->
+    <!-- und dann halt nur die Afrika/Artkis Map "falsch" ist -->
+  
+  
+  <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->
+  
+  
+  
+  <!-- you shall not loose these islands -->
+  <!-- <CampaignCondition> -->
+    <!-- <IslandsToHold> -->
+      <!-- <Item> -->
+        <!-- <Island>160002</Island> -->
+      <!-- </Item> -->
+      <!-- <Item> -->
+        <!-- <Island>160005</Island> -->
+      <!-- </Item> -->
+      <!-- <Item> -->
+        <!-- <Island>160006</Island> -->
+      <!-- </Item> -->
+    <!-- </IslandsToHold> -->
+  <!-- </CampaignCondition> -->
+  <!-- put this into a trigger to replicate -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004380</GUID>
+          <Name>LooseIslandLooseGame</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>IslandUnsettled</ConditionEvent>
+                          <ContextAsset>PlayerStartIsland</ContextAsset>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>IslandUnsettled</ConditionEvent>
+                          <ContextAsset>Campaign_SA_PlayerStartIsland</ContextAsset>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>IslandUnsettled</ConditionEvent>
+                          <ContextAsset>Campaign_SA_ColonialistIsland</ContextAsset>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionLoseGame</Template>
+                <Values>
+                  <Action />
+                  <ActionLoseGame />
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  
+  
+  <Include File="./AntiDesync/AntiDesync.include.xml" />
+  <Include File="./CampaignFixes.include.xml" />
+
+
+</ModOps>
+

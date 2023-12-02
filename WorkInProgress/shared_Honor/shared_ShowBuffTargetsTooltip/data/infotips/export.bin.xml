@@ -1,0 +1,51 @@
+<ModOps>
+    <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+
+  <!-- 25000102 -->
+  <!-- im Bereich mit ItemOrBuffEffectTargets wird entschieden, ob text 20085 angezeigt werden soll (auflistung der buff ziele),  -->
+   <!-- wenn man über einen aktiven buff eines objekts hovered. -->
+  <!-- Ich denke nicht, dass das wie gewollt funktioniert, denn aktuell ists es wohl so: -->
+   <!-- Die Ziele werden nicht angezeigt, wenn: -->
+    <!-- - die Objekt GUID direkt als Ziel genannt wird (vermutung, nicht getestet) -->
+    <!-- - die objekt GUID auf oberster Ebene des effectpools gelistet ist, welcher das ziel des buffs ist. -->
+   <!-- Besonders letzteres hat zur Folge, dass der tooltip bei verschachtelten pools in pools angezeigt wird, -->
+    <!-- aber bei pools wo dann direkt zb. alle schiffe gelistet sind, er nicht angezeigt wird.  -->
+    <!-- Obwohl es hier keinerlei lofischen Grund gibt, die ziele nicht anzuzeigen. -->
+   
+   <!-- Wann wäre es sinnvoll die Ziele nicht zu zeigen: -->
+   <!-- 1) Wenn das Objekt das einzige Ziel ist und direkt ohne pool als target genannt wurde. -->
+   <!-- 2) Wenn es sehr viele Ziele sind, vorallem wenn es keine pools, sondern objekte selbst sind. -->
+
+  <!-- Ich vermute  -->
+   <!-- <Condition>[ToolOneHelper IsObjectEffectTarget([Selection Object GUID], [RefGuid])]</Condition> -->
+  <!-- funktioniert nicht wie gewollt, eigentlich sollte es direkte targets im buff erkennen, und nicht eine einzige ebene in einen genannten pool gehen. -->
+   <!-- (RefGuid ist der Buff, Selection ist halt was wir aktuell angewählt haben) -->
+  
+  <!-- Wirklich fixen können wir das denke ich nicht, nur sagen, dass buffziele angezeigt werden sollen, wenn es weniger als x direkte ziel guids im buff genannt gibt (damits kein mega tooltip wird). -->
+  
+  <ModOp Type="replace" Path="//InfoTipData[Guid='25000102']/InfoElement/VisibilityElement/VisibilityElement/VisibilityElement/VisibilityElement[Condition='[ToolOneHelper IsObjectEffectTarget([Selection Object GUID], [RefGuid])]']">
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>1</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>1</ResultType>
+      </ResultType>
+      <ExpectedValueInt>6</ExpectedValueInt>
+      <Condition>[ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) COUNT]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  
+  
+</ModOps>
+
+
+
+
+
+
+
+

@@ -1,0 +1,907 @@
+<ModOps>
+    <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+
+  <!-- change tooltip 500057 from hovering over buildable ships in shipyard, -->
+   <!-- to display our buffs if the "ship" has EffecTTargets defined. -->
+   
+   <!-- so we can use shipyards properly to "craft" buffs or other things, that are no ships -->
+  
+  
+  
+  <!-- man kann als condition auch direkt nach einer guid fragen, falls es keine allgemeinere passende condition gibt: -->
+  <!-- <ExpectedValueInt>118718</ExpectedValueInt> -->
+  <!-- <Condition>[RefGuid]</Condition> -->
+  
+
+  <!-- make the vanilla unlocked tooltip only visible if the object has no EffectTargets defined -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='500057']/InfoElement[VisibilityElement/VisibilityElement[Condition='[Unlock IsUnlocked([RefGuid])]' and not(ExpectedValueBool)] and VisibilityElement/VisibilityElement[Condition='[IsGamepadModeActive]' and ExpectedValueBool='False']]/VisibilityElement">
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>0</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>1</ResultType>
+      </ResultType>
+      <ExpectedValueInt>0</ExpectedValueInt>
+      <Condition>[ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) COUNT]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  
+  
+  <!-- custom tooltip to display the buffs and EffectTargets in addtion to buiildcosts if it has some -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='500057']">
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>15</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>2</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Unlock IsUnlocked([RefGuid])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[IsGamepadModeActive]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>5</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <Condition>[ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) COUNT]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>5</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Text>[ToolOneHelper InfoDescription([RefGuid]) Text]</Text>
+          <Style />
+        </Text>
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>2</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) COUNT]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>20620</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>19</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <TemplateGUID>454144439</TemplateGUID>
+          <Variables>
+            <None>
+              <ID>1840762361</ID>
+              <Name>ItemGuid</Name>
+              <Source>[ItemAssetData([RefGuid]) Guid]</Source>
+            </None>
+          </Variables>
+        </InfoElement>
+      </InfoElement>
+      
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>3</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>2</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType />
+            <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) HasInfluenceChanges]</Condition>
+          </VisibilityElement>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>2</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <ExpectedValueBool>False</ExpectedValueBool>
+              <Condition>[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]</Condition>
+            </VisibilityElement>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>5</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <Condition>[BuildPermits BuildPermits([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType>
+              <OperatorType>1</OperatorType>
+            </OperatorType>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>12224</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>10</ElementType>
+          <ChildCount>2</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <InfoElement>
+            <ElementType>11</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <ChildCount>1</ChildCount>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator />
+                <ResultType />
+                <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) InfluencePayable]</Condition>
+              </VisibilityElement>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconGUID>1010190</IconGUID>
+              <Style />
+            </Icon>
+            <Text>
+              <Text>[Selection Object Shipyard BuildCostForShip([RefGuid]) InfluenceCost]</Text>
+              <Style />
+            </Text>
+            <WarningType />
+          </InfoElement>
+          <InfoElement>
+            <ElementType>11</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <ChildCount>1</ChildCount>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator />
+                <ResultType />
+                <ExpectedValueBool>False</ExpectedValueBool>
+                <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) InfluencePayable]</Condition>
+              </VisibilityElement>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconGUID>1010190</IconGUID>
+              <Style />
+            </Icon>
+            <Text>
+              <Text>[Selection Object Shipyard BuildCostForShip([RefGuid]) InfluenceCost]</Text>
+              <Style />
+            </Text>
+            <WarningType>
+              <WarningType>2</WarningType>
+            </WarningType>
+          </InfoElement>
+          <Source>1</Source>
+          <Columns>2</Columns>
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) InfluenceCost]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>12223</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>2</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[Selection Object Shipyard ConstructionTime([RefGuid])]</Condition>
+          </VisibilityElement>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>2</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <ExpectedValueBool>False</ExpectedValueBool>
+              <Condition>[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]</Condition>
+            </VisibilityElement>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>5</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <Condition>[BuildPermits BuildPermits([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType>
+              <OperatorType>1</OperatorType>
+            </OperatorType>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>6</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Style />
+          </Text>
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>10608</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>8</ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <ExpectedValueBool>False</ExpectedValueBool>
+              <Condition>[Selection Object Shipyard IsCurrentConstructionGUID([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <InfoElement>
+            <ElementType>4</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconGUID>500452</IconGUID>
+              <Style />
+            </Icon>
+            <Text>
+              <TextGUID>10609</TextGUID>
+              <Style />
+            </Text>
+            <Value>
+              <Text>[Selection Object Shipyard ConstructionTime([RefGuid]) &gt;&gt; time]</Text>
+              <Style />
+            </Value>
+            <WarningType />
+            <BackgroundType />
+          </InfoElement>
+        </InfoElement>
+        <InfoElement>
+          <ElementType>8</ElementType>
+          <ChildCount>2</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <Condition>[Selection Object Shipyard IsCurrentConstructionGUID([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <InfoElement>
+            <ElementType>4</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconGUID>500452</IconGUID>
+              <Style />
+            </Icon>
+            <Text>
+              <TextGUID>10610</TextGUID>
+              <Style />
+            </Text>
+            <Value>
+              <Text>[Selection Object Shipyard RemainingRelativeTime &gt;&gt; time]</Text>
+              <Style />
+            </Value>
+            <WarningType />
+            <BackgroundType />
+          </InfoElement>
+          <InfoElement>
+            <ElementType>4</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconGUID>1174</IconGUID>
+              <Style />
+            </Icon>
+            <Text>
+              <TextGUID>100373</TextGUID>
+              <Style />
+            </Text>
+            <Value>
+              <Text>[Selection Object Shipyard Progress &gt;&gt; percentage][AssetData(10400) Text]</Text>
+              <Style />
+            </Value>
+            <WarningType />
+            <BackgroundType />
+          </InfoElement>
+        </InfoElement>
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>3</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>2</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType />
+            <ExpectedValueBool>False</ExpectedValueBool>
+            <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Empty]</Condition>
+          </VisibilityElement>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>2</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <ExpectedValueBool>False</ExpectedValueBool>
+              <Condition>[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]</Condition>
+            </VisibilityElement>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>5</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <Condition>[BuildPermits BuildPermits([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType>
+              <OperatorType>1</OperatorType>
+            </OperatorType>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>6</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Style />
+          </Text>
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>100008</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>10</ElementType>
+          <ChildCount>3</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <InfoElement>
+            <ElementType>11</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <ChildCount>3</ChildCount>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator />
+                <ResultType />
+                <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Payable AT(#index0#)]</Condition>
+              </VisibilityElement>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator>
+                  <CompareOperator>1</CompareOperator>
+                </CompareOperator>
+                <ResultType>
+                  <ResultType>1</ResultType>
+                </ResultType>
+                <ExpectedValueInt>1010190</ExpectedValueInt>
+                <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition>
+              </VisibilityElement>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator />
+                <ResultType />
+                <ExpectedValueBool>False</ExpectedValueBool>
+                <Condition>[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]</Condition>
+              </VisibilityElement>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconText>[Selection Object Shipyard BuildCostForShip([RefGuid]) Icons AT(#index0#)]</IconText>
+              <Style />
+            </Icon>
+            <Text>
+              <Text>[Selection Object Shipyard BuildCostForShip([RefGuid]) Values AT(#index0#)]</Text>
+              <Style />
+            </Text>
+            <WarningType />
+          </InfoElement>
+          <InfoElement>
+            <ElementType>11</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <ChildCount>3</ChildCount>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator />
+                <ResultType />
+                <ExpectedValueBool>False</ExpectedValueBool>
+                <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Payable AT(#index0#)]</Condition>
+              </VisibilityElement>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator>
+                  <CompareOperator>1</CompareOperator>
+                </CompareOperator>
+                <ResultType>
+                  <ResultType>1</ResultType>
+                </ResultType>
+                <ExpectedValueInt>1010190</ExpectedValueInt>
+                <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition>
+              </VisibilityElement>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator />
+                <ResultType />
+                <ExpectedValueBool>False</ExpectedValueBool>
+                <Condition>[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]</Condition>
+              </VisibilityElement>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconText>[Selection Object Shipyard BuildCostForShip([RefGuid]) Icons AT(#index0#)]</IconText>
+              <Style />
+            </Icon>
+            <Text>
+              <Text>[Selection Object Shipyard BuildCostForShip([RefGuid]) Available AT(#index0#)]/[Selection Object Shipyard BuildCostForShip([RefGuid]) Values AT(#index0#)]</Text>
+              <Style />
+            </Text>
+            <WarningType>
+              <WarningType>2</WarningType>
+            </WarningType>
+          </InfoElement>
+          <InfoElement>
+            <ElementType>11</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <ChildCount>3</ChildCount>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator />
+                <ResultType />
+                <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Payable AT(#index0#)]</Condition>
+              </VisibilityElement>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator>
+                  <CompareOperator>1</CompareOperator>
+                </CompareOperator>
+                <ResultType>
+                  <ResultType>1</ResultType>
+                </ResultType>
+                <ExpectedValueInt>1010190</ExpectedValueInt>
+                <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition>
+              </VisibilityElement>
+              <VisibilityElement>
+                <ElementType>
+                  <ElementType>1</ElementType>
+                </ElementType>
+                <CompareOperator />
+                <ResultType />
+                <Condition>[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]</Condition>
+              </VisibilityElement>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconText>[Selection Object Shipyard BuildCostForShip([RefGuid]) Icons AT(#index0#)]</IconText>
+              <Style />
+            </Icon>
+            <Text>
+              <Text>[Selection Object Shipyard BuildCostForShip([RefGuid]) Values AT(#index0#)]</Text>
+              <Style />
+            </Text>
+            <WarningType />
+          </InfoElement>
+          <Source>[Selection Object Shipyard BuildCostForShip([RefGuid]) Values COUNT]</Source>
+          <Columns>2</Columns>
+        </InfoElement>
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>2</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType />
+            <Condition>[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>3</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <Condition>[BuildPermits BuildPermits([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>12662</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>3</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <Condition>[BuildPermits BuildPermits([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>125500</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>125310</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Style />
+          </Value>
+          <WarningType>
+            <WarningType>2</WarningType>
+          </WarningType>
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>3</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType />
+            <ExpectedValueBool>False</ExpectedValueBool>
+            <Condition>[IsGamepadModeActive]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>6</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <Style />
+          </Text>
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <Condition>[Selection Object Shipyard CurrentConstructionGUID]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>10611</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>5</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>1</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <Condition>[Selection Object Shipyard CurrentConstructionGUID]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Text>
+            <TextGUID>10612</TextGUID>
+            <Style />
+          </Text>
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+    </InfoElement>
+  </ModOp>
+  
+  
+  
+  
+  
+</ModOps>
+
+
+
+
+
+
+
+

@@ -1,0 +1,1556 @@
+<ModOps>
+   
+  <!-- The pirates have SpecialTrigger in their asset defined where one can check MilitaryStrength and can kind of define the money value they demand -->
+   <!-- to threat war/cancel treaty and so on. -->
+  <!-- But this is totally bugged and not as detailed as it should be, so we have to use these Quests as a workaround -.- -->
+   <!-- The Problem with SpecialTrigger: The money for all diplomatic actions does NOT scale by progress, only a little bit by MilitaryStrength-difference and tiny bit by CompanyLevel -->
+    <!-- MilitaryStrength does include the towers of all players. So if you have 100 towers on your islands but not a single warship, priate will be scared by you. This is bullshit,the pirate does not attack islands, so he should not care for towers! -->
+   <!-- with these quests we will use a lua script to check MilitaryShipScore instead, which only checks the strength of ships -->
+   <!-- and the demanded delivery can scale by progresslevel -->
+  <!-- downside with Quest is that we don't have this nice threat-UI =/ =/ -->
+   
+  <!-- the check if pirate is stronger than plaer is done in lua -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003822</GUID>
+          <Name>DemandIfStronger_Harlow</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>100707</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>RuinCount</PlayerCounter>
+                                    <Context>100707</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <SubTriggers>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionDiplomaticState</Template>
+                                          <Values>
+                                            <Condition>
+                                              <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                            </Condition>
+                                            <ConditionDiplomaticState>
+                                              <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                                              <TargetParticipant2>Third_party_03_Pirate_Harlow</TargetParticipant2>
+                                              <DesiredState>War</DesiredState>
+                                            </ConditionDiplomaticState>
+                                            <ConditionPropsNegatable>
+                                              <NegateCondition>1</NegateCondition>
+                                            </ConditionPropsNegatable>
+                                          </Values>
+                                        </TriggerCondition>
+                                        <SubTriggers>
+                                          <Item>
+                                            <SubTrigger>
+                                              <Template>AutoCreateTrigger</Template>
+                                              <Values>
+                                                <Trigger>
+                                                  <TriggerCondition>
+                                                    <Template>ConditionTimer</Template>
+                                                    <Values>
+                                                      <Condition />
+                                                      <ConditionTimer>
+                                                        <TimeLimit>1800000</TimeLimit>
+                                                      </ConditionTimer>
+                                                    </Values>
+                                                  </TriggerCondition>
+                                                  <SubTriggers>
+                                                    <Item>
+                                                      <SubTrigger>
+                                                        <Template>AutoCreateTrigger</Template>
+                                                        <Values>
+                                                          <Trigger>
+                                                            <TriggerCondition>
+                                                              <Template>ConditionUnlocked</Template>
+                                                              <Values>
+                                                                <Condition />
+                                                                <ConditionUnlocked>
+                                                                  <UnlockNeeded>1500001613</UnlockNeeded>
+                                                                </ConditionUnlocked>
+                                                                <ConditionPropsNegatable />
+                                                              </Values>
+                                                            </TriggerCondition>
+                                                            <TriggerActions> 
+                                                              <Item>
+                                                                <TriggerAction>
+                                                                  <Template>ActionExecuteScript</Template>
+                                                                  <Values>
+                                                                    <Action />
+                                                                    <ActionExecuteScript>
+                                                                      <ScriptFileName>data/demand_harlow_human0.lua</ScriptFileName>
+                                                                    </ActionExecuteScript>
+                                                                  </Values>
+                                                                </TriggerAction>
+                                                              </Item>
+                                                            </TriggerActions>
+                                                          </Trigger>
+                                                        </Values>
+                                                      </SubTrigger>
+                                                    </Item>
+                                                    <Item>
+                                                      <SubTrigger>
+                                                        <Template>AutoCreateTrigger</Template>
+                                                        <Values>
+                                                          <Trigger>
+                                                            <TriggerCondition>
+                                                              <Template>ConditionUnlocked</Template>
+                                                              <Values>
+                                                                <Condition />
+                                                                <ConditionUnlocked>
+                                                                  <UnlockNeeded>1500001614</UnlockNeeded>
+                                                                </ConditionUnlocked>
+                                                                <ConditionPropsNegatable />
+                                                              </Values>
+                                                            </TriggerCondition>
+                                                            <TriggerActions> 
+                                                              <Item>
+                                                                <TriggerAction>
+                                                                  <Template>ActionExecuteScript</Template>
+                                                                  <Values>
+                                                                    <Action />
+                                                                    <ActionExecuteScript>
+                                                                      <ScriptFileName>data/demand_harlow_human1.lua</ScriptFileName>
+                                                                    </ActionExecuteScript>
+                                                                  </Values>
+                                                                </TriggerAction>
+                                                              </Item>
+                                                            </TriggerActions>
+                                                          </Trigger>
+                                                        </Values>
+                                                      </SubTrigger>
+                                                    </Item>
+                                                    <Item>
+                                                      <SubTrigger>
+                                                        <Template>AutoCreateTrigger</Template>
+                                                        <Values>
+                                                          <Trigger>
+                                                            <TriggerCondition>
+                                                              <Template>ConditionUnlocked</Template>
+                                                              <Values>
+                                                                <Condition />
+                                                                <ConditionUnlocked>
+                                                                  <UnlockNeeded>1500001615</UnlockNeeded>
+                                                                </ConditionUnlocked>
+                                                                <ConditionPropsNegatable />
+                                                              </Values>
+                                                            </TriggerCondition>
+                                                            <TriggerActions> 
+                                                              <Item>
+                                                                <TriggerAction>
+                                                                  <Template>ActionExecuteScript</Template>
+                                                                  <Values>
+                                                                    <Action />
+                                                                    <ActionExecuteScript>
+                                                                      <ScriptFileName>data/demand_harlow_human2.lua</ScriptFileName>
+                                                                    </ActionExecuteScript>
+                                                                  </Values>
+                                                                </TriggerAction>
+                                                              </Item>
+                                                            </TriggerActions>
+                                                          </Trigger>
+                                                        </Values>
+                                                      </SubTrigger>
+                                                    </Item>
+                                                    <Item>
+                                                      <SubTrigger>
+                                                        <Template>AutoCreateTrigger</Template>
+                                                        <Values>
+                                                          <Trigger>
+                                                            <TriggerCondition>
+                                                              <Template>ConditionUnlocked</Template>
+                                                              <Values>
+                                                                <Condition />
+                                                                <ConditionUnlocked>
+                                                                  <UnlockNeeded>1500001616</UnlockNeeded>
+                                                                </ConditionUnlocked>
+                                                                <ConditionPropsNegatable />
+                                                              </Values>
+                                                            </TriggerCondition>
+                                                            <TriggerActions> 
+                                                              <Item>
+                                                                <TriggerAction>
+                                                                  <Template>ActionExecuteScript</Template>
+                                                                  <Values>
+                                                                    <Action />
+                                                                    <ActionExecuteScript>
+                                                                      <ScriptFileName>data/demand_harlow_human3.lua</ScriptFileName>
+                                                                    </ActionExecuteScript>
+                                                                  </Values>
+                                                                </TriggerAction>
+                                                              </Item>
+                                                            </TriggerActions>
+                                                          </Trigger>
+                                                        </Values>
+                                                      </SubTrigger>
+                                                    </Item>
+                                                  </SubTriggers>
+                                                </Trigger>
+                                              </Values>
+                                            </SubTrigger>
+                                          </Item>
+                                        </SubTriggers>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                              </SubTriggers>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>30000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    
+    
+  </ModOp>
+    
+    
+
+  
+    <!-- AutoShowDecisionScreen is not multiplayer compatible, opens the decison for all players, even the ones without the quest and they can decide -->
+
+  
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>A7_QuestStatusQuo</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003826</GUID>
+          <Name>DemandLow_Harlow</Name>
+        </Standard>
+        <Quest>
+          <StarterMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <!-- <NotificationTextGroupFemale>-1243509478</NotificationTextGroupFemale> -->
+                  <NotificationTextFemale>1500003824</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <!-- <NotificationTextGroup>284129818</NotificationTextGroup> -->
+                  <NotificationTextFemale>1500003824</NotificationTextFemale>
+                  <NotificationPriority>999</NotificationPriority>
+                  <NotificationMinDisplayTime>7000</NotificationMinDisplayTime>
+                  <DisplayTimeout>600000</DisplayTimeout>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <SubtitleGroup>-1798443027</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </StarterMessage>
+          <SuccessMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <NotificationTextGroupFemale>-1047998243</NotificationTextGroupFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationTextGroup>1132769863</NotificationTextGroup>
+                  <NotificationMinDisplayTime>10000</NotificationMinDisplayTime>
+                  <DisplayTimeout>300000</DisplayTimeout>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <Subtitle>265454</Subtitle>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </SuccessMessage>
+          <FailureMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <NotificationTextGroupFemale>-1617365429</NotificationTextGroupFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationTextGroup>305802229</NotificationTextGroup>
+                  <NotificationMinDisplayTime>10000</NotificationMinDisplayTime>
+                  <DisplayTimeout>300000</DisplayTimeout>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <Subtitle>265452</Subtitle>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </FailureMessage>
+          <ResolveConfirmationMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <!-- <NotificationTextFemale>16521</NotificationTextFemale> -->
+                  <NotificationTextFemale>1500003825</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <!-- <NotificationText>16520</NotificationText> -->
+                  <NotificationTextFemale>1500003825</NotificationTextFemale>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <SubtitleGroup>-2071104147</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </ResolveConfirmationMessage>
+          <OnQuestSucceeded>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500003824</TriggerAsset>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestSucceeded>
+          <QuestGiver>73</QuestGiver>
+          <QuestDifficulty>Easy</QuestDifficulty>
+          <NeededProgressLevel>EarlyGame;EarlyMidGame;MidGame;LateMidGame;LateGame;EndGame</NeededProgressLevel>
+          <StoryText>802036</StoryText>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180023</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+          <PreActivationTimer>0</PreActivationTimer>
+          <DelayTimer>0</DelayTimer>
+          <QuestTimeLimit>900000</QuestTimeLimit>
+          <QuestCategory>RandomQuest</QuestCategory>
+          <QuestActivation>QuestStart</QuestActivation>
+          <CountForQuestLimit>0</CountForQuestLimit>
+          <QuestTrackerVisibility>Session</QuestTrackerVisibility>
+          <QuestBookVisibility>SameAsQuestTracker</QuestBookVisibility>
+          <IsAbortable>1</IsAbortable>
+          <CanBeActiveForMultipleParticipants>1</CanBeActiveForMultipleParticipants>
+          <ConfirmOnReached>0</ConfirmOnReached>
+          <HasExclusiveQuestGiver>0</HasExclusiveQuestGiver>
+          <KeepCheckingPreconditionsWhenRunning>1</KeepCheckingPreconditionsWhenRunning>
+          <QuestBookBackground>data/ui/2kimages/main/assets16/questbackground/bg_quest_smugglewithoutscanners_delivery_pickup.png</QuestBookBackground>
+          <ReputationQuestFail>
+            <ReputationFailList>
+              <Item>
+                <ReputationParticipant>Third_party_03_Pirate_Harlow</ReputationParticipant>
+                <ReputationAmount>-5</ReputationAmount>
+              </Item>
+              <Item>
+                <ReputationParticipant>Third_party_04_Pirate_LaFortune</ReputationParticipant>
+                <ReputationAmount>1</ReputationAmount>
+              </Item>
+            </ReputationFailList>
+          </ReputationQuestFail>
+          <QuestHints>
+            <Item>
+              <Text>1500003820</Text>
+            </Item>
+            <Item>
+              <Text>1500003822</Text>
+            </Item>
+          </QuestHints>
+          <HasStarterSpeechBubble>0</HasStarterSpeechBubble>
+        </Quest>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionDiplomaticState</Template>
+            <Values>
+              <Condition />
+              <ConditionDiplomaticState>
+                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                <TargetParticipant2>Third_party_03_Pirate_Harlow</TargetParticipant2>
+                <DesiredState>War</DesiredState>
+              </ConditionDiplomaticState>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </Condition>
+          <SubConditions>
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>100707</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </Condition>
+                    <SubConditions>
+                      <Item>
+                        <SubCondition>
+                          <Template>PreConditionList</Template>
+                          <Values>
+                            <PreConditionList>
+                              <Condition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>RuinCount</PlayerCounter>
+                                    <Context>100707</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </Condition>
+                            </PreConditionList>
+                          </Values>
+                        </SubCondition>
+                      </Item>
+                    </SubConditions>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+          </SubConditions>
+        </PreConditionList>
+        <Text />
+        <Reward>
+          <RewardAssets />
+          <RewardReputation>
+            <Item>
+              <ReputationParticipant>Third_party_03_Pirate_Harlow</ReputationParticipant>
+              <ReputationAmount>2</ReputationAmount>
+            </Item>
+            <Item>
+              <ReputationParticipant>Third_party_04_Pirate_LaFortune</ReputationParticipant>
+              <ReputationAmount>-1</ReputationAmount>
+            </Item>
+          </RewardReputation>
+        </Reward>
+        <Objectives>
+          <WinConditionCompletionOrder>MutuallyExclusive</WinConditionCompletionOrder>
+          <WinConditions>
+            <!-- <Item> -->
+              <!-- <Objective> -->
+                <!-- <Template>DeliveryObjective</Template> -->
+                <!-- <Values> -->
+                  <!-- <ConditionQuestDelivery> -->
+                    <!-- <DeliveryObject_cqd> -->
+                      <!-- <Item> -->
+                        <!-- <ObjectGUID>1010017</ObjectGUID> -->
+                        <!-- <Min>1000</Min> -->
+                        <!-- <Max>1000</Max> -->
+                      <!-- </Item> -->
+                      <!-- <Item> -->
+                        <!-- <ObjectGUID>1010196</ObjectGUID> -->
+                        <!-- <Min>1</Min> -->
+                        <!-- <Max>1</Max> -->
+                      <!-- </Item> -->
+                    <!-- </DeliveryObject_cqd> -->
+                    <!-- <DeliveryType>TargetObject</DeliveryType> -->
+                    <!-- <DeliveryExecutionPlace> -->
+                      <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                      <!-- <Values> -->
+                        <!-- <ConditionObjectClientQuestObject /> -->
+                        <!-- <ConditionScanner /> -->
+                        <!-- <ConditionObjectiveSignsAndFeedback /> -->
+                      <!-- </Values> -->
+                    <!-- </DeliveryExecutionPlace> -->
+                  <!-- </ConditionQuestDelivery> -->
+                  <!-- <ConditionQuestObjective> -->
+                    <!-- <TextCombinedContextValue>12754</TextCombinedContextValue> -->
+                  <!-- </ConditionQuestObjective> -->
+                  <!-- <ObjectiveScaling> -->
+                    <!-- <ScaleObjectives>1</ScaleObjectives> -->
+                    <!-- <ScaleFactors> -->
+                      <!-- <EarlyGame> -->
+                        <!-- <Factor>1</Factor> -->
+                      <!-- </EarlyGame> -->
+                      <!-- <EarlyMidGame> -->
+                        <!-- <Factor>2</Factor> -->
+                      <!-- </EarlyMidGame> -->
+                      <!-- <MidGame> -->
+                        <!-- <Factor>3</Factor> -->
+                      <!-- </MidGame> -->
+                      <!-- <LateMidGame> -->
+                        <!-- <Factor>4</Factor> -->
+                      <!-- </LateMidGame> -->
+                      <!-- <LateGame> -->
+                        <!-- <Factor>5</Factor> -->
+                      <!-- </LateGame> -->
+                      <!-- <EndGame> -->
+                        <!-- <Factor>6</Factor> -->
+                      <!-- </EndGame> -->
+                    <!-- </ScaleFactors> -->
+                  <!-- </ObjectiveScaling> -->
+                  <!-- <ConditionPropsSessionSettings /> -->
+                <!-- </Values> -->
+              <!-- </Objective> -->
+            <!-- </Item> -->
+            
+            <Item>
+              <Objective>
+                <Template>SellObjectToParticipantObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>13777</TextCombinedContextValue>
+                    <LinkAllQuestActionsToQuest>1</LinkAllQuestActionsToQuest>
+                    <OnSuccessActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionMoveObject</Template>
+                                <Values>
+                                  <Action />
+                                  <ObjectFilter>
+                                    <ObjectGUID>100437</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                    <CheckQuestStarterSession>1</CheckQuestStarterSession>
+                                    <MaxObjectCount>1</MaxObjectCount>
+                                  </ObjectFilter>
+                                  <ObjectTargetFilter>
+                                    <TargetGUID>100707</TargetGUID>
+                                    <TargetCheckParticipantID>1</TargetCheckParticipantID>
+                                    <TargetParticipantID>Third_party_03_Pirate_Harlow</TargetParticipantID>
+                                  </ObjectTargetFilter>
+                                  <ActionMoveObject>
+                                    <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
+                                    <SearchMode>Closest</SearchMode>
+                                  </ActionMoveObject>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <!-- TODO: einzigartige GUID Kopie von jedem schiff machen, damit ab jetzt klar ist um welches schiff es geht -->
+                             <!-- und evlt diese actions in eine unsichtbare hilfsquest im hintergrund packen, damits immer klappt wenn ein schiff an piraten verkauft wird -->
+                              <!-- wobei wir die actions evlt auch in nen trigger verlagern sollten, -->
+                               <!-- in diesem Trigger können wir als condition machen, dass Neutral in dieser Session nur 1 von dieser GUID besitzen darf, -->
+                                <!-- nur dann wandeln wirs in piratenschiff um, andernfalls machen wir spawnship -->
+                                 <!-- um sicher zu sein, dass wir am ende kein piratenschiff haben, dass als archibald disguised ist. -->
+                                  <!-- wobei das eig auch ganz witzig wäre... -->
+                                  
+                                  <!-- evlt noch andere conditions: -->
+                                   <!-- wenns mehrere gibt, dann dennoch mit MaxObjectCount move+changeguid in einzigartige guid -->
+                                    <!-- und direkt danach prüfen, ob diese einzigartige guid in der nähe der piraten ist. -->
+                                     <!-- wenn ja, ist alles gut, war wohl das richtige. -->
+                                      <!-- wenn nein, dann deleten (am besten instant auf der stelle) und dann wiederholen wir den befehl -->
+                                      <!-- so lange bis wir das richtige in der nähe der piraten gefunden haben -->
+                                    
+                                  
+                                  <!-- das setzt natürlich voraus, dass neutral niemals ein playership besitzt, welches nicht gefahrlos entfernt werden kann -->
+                                  <!-- ach mist, es gibt einige Quests die normale schiffe mit neutral owner spawnen -.- -->
+                                   <!-- diese alle ersetzen durch neue guid? <Object>100439</Object> -->
+                                  <!-- leider muss der erste befehl ActionMoveObject sein um den delete befehl aufzuheben. -->
+                                   <!-- wenn wir ActionSetObjectGUID oder ActionChangeParticipant zuerst machen, dann verschwindet das schiff instant. -->
+                                    <!-- aber von potentiellen quest schiffen wollen wir den moveto befehl ja nicht überschreiben -.- -->
+                                  
+                                  <!-- die schiffe die trader zum verkauf anbieten sind auch playerships die neutral sind -.- -->
+                                   <!-- diese könnte man theoretisch in lua mit Sellable.OnSale erkennen, aber kompliziert und keine ahnung wie das vernküpfen könnte.. -->
+                                   <!-- mal testen was passiert wenn ich diese lösche ob und wann dann neue zum verkauf spawnen -->
+                                  
+                            <Item>
+                              <Action>
+                                <Template>ActionSetObjectGUID</Template>
+                                <Values>
+                                  <Action />
+                                  <ObjectFilter>
+                                    <ObjectGUID>100437</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                    <CheckQuestStarterSession>1</CheckQuestStarterSession>
+                                    <MaxObjectCount>1</MaxObjectCount>
+                                  </ObjectFilter>
+                                  <ActionSetObjectGUID>
+                                    <NewGUID>100563</NewGUID>
+                                  </ActionSetObjectGUID>
+                                </Values>
+                              </Action>
+                            </Item>
+                            
+                            
+                            
+                            <!-- a delay just in case we accidently chose a ship which was sold to another neutral trader, to give the ship time to move towards pirates (if it is already near pirates, see it as Umbau des schiffs) -->
+                            <!-- dont use MaxObjectCount here anymore, because after the delay there already might be several ships like this, if player sold several -->
+                            <Item>
+                              <Action>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>10000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionChangeParticipant</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionChangeParticipant>
+                                                    <NewParticipantID>Third_party_03_Pirate_Harlow</NewParticipantID>
+                                                  </ActionChangeParticipant>
+                                                  <ObjectFilter>
+                                                    <ObjectGUID>100563</ObjectGUID>
+                                                    <CheckParticipantID>1</CheckParticipantID>
+                                                    <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                                    <CheckQuestStarterSession>1</CheckQuestStarterSession>
+                                                  </ObjectFilter>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionSetObjectGUID</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ObjectFilter>
+                                                    <ObjectGUID>100563</ObjectGUID>
+                                                    <CheckParticipantID>1</CheckParticipantID>
+                                                    <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID>
+                                                    <CheckQuestStarterSession>1</CheckQuestStarterSession>
+                                                  </ObjectFilter>
+                                                  <ActionSetObjectGUID>
+                                                    <NewGUID>102429</NewGUID>
+                                                  </ActionSetObjectGUID>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </Action>
+                            </Item>
+                            
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </OnSuccessActions>
+
+                  </ConditionQuestObjective>
+                  <ConditionQuestSellObjectToParticipant>
+                    <BuyerParticipant>Third_party_03_Pirate_Harlow</BuyerParticipant>
+                    <ObjectToSell>100437</ObjectToSell>
+                    <SellAmount>1</SellAmount>
+                  </ConditionQuestSellObjectToParticipant>
+                </Values>
+              </Objective>
+            </Item>
+            
+
+            <!-- <Item> -->
+              <!-- <Objective> -->
+                <!-- <Template>TutorialObjective</Template> -->
+                <!-- <Values> -->
+                  <!-- <ConditionQuestObjective> -->
+                    <!-- <LinkAllQuestActionsToQuest>1</LinkAllQuestActionsToQuest> -->
+                    <!-- <OnSuccessActions> -->
+                      <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                      <!-- <Values> -->
+                        <!-- <ActionList> -->
+                          <!-- <Actions> -->
+                            <!-- <Item> -->
+                              <!-- <Action> -->
+                                <!-- <Template>ActionChangeParticipant</Template> -->
+                                <!-- <Values> -->
+                                  <!-- <Action /> -->
+                                  <!-- <ActionChangeParticipant> -->
+                                    <!-- <NewParticipantID>Third_party_03_Pirate_Harlow</NewParticipantID> -->
+                                  <!-- </ActionChangeParticipant> -->
+                                  <!-- <ObjectFilter> -->
+                                    <!-- <ObjectGUID>100437</ObjectGUID> -->
+                                    <!-- <ObjectUseParentConditionObjects>1</ObjectUseParentConditionObjects> -->
+                                  <!-- </ObjectFilter> -->
+                                <!-- </Values> -->
+                              <!-- </Action> -->
+                            <!-- </Item> -->
+                          <!-- </Actions> -->
+                        <!-- </ActionList> -->
+                      <!-- </Values> -->
+                    <!-- </OnSuccessActions> -->
+                  <!-- </ConditionQuestObjective> -->
+                  <!-- <ConditionQuestTutorial> -->
+                    <!-- <InteractionFlow> -->
+                      <!-- <Item> -->
+                        <!-- <TutorialInteraction> -->
+                          <!-- <Template>ConditionTutorialInteraction</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Condition> -->
+                              <!-- <LinkAllActionsToQuest>1</LinkAllActionsToQuest> -->
+                            <!-- </Condition> -->
+                            <!-- <ConditionTutorialInteraction> -->
+                              <!-- <HintType>Object</HintType> -->
+                              <!-- <TutorialConditionType>Selected</TutorialConditionType> -->
+                              <!-- <HintEndCondition>Selection</HintEndCondition> -->
+                              <!-- <HintAnchor>Bottom</HintAnchor> -->
+                              <!-- <HintText>5837</HintText> -->
+                              <!-- <ObjectFilter> -->
+                                <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                                <!-- <Values> -->
+                                  <!-- <ObjectFilter> -->
+                                    <!-- <ObjectGUID>100437</ObjectGUID> -->
+                                    <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                                    <!-- <CheckProcessingParticipantID>1</CheckProcessingParticipantID> -->
+                                  <!-- </ObjectFilter> -->
+                                <!-- </Values> -->
+                              <!-- </ObjectFilter> -->
+                            <!-- </ConditionTutorialInteraction> -->
+                          <!-- </Values> -->
+                        <!-- </TutorialInteraction> -->
+                      <!-- </Item> -->
+                    <!-- </InteractionFlow> -->
+                  <!-- </ConditionQuestTutorial> -->
+                <!-- </Values> -->
+              <!-- </Objective> -->
+            <!-- </Item> -->
+            
+            
+          </WinConditions>
+        </Objectives>
+        <QuestOptional>
+          <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionStarterObject />
+              <ConditionQuestObjective />
+              <ConditionPropsSessionSettings />
+            </Values>
+          </StarterObject>
+        </QuestOptional>
+      </Values>
+    </Asset>
+    
+    <!-- subtitle für lafortune: <SubtitleGroup>-402157553</SubtitleGroup> -->
+  <!-- fail: <Subtitle>265453</Subtitle> -->
+  <!-- success <Subtitle>265456</Subtitle> -->
+    <Asset>
+      <Template>A7_QuestStatusQuo</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003827</GUID>
+          <Name>DemandLow_LaFortune</Name>
+        </Standard>
+        <Quest>
+          <StarterMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <!-- <NotificationTextGroupFemale>-1243509478</NotificationTextGroupFemale> -->
+                  <NotificationTextFemale>1500003824</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <!-- <NotificationTextGroup>284129818</NotificationTextGroup> -->
+                  <NotificationTextFemale>1500003824</NotificationTextFemale>
+                  <NotificationPriority>999</NotificationPriority>
+                  <NotificationMinDisplayTime>7000</NotificationMinDisplayTime>
+                  <DisplayTimeout>300000</DisplayTimeout>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <SubtitleGroup>-402157553</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </StarterMessage>
+          <SuccessMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <NotificationTextGroupFemale>-1047998243</NotificationTextGroupFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationTextGroup>1132769863</NotificationTextGroup>
+                  <NotificationMinDisplayTime>10000</NotificationMinDisplayTime>
+                  <DisplayTimeout>300000</DisplayTimeout>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <Subtitle>265456</Subtitle>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </SuccessMessage>
+          <FailureMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <NotificationTextGroupFemale>-1617365429</NotificationTextGroupFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationTextGroup>305802229</NotificationTextGroup>
+                  <NotificationMinDisplayTime>10000</NotificationMinDisplayTime>
+                  <DisplayTimeout>300000</DisplayTimeout>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <Subtitle>265453</Subtitle>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </FailureMessage>
+          <ResolveConfirmationMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <!-- <NotificationTextFemale>16521</NotificationTextFemale> -->
+                  <NotificationTextFemale>1500003825</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <!-- <NotificationText>16520</NotificationText> -->
+                  <NotificationTextFemale>1500003825</NotificationTextFemale>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <SubtitleGroup>-2071104147</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </ResolveConfirmationMessage>
+          <OnQuestSucceeded>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500003825</TriggerAsset>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestSucceeded>
+          <QuestGiver>76</QuestGiver>
+          <QuestDifficulty>Easy</QuestDifficulty>
+          <NeededProgressLevel>EarlyGame;EarlyMidGame;MidGame;LateMidGame;LateGame;EndGame</NeededProgressLevel>
+          <StoryText>802036</StoryText>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180025</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+          <PreActivationTimer>0</PreActivationTimer>
+          <DelayTimer>0</DelayTimer>
+          <QuestTimeLimit>900000</QuestTimeLimit>
+          <QuestCategory>RandomQuest</QuestCategory>
+          <QuestActivation>QuestStart</QuestActivation>
+          <CountForQuestLimit>0</CountForQuestLimit>
+          <QuestTrackerVisibility>Session</QuestTrackerVisibility>
+          <QuestBookVisibility>SameAsQuestTracker</QuestBookVisibility>
+          <IsAbortable>1</IsAbortable>
+          <CanBeActiveForMultipleParticipants>1</CanBeActiveForMultipleParticipants>
+          <ConfirmOnReached>0</ConfirmOnReached>
+          <HasExclusiveQuestGiver>0</HasExclusiveQuestGiver>
+          <KeepCheckingPreconditionsWhenRunning>1</KeepCheckingPreconditionsWhenRunning>
+          <QuestBookBackground>data/ui/2kimages/main/assets16/questbackground/bg_quest_smugglewithoutscanners_delivery_pickup.png</QuestBookBackground>
+          <ReputationQuestFail>
+            <ReputationFailList>
+              <Item>
+                <ReputationParticipant>Third_party_04_Pirate_LaFortune</ReputationParticipant>
+                <ReputationAmount>-5</ReputationAmount>
+              </Item>
+              <Item>
+                <ReputationParticipant>Third_party_03_Pirate_Harlow</ReputationParticipant>
+                <ReputationAmount>1</ReputationAmount>
+              </Item>
+            </ReputationFailList>
+          </ReputationQuestFail>
+          <QuestHints>
+            <Item>
+              <Text>1500003820</Text>
+            </Item>
+          </QuestHints>
+          <HasStarterSpeechBubble>0</HasStarterSpeechBubble>
+        </Quest>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionDiplomaticState</Template>
+            <Values>
+              <Condition />
+              <ConditionDiplomaticState>
+                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                <TargetParticipant2>Third_party_04_Pirate_LaFortune</TargetParticipant2>
+                <DesiredState>War</DesiredState>
+              </ConditionDiplomaticState>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </Condition>
+          <SubConditions>
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>100708</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </Condition>
+                    <SubConditions>
+                      <Item>
+                        <SubCondition>
+                          <Template>PreConditionList</Template>
+                          <Values>
+                            <PreConditionList>
+                              <Condition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>RuinCount</PlayerCounter>
+                                    <Context>100708</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </Condition>
+                            </PreConditionList>
+                          </Values>
+                        </SubCondition>
+                      </Item>
+                    </SubConditions>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+          </SubConditions>
+        </PreConditionList>
+        <Text />
+        <Reward>
+          <RewardAssets />
+          <RewardReputation>
+            <Item>
+              <ReputationParticipant>Third_party_04_Pirate_LaFortune</ReputationParticipant>
+              <ReputationAmount>2</ReputationAmount>
+            </Item>
+            <Item>
+              <ReputationParticipant>Third_party_03_Pirate_Harlow</ReputationParticipant>
+              <ReputationAmount>-1</ReputationAmount>
+            </Item>
+          </RewardReputation>
+        </Reward>
+        <Objectives>
+          <WinConditionCompletionOrder>Parallel</WinConditionCompletionOrder>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>DeliveryObjective</Template>
+                <Values>
+                  <ConditionQuestDelivery>
+                    <DeliveryObject_cqd>
+                      <Item>
+                        <ObjectGUID>1010017</ObjectGUID>
+                        <Min>1000</Min>
+                        <Max>1000</Max>
+                      </Item>
+                      <Item>
+                        <ObjectGUID>1010196</ObjectGUID>
+                        <Min>1</Min>
+                        <Max>1</Max>
+                      </Item>
+                    </DeliveryObject_cqd>
+                    <DeliveryType>TargetObject</DeliveryType>
+                    <DeliveryExecutionPlace>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ConditionObjectClientQuestObject />
+                        <ConditionScanner />
+                        <ConditionObjectiveSignsAndFeedback />
+                      </Values>
+                    </DeliveryExecutionPlace>
+                  </ConditionQuestDelivery>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>12754</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ObjectiveScaling>
+                    <ScaleObjectives>1</ScaleObjectives>
+                    <ScaleFactors>
+                      <EarlyGame>
+                        <Factor>1</Factor>
+                      </EarlyGame>
+                      <EarlyMidGame>
+                        <Factor>2</Factor>
+                      </EarlyMidGame>
+                      <MidGame>
+                        <Factor>3</Factor>
+                      </MidGame>
+                      <LateMidGame>
+                        <Factor>4</Factor>
+                      </LateMidGame>
+                      <LateGame>
+                        <Factor>5</Factor>
+                      </LateGame>
+                      <EndGame>
+                        <Factor>6</Factor>
+                      </EndGame>
+                    </ScaleFactors>
+                  </ObjectiveScaling>
+                  <ConditionPropsSessionSettings />
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+        <QuestOptional>
+          <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionStarterObject />
+              <ConditionQuestObjective />
+              <ConditionPropsSessionSettings />
+            </Values>
+          </StarterObject>
+        </QuestOptional>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+    
+    
+  <ModOp Type="addNextSibling" GUID="130248">
+    <!-- trigger that forcebuilds ship directly when registered (and pirate is there), eg. used in quests -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003824</GUID>
+          <Name>ForceBuildShip_Harlow</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>100707</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>RuinCount</PlayerCounter>
+                                    <Context>100707</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <SubTriggers>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500001613</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <TriggerActions> 
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionExecuteScript</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionExecuteScript>
+                                                  <ScriptFileName>data/forcebuild_harlow_human0.lua</ScriptFileName>
+                                                </ActionExecuteScript>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500001614</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <TriggerActions>
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionExecuteScript</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionExecuteScript>
+                                                  <ScriptFileName>data/forcebuild_harlow_human1.lua</ScriptFileName>
+                                                </ActionExecuteScript>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500001615</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <TriggerActions> 
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionExecuteScript</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionExecuteScript>
+                                                  <ScriptFileName>data/forcebuild_harlow_human2.lua</ScriptFileName>
+                                                </ActionExecuteScript>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500001616</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <TriggerActions> 
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionExecuteScript</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionExecuteScript>
+                                                  <ScriptFileName>data/forcebuild_harlow_human3.lua</ScriptFileName>
+                                                </ActionExecuteScript>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                              </SubTriggers>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003825</GUID>
+          <Name>ForceBuildShip_LaFortune</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_04_Pirate_LaFortune</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>100708</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>RuinCount</PlayerCounter>
+                                    <Context>100708</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <SubTriggers>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500001613</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <TriggerActions> 
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionExecuteScript</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionExecuteScript>
+                                                  <ScriptFileName>data/forcebuild_lafortune_human0.lua</ScriptFileName>
+                                                </ActionExecuteScript>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500001614</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <TriggerActions>
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionExecuteScript</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionExecuteScript>
+                                                  <ScriptFileName>data/forcebuild_lafortune_human1.lua</ScriptFileName>
+                                                </ActionExecuteScript>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500001615</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <TriggerActions> 
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionExecuteScript</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionExecuteScript>
+                                                  <ScriptFileName>data/forcebuild_lafortune_human2.lua</ScriptFileName>
+                                                </ActionExecuteScript>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500001616</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <TriggerActions> 
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionExecuteScript</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionExecuteScript>
+                                                  <ScriptFileName>data/forcebuild_lafortune_human3.lua</ScriptFileName>
+                                                </ActionExecuteScript>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                              </SubTriggers>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    
+    
+  </ModOp>  
+  
+    
+</ModOps>
