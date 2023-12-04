@@ -1,0 +1,85 @@
+<ModOps>
+    
+  <!-- uses Serp GUID 1500004381 (shared with Story/Campaign in multiplayer guids) -->
+  
+  <!-- Bugfix ? -->
+   <!-- Was für Quests sind diese Q7.1 und Q1.1 usw Quests? Scheinen keine aus Sandbox zu sein, sind aber auch nicht mit S03 oderso markiert. -->
+   <!-- Vom Text her könnte es S04 sein, da es weas mit artefakte zu kaufen zu zun haben scheint, -->
+    <!-- aber S04 spielt nicht in der neuen Welt Session und mit Queen/Paloma hats doch auch nichts zu tun?! -->
+  <!-- Scheinbar haben diese Pools damit zu tun: Start_Questline_Pool , Start_Questline2_Pool usw   -->
+    <!-- 1384 Q0_StartStoryline_Quest wird gestartet durch 103687 StartDLC11_Questline_Pool -->
+     <!-- doch der Pool 103687 StartDLC11_Questline_Pool scheint nirgends enabled zu werden und is DisabledByDefault -->
+   
+   <!-- Enable the whole and big paloma DLC11 Questline: 103687 StartDLC11_Questline_Pool -->
+   <!-- Dadurch starten die Quests also sobald die PreConditions für 103687 erfüllt sind: kein MP, DLC aktiv, Postamt/Briefkasten, 400 Obreros in neuer welt, irgendein Pop-Haus in alter Welt.  -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004381</GUID>
+          <Name>EnableDLC11_Questline</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsCreativeMode</Template>
+            <Values>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+              <Condition />
+              <ConditionIsCreativeMode />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetQuestPoolEnablement</Template>
+                <Values>
+                  <Action />
+                  <ActionSetQuestPoolEnablement>
+                    <QuestPoolListToChange>
+                      <Item>
+                        <QuestPool>103687</QuestPool>
+                      </Item>
+                    </QuestPoolListToChange>
+                    <IsQuestPoolEnabled>1</IsQuestPoolEnabled>
+                    <ChangeForProcessingParticipant>1</ChangeForProcessingParticipant>
+                  </ActionSetQuestPoolEnablement>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- Add as condition for the questpool that new world session must be loaded, just to be sure it is not a scenario or so -->
+  <ModOp Type="merge" GUID='103687' Path="/Values/QuestPool">
+    <SessionDependencies>
+      <Item>
+        <SessionOrRegion>180025</SessionOrRegion>
+      </Item>
+    </SessionDependencies>
+  </ModOp>
+  
+  
+  
+  <!-- 103567 Q8 - Ending Popup letter3  sieht komisch aus, denn da ist als Condition ConditionTextPopupClosed PalomaEnding02 -->
+   <!-- und dann wird als Action ActionTriggerTextPopup PalomaEnding02 gemacht, während es auch PalomaEnding03 gibt aber nie im code verwendet wird. -->
+  <!-- ich würde also stark behaupten, dass es hier als Action PalomaEnding03 sein muss  -->
+  <ModOp Type="replace" GUID='103567' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionTriggerTextPopup[TextPopupLayout='PalomaEnding02']/TextPopupLayout">
+    <TextPopupLayout>PalomaEnding03</TextPopupLayout>
+  </ModOp>
+        
+        
+        <!-- todo: -->
+         <!-- questanzeige aller quests evtl. nur Session statt global machen, damit klarer ist worauf es sich bezieht, zumidest bei quests mit session bezug -->
+          <!-- zb die ersten quests spielen in alter welt, dort bei hauptinsel muss man zb die ersten decision güter haben, was nur schwer erkenntlich ist (evtl. da auch ein jumpto bei quest einbauen) -->
+    
+    
+</ModOps>
