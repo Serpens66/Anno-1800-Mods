@@ -1,0 +1,1020 @@
+<ModOps>
+    
+    <!-- if human is not at war with pirates while the comeback fleet spawns (eg. AI destroyed them or human with pirate flag), the resettle quest is not started by the game -->
+    <!-- Since this is hardcoded we can not really fix this.  -->
+    <!-- A workaround is to force war between human and pirate as soon as the base is destryoed and restore the previous relation (pirate will ask you for treaty) -->
+    <!-- again as soon as the comeback fleet arrives.  -->
+    
+    <!-- This file does contain the relevant triggers for this. -->
+    
+    
+    <!-- neither ActionExecuteDiplomaticAction nor ActionForceDiplomaticRelation works with RequestNonAttack/NonAttack, so this wont be restored... -->
+    <!-- ActionForceDiplomaticRelation with Alliance does not include TradeRights nor Peace,And TradeRights does not include Peace (cancel traderights results in war then). So we will isntead force Peace and make pirate request the other things, if that was the previous state -->
+    <!-- we dont need to check CeaseFire, because the game has no problem with that (because it is still counted as war in the hardcoded check I guess) -->
+
+    
+    <!-- Anne -->
+    <ModOp Type="add" GUID='1500001140' Path="/Values/Trigger/TriggerActions">
+        <!-- on defeat, check current relation and make war with pirates (and restore relation when comebackfleet arrives), to not have the resettle quest bugged.. -->
+        <Item>
+          <TriggerAction>
+            <Template>ActionDelayedActions</Template>
+            <Values>
+              <Action />
+              <ActionDelayedActions>
+                <!-- with 60 seconds delay to also catch peace offer of pirates after they are already defeated (when you destroyed buildings and are much stronger they can request peace and this request-notification can have a delay) -->
+                <ExecutionDelay>60000</ExecutionDelay>
+                <DelayedActions>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <ActionList>
+                      <Actions>
+                        <Item>
+                          <Action>
+                            <Template>ActionRegisterTrigger</Template>
+                            <Values>
+                              <Action />
+                              <ActionRegisterTrigger>
+                                <TriggerAsset>1500001107</TriggerAsset>
+                              </ActionRegisterTrigger>
+                            </Values>
+                          </Action>
+                        </Item>
+                      </Actions>
+                    </ActionList>
+                  </Values>
+                </DelayedActions>
+              </ActionDelayedActions>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    <!-- if we loaded a game and therefore quest was ended OR we destroyed the comebackfleet, we again have to force war and restore it later, so register 1500001107 -->
+    <ModOp Type="AddNextSibling" GUID="1500001103" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerActions/Item[TriggerAction/Template='ActionDeleteObjects']">
+        <Item>
+          <TriggerAction>
+            <Template>ActionDelayedActions</Template>
+            <Values>
+              <Action />
+              <ActionDelayedActions>
+                <!-- with 60 seconds delay to also catch peace offer of pirates after they are already defeated (when you destroyed ships and are much stronger they can request peace and this request-notification can have a delay) -->
+                <ExecutionDelay>60000</ExecutionDelay>
+                <DelayedActions>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <ActionList>
+                      <Actions>
+                        <Item>
+                          <Action>
+                            <Template>ActionRegisterTrigger</Template>
+                            <Values>
+                              <Action />
+                              <ActionRegisterTrigger>
+                                <TriggerAsset>1500001107</TriggerAsset>
+                              </ActionRegisterTrigger>
+                            </Values>
+                          </Action>
+                        </Item>
+                      </Actions>
+                    </ActionList>
+                  </Values>
+                </DelayedActions>
+              </ActionDelayedActions>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    
+    
+    
+  <!-- order of the ConditionDiplomaticState checks is important, because when having TradeRights, you also have Peace, so if Peace is checked before, only that one will be restored. -->
+   <!-- Human0 in krieg mit piraten zwingen, weil sonst comebackfleet verbuggt ist -->
+  <!-- wir stellen die vorherige relation wieder her, nachdem comebackfleet gespawned ist -->
+  <!-- we use ActionForceDiplomaticRelation (instead of ActionExecuteDiplomaticAction DeclareWare, because it does not change reputation -->
+  <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001107</GUID>
+          <Name>Check Previous Pirate Relation Anne</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionDiplomaticState</Template>
+                        <Values>
+                          <Condition>
+                            <!-- use IsOptional because we want to "defuse" this trigger regardless what the case is -->
+                            <IsOptional>1</IsOptional>
+                          </Condition>
+                          <ConditionDiplomaticState>
+                            <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                            <TargetParticipant2>Third_party_03_Pirate_Harlow</TargetParticipant2>
+                            <DesiredState>Alliance</DesiredState>
+                          </ConditionDiplomaticState>
+                          <ConditionPropsNegatable />
+                        </Values>
+                      </TriggerCondition>
+                      <TriggerActions>
+                          <Item>
+                            <TriggerAction>
+                              <Template>ActionRegisterTrigger</Template>
+                              <Values>
+                                <Action />
+                                <ActionRegisterTrigger>
+                                  <TriggerAsset>1500001108</TriggerAsset>
+                                </ActionRegisterTrigger>
+                              </Values>
+                            </TriggerAction>
+                          </Item>
+                          <Item>
+                            <TriggerAction>
+                              <Template>ActionForceDiplomaticRelation</Template>
+                              <Values>
+                                <Action />
+                                <ActionForceDiplomaticRelation>
+                                  <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                                  <ForceRelationTargetParticipant>Third_party_03_Pirate_Harlow</ForceRelationTargetParticipant>
+                                  <ForcedRelationType>War</ForcedRelationType>
+                                </ActionForceDiplomaticRelation>
+                              </Values>
+                            </TriggerAction>
+                          </Item>
+                      </TriggerActions>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+              
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionDiplomaticState</Template>
+                        <Values>
+                          <Condition>
+                            <!-- use IsOptional because we want to "defuse" this trigger regardless what the case is -->
+                            <IsOptional>1</IsOptional>
+                          </Condition>
+                          <ConditionDiplomaticState>
+                            <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                            <TargetParticipant2>Third_party_03_Pirate_Harlow</TargetParticipant2>
+                            <DesiredState>TradeRights</DesiredState>
+                          </ConditionDiplomaticState>
+                          <ConditionPropsNegatable />
+                        </Values>
+                      </TriggerCondition>
+                      <TriggerActions>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionRegisterTrigger</Template>
+                            <Values>
+                              <Action />
+                              <ActionRegisterTrigger>
+                                <TriggerAsset>1500001109</TriggerAsset>
+                              </ActionRegisterTrigger>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionForceDiplomaticRelation</Template>
+                            <Values>
+                              <Action />
+                              <ActionForceDiplomaticRelation>
+                                <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                                <ForceRelationTargetParticipant>Third_party_03_Pirate_Harlow</ForceRelationTargetParticipant>
+                                <ForcedRelationType>War</ForcedRelationType>
+                              </ActionForceDiplomaticRelation>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                      </TriggerActions>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+              
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionDiplomaticState</Template>
+                        <Values>
+                          <Condition>
+                            <!-- use IsOptional because we want to "defuse" this trigger regardless what the case is -->
+                            <IsOptional>1</IsOptional>
+                          </Condition>
+                          <ConditionDiplomaticState>
+                            <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                            <TargetParticipant2>Third_party_03_Pirate_Harlow</TargetParticipant2>
+                            <DesiredState>Peace</DesiredState>
+                          </ConditionDiplomaticState>
+                          <ConditionPropsNegatable />
+                        </Values>
+                      </TriggerCondition>
+                      <TriggerActions>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionRegisterTrigger</Template>
+                            <Values>
+                              <Action />
+                              <ActionRegisterTrigger>
+                                <TriggerAsset>1500001110</TriggerAsset>
+                              </ActionRegisterTrigger>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionForceDiplomaticRelation</Template>
+                            <Values>
+                              <Action />
+                              <ActionForceDiplomaticRelation>
+                                <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                                <ForceRelationTargetParticipant>Third_party_03_Pirate_Harlow</ForceRelationTargetParticipant>
+                                <ForcedRelationType>War</ForcedRelationType>
+                              </ActionForceDiplomaticRelation>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                      </TriggerActions>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+
+          </SubTriggers>
+          <!-- hier keine actions, damit bei War einfach nichts passiert (Force hat zuviele unbekannte nachteile, also lieber auch kein force war bei war machen) -->
+          <TriggerActions />
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    
+    <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001108</GUID>
+          <Name>Make Alliance again Anne</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionQuestState</Template>
+            <Values>
+              <Condition />
+              <ConditionQuestState>
+                <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                <ConditionQuestStateQuestGUID>153262</ConditionQuestStateQuestGUID>
+              </ConditionQuestState>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionForceDiplomaticRelation</Template>
+                  <Values>
+                    <Action />
+                    <ActionForceDiplomaticRelation>
+                      <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                      <ForceRelationTargetParticipant>Third_party_03_Pirate_Harlow</ForceRelationTargetParticipant>
+                      <ForcedRelationType>Peace</ForcedRelationType>
+                    </ActionForceDiplomaticRelation>
+                  </Values>
+                </TriggerAction>
+              </Item>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionExecuteDiplomaticAction</Template>
+                  <Values>
+                    <Action />
+                    <ActionExecuteDiplomaticAction>
+                      <DiplomacyAction>RequestTraderights</DiplomacyAction>
+                      <DiplomaticSourceParticipant>Third_party_03_Pirate_Harlow</DiplomaticSourceParticipant>
+                      <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
+                    </ActionExecuteDiplomaticAction>
+                  </Values>
+                </TriggerAction>
+              </Item>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionRegisterTrigger</Template>
+                  <Values>
+                    <Action />
+                    <ActionRegisterTrigger>
+                      <TriggerAsset>1500001111</TriggerAsset>
+                    </ActionRegisterTrigger>
+                  </Values>
+                </TriggerAction>
+              </Item>
+          </TriggerActions>
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001109</GUID>
+          <Name>Make TradeRights again Anne</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionQuestState</Template>
+            <Values>
+              <Condition />
+              <ConditionQuestState>
+                <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                <ConditionQuestStateQuestGUID>153262</ConditionQuestStateQuestGUID>
+              </ConditionQuestState>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionForceDiplomaticRelation</Template>
+                  <Values>
+                    <Action />
+                    <ActionForceDiplomaticRelation>
+                      <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                      <ForceRelationTargetParticipant>Third_party_03_Pirate_Harlow</ForceRelationTargetParticipant>
+                      <ForcedRelationType>Peace</ForcedRelationType>
+                    </ActionForceDiplomaticRelation>
+                  </Values>
+                </TriggerAction>
+              </Item>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionExecuteDiplomaticAction</Template>
+                  <Values>
+                    <Action />
+                    <ActionExecuteDiplomaticAction>
+                      <DiplomacyAction>RequestTraderights</DiplomacyAction>
+                      <DiplomaticSourceParticipant>Third_party_03_Pirate_Harlow</DiplomaticSourceParticipant>
+                      <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
+                    </ActionExecuteDiplomaticAction>
+                  </Values>
+                </TriggerAction>
+              </Item>
+          </TriggerActions>
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001110</GUID>
+          <Name>Make Peace again Anne</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionQuestState</Template>
+            <Values>
+              <Condition />
+              <ConditionQuestState>
+                <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                <ConditionQuestStateQuestGUID>153262</ConditionQuestStateQuestGUID>
+              </ConditionQuestState>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionForceDiplomaticRelation</Template>
+                  <Values>
+                    <Action />
+                    <ActionForceDiplomaticRelation>
+                      <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                      <ForceRelationTargetParticipant>Third_party_03_Pirate_Harlow</ForceRelationTargetParticipant>
+                      <ForcedRelationType>Peace</ForcedRelationType>
+                    </ActionForceDiplomaticRelation>
+                  </Values>
+                </TriggerAction>
+              </Item>
+          </TriggerActions>
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    
+    <!-- before pirate can request alliance, we have to wait for TradeRights (otherwise it will be Alliance without trading) -->
+    <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001111</GUID>
+          <Name>Make RequestAlliance Anne</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionDiplomaticState</Template>
+            <Values>
+              <Condition />
+              <ConditionDiplomaticState>
+                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                <TargetParticipant2>Third_party_03_Pirate_Harlow</TargetParticipant2>
+                <DesiredState>TradeRights</DesiredState>
+              </ConditionDiplomaticState>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionReputation</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionReputation>
+                            <Reputation>80</Reputation>
+                            <ComparisonOperator>AtLeast</ComparisonOperator>
+                          </ConditionReputation>
+                          <ParticipantRelation>
+                            <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
+                            <SourceIsOwner>1</SourceIsOwner>
+                          </ParticipantRelation>
+                        </Values>
+                      </TriggerCondition>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+          </SubTriggers>
+          <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionExecuteDiplomaticAction</Template>
+                  <Values>
+                    <Action />
+                    <ActionExecuteDiplomaticAction>
+                      <DiplomacyAction>RequestAlliance</DiplomacyAction>
+                      <DiplomaticSourceParticipant>Third_party_03_Pirate_Harlow</DiplomaticSourceParticipant>
+                      <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
+                    </ActionExecuteDiplomaticAction>
+                  </Values>
+                </TriggerAction>
+              </Item>
+          </TriggerActions>
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    <!-- replace the ConditionReputation value for RequestAlliance with the one from PartialAgreementThreshold -->
+    <ModOp Type="replace" GUID="1500001111"
+       Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition/Values/ConditionReputation/Reputation/text()"
+       Content="//Values[Standard/GUID='73']/Diplomacy/DiplomacyActionBalancing/RequestAlliance/PartialAgreementThreshold/text()">
+    </ModOp>
+    
+    <!-- ################################ -->
+    <!-- LaFortune -->
+    
+    
+    <ModOp Type="add" GUID='1500001144' Path="/Values/Trigger/TriggerActions">
+        <!-- on defeat, check current relation and make war with pirates (and restore relation when comebackfleet arrives), to not have the resettle quest bugged.. -->
+        <Item>
+          <TriggerAction>
+            <Template>ActionDelayedActions</Template>
+            <Values>
+              <Action />
+              <ActionDelayedActions>
+                <!-- with 60 seconds delay to also catch peace offer of pirates after they are already defeated (when you destroyed ships/buildings and are much stronger they can request peace and this request-notification can have a delay) -->
+                <ExecutionDelay>60000</ExecutionDelay>
+                <DelayedActions>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <ActionList>
+                      <Actions>
+                        <Item>
+                          <Action>
+                            <Template>ActionRegisterTrigger</Template>
+                            <Values>
+                              <Action />
+                              <ActionRegisterTrigger>
+                                <TriggerAsset>1500001112</TriggerAsset>
+                              </ActionRegisterTrigger>
+                            </Values>
+                          </Action>
+                        </Item>
+                      </Actions>
+                    </ActionList>
+                  </Values>
+                </DelayedActions>
+              </ActionDelayedActions>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    <!-- if we loaded a game and therefore quest was ended OR we destroyed the comebackfleet, we again have to force war and restore it later, so register 1500001112 -->
+    <ModOp Type="AddNextSibling" GUID="1500001104" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerActions/Item[TriggerAction/Template='ActionDeleteObjects']">
+        <Item>
+          <TriggerAction>
+            <Template>ActionDelayedActions</Template>
+            <Values>
+              <Action />
+              <ActionDelayedActions>
+                <!-- with 60 seconds delay to also catch peace offer of pirates after they are already defeated (when you destroyed ships/buildings and are much stronger they can request peace and this request-notification can have a delay) -->
+                <ExecutionDelay>60000</ExecutionDelay>
+                <DelayedActions>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <ActionList>
+                      <Actions>
+                        <Item>
+                          <Action>
+                            <Template>ActionRegisterTrigger</Template>
+                            <Values>
+                              <Action />
+                              <ActionRegisterTrigger>
+                                <TriggerAsset>1500001112</TriggerAsset>
+                              </ActionRegisterTrigger>
+                            </Values>
+                          </Action>
+                        </Item>
+                      </Actions>
+                    </ActionList>
+                  </Values>
+                </DelayedActions>
+              </ActionDelayedActions>
+            </Values>
+          </TriggerAction>
+        </Item>
+    </ModOp>
+    
+    
+    
+    <!-- order of the ConditionDiplomaticState checks is important, because when having TradeRights, you also have Peace, so if Peace is checked before, only that one will be restored. -->
+    <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001112</GUID>
+          <Name>Check Previous Pirate Relation LaFortune</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionDiplomaticState</Template>
+                      <Values>
+                        <Condition>
+                          <!-- use IsOptional because we want to "defuse" this trigger regardless what the case is -->
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionDiplomaticState>
+                          <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                          <TargetParticipant2>Third_party_04_Pirate_LaFortune</TargetParticipant2>
+                          <DesiredState>Alliance</DesiredState>
+                        </ConditionDiplomaticState>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionRegisterTrigger</Template>
+                            <Values>
+                              <Action />
+                              <ActionRegisterTrigger>
+                                <TriggerAsset>1500001113</TriggerAsset>
+                              </ActionRegisterTrigger>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionForceDiplomaticRelation</Template>
+                            <Values>
+                              <Action />
+                              <ActionForceDiplomaticRelation>
+                                <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                                <ForceRelationTargetParticipant>Third_party_04_Pirate_LaFortune</ForceRelationTargetParticipant>
+                                <ForcedRelationType>War</ForcedRelationType>
+                              </ActionForceDiplomaticRelation>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionDiplomaticState</Template>
+                      <Values>
+                        <Condition>
+                          <!-- use IsOptional because we want to "defuse" this trigger regardless what the case is -->
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionDiplomaticState>
+                          <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                          <TargetParticipant2>Third_party_04_Pirate_LaFortune</TargetParticipant2>
+                          <DesiredState>TradeRights</DesiredState>
+                        </ConditionDiplomaticState>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionRegisterTrigger</Template>
+                            <Values>
+                              <Action />
+                              <ActionRegisterTrigger>
+                                <TriggerAsset>1500001114</TriggerAsset>
+                              </ActionRegisterTrigger>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionForceDiplomaticRelation</Template>
+                            <Values>
+                              <Action />
+                              <ActionForceDiplomaticRelation>
+                                <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                                <ForceRelationTargetParticipant>Third_party_04_Pirate_LaFortune</ForceRelationTargetParticipant>
+                                <ForcedRelationType>War</ForcedRelationType>
+                              </ActionForceDiplomaticRelation>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionDiplomaticState</Template>
+                      <Values>
+                        <Condition>
+                          <!-- use IsOptional because we want to "defuse" this trigger regardless what the case is -->
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionDiplomaticState>
+                          <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                          <TargetParticipant2>Third_party_04_Pirate_LaFortune</TargetParticipant2>
+                          <DesiredState>Peace</DesiredState>
+                        </ConditionDiplomaticState>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionRegisterTrigger</Template>
+                            <Values>
+                              <Action />
+                              <ActionRegisterTrigger>
+                                <TriggerAsset>1500001115</TriggerAsset>
+                              </ActionRegisterTrigger>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                        <Item>
+                          <TriggerAction>
+                            <Template>ActionForceDiplomaticRelation</Template>
+                            <Values>
+                              <Action />
+                              <ActionForceDiplomaticRelation>
+                                <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                                <ForceRelationTargetParticipant>Third_party_04_Pirate_LaFortune</ForceRelationTargetParticipant>
+                                <ForcedRelationType>War</ForcedRelationType>
+                              </ActionForceDiplomaticRelation>
+                            </Values>
+                          </TriggerAction>
+                        </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+
+          </SubTriggers>
+          <TriggerActions />
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    
+    <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001113</GUID>
+          <Name>Make Alliance again LaFortune</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionQuestState</Template>
+            <Values>
+              <Condition />
+              <ConditionQuestState>
+                <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                <ConditionQuestStateQuestGUID>153272</ConditionQuestStateQuestGUID>
+              </ConditionQuestState>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionForceDiplomaticRelation</Template>
+                  <Values>
+                    <Action />
+                    <ActionForceDiplomaticRelation>
+                      <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                      <ForceRelationTargetParticipant>Third_party_04_Pirate_LaFortune</ForceRelationTargetParticipant>
+                      <ForcedRelationType>Peace</ForcedRelationType>
+                    </ActionForceDiplomaticRelation>
+                  </Values>
+                </TriggerAction>
+              </Item>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionExecuteDiplomaticAction</Template>
+                  <Values>
+                    <Action />
+                    <ActionExecuteDiplomaticAction>
+                      <DiplomacyAction>RequestTraderights</DiplomacyAction>
+                      <DiplomaticSourceParticipant>Third_party_04_Pirate_LaFortune</DiplomaticSourceParticipant>
+                      <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
+                    </ActionExecuteDiplomaticAction>
+                  </Values>
+                </TriggerAction>
+              </Item>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionRegisterTrigger</Template>
+                  <Values>
+                    <Action />
+                    <ActionRegisterTrigger>
+                      <TriggerAsset>1500001116</TriggerAsset>
+                    </ActionRegisterTrigger>
+                  </Values>
+                </TriggerAction>
+              </Item>
+          </TriggerActions>
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001114</GUID>
+          <Name>Make TradeRights again LaFortune</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionQuestState</Template>
+            <Values>
+              <Condition />
+              <ConditionQuestState>
+                <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                <ConditionQuestStateQuestGUID>153272</ConditionQuestStateQuestGUID>
+              </ConditionQuestState>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionForceDiplomaticRelation</Template>
+                  <Values>
+                    <Action />
+                    <ActionForceDiplomaticRelation>
+                      <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                      <ForceRelationTargetParticipant>Third_party_04_Pirate_LaFortune</ForceRelationTargetParticipant>
+                      <ForcedRelationType>Peace</ForcedRelationType>
+                    </ActionForceDiplomaticRelation>
+                  </Values>
+                </TriggerAction>
+              </Item>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionExecuteDiplomaticAction</Template>
+                  <Values>
+                    <Action />
+                    <ActionExecuteDiplomaticAction>
+                      <DiplomacyAction>RequestTraderights</DiplomacyAction>
+                      <DiplomaticSourceParticipant>Third_party_04_Pirate_LaFortune</DiplomaticSourceParticipant>
+                      <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
+                    </ActionExecuteDiplomaticAction>
+                  </Values>
+                </TriggerAction>
+              </Item>
+          </TriggerActions>
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001115</GUID>
+          <Name>Make Peace again LaFortune</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionQuestState</Template>
+            <Values>
+              <Condition />
+              <ConditionQuestState>
+                <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                <ConditionQuestStateQuestGUID>153272</ConditionQuestStateQuestGUID>
+              </ConditionQuestState>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionForceDiplomaticRelation</Template>
+                  <Values>
+                    <Action />
+                    <ActionForceDiplomaticRelation>
+                      <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                      <ForceRelationTargetParticipant>Third_party_04_Pirate_LaFortune</ForceRelationTargetParticipant>
+                      <ForcedRelationType>Peace</ForcedRelationType>
+                    </ActionForceDiplomaticRelation>
+                  </Values>
+                </TriggerAction>
+              </Item>
+          </TriggerActions>
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    
+    <!-- before pirate can request alliance, we have to wait for TradeRights (otherwise it will be Alliance without trading) -->
+    <ModOp GUID="130248" Type="AddNextSibling">
+		<Asset>
+			<Template>Trigger</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001116</GUID>
+          <Name>Make RequestAlliance LaFortune</Name>
+				</Standard>
+				<Trigger>
+					<TriggerCondition>
+            <Template>ConditionDiplomaticState</Template>
+            <Values>
+              <Condition />
+              <ConditionDiplomaticState>
+                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                <TargetParticipant2>Third_party_04_Pirate_LaFortune</TargetParticipant2>
+                <DesiredState>TradeRights</DesiredState>
+              </ConditionDiplomaticState>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionReputation</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionReputation>
+                            <Reputation>80</Reputation>
+                            <ComparisonOperator>AtLeast</ComparisonOperator>
+                          </ConditionReputation>
+                          <ParticipantRelation>
+                            <TargetParticipant>Third_party_04_Pirate_LaFortune</TargetParticipant>
+                            <SourceIsOwner>1</SourceIsOwner>
+                          </ParticipantRelation>
+                        </Values>
+                      </TriggerCondition>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+          </SubTriggers>
+          <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionExecuteDiplomaticAction</Template>
+                  <Values>
+                    <Action />
+                    <ActionExecuteDiplomaticAction>
+                      <DiplomacyAction>RequestAlliance</DiplomacyAction>
+                      <DiplomaticSourceParticipant>Third_party_04_Pirate_LaFortune</DiplomaticSourceParticipant>
+                      <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
+                    </ActionExecuteDiplomaticAction>
+                  </Values>
+                </TriggerAction>
+              </Item>
+          </TriggerActions>
+				</Trigger>
+				<TriggerSetup>
+					<AutoRegisterTrigger>0</AutoRegisterTrigger>
+					<UsedBySecondParties>0</UsedBySecondParties>
+				</TriggerSetup>
+			</Values>
+		</Asset>
+	</ModOp>
+    <!-- replace the ConditionReputation value for RequestAlliance with the vanilla one from PartialAgreementThreshold -->
+    <ModOp Type="replace" GUID="1500001116"
+       Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition/Values/ConditionReputation/Reputation/text()"
+       Content="//Values[Standard/GUID='76']/Diplomacy/DiplomacyActionBalancing/RequestAlliance/PartialAgreementThreshold/text()">
+    </ModOp>
+    
+    
+</ModOps>

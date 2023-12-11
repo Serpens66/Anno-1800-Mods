@@ -1,0 +1,460 @@
+<ModOps>
+    
+    <!-- the code is based on my SpawnShips code from stronger pirates mod, to replace the WarFleet -->
+    
+    <!-- The empty trigger below will be filled in SpawnWarFleetFilling file -->
+    
+    
+    <!-- Spawn Pirate ships (one per execution) based on progression of the executing human player, if pirate harbour (kind of shipyard) is no ruin and less than x ships of each kind of warfleet exist. -->
+    
+    <!-- This trigger is executed for every human player independently, so with 4 players a single execution (for each of them) may spawn up to 4 ships at once. I don't know a way to only spawn ships for the Host execution or so. -->
+     <!-- It does not mean more total ships, but faster spawn rate: between 1 and 4 ships every x minutes at once, until max amount is reached -->
+     <!-- the total amount of ships could be altered by checking ConditionIsParticipantInGame Human0 Human1 and so on up to Human3. -->
+     <!-- But since we can not simply multiply a value and not use a variable, we have to copy the whole ~2000 lines long trigger four times to have different total values depending on the human playercount. -->
+      <!-- And I dont know if eg. playing with 2 humans always means there will be Human0 and Human1, or if it also can be Human0 and Human2, because second human took third slot. (but Human0 is most likely always there) -->
+      
+
+    <!-- MutuallyExclusive makes the subtriggers execute one after the other and breaks the execution as soon the first one is true (but still triggering the action of the subtrigger of course) -->
+    <!-- We use ContextGUID to spawn directly next to the pirate harbor. Since this is a unique object in the session it works fine this way -->
+      <!-- if there would be multiple we could instead use MatcherGUID with a new Matcher object (template) to search for a specific object. Not perfect, but better than nothing -->
+    
+    <!-- instead of only checking if the harbour is not ruin, we also could check if pirate is defeated or not. -->
+     <!-- But I think it is ok to stop spawning ships as soon as the harbour is destroyed and continue when it is repaired again. -->
+    
+    
+    <!-- We have to spawn the ships as General_Enemy and directly change the owner to pirate. Otherwise it seems the pirate won't use -->
+    <!-- the ships to patrol (squadlogic) and only use them every ~25 minutes (AttackIntervall) to do attacks, the rest of the time they do nothing -->
+    <!-- using VisualSpawnOwner is not needed as we direclty change owner and it shows code not working, if we see that ships belong to General_Enemy -->
+    <!-- but we will still use VisualSpawnOwner, because this way it show pirate-owner even after we change owner to neutral -->
+    
+    
+    <!-- Harlow in Moderate Session 180023: -->
+    <ModOp Type="AddNextSibling" GUID='141003'>
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001105</GUID>
+              <Name>Spawn Pirate Ships</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionPlayerCounter</Template>
+                <Values>
+                  <Condition />
+                  <ConditionPlayerCounter>
+                    <PlayerCounter>ObjectBuilt</PlayerCounter>
+                    <Context>100707</Context>
+                    <CounterAmount>1</CounterAmount>
+                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                  </ConditionPlayerCounter>
+                </Values>
+              </TriggerCondition>
+              <SubTriggers>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition>
+                              <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                            </Condition>
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>RuinCount</PlayerCounter>
+                              <Context>100681</Context>
+                              <CounterAmount>0</CounterAmount>
+                              <ComparisonOp>AtMost</ComparisonOp>
+                              <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                              <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                        <SubTriggers>
+                          <!-- EndGame 142932 Condition. -->
+                          <!-- start with Endgame, because first condition that is true gets executed only with MutuallyExclusive -->
+                          <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>142932</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                          </Item>
+                          <!-- LateGame 140505 Condition.  -->
+                          <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>140505</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                          </Item>
+                          <!-- LateMidGame 140504 Condition -->
+                          <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>140504</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                          </Item>
+                          <!-- MidGame 140503 Condition -->
+                          <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>140503</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <!-- EarlyMidGame 140500 Condition -->
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>140500</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <!-- EarlyGame ConditionAlwaysTrue -->
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionAlwaysTrue</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionAlwaysTrue />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                        </SubTriggers>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+              <ResetTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <!-- still a short timer before reset, because eg. in EarlyGame vanilla there is no WarFleet and therefore no timer -->
+                      <Template>ConditionTimer</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionTimer>
+                          <TimeLimit>30000</TimeLimit>
+                        </ConditionTimer>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </ResetTrigger>
+            </Trigger>
+            <TriggerSetup>
+                <UsedBySecondParties>0</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    
+    <!-- LaFortune in New World Session 180023 (the same content, just adusted to LaFortune guids): -->
+    <!-- ConditionIsParticipantInGame does not work for LaFortune, so check lighthouse instead -->
+    <ModOp Type="AddNextSibling" GUID='141003'>
+        <Asset>
+          <Template>Trigger</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001106</GUID>
+              <Name>Spawn Pirate Ships New World</Name>
+            </Standard>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionPlayerCounter</Template>
+                <Values>
+                  <Condition />
+                  <ConditionPlayerCounter>
+                    <PlayerCounter>ObjectBuilt</PlayerCounter>
+                    <Context>100708</Context>
+                    <CounterAmount>1</CounterAmount>
+                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                  </ConditionPlayerCounter>
+                </Values>
+              </TriggerCondition>
+              <SubTriggers>
+                <Item>
+                  <SubTrigger>
+                    <Template>AutoCreateTrigger</Template>
+                    <Values>
+                      <Trigger>
+                        <TriggerCondition>
+                          <Template>ConditionPlayerCounter</Template>
+                          <Values>
+                            <Condition>
+                              <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                            </Condition>
+                            <ConditionPlayerCounter>
+                              <PlayerCounter>RuinCount</PlayerCounter>
+                              <Context>100682</Context>
+                              <CounterAmount>0</CounterAmount>
+                              <ComparisonOp>AtMost</ComparisonOp>
+                              <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                              <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                            </ConditionPlayerCounter>
+                          </Values>
+                        </TriggerCondition>
+                        <SubTriggers>
+                          <!-- EndGame 142932 Condition.  -->
+                          <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>142932</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                          </Item>
+                          <!-- LateGame 140505 Condition.  -->
+                          <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>140505</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                          </Item>
+                          <!-- LateMidGame 140504 Condition -->
+                          <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>140504</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                          </Item>
+                            <!-- MidGame 140503 Condition -->
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>140503</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <!-- EarlyMidGame 140500 Condition -->
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionUnlocked</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionUnlocked>
+                                            <UnlockNeeded>140500</UnlockNeeded>
+                                          </ConditionUnlocked>
+                                          <ConditionPropsNegatable />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <!-- EarlyGame ConditionAlwaysTrue -->
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                        <Template>ConditionAlwaysTrue</Template>
+                                        <Values>
+                                          <Condition>
+                                            <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                                          </Condition>
+                                          <ConditionAlwaysTrue />
+                                        </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers />
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                        </SubTriggers>
+                      </Trigger>
+                    </Values>
+                  </SubTrigger>
+                </Item>
+              </SubTriggers>
+              <ResetTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <!-- still a short timer before reset, because eg. in EarlyGame vanilla there is no WarFleet and therefore no timer -->
+                      <Template>ConditionTimer</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionTimer>
+                          <TimeLimit>30000</TimeLimit>
+                        </ConditionTimer>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </ResetTrigger>
+            </Trigger>
+            <TriggerSetup>
+                <UsedBySecondParties>0</UsedBySecondParties>
+            </TriggerSetup>
+          </Values>
+        </Asset>
+    </ModOp>
+    
+    
+    
+</ModOps>
