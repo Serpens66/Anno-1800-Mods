@@ -142,15 +142,29 @@
   </ModOp>
   
 
-  <!-- replace the main TriggerCondition of the "SunkenTreasures SessionDiscovery Condition" with "AlwaysFalse" so it never unlocks the expeditions for humans -->
-  <ModOp Type="replace" GUID='113818' Path="/Values/Trigger/TriggerCondition">
-    <TriggerCondition>
-      <Template>ConditionAlwaysFalse</Template>
-      <Values>
-        <Condition />
-        <ConditionAlwaysFalse />
-      </Values>
-    </TriggerCondition>
+  <!-- never unlocks the expeditions for humans by changing "SunkenTreasures SessionDiscovery Condition" -->
+  <ModOp Type="add" GUID='113818' Path="/Values/Trigger/SubTriggers">
+    <!-- instead of using "AlwaysFalse", which stays like this after the mod was disabled, we check if the "never unlock" guid is unlocked. Because a guid that does not exist counts as unlocked. This way we make sure the trigger works again if the user disables this mod, although trigger keep the changed code -->
+    <!-- and we put it into the Subtriggers, instead of replacing the TriggerCondition -->
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionUnlocked</Template>
+              <Values>
+                <Condition />
+                <ConditionUnlocked>
+                  <UnlockNeeded>1500001169</UnlockNeeded>
+                </ConditionUnlocked>
+                <ConditionPropsNegatable />
+              </Values>
+              </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
   </ModOp>
   
   <!-- Never Unlock for AI SunkenTreasures_Session -->
