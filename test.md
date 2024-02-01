@@ -36,7 +36,22 @@ A value <= 0 means infinite calls are possible. Eg. use these to make sure eg. a
 #### `CountForQuestLimit`:
 Defaults to 1. "True if this quest counts for the global and the pool quest limits.". Set this to 0 if you don't want a quest to prevent other quests of the same pool to be started. I don't know if there really is a global limit and how much it is.
 
-#### `PreActivationTimer`:
-"This timer cancelles a quest if the quest has not become active until the timer runs out."
+#### `PreActivationTimer/QuestTimeLimit`:
+PreActivationTimer: "This timer cancelles a quest if the quest has not become active until the timer runs out." Eg. used for Quests that need to be accepted by the user first, eg. the ones popping up in the world with a star-icon spinning over them. If the user does not activate/accept the quest within PreActivationTimer, it is cancelled. Default will be 0 which disables this timer.  
+QuestTimeLimit: Defaults to 1800000 ms. "If a time limit is set, the quest will fail if it is not completed within this time". Timer starts after the Quest was activated/accepted.
 
+#### `QuestCategory`:
+Defaults to MainQuest. "The category of the quest defines the internal behaviour of the quest.". Since we can neither change nor look at the "interal behaviour", we can only test a bit what this does exactly. See datasets.xml QuestCategory for all allowed values. But it might be best to always use "RandomQuest" here unless you want to add a new Quest to the vanilla Story Questline.
+
+#### `QuestActivation`:
+"Defines at which point this quest changes its status to "Activated". Only activated quests are visible in the Quest Tracker." For allowed values see datasets.xml QuestActivationTime.  
+`ManualActivation` means the Quest will appear as acceptable Quest on the map eg. with the star-icon and the user can select and start it this way.  
+`QuestStart` means the Quest will directly be active in the players Questlog without a choice to accept/decline, but of course the player might be able to abort it.  
+`ConfirmationDialog` not tested by me, I assume it directly starts a notification if you want accept the quest or not.  
+
+#### `IsAbortable`:
+Defaults to 1. "If true, this quest can be aborted in the assignment center or the quest tracker". Allow to abort accepted/active quests or not.
+
+#### `NeededProgressLevel`:
+"This quest can only be triggered if the player progress level matches these checked levels." Defaults to `EarlyGame;EarlyMidGame;MidGame;LateMidGame;LateGame;EndGame` so all progresslevels are allowed by default.
 
