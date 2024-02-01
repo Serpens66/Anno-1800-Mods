@@ -1,5 +1,9 @@
 WIP quest tutorial, will be deleted when finished and uploaded to the anno 1800 modding-guide
 
+TODO: das packen zu allgemein Quests: The same Quest and also the same Trigger can be started/triggered multiple times at once. So make sure to only start/register them once at the same time.
+
+"Defaults to" is based on the default values defined in properties.xml. There may be other values defined in the template you are using (if defined nowhere the values will be 0).
+
 # Properties/Values of Quests:
 See templates.xml searching for "<Name>A7_Quest" to see the properties a normal quest has. See p-t.xml and search for <Name>Quest</Name> (there are multiple results, in current version it is in line 46508) and the other relevant properties.  
 Properties/values I don't mention here should be self explanatory or already explained enough by the description in p-t.xml
@@ -25,10 +29,11 @@ Eg. `OnQuestStart` already happens as soon as the player is able to accept the Q
 #### `QuestGiver`
 "This is the guys picture will be shown in the quest". As mentioned above this is also where the default messages will be taken from. A quest can not start, if the QuestGiver does not exist in the game (eg. Jorgensen can not start a quest if she is not part of the game). Most neutral QuestGivers like the farmers (`<GUID>86</GUID>`) are using the `Profile_Virtual_NeverOwnsObjects` template which has `<CreateModeMeta>AutoCreate_Always</CreateModeMeta>` defined to make sure they always exist in every game.
 
-#### `StoryText/DescriptionText/AlternativeRewardTitle`:
+#### `StoryText/DescriptionText/AlternativeRewardTitle/QuestHints`:
 StoryText: "This is the fluff text of a quest." eg. an embellished story.  
 DescriptionText: "This is the description of a quest." telling the player what to do exactly in short. Not needed if the WinConditions are self explanatory already.  
 AlternativeRewardTitle: "An alternative headline for the rewards". Defaults to GUID 2653 ("Reward"). So use it if you think this word does not fit for your Quest.
+QuestHints: Add Text GUIDs here for short hints how to solve the Quest like "Search near X" or mention the session name where to look and stuff like this.
 
 #### `MaxCallOut/MaxSolveCount/MaxAbortCount`:
 "Maximum number that this quest can be triggered." / "Maximum number that this quest can be solved." / "Maximum number that this quest can be aborted."  
@@ -77,7 +82,7 @@ ConfirmOnReachedCondition: "Use this to provide a custom configuration for the r
 I don't know what this does, it is neither used in vanilla nor explained in p-t.xml. I assume quests listed here can not be active at the same time? But one needs to test.
 
 #### `QuestSessionDependencies/QuestBlockedSessions`:
-QuestSessionDependencies: "If not empty, the quest can only be triggered if **one** of the specified sessions is loaded".  
+QuestSessionDependencies: "If not empty, the quest can only be triggered if **one** of the specified sessions is loaded". I think if nothing else is defined and the quest is started via a QuestPool, this is also the Quest the session will be active in.  
 QuestBlockedSessions: "If not empty, the quest can not be triggered in one of the specified sessions".  
 Both also accept Regions. 
 
@@ -86,6 +91,24 @@ Both also accept Regions.
 
 #### `KeepCheckingPreconditionsWhenRunning`:
 "If true, the quest keeps checking the preconditions and will abort automatically if they are not met any longer". Defaults to 0. This is eg. especially helpful for Quests involving QuestGivers you can have different treaties with. Eg. you can add a PreCondition that the player must at least have TradeRights with the QuestGiver and set KeepCheckingPreconditionsWhenRunning=1 to automatically abort the active Quest if this is no longer the case.  
-**Note**: `KeepCheckingPreconditionsWhenRunning` does only check the PreConditions if the Quest itself, not the ones from the executing QuestPool.
+**Note**: `KeepCheckingPreconditionsWhenRunning` does only check the PreConditions of the Quest itself, not the ones from the executing QuestPool.  
+The game does already cancels Quests to players you declare war to, but this is bugged since it only cancels one Quest. If there are multiple they are not all cancelled, so it is better to also include this as PreCondition if practicable.
+
+#### `ReputationQuestFail/ReputationQuestDeclined/Reward-RewardReputation`:
+Adding a list with `ReputationParticipant` "The participant that rewards reputation" and `ReputationAmount` "The amount of reputation that is rewarded. This number can be negative to create a reputation loss". So you can make the player loose reputation when a quest fails, but also gain reputation with other AIs.
+Reward/RewardReputation is defined outside of the Quest property, but works the same and is awared on Success of the Quest.
+
+#### `ResetPreconditionsAfterQuestWasTriggered`:
+"If true, the interal state of all preconditions will be reset. This is especially important for ConditionEvent which otherwise endlessly remembers any received event". Defaults to 0. I think this is only relevant if your PreCondition contain ConditionEvent like SessionEnter an such events. If you use such an event and leave this value 0, only "Entering the Session" once is enough to have the PreCondition true always, also for the next time the same Quest might start. If you set it to 1 instead, you must enter the Session everytime again to again allow the Quest to be started.  
+So most of the time this is not relevant for you.
+
+#### `RespectRelatedQuestSession`:
+"If true, this quest tries to spawn in the same session as another quest that is configured in the preconditions. We try to determine the correct quest out of all conditions given. An assert will be thrown if we don't manage to find a quest but this flag is set". Better define the sessions in different way to be sure, eg. in QuestSessionDependencies if started via a Pool or with QuestSession if started via ActionStartQuest.
+
+#### `HasStarterSpeechBubble/StarterSpeechBubble/HasSuccessSpeechBubble/SuccessSpeechBubble`:
+Did not use this yet. Feel free to add how to use this if you know more about it.
+
+#### `CanBeActiveForMultipleParticipants`:
+"Only takes effect in quest pools. Checking this will stop preventing the quest from being called from the pool, while another player has this quest running". Defaults to 0, but set it to 1 if you only want one human player to have the same Quest active at the same time.
 
 
