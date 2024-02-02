@@ -9,8 +9,22 @@ WIP quest tutorial, will be deleted when finished and uploaded to the anno 1800 
 
 QuestPools are a helper construct to automatically start quests on regular basis if PreConditions are fullfilled. Eg. if you made like 10 Quests that simply should be chosen randomly if preconditions are fullfilled (just like the games Random Quests) you can put your Quests in a pool and define how often the pool should start up to how many quests at once and so on. It also supports adding QuestLines into the pool instead of Quests directly to make sure they are started one after the other.
 
+A Pool will automatically start the Quests as soon as the PreConditions of the Pool and of the first Quest of the Questlines are met. There is no need to add this pool somewhere else or to activate it. If you set DisabledByDefault=1 in a pool it will be disabled (not starting any quests) and need to be enabled first with ActionSetQuestPoolEnablement and IsQuestPoolEnabled=1. But enabling/disabling pools with ActionSetQuestPoolEnablement is only needed if you are not able to include it as PreCondition (this vanilla pool is eg. disabled when the player looses the continental island).  
+Some QuestPools are also added to AI player assets, like `<QuestPool>150082</QuestPool>` is added to Jorgensen. This is not mandatory, as far as I know this only means that Quests are offered at the lighthouse of the AI and you don't have to define the starting point of a Quest in the Quest itself.
 
-#### `IsTopLevel` :
+#### `DisabledByDefault`:
+Disabled Pools do not start Quests. Defaults to 0. For basic usage, just leave this at 0 and don't mess with Enabling/Disabling QuestPools. Most of the time the PreConditions you can define for Pools/Quests are more then enough. Eg. the vanilla game disables the QuestPool for Cape-Quests if the player looses the continental island. An alternative would be to add "owning the continental island" into the PreConditions of the Pool. There may be cases where disabling/enabling Pools is better, but they are rare (use ActionSetQuestPoolEnablement and IsQuestPoolEnabled=1 to enable a disabled pool).
+
+#### `Quests/Groups/SubPools`:
+Lists inlucding Quests/Groups/SubPools, you can define a Weight for each of them to have some more likely to be chosen.    
+`Quests`: can be directly the Quest GUIDs you want to include or `QuestLine` objects to make sure they are automatically played one after the other.  
+`Groups`: When you search for the `GUID -616566410` you will find it to be a Group GUID above alot of Assets being Quests from Jorgensen and used in a QuestPool. This is a easy way to automatically include all Quests within that Group, but it is not very clear for the reader and modder. Because it also means you must take care **where to put** your own quest to avoid accidently adding it to such a existing group!  
+`SubPools`: Pools can even include other Pools. Eg. you want a Pool to start some random Quests, but you have many Quests of different categories and want different cooldowns for them. Then you can order them into different SubPools with their own Cooldowns and start them with a TopLevel Pool. Eg. the TopLevel Pool calls a Quest once every 30 minutes and your SubPools have a PoolCooldown of 60 minutes, to make sure the same category of Quest is not chosen two times in a row.  
+
+#### `IsMainStoryPool`:
+Defaults to 0. Not really sure what this does, but I assume it should only be used for vanilla story Quests, so better don't touch this.
+
+#### `IsTopLevel`:
 *"If true, this pool will be used directly to select quests and does not depent on a parent pool to be chosen."* Defaults to 0. Relevant because Pools can even include other pools. Only the TopLevel pool (the one that is not included within other pools) should have this set to 1 and it means that this pool is the one responsible to start the quests (while lower-level pools wait for "instructions" from their higher pool).
 
 #### `QuestLimit`:
