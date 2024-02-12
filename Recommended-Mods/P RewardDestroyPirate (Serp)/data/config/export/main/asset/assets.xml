@@ -2,21 +2,14 @@
    
 
    <!-- verwendet Serp GUIDs von 1500001040 bis einschließlich 1500001080 (freigehalten bis einschließlich 1500001100) -->
-   <!-- freie guids: 1500001041 + 1500001081 bis 1500001100 -->
+   <!-- freie guids: 1500001082 bis 1500001100 -->
    
    <!-- This mod gives you some Rewards when destroying the pirate base (and half of it, if you destroy the comeback fleet before they resettle) -->
    
    <!-- This mod requires my PirateDefeatHelpers submod -->
    
-   
-   <!-- TODO: -->
-    <!-- when updating, also use ObjectDummies shared mod and use A7_QuestDummyQuest for the quests -->
 
-   <!-- bei ConditionQuestStatusQuo (mit ConditionPlayerCounter) können wir CheckAnyPoolAsset=1 oder CombinePoolAssets=1 definieren. -->
-    <!-- bei ersterem wid geguckt ob zb. 2 stück von dem oder 2 stück von jenem aus dem pool erledigt wurden. -->
-    <!-- bei zweiterem werden die erledigten anzahlen aus dem pool addiert, dh. man braucht nur insg, 2 irgendwas in summe aus dem pool erledigen     -->
-    <!-- bei einem CounterAmount von 1 ist das ergebnis bei beiden varianten natürlich identisch -->
-    <!-- Wenn keins von beiden definiert ist, muss glaub ich jedes aus dem pool erfüllt sein, also zb 2 von jedem aus dem pool -->
+
    
    <!-- ConditionIsParticipantInGame does not work for LaFortune, dont use it, instead check for Lighthouse object or so -->
    
@@ -464,44 +457,21 @@
     </ModOp>
 
 
-    
-    <!-- Viele der SimpleEventType (ConditionEvent) , zb ObjectDestroyed kann man kein GUID übergeben (ContextAsset wird ignoriert) -->
-    <!-- und daher triggert das dann für den ausführenden Spieler bei jedem Objekt was er zerstört. und ich seh keine möglichkeit das zu filtern -->
-    
-    <!-- ich glaub quest DestroyObjective klappt nur für schiffe. 
-    (deswegen nutzen die Devs bei Angereb PlayerCounter ObjectDestroyed,wobei RelativeToQuestStart sehr hilfreich ist) -->
-    <!-- gibt zwar auch eine mit <PrebuiltObject>100681</PrebuiltObject> aber das ist nur eine fake quest um da nen icon drüber zu packen -->
-     <!-- und exakt der code triggert nicht, wenn kontor zerstört wird -->
-     <!-- klappt auch nicht beiKI Kontor, aber bei KI schiffen geht -->
-     <!-- aber bei Event ObjectDestroyed wird gebäude und auch kontor zerstören gezählt. -->
-    
-    <!-- MetaParticipantRemoved / SessionParticipantRemoved / HostileTakeoverCompleted funktioniert nicht bei Pirat defeat -->
-    
-    <!-- letzlich klappt aber: -->
-    <!-- <PlayerCounter>ObjectDestroyed</PlayerCounter> -->
-    <!-- mit: -->
-    <!-- <RelativeToQuestStart>1</RelativeToQuestStart> -->
-    <!-- sehr gut. -->
-    <!-- Wäre schöner, wenn wir wüssten wann Pirat komplett zerstört ist, aber da hat nichts funktioniert was ich getestet hab, also muss Zerstörung des Kontos reichen -->
-    <!-- -> PirateDefeatHelpers nutzt RuinCount vom Leuchtturm um sicher zu wissen wann pirat komplett zerstört ist -->
-    
+
     
     <!-- QuestGiver is NOT the pirate (notifications are disguised as pirates), because: -->
     <!-- - the pirate can not give us the reward after he is destroyed (would still work if we would set ExecutionPlaceConfirmOnReached to 0, but I think it is nicer to collect reward at harbor) -->
     <!-- - And a quest from pirate with Success destroying the pirate is weird anyway, although vanilla already does it like this..  -->
     
-    <ModOp Type="AddNextSibling" GUID="110746">
+    <ModOp Type="AddNextSibling" GUID="152264">
         <Asset>
-          <Template>A7_QuestStatusQuo</Template>
+          <Template>A7_QuestDummyQuest</Template>
           <Values>
             <Standard>
               <GUID>1500001043</GUID>
               <Name>Pirates Defeated Harlow</Name>
             </Standard>
             <Quest>
-              <StarterMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </StarterMessage>
               <SuccessMessage>
                 <Notification>
                   <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -517,24 +487,8 @@
                     </NotificationSubtitle>
                   </Values>
                 </Notification>
+                <SuppressMessage>0</SuppressMessage>
               </SuccessMessage>
-              <FailureMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </FailureMessage>
-              <SelectionReminderMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </SelectionReminderMessage>
-              <AbortedManuallyMessage />
-              <AbortedAutomaticallyMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </AbortedAutomaticallyMessage>
-              <InvitationMessage>   
-                <SuppressMessage>1</SuppressMessage>
-              </InvitationMessage>
-              <EscortShipSelectedMessage />
-              <ReminderMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </ReminderMessage>
               <ResolveConfirmationMessage>
                 <Notification>
                   <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -550,44 +504,13 @@
                     </NotificationSubtitle>
                   </Values>
                 </Notification>
+                <SuppressMessage>0</SuppressMessage>
               </ResolveConfirmationMessage>
-              <InvitationSmugglerQuestMessage />
-              <SmugglerQuestTradingStationReached />
-              <StartInvitationGiveItemMessage />
-              <StartFollowShipMessage />
-              <OnQuestStart />
-              <OnQuestDeclined />
-              <OnQuestActive />
-              <OnQuestAborted />
-              <OnQuestTimedOut />
-              <OnActiveQuestTimedOut />
-              <OnQuestFailed />
-              <OnQuestDiscarded />
-              <OnQuestSucceeded />
-              <OnQuestEnd />
-              <OnPhotographySuccessNewspaperAction />
-              <QuestGiver>86</QuestGiver>
-              <QuestDifficulty>Medium</QuestDifficulty>
-              <StoryText>17246</StoryText>
-              <QuestActivation>QuestStart</QuestActivation>
-              <IsAbortable>0</IsAbortable>
-              <CountForQuestLimit>0</CountForQuestLimit>
-              <HasReminderMessage>0</HasReminderMessage>
-              <QuestTimeLimit>0</QuestTimeLimit>
-              <QuestTrackerVisibility>Never</QuestTrackerVisibility>
               <QuestSessionDependencies>
                 <Item>
                   <SessionOrRegion>180023</SessionOrRegion>
                 </Item>
               </QuestSessionDependencies>
-              <ConfirmOnReachedCondition />
-              <ConfirmOnReached>0</ConfirmOnReached>
-              <ReputationQuestFail>
-                  <ReputationFailList />
-              </ReputationQuestFail>
-              <QuestHints />
-              <StarterSpeechBubble />
-              <SuccessSpeechBubble />
             </Quest>
             <PreConditionList />
             <Text />
@@ -643,16 +566,13 @@
         </Asset>
         
         <Asset>
-          <Template>A7_QuestStatusQuo</Template>
+          <Template>A7_QuestDummyQuest</Template>
           <Values>
             <Standard>
               <GUID>1500001044</GUID>
               <Name>Pirates Defeated LaFortune</Name>
             </Standard>
             <Quest>
-              <StarterMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </StarterMessage>
               <SuccessMessage>
                 <Notification>
                   <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -668,24 +588,8 @@
                     </NotificationSubtitle>
                   </Values>
                 </Notification>
+                <SuppressMessage>0</SuppressMessage>
               </SuccessMessage>
-              <FailureMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </FailureMessage>
-              <SelectionReminderMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </SelectionReminderMessage>
-              <AbortedManuallyMessage />
-              <AbortedAutomaticallyMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </AbortedAutomaticallyMessage>
-              <InvitationMessage>   
-                <SuppressMessage>1</SuppressMessage>
-              </InvitationMessage>
-              <EscortShipSelectedMessage />
-              <ReminderMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </ReminderMessage>
               <ResolveConfirmationMessage>
                 <Notification>
                   <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -701,47 +605,14 @@
                     </NotificationSubtitle>
                   </Values>
                 </Notification>
+                <SuppressMessage>0</SuppressMessage>
               </ResolveConfirmationMessage>
-              <InvitationSmugglerQuestMessage />
-              <SmugglerQuestTradingStationReached />
-              <StartInvitationGiveItemMessage />
-              <StartFollowShipMessage />
-              <OnQuestStart />
-              <OnQuestDeclined />
-              <OnQuestActive />
-              <OnQuestAborted />
-              <OnQuestTimedOut />
-              <OnActiveQuestTimedOut />
-              <OnQuestFailed />
-              <OnQuestDiscarded />
-              <OnQuestSucceeded />
-              <OnQuestEnd />
-              <OnPhotographySuccessNewspaperAction />
-              <QuestGiver>186</QuestGiver>
-              <QuestDifficulty>Medium</QuestDifficulty>
-              <StoryText>17246</StoryText>
-              <QuestActivation>QuestStart</QuestActivation>
-              <IsAbortable>0</IsAbortable>
-              <CountForQuestLimit>0</CountForQuestLimit>
-              <HasReminderMessage>0</HasReminderMessage>
-              <QuestTimeLimit>0</QuestTimeLimit>
-              <QuestTrackerVisibility>Never</QuestTrackerVisibility>
               <QuestSessionDependencies>
                 <Item>
                   <SessionOrRegion>180025</SessionOrRegion>
                 </Item>
               </QuestSessionDependencies>
-              <ConfirmOnReachedCondition />
-              <ConfirmOnReached>0</ConfirmOnReached>
-              <ReputationQuestFail>
-                  <ReputationFailList />
-              </ReputationQuestFail>
-              <QuestHints />
-              <StarterSpeechBubble />
-              <SuccessSpeechBubble />
             </Quest>
-            <PreConditionList />
-            <Text />
             <Reward>
               <RewardAssets>
                 <Item>
@@ -797,18 +668,15 @@
     
     <!-- Quest Rewards for destroying comeback fleet (at least two ships) -->
     
-    <ModOp Type="AddNextSibling" GUID="110746">
+    <ModOp Type="AddNextSibling" GUID="152264">
         <Asset>
-          <Template>A7_QuestStatusQuo</Template>
+          <Template>A7_QuestDummyQuest</Template>
           <Values>
             <Standard>
               <GUID>1500001079</GUID>
               <Name>Pirates Defeated Fleet Harlow</Name>
             </Standard>
             <Quest>
-              <StarterMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </StarterMessage>
               <SuccessMessage>
                 <Notification>
                   <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -826,66 +694,12 @@
                 </Notification>
                 <SuppressMessage>0</SuppressMessage>
               </SuccessMessage>
-              <FailureMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </FailureMessage>
-              <SelectionReminderMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </SelectionReminderMessage>
-              <AbortedManuallyMessage />
-              <AbortedAutomaticallyMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </AbortedAutomaticallyMessage>
-              <InvitationMessage>   
-                <SuppressMessage>1</SuppressMessage>
-              </InvitationMessage>
-              <EscortShipSelectedMessage />
-              <ReminderMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </ReminderMessage>
-              <ResolveConfirmationMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </ResolveConfirmationMessage>
-              <InvitationSmugglerQuestMessage />
-              <SmugglerQuestTradingStationReached />
-              <StartInvitationGiveItemMessage />
-              <StartFollowShipMessage />
-              <OnQuestStart />
-              <OnQuestDeclined />
-              <OnQuestActive />
-              <OnQuestAborted />
-              <OnQuestTimedOut />
-              <OnActiveQuestTimedOut />
-              <OnQuestFailed />
-              <OnQuestDiscarded />
-              <OnQuestSucceeded />
-              <OnQuestEnd />
-              <OnPhotographySuccessNewspaperAction />
-              <QuestGiver>86</QuestGiver>
-              <QuestDifficulty>Medium</QuestDifficulty>
-              <StoryText>17246</StoryText>
-              <QuestActivation>QuestStart</QuestActivation>
-              <IsAbortable>0</IsAbortable>
-              <CountForQuestLimit>0</CountForQuestLimit>
-              <HasReminderMessage>0</HasReminderMessage>
-              <QuestTimeLimit>0</QuestTimeLimit>
-              <QuestTrackerVisibility>Never</QuestTrackerVisibility>
               <QuestSessionDependencies>
                 <Item>
                   <SessionOrRegion>180023</SessionOrRegion>
                 </Item>
               </QuestSessionDependencies>
-              <ConfirmOnReachedCondition />
-              <ConfirmOnReached>0</ConfirmOnReached>
-              <ReputationQuestFail>
-                  <ReputationFailList />
-              </ReputationQuestFail>
-              <QuestHints />
-              <StarterSpeechBubble />
-              <SuccessSpeechBubble />
             </Quest>
-            <PreConditionList />
-            <Text />
             <Reward>
               <RewardAssets>
                 <Item>
@@ -976,16 +790,13 @@
         </Asset>
         
         <Asset>
-          <Template>A7_QuestStatusQuo</Template>
+          <Template>A7_QuestDummyQuest</Template>
           <Values>
             <Standard>
               <GUID>1500001080</GUID>
               <Name>Pirates Defeated Fleet LaFortune</Name>
             </Standard>
             <Quest>
-              <StarterMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </StarterMessage>
               <SuccessMessage>
                 <Notification>
                     <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -1003,66 +814,12 @@
                   </Notification>
                 <SuppressMessage>0</SuppressMessage>
               </SuccessMessage>
-              <FailureMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </FailureMessage>
-              <SelectionReminderMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </SelectionReminderMessage>
-              <AbortedManuallyMessage />
-              <AbortedAutomaticallyMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </AbortedAutomaticallyMessage>
-              <InvitationMessage>   
-                <SuppressMessage>1</SuppressMessage>
-              </InvitationMessage>
-              <EscortShipSelectedMessage />
-              <ReminderMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </ReminderMessage>
-              <ResolveConfirmationMessage>
-                <SuppressMessage>1</SuppressMessage>
-              </ResolveConfirmationMessage>
-              <InvitationSmugglerQuestMessage />
-              <SmugglerQuestTradingStationReached />
-              <StartInvitationGiveItemMessage />
-              <StartFollowShipMessage />
-              <OnQuestStart />
-              <OnQuestDeclined />
-              <OnQuestActive />
-              <OnQuestAborted />
-              <OnQuestTimedOut />
-              <OnActiveQuestTimedOut />
-              <OnQuestFailed />
-              <OnQuestDiscarded />
-              <OnQuestSucceeded />
-              <OnQuestEnd />
-              <OnPhotographySuccessNewspaperAction />
-              <QuestGiver>186</QuestGiver>
-              <QuestDifficulty>Medium</QuestDifficulty>
-              <StoryText>17246</StoryText>
-              <CountForQuestLimit>0</CountForQuestLimit>
-              <HasReminderMessage>0</HasReminderMessage>
-              <QuestActivation>QuestStart</QuestActivation>
-              <IsAbortable>0</IsAbortable>
-              <QuestTimeLimit>0</QuestTimeLimit>
-              <QuestTrackerVisibility>Never</QuestTrackerVisibility>
               <QuestSessionDependencies>
                 <Item>
                   <SessionOrRegion>180025</SessionOrRegion>
                 </Item>
               </QuestSessionDependencies>
-              <ConfirmOnReachedCondition />
-              <ConfirmOnReached>0</ConfirmOnReached>
-              <ReputationQuestFail>
-                  <ReputationFailList />
-              </ReputationQuestFail>
-              <QuestHints />
-              <StarterSpeechBubble />
-              <SuccessSpeechBubble />
             </Quest>
-            <PreConditionList />
-            <Text />
             <Reward>
               <RewardAssets>
                 <Item>
