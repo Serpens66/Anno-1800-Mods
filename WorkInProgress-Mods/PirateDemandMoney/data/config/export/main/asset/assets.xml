@@ -1,6 +1,10 @@
 <ModOps>
 
   <!-- uses Serp GUIDs from 1500003820 to (reserved up to 1500003849) -->
+  <!-- 1500003834+1500003837 is used in shared_ObjectDummies 1.04 as EmptyQuest/EmptyPool -->
+  <!-- ab 1500003844 frei  -->
+  
+  <!-- TODO evtl PirateHelper verwenden, zb. zum prüfen ob Pirat aktuell heile -->
 
   <!-- evlt ein Stronger Pirates Addon Mod odersowas draus machen (wobei mans auch ohne nutzen kann) -->
    <!-- Sinn ist, dass ich hier sinnvolle Dinge reinpacke, die standalone aber auch mit stronger pirates ODER combat overhaul -->
@@ -10,31 +14,8 @@
       <!-- weil einiges davon ja nun hier über quests gelöst wird -->
     
 
-  <!-- alle vanilla normalen piratenquests sollten wir ein rewardmalus geben, wenn man sie nicht erfüllt (falls das nicht schon der Fall ist) -->
-  <!-- ReputationQuestFail / ReputationQuestDeclined -->
-   <!-- (vanilla quests nurzen ReputationQuestFail mit -2 aber nicht ReputationQuestDeclined. ist für vanilla denke ich ok) -->
-
-  <!-- KeepCheckingPreconditionsWhenRunning für quests von piraten nutzen -->
-
-  <!-- hier können wir quests mit untersch. Folgen machen, -->
-   <!-- eine Art wo man nur -5 bis -10 rep bekommt, wenn mans nicht erledigt. -->
-   <!-- und eine Art wo der aktuelle vertrag gekündigt wird und es eine stufe niedriger geht (mit trigger resiteren und der rpüft dann akuellen status und lässt piraten das nächst niedrigere starten) -->
 
   <!-- also Aufgaben müssen wir nicht nur Geldforderungen machen, sondern auch andere Dinge die zum Piraten passen könnten, -->
-   <!-- zb. dass man ihnen ein Schiff verkauft (wenn möglich iwie so, dass es dann auch in ihre flotte mit changeowner und changeguid übergeht) -->
-  <!-- <PlayerCounter>ShipsSoldToParticipant</PlayerCounter> -->
-
-    <!-- wobei man diese schiffverkaufsquest auch machen sollte, -->
-     <!-- wenn pirat nur wenig schiffe hat und man mit ihm allianz/handel hat, dann gibt sie mehr + Ruf und nur wenig -Ruf, -->
-      <!-- weils dann dabei hilft den Piraten wieder stärker zu machen, quasi als unterstützung -->
-
-  <!-- wenn man dem piraten so schiffe verkauft, dann werden sie neutral und verlassen die karte -->
-   <!-- aber dann per trigger alle neutralen schiffe dem piraten zu geben ist auch nicht genua genug... -->
-
-<!-- ich glaub das Beste was wir bzgl "dem piraten sciffe geben" machen können, -->
- <!-- wäre dass der Pirat das Baumaterial und ein wenig Geld für ein Schiff anfragt -->
- <!-- und wir dann ein piratenschiff durch die Quest spawnen. Dadurch dass es durch die Quest spawned  -->
-  <!-- kann man es direkt targeten mit actions. -->
 
 
   <!-- man kann auch Piraten-Buffs an solche Zahlungen, oder auch den Handel mit den Piraten knüpfen, -->
@@ -46,32 +27,11 @@
    <!-- wie im multiplayer handhaben? buffs stackable machen und dann wird pirat halt noch stärker, was ok ist -->
      <!-- wobei ich glaube mit ActionBuff kann man buffs nicht stackable machen =/ -->
 
-  <!-- anstatt schiff per trigger zu spawnen kann man auch lua: -->
-   <!-- ts.SessionParticipants.GetParticipant(17).Trader.ForceBuild() -->
-   <!-- funzt und spawnt das nächste schiff der WarFleet sofort, unabhängig von cooldown und Craftingtime. -->
-    <!-- spawned kein schiff, wenn alle schiffe der warfleet bereits gespawned sind -->
-   <!-- leider kenne ich keine condition um zu prüfen ob schiffe zur vollstnädigen warlfeet fehlen.. -->
-    <!-- man könnte höchstens eine neue schiffsguid immer ans ende der warfleet packen um das zu prüfen (mod lädt nach anderen mods und fügt mit add eins zu) -->
-    <!-- und wenn pirat das hat, dann sind alle da... Wobei stimmt NICHT! es können ja auch oben von der liste schiffe versenkt werden usw. -->
-  <!-- .. -->
-  <!-- man könnte das instant ship spawn auch an ShipSold und Trademoney counter heften, sodass das handeln und schiff verkaufen mit ihm dafür sorgt, -->
-   <!-- dass pirat schneller die manximale flotte erreicht (wenn befehl dann eh lua ist, kann man auch bei shipsold direkt lua skript starten und dort dann zb prüfen welches progresslevel es ist, -->
-    <!-- und dort kann man auch sich für die partie die gesamthandelsmenge abspeichern und wenn das seit letztem trade um zb 100k zugenommen hat, direkt 5 schiffe spawnen (wenn man pro 20k spawnen will) -->
-      <!-- und progresslevel des auslösenden spielers prüfen und daran den handelsumsatz orienterien. zb 2500*Progresslevel für ein schiff -->
-  <!-- .. shipsold aber evlt doch lieber an einen actionspawn trigger binden, damits über die warfleet hinaus geht UND derselbe schiffstyp -->
-   <!-- gespawned wird (wenn unbekannte schiffsguid oder kein kriegschiff, dann nichts machen?) -->
   
   
-  <!-- evlt auch trigger machen, der prüft ob pirat über 1 stunde lang konstant weniger als  -->
-    <!-- x schiffe (je nach progress?) hatte und wenn ja, dann gleich ~3 mal ForceBuild aufrufen (pro menschlichen spieler), -->
-    <!-- um eine eventulee blockade der insel zu durchbrechen -->
   
-  <!-- kann man piraten nur mit handelsvertraag schiffe verkaufen? ja geht nur mit handelsvertrag -->
-   <!-- BringVehicleToObjectObjective wenn nur Frieden ist als workaround um auch bei frieden nach schiffenzu fragen? -->
-    <!-- man kann nur sagen "bringe irgendein vehicle zum Zielobjekt"... -->
-   <!-- SellObjectToParticipantObjective -->
-   <!-- bei diesen objectives mal testen ob man danach in successaction ObjectRestrictToQuestObjects im objectfilter nutzen kann -->
-    <!-- evlt auch in einer "OnSuccessActions" die direkt im Objective drinsteht -->
+  <!-- TODO:  -->
+   <!-- CoopCount mod brauchen wir wohl nicht mehr? -->
    
    
    <!-- man kann auch piratenquests geben, dass man fremde schiffe zerstören soll (zur not halt die des jeweils anderen piraten) -->
@@ -82,32 +42,96 @@
       <!-- einfach damit man auch einen positiven anreiz dazu hat den piraten zu helfen und nicht nur bestrafung wenn nicht -->
       <!-- (wobei man die piratenpool items glaube ich auch schon bei ihnen kaufen kann.. also mal gucken ob ich nen neuen itempool dafür mache oderso.. wenn ja dann diesen auch bei priate rewrads bei destryo zufügen) -->
 
-<!-- mit changeskin/changevariation könnte man auch aussehen der gebuffden türme/schiffe ändern, aber dazu braucht man erstmal entsprechende grafiekn :D -->
+<!-- mit <Template>ActionChangeSkin</Template> könnte man auch aussehen der gebuffden türme/schiffe ändern, aber dazu braucht man erstmal entsprechende grafiekn :D -->
 
 
-  <!-- mal testen: -->
-  <!-- Participants Current Highscore HighscoreData MilitaryShipScore -->
-  <!-- bzw. ts.Participants.GetParticipant(ID).Highscore.HighscoreData.GetMilitaryShipScore() -->
-  <!-- vllt kann man dies dann in lua scripten prüfen und basierend darauf trigger starten -->
-  <!-- ohne dass man alle schiffe durchloopen muss.. -->
-  <!-- und evlt dann über quests lösen? eine Quest die dem menschlichen spieler dann gegeben wird -->
-   <!-- in der x Geld verlangt wird und wenn nicht bezahlt wird, dann krieg usw. -->
-  <!-- mit DeliveryObjective und <ObjectiveScaling> passt sich die eldforderung dann sogar dem spielfortschritt an -->
+  <!-- damit eventuelle Buffs auch in Staärkeberechnung eingehen, evtl3 buffstufen der piraten machen die man iwie abfragen kann -->
+   <!-- und dabei dann die schiffsstärke mit faktor multiplizieren oderso -->
+  
+  <!-- geht und wird nicht unsichtbar sobald skin nicht emhr gibt, sondern geht zu default zurück -->
+  <!-- skin test: -->
+  <ModOp Type="AddNextSibling" GUID="80154">
+      <Asset>
+        <Template>Skin</Template>
+        <Values>
+          <Standard>
+            <GUID>1500003843</GUID>
+            <Name>Skin Type01 Gun Boat</Name>
+            <IconFilename>data/ui/2kimages/main/3dicons/ships/icon_gunboat_skin_01.png</IconFilename>
+            <ID>cdlc04_SkinType01GunBoat</ID>
+          </Standard>
+          <Skin>
+            <SkinName>133355</SkinName>
+            <SkinDescription>133356</SkinDescription>
+            <SkinVariations>
+              <Item>
+                <FileName>data/cdlc04/graphics/vehicles/skinpack_ships_01/gunboat/gunboat.cfg</FileName>
+              </Item>
+            </SkinVariations>
+            <SkinCategoryDescription>5761</SkinCategoryDescription>
+          </Skin>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <Text />
+        </Values>
+      </Asset>
+  </ModOp>
 
-  <!-- ts.Participants.GetParticipant(25).Highscore.HighscoreData.MilitaryShipScore()^ -->
+  <ModOp Type="merge" GUID='102429' Path="/Values/Object">
+    <Skins>
+      <DefaultSkinName>102429</DefaultSkinName>
+      <!-- <DefaultSkinDescription>23853</DefaultSkinDescription> -->
+      <DefaultSkinCategoryName>7312</DefaultSkinCategoryName>
+      <!-- <OverrideDefaultIcon>data/ui/2kimages/main/3dicons/specialists/pirates/icon_pirate_gunboat_151.png</OverrideDefaultIcon> -->
+      <!-- <OverrideDefaultIcon>data/ui/2kimages/main/3dicons/campaign/icon_pyrphorian.png</OverrideDefaultIcon> -->
+      <SkinList>
+        <Item>
+          <SkinAssetGuid>1500003843</SkinAssetGuid>
+        </Item>
+      </SkinList>
+    </Skins>
+  </ModOp>
+  
+    <!-- <Item> -->
+      <!-- <TriggerAction> -->
+        <!-- <Template>ActionChangeSkin</Template> -->
+        <!-- <Values> -->
+          <!-- <Action /> -->
+          <!-- <ObjectFilter> -->
+            <!-- <ObjectGUID>102429</ObjectGUID> -->
+            <!-- <CheckParticipantID>1</CheckParticipantID> -->
+            <!-- <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID> -->
+          <!-- </ObjectFilter> -->
+          <!-- <ActionChangeSkin> -->
+            <!-- <NewSkinIndex>1</NewSkinIndex> -->
+          <!-- </ActionChangeSkin> -->
+        <!-- </Values> -->
+      <!-- </TriggerAction> -->
+    <!-- </Item> -->
+  
 
-  <!-- überlegen ob wir das als extra mod machen, -->
-   <!-- damits auch mit combat overhaul kompatibel ist -->
-
-  <!-- im lua sript können wir auch chancen einbauen. -->
-  <!-- zb wenn pirat zwischen 1.01 und 2 mal so hohe schiffsstärke wie human hat, -->
-   <!-- dann starten wir an sich die normal-teure Quest. -->
-   <!-- Aber bei 1.01 nur mit einer chance von 50% -->
-   <!-- und bei 2 mit einer chance von 75% oderso. -->
-  <!-- von 2 bis 5 dann teure quest -->
-   <!-- und alles über 10 dann sehr teure quest. -->
-
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <!-- add icon to the all pirate ships pool -->
+  <ModOp Type="merge" GUID='700138' Path="/Values/Standard" Condition="!/Values/Standard/IconFilename">
+    <IconFilename>data/ui/2kimages/main/3dicons/icon_pirate_flag.png</IconFilename>
+  </ModOp>
+  <!-- and to the all player ships pool -->
+  <ModOp Type="merge" GUID='700155' Path="/Values/Standard" Condition="!/Values/Standard/IconFilename">
+    <IconFilename>data/ui/2kimages/main/3dicons/ships/icon_ship_liner.png</IconFilename>
+  </ModOp>
+  
 
   <!-- give pirates this property so we can check their MilitaryShipScore in lua to find out how strong their ships only are compared to the players ships  -->
    <!-- (MilitaryStrength also counts all miltiary buildings, but the pirates dont care for them, it does not matter if you own thousand towers for them to destroy your ships ) -->
@@ -124,69 +148,357 @@
   </ModOp>
 
 
-  
-  
-  
-  <!-- <ModOp Type="addNextSibling" GUID="150725"> -->
-    <!-- <Asset> -->
-      <!-- <Template>QuestPool</Template> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>000000000000</GUID> -->
-          <!-- <Name>HelpPiratesQuests_Harlow</Name> -->
-          <!-- <IconFilename>data/ui/2kimages/main/assets/bg_om_info.png</IconFilename> -->
-        <!-- </Standard> -->
-        <!-- <QuestPool> -->
-          <!-- <PoolCooldown>2700000</PoolCooldown> -->
-          <!-- <QuestCooldown>0</QuestCooldown> -->
-          <!-- <CooldownOnQuestStart>1</CooldownOnQuestStart> -->
-          <!-- <CooldownOnQuestEnd>0</CooldownOnQuestEnd> -->
-          <!-- <AffectedByCooldownFactor>0</AffectedByCooldownFactor> -->
-          <!-- <IsMainStoryPool>0</IsMainStoryPool> -->
-          <!-- <IsTopLevel>1</IsTopLevel> -->
-          <!-- <QuestLimit>1</QuestLimit> -->
-        <!-- </QuestPool> -->
-        <!-- <Locked> -->
-          <!-- <DefaultLockedState>0</DefaultLockedState> -->
-        <!-- </Locked> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
+  <ModOp Type="addNextSibling" GUID="150725">
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003832</GUID>
+          <Name>HelpPiratesQuests_Harlow</Name>
+        </Standard>
+        <QuestPool>
+          <SubPools>
+            <Item>
+              <Pool>1500003824</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003825</Pool>
+              <Weight>20</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003828</Pool>
+              <Weight>30</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003837</Pool>
+              <Weight>10</Weight>
+            </Item>
+          </SubPools>
+          <!-- <PoolCooldown>1800000</PoolCooldown> -->
+          <PoolCooldown>100000</PoolCooldown>
+          <QuestCooldown>0</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>1</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
     
-    <!-- <Asset> -->
-      <!-- <Template>QuestPool</Template> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>000000000000</GUID> -->
-          <!-- <Name>HelpPiratesQuests_LaFortune</Name> -->
-          <!-- <IconFilename>data/ui/2kimages/main/assets/bg_om_info.png</IconFilename> -->
-        <!-- </Standard> -->
-        <!-- <QuestPool> -->
-          <!-- <PoolCooldown>2700000</PoolCooldown> -->
-          <!-- <QuestCooldown>0</QuestCooldown> -->
-          <!-- <CooldownOnQuestStart>1</CooldownOnQuestStart> -->
-          <!-- <CooldownOnQuestEnd>0</CooldownOnQuestEnd> -->
-          <!-- <AffectedByCooldownFactor>0</AffectedByCooldownFactor> -->
-          <!-- <IsMainStoryPool>0</IsMainStoryPool> -->
-          <!-- <IsTopLevel>1</IsTopLevel> -->
-          <!-- <QuestLimit>1</QuestLimit> -->
-        <!-- </QuestPool> -->
-        <!-- <Locked> -->
-          <!-- <DefaultLockedState>0</DefaultLockedState> -->
-        <!-- </Locked> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
-  <!-- </ModOp> -->
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003833</GUID>
+          <Name>HelpPiratesQuests_LaFortune</Name>
+        </Standard>
+        <QuestPool>
+          <SubPools>
+            <Item>
+              <Pool>1500003829</Pool>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003830</Pool>
+              <Weight>20</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003831</Pool>
+              <Weight>30</Weight>
+            </Item>
+            <Item>
+              <Pool>1500003837</Pool>
+              <Weight>10</Weight>
+            </Item>
+          </SubPools>
+          <PoolCooldown>1800000</PoolCooldown>
+          <QuestCooldown>0</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>1</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_04_Pirate_LaFortune</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003824</GUID>
+          <Name>Easy Demand Quests Harlow</Name>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <Item>
+              <Quest>1500003826</Quest>
+            </Item>
+          </Quests>
+          <PoolCooldown>0</PoolCooldown>
+          <QuestCooldown>3599000</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>0</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked />
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003824</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003825</GUID>
+          <Name>Medium Demand Quests Harlow</Name>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <Item>
+              <Quest>1500003838</Quest>
+            </Item>
+          </Quests>
+          <PoolCooldown>0</PoolCooldown>
+          <QuestCooldown>3599000</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>0</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked />
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003825</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003828</GUID>
+          <Name>Hard Demand Quests Harlow</Name>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <Item>
+              <Quest>1500003839</Quest>
+            </Item>
+          </Quests>
+          <PoolCooldown>0</PoolCooldown>
+          <QuestCooldown>3599000</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>0</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked />
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003828</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003829</GUID>
+          <Name>Easy Demand Quests LaFortune</Name>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <Item>
+              <Quest>1500003827</Quest>
+            </Item>
+          </Quests>
+          <PoolCooldown>0</PoolCooldown>
+          <QuestCooldown>3599000</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>0</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked />
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003829</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003830</GUID>
+          <Name>Medium Demand Quests LaFortune</Name>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <Item>
+              <Quest>1500003840</Quest>
+            </Item>
+          </Quests>
+          <PoolCooldown>0</PoolCooldown>
+          <QuestCooldown>3599000</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>0</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked />
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003830</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003831</GUID>
+          <Name>Hard Demand Quests LaFortune</Name>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <Item>
+              <Quest>1500003841</Quest>
+            </Item>
+          </Quests>
+          <PoolCooldown>0</PoolCooldown>
+          <QuestCooldown>3599000</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>0</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked />
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003831</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+  </ModOp>
   
   <!-- In Profile/QuestPoolList vom QuestGiver müssen die Pools nicht unbedingt. -->
    <!-- das ist wohl nur dazu da, dass die Quests direkt beim Leuchtturmobjekt gestartet werden? das hat aber den nachteil, dass wenn da mehrere gestacked sind, man sie nicht frei wählen kann (wobei wenn man sie mit x schließt, nicht ablehnt, dann kommt die darunter) -->
   <!-- <ModOp Type = "add" GUID = '73' Path = "/Values/Profile/QuestPoolList"> -->
     <!-- <Item> -->
-      <!-- <QuestPool>000000000000</QuestPool> -->
+      <!-- <QuestPool>1500003832</QuestPool> -->
     <!-- </Item> -->
   <!-- </ModOp> -->
   <!-- <ModOp Type = "add" GUID = '76' Path = "/Values/Profile/QuestPoolList"> -->
     <!-- <Item> -->
-      <!-- <QuestPool>000000000000</QuestPool> -->
+      <!-- <QuestPool>1500003833</QuestPool> -->
     <!-- </Item> -->
   <!-- </ModOp> -->
   

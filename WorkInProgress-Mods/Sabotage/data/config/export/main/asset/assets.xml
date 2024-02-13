@@ -4,10 +4,16 @@
   <!-- GUIDs from 1500001170 to 1500001220 and more starting from 1500001400 to 1500001599 and from 1500001700 bis 1500002989 freigehalten -->
 
   <!-- frei:            ab  1500001835 (lieber erst reputation code machen und gucken wieviele guids ich dafür brauche, bevor ich 1500001835+ nutze! )     -->
-  <!--    , 1500001549 bis 1500001554 , , , 1500001587 bis 1500001589           -->
+  <!--    , 1500001549 bis 1500001554            -->
   <!-- 1500001829 bis 1500001834 freigehalten für weitere AIDefenseHuman1 bisHuman3 Trigger, zb für reputation-sabotage -->
   <!-- ab 1500001835 ist noch frei, aber halt erstmal rep code machen. -->
-  <!-- daher nutze ich bis dahin jetzt ab 1500001900 bis  für Audio -->
+  <!-- daher nutze ich bis dahin jetzt ab 1500001900 bis 1500002150 für Audio -->
+  <!-- 1500002151 bis 1500002179 reserviert für Hilfsressourcen zum Itemspawn -->
+  <!-- dh ab 1500002180 zurzeit frei -->
+
+
+  <!-- TODO mal ConditionEvent ItemActionCompleted testen, ob das mit GUID geht -->
+  <!-- und vorallem ob SchießItem geht, ConditionItemUsed geht zb nicht bei schieß-items, nur bei ausrüstbar und acitve-mit buff -->
 
   <!-- TODO: -->
   <!-- In Hard AI die spawnchance/zeit für KI spione angleichen -->
@@ -23,6 +29,17 @@
     <!-- sowas auftaucht wie Geld Balance von Bente usw.:  -->
       <!-- ts.Participants.GetParticipant(25).GetProfileCounter().GetStats().GetCounter(0,6,1010017,3) -->
 
+  <!-- bzgl spy sounds: diese müssen ja separat installiert werden im installationsordner.  -->
+   <!-- am besten packt man in dem download dazu auch den xml code, sodass ich im sabotage mod prüfen kann, ob der user das gelesen und separat gedownloadet -->
+    <!-- und installiert hat, und dann nehm ich entweder den spy sound 1404 oder eben den sound vom firetypen -->
+
+  <!-- Evlt eine QuestLine zur Einführung der Sabotage machen? -->
+    <!-- prüft ob eine KI oder anderer Spieler mit dabei ist, damit man ein Ziel hat. -->
+    <!-- und dann Quests wie sabotiere ein gebäude X (gucken wie man das prüfen kann, conditionbuffed geht ja nicht, aber da haben wir sicher methoden?) -->
+    <!-- oder entdecke und erledige ienen feindlichen spion (könnte man auch als General_Enemy (oder pirates) spawnen) -->
+  <!-- evlt im discord fragen ob jemand kreatives sich was dazu ausdenken möchte.. -->
+
+  <!-- die KI spies abschaltbar machen, ohne dass user was an dateien ändern muss. zb. wenn user gebäude X gebaut hat, spawned KI keine spies bei ihm -->
 
 
   <!-- nachdem alles sonst fertig ist: -->
@@ -121,6 +138,9 @@
      <!-- anderer spieler kann gebäude mit police units zerstören ,auch über autoattack (patroulie) -->
       <!-- dummerweise gibts kein gutes targetting, womit wir nur auf freier fläche etwas spawnen können... -->
        <!-- einziger workaround evlt dem building walking und commandqueue zu geben, damit es automatisch an erlaubte position bewegt -->
+      <!-- Alternativ einfach ein normales objekt, kein building mit spy spawnen, wobei nur bestimmte gebäude target sein können -->
+       <!-- und das gilt dann quasi als "eingenistet" auch wenns nicht direkt mit dem Gebäude verbunden ist. -->
+       <!-- Police unit kann das objekt zerstören und kann auch durch auge erkennbares objekt sein -->
        
    <!-- .. -->
    <!-- Ideen Spion zwingen sich wieder aufzuladen: -->
@@ -130,6 +150,22 @@
     <!-- wo man sich eins der sabotageitems aussuchen kann. alle davon und auch diese aussuchitems haben nur 1 Ladung. -->
      <!-- decisionquest ist leider doof dafür, aber was besseres kenne ich wohl nicht... oder man spawnt neben dem Spy eine Kiste die man öffnen -->
       <!-- kann und nen item davon nehmen (bzw. aktivieren) und dann spawnt es im spy.. -->
+    <!-- GEHT vermutlich so am besten: -->
+     <!-- spion spawned immer ohne items, bekommt beim spawn aber durch lua script items gutgeschrieben -->
+      <!-- die anzahl der items die spawnen sollen kann man dann über ein internes nicht sichtbares produkt zählen. -->
+       <!-- wenn wir mit slots arbeiten und im script den slot immer vorher leeren, sollte das auch MP (whichplayer) und coop kompatibel sein. -->
+  
+  <!-- Bzgl. der Limitierung von Items einsetzen: -->
+   <!-- evlt kann man die items auch in gebäude kaufbar machen, ist dann wie werft aufgebaut und kostet zb Ruhm oder neue währung -->
+    <!-- und kann nur gebaut werden, wenn spion in der nähe eines solchen gebäudes weltweit (ansonsten locked oder kein buildpermit) -->
+   <!-- und wenn man so ein sabotage item kauft, dann wird trigger ausgeführt, der globale versteckte ressource zufügt um zu zählen wieviele von wlchem item man hat -->
+    <!-- und AddGood to spion und bei jedem spawn eine spion bekommt der spion via lua script die jeweilige items -->
+   <!-- Auf fremder insel könnte man dann zb "Gebäude infiltrieren" wodurch ein hilfsobjekt darauf gespawned wird. das kann man zb anklicken und dort -->
+    <!-- ebenfalls die items kaufen, aber zb. teurer als auf der eigenen insel. -->
+   <!-- Oder man nutzt das infiltrieren (auch) um die Währung zu erhalten, mit der man neue items kaufen kann -->
+   <!-- Limitieren wieviel der spion an items haben darf, kann man auch n lua script nutzen und da zählen wieviele von welchem item der user hat (durch die hidden ressource) -->
+    <!-- und evtl. noch mit nem wert multiplizieren, um die items untersch. zu geqwichten. Und sobald ein wert überschritten ist, kann user keine weiteren items -->
+     <!-- mehr kaufen (locked oder buildpermit) -->
   
   
   
@@ -157,7 +193,8 @@
     <!-- und dort dann killer objekt spawnen dass ihn tötet  -->
      <!-- alternativ ein move_to befehl zu einer police unit , aber würde der alle police units weltweit treffen? oder können wir das auf die insel eingrenzen? -->
       <!-- evlt mit ObjectFilter <CheckQuestArea>1</CheckQuestArea> wenn wir das Area mit ConditionPlayerCounter festlegen? -->
-
+  
+  <!-- - Zeitungsartikel bei feindlichen menschlichen Spieler auslösen -->
   
   <!-- gui: -->
   <!-- der tooltip scheint hardcoded auf diese GUID zu sein, also wohl nicht änderbar.. -->
@@ -178,6 +215,7 @@
   <Include File="./Buildings.include.xml" />
   <Include File="./Units.include.xml" />
   <Include File="./Trigger.include.xml" />
+  <Include File="./TriggerEquipItems.include.xml" />
   <!-- Defense: Code to spawn police units for the AI and move them and also chance to catch spy ships in range of own ships of military buildings. -->
   <!--  Also needed for few humanVShuman actions, like stealing gold and manipulating reputation  -->
   <Include File="./AIDefenseTrigger/TriggerAIDefense.include.xml" />
@@ -476,7 +514,7 @@
         </Standard>
         <AssetPool>
           <AssetList>
-            <!-- Kontors moderate TODO use 700000 with modloader11 -->
+            <!-- Kontors moderate TODO use 700000 bzw die enthaltenen pools darin with modloader11 -->
             <Item>
               <Asset>1010517</Asset>
             </Item>
@@ -887,6 +925,9 @@
         </PlayerCounterContextPool>
       </Values>
     </Asset>
+    
+    
+    
   </ModOp>
   
   

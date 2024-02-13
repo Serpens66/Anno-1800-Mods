@@ -6,7 +6,15 @@
    
    <!-- 1500001342 bis 1500001399 für die decision unlock triggers -->
    <!-- pro KI einen für Allianz und einen für Traderights und einen für den timer -->
-    <!-- TODO: in UnlockREquirements der decision kann man bestimmt merhere zufügen, also timer separat eintragen -->
+    <!-- TODO: in UnlockREquirements der decision kann man bestimmt merhere zufügen (timer hab ich jetzt durch verzögertes registern von 1500001342 eingebuat, kann man aber noch ändern wenn man will) -->
+   
+   
+   <!-- Anstatt eine option für allianz und eine für traderights (kleine flotte) zu haben, -->
+    <!-- könnte man auch nur eine option haben und je nach diplo halt mehr oder weniger schiffe spawnen -->
+   
+   <!-- noch überlegen, ob die schiffe neben einer werft der KI gespawned werden sollen, oder am Kartenrand. -->
+    <!-- wenn Kartenrand, dann kann ich aus der Kontrolle ob KI eine Werft besitzt, die Session rausnehmen, sodass es reicht, wenn die KI irgendwo -->
+     <!-- eine werft besitzt , zb weil KI aus alter welt vertrieben wurde oderso -->
    
    
   <ModOp Type="addNextSibling" GUID="130248">
@@ -15,7 +23,7 @@
       <Values>
         <Standard>
           <GUID>1500001342</GUID>
-          <Name>AlliedWithBente since x minutes</Name>
+          <Name>Can Ask Bente for Small Fleet</Name>
         </Standard>
         <Locked />
         <Trigger>
@@ -43,7 +51,9 @@
                     <!-- <TriggerCondition> -->
                       <!-- <Template>ConditionUnlocked</Template> -->
                       <!-- <Values> -->
-                        <!-- <Condition /> -->
+                        <!-- <Condition> -->
+                          <!-- <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> -->
+                        <!-- </Condition> -->
                         <!-- <ConditionUnlocked> -->
                           <!-- <UnlockNeeded>140500</UnlockNeeded> -->
                         <!-- </ConditionUnlocked> -->
@@ -53,7 +63,9 @@
                     <TriggerCondition>
                       <Template>ConditionTimer</Template>
                       <Values>
-                        <Condition />
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
                         <ConditionTimer>
                           <TimeLimit>1000</TimeLimit>
                         </ConditionTimer>
@@ -66,14 +78,46 @@
                           <Values>
                             <Trigger>
                               <TriggerCondition>
-                                <Template>ConditionTimer</Template>
+                                <Template>ConditionPlayerCounter</Template>
                                 <Values>
                                   <Condition />
-                                  <ConditionTimer>
-                                    <!-- todo test -->
-                                    <!-- <TimeLimit>3600000</TimeLimit> -->
-                                    <TimeLimit>10000</TimeLimit>
-                                  </ConditionTimer>
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>ObjectBuilt</PlayerCounter>
+                                    <Context>1010520</Context>
+                                    <!-- <Context>130050</Context> -->
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
+                                    <!-- <CounterScope>Session</CounterScope> -->
+                                    <!-- <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext> -->
+                                    <!-- <CounterScopeContext>180023</CounterScopeContext> -->
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>ObjectBuilt</PlayerCounter>
+                                    <Context>1010521</Context>
+                                    <!-- <Context>130051</Context> -->
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
+                                    <!-- <CounterScope>Session</CounterScope> -->
+                                    <!-- <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext> -->
+                                    <!-- <CounterScopeContext>180023</CounterScopeContext> -->
+                                  </ConditionPlayerCounter>
                                 </Values>
                               </TriggerCondition>
                             </Trigger>
@@ -91,21 +135,113 @@
             <Values>
               <Trigger>
                 <TriggerCondition>
-                  <Template>ConditionDiplomaticState</Template>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                   <Values>
-                    <Condition />
-                    <ConditionDiplomaticState>
-                      <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
-                      <TargetParticipant2>Second_ai_01_Jorgensen</TargetParticipant2>
-                      <!-- todo test -->
-                      <!-- <DesiredState>Alliance</DesiredState> -->
-                      <DesiredState>Peace</DesiredState>
-                    </ConditionDiplomaticState>
-                    <ConditionPropsNegatable>
-                      <NegateCondition>1</NegateCondition>
-                    </ConditionPropsNegatable>
+                    <Condition>
+                      <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                    </Condition>
+                    <ConditionAlwaysTrue />
                   </Values>
                 </TriggerCondition>
+                <SubTriggers>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionDiplomaticState</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionDiplomaticState>
+                                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                                <TargetParticipant2>Second_ai_01_Jorgensen</TargetParticipant2>
+                                <!-- todo test -->
+                                <!-- <DesiredState>Alliance</DesiredState> -->
+                                <DesiredState>Peace</DesiredState>
+                              </ConditionDiplomaticState>
+                              <ConditionPropsNegatable>
+                                <NegateCondition>1</NegateCondition>
+                              </ConditionPropsNegatable>
+                            </Values>
+                          </TriggerCondition>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <Condition />
+                              <ConditionAlwaysTrue />
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionPlayerCounter</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionPlayerCounter>
+                                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                                          <Context>1010520</Context>
+                                          <!-- <Context>130050</Context> -->
+                                          <ComparisonOp>LessThan</ComparisonOp>
+                                          <CounterAmount>1</CounterAmount>
+                                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                          <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
+                                          <!-- <CounterScope>Session</CounterScope> -->
+                                          <!-- <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext> -->
+                                          <!-- <CounterScopeContext>180023</CounterScopeContext> -->
+                                        </ConditionPlayerCounter>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionPlayerCounter</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionPlayerCounter>
+                                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                                          <Context>1010521</Context>
+                                          <!-- <Context>130051</Context> -->
+                                          <ComparisonOp>LessThan</ComparisonOp>
+                                          <CounterAmount>1</CounterAmount>
+                                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                          <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
+                                          <!-- <CounterScope>Session</CounterScope> -->
+                                          <!-- <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext> -->
+                                          <!-- <CounterScopeContext>180023</CounterScopeContext> -->
+                                        </ConditionPlayerCounter>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
                 <TriggerActions> 
                   <Item>
                     <TriggerAction>
@@ -296,25 +432,125 @@
     
     <!-- nicht für jedes luftschiff nen trigger machen, sondern nur 2-4 ausgewählte -->
     
-    <!-- für diese Spawn Trigger die GUIDs 1500003870 bis 1500003900 freigehalten -->
+    <!-- für diese Spawn Trigger die GUIDs 1500003870 bis 1500003900 freigehalten (1500003871 und ab 1500003879 noch frei) -->
     
     <!-- TODO auch luftschiffe mit reinpacken, wenn passend -->
     
+    <!-- make sure the amounts credited back here are the same we substract in Decision file with ActionAddGoodsToItemContainer -->
     <Asset>
-      <Template>Trigger</Template>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003870</GUID>
+          <Name>Credit SupportFleetCostsBack onLuaFail</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003870</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1010017</Resource>
+                    <ResourceAmount>5000</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000240</Resource>
+                    <ResourceAmount>20</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>5000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003870</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
       <Values>
         <Standard>
           <GUID>1500003872</GUID>
           <Name>SpawnSupportFleet_War1</Name>
         </Standard>
+        <Locked />
         <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+            <!-- <Values> -->
+              <!-- <Condition> -->
+                <!-- <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> -->
+              <!-- </Condition> -->
+              <!-- <ConditionAlwaysTrue /> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
           <TriggerCondition>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Template>ConditionUnlocked</Template>
             <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionAlwaysTrue />
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003872</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
           <SubTriggers>
@@ -678,20 +914,74 @@
             </Item>
             <Item>
               <TriggerAction>
-                <Template>ActionRegisterTrigger</Template>
+                <Template>ActionDelayedActions</Template>
                 <Values>
                   <Action />
-                  <ActionRegisterTrigger>
-                    <TriggerAsset>1500001342</TriggerAsset>
-                  </ActionRegisterTrigger>
+                  <ActionDelayedActions>
+                    <ExecutionDelay>3600000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001342</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
                 </Values>
               </TriggerAction>
             </Item>
           </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>5000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003872</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
         <TriggerSetup>
-          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
           <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
         </TriggerSetup>
       </Values>
     </Asset>
@@ -704,10 +994,44 @@
           <Name>SpawnSupportFleetWar2</Name>
         </Standard>
         <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003873</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
           <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
           <SubTriggers>
             
           </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003873</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
       </Values>
     </Asset>
@@ -719,10 +1043,44 @@
           <Name>SpawnSupportFleet_Trade1</Name>
         </Standard>
         <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003874</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
           <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
           <SubTriggers>
             
           </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003874</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
       </Values>
     </Asset>
@@ -734,10 +1092,44 @@
           <Name>SpawnSupportFleet_Trade2</Name>
         </Standard>
         <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003875</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
           <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
           <SubTriggers>
             
           </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003875</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
       </Values>
     </Asset>
@@ -749,10 +1141,44 @@
           <Name>SpawnSupportFleet_Mixed</Name>
         </Standard>
         <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003876</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
           <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
           <SubTriggers>
             
           </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003876</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
       </Values>
     </Asset>
@@ -764,10 +1190,44 @@
           <Name>SpawnSupportFleet_Pirates</Name>
         </Standard>
         <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003877</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
           <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
           <SubTriggers>
             
           </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003877</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
       </Values>
     </Asset>
@@ -779,10 +1239,44 @@
           <Name>SpawnSupportFleet_Queen</Name>
         </Standard>
         <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500003878</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
           <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
           <SubTriggers>
             
           </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500003878</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
       </Values>
     </Asset>

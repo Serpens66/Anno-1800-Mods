@@ -1,0 +1,3638 @@
+<ModOps>
+
+  <!-- uses guids 1500001587 bis 1500001589  -->
+  <!-- und 1500002151 bis 1500002179 -->
+  <!-- 1500002153,  noch frei -->
+  
+  
+  <!-- ################################################### -->
+  <!-- ##  Trigger  ## -->
+  <!-- ## Triggers to provide spy units with the correct amount of items on spawn ## -->
+   <!-- they will be registered on every spy spawn, checked within trigger 1500001190  -->
+  <!-- ################################################### -->
+  
+  <!-- Spy will always spawn with only basic items, because of the land/water mechanic, because the unit is spawned and destryoed each time. -->
+   <!-- to still be able to allow the spy to buy a limited amout of items to use, we have to add the items on spawn -->
+  <!-- to count how much of each item the user bought/has left, we will count them with helper meta ressources -->
+  <!-- "hast du 1 x ressource, dann füge 1 y item zu. Hast du 2 x ressourcen, dann fürge 2 y items zu" usw. -->
+  <!-- Geht halbwegs auch mit lua, aber da gibts diverse andere Probleme (MP/Coop sorgen für mehrfache ausführung und session. ist immer nur die aktuelle session des spielers) -->
+    <!-- deswegen ist mit Triggern schon sinnvoller, auch wenn wir jede Menge einzeln prüfen müssen. Daher ist die maximlae Anzahl pro Item am besten limitiert, zb. auf 3 -->
+  
+  <!-- Die "Ressource Item" kann man zb bekommen indem man sie für "Ressource Buy Item Ressources" kauft, zb. in einem shipyard ähnlichem gebäude -->
+    <!-- also bei Bau eines objekts darin dann gutschreiben der ressource -->
+  <!-- Und "Ressource Buy Item Ressources" könnte man zb. für das Platzieren von Spionageposten oderso auf fremden Inseln bekommen (die der inselbesitzer zb mit polizei zerstören kann) -->
+   <!-- (am besten limitieren auf 2 pro insel oderso, falls das geht) -->
+    <!-- Wobei ich hier noch nicht sicher bin, wie das am sinnvollsten bei KI funzt, denn die hat ja nur police units, wenn spy auf insel ist  -->
+     <!-- und würde sonst keine Spionageposten zerstören.. hier vllt sonst einfach alle x minuten zufällig ne chance was zu zerstören, aber auch das ist nicht so leicht -->
+      <!-- wenn es davon mehrere überall geben kann... -->
+    <!-- bzw. diese spionposten einfach entfernen sobald spion insel verlässt und man muss sie auf jeder insel neu einrichten -->
+    <!-- in allen dieser posten kann man dann die items auch kaufen (oder evlt nur in einem von mehreren), man kann aber zb- nur 1+1*Anzahl der Posten kaufen/dabei haben -->
+     <!-- muss also regelmäßig zu ihnen zurück oderso... -->
+  
+  
+      <!-- TODO -->
+    <!-- wir müssen bei Verwendung eines Items die Menge an resourcen die zählt wieviele wir von diesem Items haben dürfen, -->
+     <!-- um 1 reduzieren. Damit wir das können muss ich vermutlich ein anderes Objekt beim Projectil-Spawn spawnen, damit erkannt wird, -->
+      <!-- welches item eingesetzt wurde. -->
+      <!-- Entweder ersetze ich das dann sofort durch das 1500001716 asset (und reduziere die menge der ressource) -->
+       <!-- oder ich muss alle diese objekte in einen Pool "All Recently-Sabotaged Objects" packen -->
+       <!-- besser ersteres machen -->
+       <!-- wobei problem ist, dass das nur für den land spy funzt, da wir da mit dem dummybuilding auf seiner insel automatisch die richtige session fürs spawnen bekommen. -->
+       <!-- bei allen items die via schiff eingesetzt werden, bekommen wir die session nicht, weshalb ActionSpawn nicht zuverlässig funzt. -->
+        <!-- wobei wir am besten einfach ChangeGUID machen, statt spawnen+remove. Das sollte funktionieren. -->
+      <!-- TODO... ConditionItemUsed funzt leider nicht für schuss-items... -->
+      <!-- bleibt also nur der Weg jedem item-projektil ein eigenes SpawnOnImpact zu geben.. -->
+  
+  
+  
+  <ModOp Type="AddNextSibling" GUID="119392">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001587</GUID>
+          <Name>Ressource Buy Item Ressources</Name>
+          <IconFilename>data/sabotage_graphics_serp/icons/Spy1404.png</IconFilename>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product>
+          <StorageLevel>Meta</StorageLevel>
+        </Product>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500002151</GUID>
+          <Name>Ressource Item: 1500001180 Incident Fire</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product>
+          <StorageLevel>Meta</StorageLevel>
+        </Product>
+      </Values>
+    </Asset>
+    <!-- für Illness/ArcticIllness können wir durch Trigger jetzt auch checken in welcher Session Spy ist und dann das richtige spawnen -->
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002152</GUID>
+          <Name>Ressource Item: 1500001179 Incident Illness / 1500001723 Incident ArcticIllness</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500002151</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500002153</GUID> -->
+          <!-- <Name>Ressource Item: </Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002154</GUID>
+          <Name>Ressource Item: 1500001184 Incident Riot</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002155</GUID>
+          <Name>Ressource Item: 1500001725 Incident Explosion</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002156</GUID>
+          <Name>Ressource Item: 1500001208 Production/Repair-/Shipyard-/LoadingSpeed Debuff</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002157</GUID>
+          <Name>Ressource Item: 1500001218 Higher Maintenance / Less Taxes and Happiness</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002158</GUID>
+          <Name>Ressource Item: 1500001467 Less Attractivness Zoo/Garden/Museum/VisitorPier</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002159</GUID>
+          <Name>Ressource Item: 1500001569 Health/Attack Buildings Debuff</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002160</GUID>
+          <Name>Ressource Item: 1500001463 Health/Attack/Speed Ships Debuff</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002161</GUID>
+          <Name>Ressource Item: 1500001489 Steal Money</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002151</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002162</GUID>
+          <Name>Ressource Item: 1500001572 Drop Mine</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500002151</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500002163</GUID> -->
+          <!-- <Name>Ressource Item: Change Rep</Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+    
+  </ModOp>
+  
+  
+  <!-- make them buyable in shipyard like object -->
+    <!-- it can be spawned by a spy unit with an item -->
+    <!-- vllt doch langsam beweglich auf land machen (aber so, dass es nicht in anderen gebäuden verschwinden kann) und aussehen wie beliebiges gebäude? -->
+  <ModOp Type="AddNextSibling" GUID='1010520'>
+    <Asset>
+      <Template>ObjectShipyard_Store</Template>
+      <Values>
+        <Standard>
+          <GUID>1500002179</GUID>
+          <Name>Buy Sabotage Items</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/city_institution/icon_police.png</IconFilename>
+          <InfoDescription>1500001503</InfoDescription>
+        </Standard>
+        <Blocking />
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/buildings/public/institution_01/institution_01.cfg</Filename>
+            </Item>
+          </Variations>
+          <Skins>
+            <DefaultSkinName>1010462</DefaultSkinName>
+            <DefaultSkinDescription>23853</DefaultSkinDescription>
+            <DefaultSkinCategoryName>7312</DefaultSkinCategoryName>
+            <OverrideDefaultIcon>data/ui/2kimages/main/3dicons/ornaments/cosmetic_dlc09/icon_policestation_default.png</OverrideDefaultIcon>
+            <SkinList>
+              <Item>
+                <SkinAssetGuid>5230</SkinAssetGuid>
+              </Item>
+            </SkinList>
+          </Skins>
+        </Object>
+        <Selection>
+          <GUIType>Shipyard</GUIType>
+          <MultiSelectable>0</MultiSelectable>
+          <SelectionPriority>5</SelectionPriority>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+          <InfoCorner>0</InfoCorner>
+        </Selection>
+        <Text />
+        <Shipyard>
+          <AssemblyOptions>
+            <Item>
+              <Vehicle>1500002164</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002165</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002166</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002167</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002168</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002169</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002170</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002171</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002172</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002173</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002174</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002175</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002176</Vehicle>
+            </Item>
+            <Item>
+              <Vehicle>1500002177</Vehicle>
+            </Item>
+          </AssemblyOptions>
+        </Shipyard>
+        <Infolayer />
+        <SoundEmitter />
+        <Attackable>
+          <AttackableType>IslandBuilding</AttackableType>
+          <MaximumHitPoints>5000</MaximumHitPoints>
+          <ExplosionEffectsMin>1</ExplosionEffectsMin>
+          <ExplosionEffectsMax>1</ExplosionEffectsMax>
+          <SelfHealPerHealTick>4</SelfHealPerHealTick>
+        </Attackable>
+        
+        <FactoryBase>
+          <FactoryOutputs>
+            <Item>
+              <Product>1500001587</Product>
+              <Amount>1</Amount>
+            </Item>
+          </FactoryOutputs>
+          <CycleTime>60</CycleTime>
+          <IsMainFactory>1</IsMainFactory>
+          <TeleportProducedGoodsIntoAreaStorage>1</TeleportProducedGoodsIntoAreaStorage>
+          <WarehouseTransporterAsset>0</WarehouseTransporterAsset>
+          <MissingConnectionInfolayer>0</MissingConnectionInfolayer>
+        </FactoryBase>
+        <!-- <LogisticNode> -->
+          <!-- <TransporterCountMax>0</TransporterCountMax> -->
+          <!-- <TransporterAsset>120062</TransporterAsset> -->
+          <!-- <NeedsTransporterQueue>0</NeedsTransporterQueue> -->
+        <!-- </LogisticNode> -->
+        
+        <CommandQueue>
+          <IsPlayerControllableVehicle>1</IsPlayerControllableVehicle>
+          <InsecurityAttractiveness>-20</InsecurityAttractiveness>
+          <MilitaryShipPoints>0</MilitaryShipPoints>
+          <PriorityShipList>10</PriorityShipList>
+        </CommandQueue>
+        <Walking>
+          <ForwardSpeed>0.05</ForwardSpeed>
+          <WalkSequence>walk01</WalkSequence>
+          <IdleSequence2>idle01</IdleSequence2>
+          <DiscoverRadius>10</DiscoverRadius>
+          <ReservationLength>0</ReservationLength>
+          <ReservationWidth>0</ReservationWidth>
+          <TurnAroundRadius>0</TurnAroundRadius>
+          <Acceleration>6</Acceleration>
+          <TurnRadius>0.1</TurnRadius>
+          <TurnSpeed>240</TurnSpeed>
+          <TurnDeceleration>0</TurnDeceleration>
+          <TurnMovement>80</TurnMovement>
+          <LeaningSpeed>0.01</LeaningSpeed>
+          <LeaningDamping>0.01</LeaningDamping>
+          <WindMinSlowdownFactor>1</WindMinSlowdownFactor>
+          <WindMaxSpeedupFactor>1</WindMaxSpeedupFactor>
+          <MinSlowdownFactor>1</MinSlowdownFactor>
+          <CurveSegmentDensity>High</CurveSegmentDensity>
+          <PathPlannerLayer>Land</PathPlannerLayer>
+        </Walking>
+        
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- ItemEffect is added, so my mod "shared_ShipyardForBuffsTooltip" prevents displaying ships stats -->
+  <!-- CraftingTime should be at least 100ms so the trigger has no problem to credit it one at a time -->
+  <ModOp GUID="114166" Type="addNextSibling">
+    <Asset>
+      <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+      <Values>
+        <Standard>
+          <GUID>1500002164</GUID>
+          <Name>Buy Ressource Item: 1500001180 Incident Fire</Name>
+          <IconFilename>data/ui/2kimages/main/icons/dlc_11/icon_ship_fire_armed_red.png</IconFilename>
+          <InfoDescription>1500001176</InfoDescription>
+        </Standard>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1500001587</Ingredient>
+              <Amount>100</Amount>
+            </Item>
+          </Costs>
+          <InfluenceCostType>None</InfluenceCostType>
+        </Cost>
+        <Craftable>
+          <CraftingTime>5000</CraftingTime>
+        </Craftable>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <ItemEffect />
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002165</GUID>
+          <Name>Buy Ressource Item: 1500001179 Incident Illness / 1500001723 Incident ArcticIllness</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/newspaper/icon_illness_chance_red.png</IconFilename>
+          <InfoDescription>1500001727</InfoDescription>
+        </Standard>
+      </Values>
+    </Asset>
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500002164</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500002166</GUID> -->
+          <!-- <Name>Buy Ressource Item: </Name> -->
+          <!-- <IconFilename></IconFilename> -->
+          <!-- <InfoDescription>XX</InfoDescription> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002167</GUID>
+          <Name>Buy Ressource Item: 1500001184 Incident Riot</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/newspaper/icon_newscategory_riot_bad.png</IconFilename>
+          <InfoDescription>1500001719</InfoDescription>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002168</GUID>
+          <Name>Buy Ressource Item: 1500001725 Incident Explosion</Name>
+          <IconFilename>data/ui/2kimages/main/icons/notification_icons/icon_incident_explosion_outline.png</IconFilename>
+          <InfoDescription>1500001190</InfoDescription>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002169</GUID>
+          <Name>Buy Ressource Item: 1500001208 Production/Repair-/Shipyard-/LoadingSpeed Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_workforce_2d.png</IconFilename>
+          <InfoDescription>1500001567</InfoDescription>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002170</GUID>
+          <Name>Buy Ressource Item: 1500001218 Higher Maintenance / Less Taxes and Happiness</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_house_income.png</IconFilename>
+          <InfoDescription>1500001715</InfoDescription>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002171</GUID>
+          <Name>Buy Ressource Item: 1500001467 Less Attractivness Zoo/Garden/Museum/VisitorPier</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_monument_attractiveness.png</IconFilename>
+          <InfoDescription>1500001718</InfoDescription>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002172</GUID>
+          <Name>Buy Ressource Item: 1500001569 Health/Attack Buildings Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/icons/achievement/icon_achievement_category_military.png</IconFilename>
+          <InfoDescription>1500001556</InfoDescription>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002173</GUID>
+          <Name>Buy Ressource Item: 1500001463 Health/Attack/Speed Ships Debuff</Name>
+          <IconFilename>data/ui/2kimages/main/icons/ship_info/icon_ship_moving.png</IconFilename>
+          <InfoDescription>1500001574</InfoDescription>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002174</GUID>
+          <Name>Buy Ressource Item: 1500001489 Steal Money</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/consumables/icon_moneybag_rare.png</IconFilename>
+          <InfoDescription>1500001594</InfoDescription>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500002164</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500002175</GUID>
+          <Name>Buy Ressource Item: 1500001572 Drop Mine</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/drop_goods/icon_dropgood_seamines.png</IconFilename>
+          <InfoDescription>853</InfoDescription>
+        </Standard>
+        <Cost>
+          <Costs>
+            <Item>
+              <Ingredient>1500001587</Ingredient>
+              <Amount>25</Amount>
+            </Item>
+          </Costs>
+        </Cost>
+      </Values>
+    </Asset>
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500002164</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500002176</GUID> -->
+          <!-- <Name>Buy Ressource Item: Change Rep</Name> -->
+          <!-- <IconFilename></IconFilename> -->
+          <!-- <InfoDescription>XX</InfoDescription> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  </ModOp>
+  
+  
+  <!-- mithilfe von ObjectFilter wird entschieden (auch im anderen trigger), ob Items Land oder Wasser oder beide Spies bekommen (vorallem da water spy limitierte anzahl an plätzen hat und einiges auf wasser nutzlos ist) -->
+  <ModOp GUID="130248" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001588</GUID>
+          <Name>Provide Spy Items on Spawn</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>Parallel</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002151</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001180</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002151</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001180</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002151</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001180</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002152</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <Context>1500001484</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CounterScope>Region</CounterScope>
+                                    <CounterScopeContext>160001</CounterScopeContext>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddGoodsToItemContainer</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddGoodsToItemContainer>
+                                        <Goods>
+                                          <Item>
+                                            <Good>1500001723</Good>
+                                            <Amount>1</Amount>
+                                          </Item>
+                                        </Goods>
+                                        <ItemContainerObjects>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ObjectFilter>
+                                              <ObjectGUID>1500001484</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </ItemContainerObjects>
+                                      </ActionAddGoodsToItemContainer>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <Context>1500001484</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CounterScope>Region</CounterScope>
+                                    <CounterScopeContext>160001</CounterScopeContext>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddGoodsToItemContainer</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddGoodsToItemContainer>
+                                        <Goods>
+                                          <Item>
+                                            <Good>1500001179</Good>
+                                            <Amount>1</Amount>
+                                          </Item>
+                                        </Goods>
+                                        <ItemContainerObjects>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ObjectFilter>
+                                              <ObjectGUID>1500001484</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </ItemContainerObjects>
+                                      </ActionAddGoodsToItemContainer>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002152</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <Context>1500001484</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CounterScope>Region</CounterScope>
+                                    <CounterScopeContext>160001</CounterScopeContext>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddGoodsToItemContainer</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddGoodsToItemContainer>
+                                        <Goods>
+                                          <Item>
+                                            <Good>1500001723</Good>
+                                            <Amount>2</Amount>
+                                          </Item>
+                                        </Goods>
+                                        <ItemContainerObjects>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ObjectFilter>
+                                              <ObjectGUID>1500001484</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </ItemContainerObjects>
+                                      </ActionAddGoodsToItemContainer>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <Context>1500001484</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CounterScope>Region</CounterScope>
+                                    <CounterScopeContext>160001</CounterScopeContext>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddGoodsToItemContainer</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddGoodsToItemContainer>
+                                        <Goods>
+                                          <Item>
+                                            <Good>1500001179</Good>
+                                            <Amount>2</Amount>
+                                          </Item>
+                                        </Goods>
+                                        <ItemContainerObjects>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ObjectFilter>
+                                              <ObjectGUID>1500001484</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </ItemContainerObjects>
+                                      </ActionAddGoodsToItemContainer>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002152</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <Context>1500001484</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CounterScope>Region</CounterScope>
+                                    <CounterScopeContext>160001</CounterScopeContext>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddGoodsToItemContainer</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddGoodsToItemContainer>
+                                        <Goods>
+                                          <Item>
+                                            <Good>1500001723</Good>
+                                            <Amount>3</Amount>
+                                          </Item>
+                                        </Goods>
+                                        <ItemContainerObjects>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ObjectFilter>
+                                              <ObjectGUID>1500001484</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </ItemContainerObjects>
+                                      </ActionAddGoodsToItemContainer>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <Context>1500001484</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CounterScope>Region</CounterScope>
+                                    <CounterScopeContext>160001</CounterScopeContext>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddGoodsToItemContainer</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddGoodsToItemContainer>
+                                        <Goods>
+                                          <Item>
+                                            <Good>1500001179</Good>
+                                            <Amount>3</Amount>
+                                          </Item>
+                                        </Goods>
+                                        <ItemContainerObjects>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ObjectFilter>
+                                              <ObjectGUID>1500001484</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </ItemContainerObjects>
+                                      </ActionAddGoodsToItemContainer>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002154</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001184</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002154</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001184</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002154</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001184</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002155</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001725</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002155</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001725</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002155</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001725</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002156</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001208</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002156</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001208</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002156</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001208</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002157</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001218</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002157</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001218</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002157</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001218</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002158</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001467</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002158</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001467</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002158</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001467</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002159</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001569</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002159</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001569</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002159</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001569</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002160</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001463</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002160</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001463</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002160</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001463</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002161</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001489</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002161</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001489</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002161</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001489</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002162</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001572</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001478</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002162</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>2</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001572</Good>
+                                  <Amount>2</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001478</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>GoodsInStock</PlayerCounter>
+                          <Context>1500002162</Context>
+                          <ComparisonOp>Equals</ComparisonOp>
+                          <CounterAmount>3</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001572</Good>
+                                  <Amount>3</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001478</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionPlayerCounter</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition> -->
+                          <!-- <IsOptional>1</IsOptional> -->
+                        <!-- </Condition> -->
+                        <!-- <ConditionPlayerCounter> -->
+                          <!-- <PlayerCounter>GoodsInStock</PlayerCounter> -->
+                          <!-- <Context>1500002163</Context> -->
+                          <!-- <ComparisonOp>Equals</ComparisonOp> -->
+                          <!-- <CounterAmount>1</CounterAmount> -->
+                        <!-- </ConditionPlayerCounter> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionAddGoodsToItemContainer</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionAddGoodsToItemContainer> -->
+                              <!-- <Goods> -->
+                                <!-- <Item> -->
+                                  <!-- <Good>REPGUID</Good> -->
+                                  <!-- <Amount>1</Amount> -->
+                                <!-- </Item> -->
+                              <!-- </Goods> -->
+                              <!-- <ItemContainerObjects> -->
+                                <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                                <!-- <Values> -->
+                                  <!-- <ObjectFilter> -->
+                                    <!-- <ObjectGUID>1500001173</ObjectGUID> -->
+                                    <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                                    <!-- <CheckProcessingParticipantID>1</CheckProcessingParticipantID> -->
+                                  <!-- </ObjectFilter> -->
+                                <!-- </Values> -->
+                              <!-- </ItemContainerObjects> -->
+                            <!-- </ActionAddGoodsToItemContainer> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionPlayerCounter</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition> -->
+                          <!-- <IsOptional>1</IsOptional> -->
+                        <!-- </Condition> -->
+                        <!-- <ConditionPlayerCounter> -->
+                          <!-- <PlayerCounter>GoodsInStock</PlayerCounter> -->
+                          <!-- <Context>1500002163</Context> -->
+                          <!-- <ComparisonOp>Equals</ComparisonOp> -->
+                          <!-- <CounterAmount>2</CounterAmount> -->
+                        <!-- </ConditionPlayerCounter> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionAddGoodsToItemContainer</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionAddGoodsToItemContainer> -->
+                              <!-- <Goods> -->
+                                <!-- <Item> -->
+                                  <!-- <Good>REPGUID</Good> -->
+                                  <!-- <Amount>2</Amount> -->
+                                <!-- </Item> -->
+                              <!-- </Goods> -->
+                              <!-- <ItemContainerObjects> -->
+                                <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                                <!-- <Values> -->
+                                  <!-- <ObjectFilter> -->
+                                    <!-- <ObjectGUID>1500001173</ObjectGUID> -->
+                                    <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                                    <!-- <CheckProcessingParticipantID>1</CheckProcessingParticipantID> -->
+                                  <!-- </ObjectFilter> -->
+                                <!-- </Values> -->
+                              <!-- </ItemContainerObjects> -->
+                            <!-- </ActionAddGoodsToItemContainer> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionPlayerCounter</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition> -->
+                          <!-- <IsOptional>1</IsOptional> -->
+                        <!-- </Condition> -->
+                        <!-- <ConditionPlayerCounter> -->
+                          <!-- <PlayerCounter>GoodsInStock</PlayerCounter> -->
+                          <!-- <Context>1500002163</Context> -->
+                          <!-- <ComparisonOp>Equals</ComparisonOp> -->
+                          <!-- <CounterAmount>3</CounterAmount> -->
+                        <!-- </ConditionPlayerCounter> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionAddGoodsToItemContainer</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionAddGoodsToItemContainer> -->
+                              <!-- <Goods> -->
+                                <!-- <Item> -->
+                                  <!-- <Good>REPGUID</Good> -->
+                                  <!-- <Amount>3</Amount> -->
+                                <!-- </Item> -->
+                              <!-- </Goods> -->
+                              <!-- <ItemContainerObjects> -->
+                                <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                                <!-- <Values> -->
+                                  <!-- <ObjectFilter> -->
+                                    <!-- <ObjectGUID>1500001173</ObjectGUID> -->
+                                    <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                                    <!-- <CheckProcessingParticipantID>1</CheckProcessingParticipantID> -->
+                                  <!-- </ObjectFilter> -->
+                                <!-- </Values> -->
+                              <!-- </ItemContainerObjects> -->
+                            <!-- </ActionAddGoodsToItemContainer> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500002178</GUID>
+          <Name>Credit Item/Ressource on Buy</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002164</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002151</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001180</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002165</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <Context>1500001484</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CounterScope>Region</CounterScope>
+                                    <CounterScopeContext>160001</CounterScopeContext>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddGoodsToItemContainer</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddGoodsToItemContainer>
+                                        <Goods>
+                                          <Item>
+                                            <Good>1500001179</Good>
+                                            <Amount>1</Amount>
+                                          </Item>
+                                        </Goods>
+                                        <ItemContainerObjects>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ObjectFilter>
+                                              <ObjectGUID>1500001484</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </ItemContainerObjects>
+                                      </ActionAddGoodsToItemContainer>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <Context>1500001484</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CounterScope>Region</CounterScope>
+                                    <CounterScopeContext>160001</CounterScopeContext>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddGoodsToItemContainer</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddGoodsToItemContainer>
+                                        <Goods>
+                                          <Item>
+                                            <Good>1500001723</Good>
+                                            <Amount>1</Amount>
+                                          </Item>
+                                        </Goods>
+                                        <ItemContainerObjects>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ObjectFilter>
+                                              <ObjectGUID>1500001484</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </ItemContainerObjects>
+                                      </ActionAddGoodsToItemContainer>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002152</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionPlayerCounter</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition /> -->
+                        <!-- <ConditionPlayerCounter> -->
+                          <!-- <PlayerCounter>ObjectBuilt</PlayerCounter> -->
+                          <!-- <Context>1500002166</Context> -->
+                          <!-- <CounterAmount>1</CounterAmount> -->
+                          <!-- <RelativeToQuestStart>1</RelativeToQuestStart> -->
+                        <!-- </ConditionPlayerCounter> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionAddResource</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionAddResource> -->
+                              <!-- <Resource>1500002153</Resource> -->
+                              <!-- <ResourceAmount>1</ResourceAmount> -->
+                            <!-- </ActionAddResource> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionAddGoodsToItemContainer</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionAddGoodsToItemContainer> -->
+                              <!-- <Goods> -->
+                                <!-- <Item> -->
+                                  <!-- <Good>YY</Good> -->
+                                  <!-- <Amount>1</Amount> -->
+                                <!-- </Item> -->
+                              <!-- </Goods> -->
+                              <!-- <ItemContainerObjects> -->
+                                <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                                <!-- <Values> -->
+                                  <!-- <ObjectFilter> -->
+                                    <!-- <ObjectGUID>1500001484</ObjectGUID> -->
+                                    <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                                    <!-- <CheckProcessingParticipantID>1</CheckProcessingParticipantID> -->
+                                  <!-- </ObjectFilter> -->
+                                <!-- </Values> -->
+                              <!-- </ItemContainerObjects> -->
+                            <!-- </ActionAddGoodsToItemContainer> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002167</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002154</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001184</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002168</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002155</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001725</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002169</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002156</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001208</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002170</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002157</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001218</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002171</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002158</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001467</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002172</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002159</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001569</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002173</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002160</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001463</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001484</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002174</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002161</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001489</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001173</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>ObjectBuilt</PlayerCounter>
+                          <Context>1500002175</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1500002162</Resource>
+                              <ResourceAmount>1</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddGoodsToItemContainer</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddGoodsToItemContainer>
+                              <Goods>
+                                <Item>
+                                  <Good>1500001572</Good>
+                                  <Amount>1</Amount>
+                                </Item>
+                              </Goods>
+                              <ItemContainerObjects>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001478</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </ItemContainerObjects>
+                            </ActionAddGoodsToItemContainer>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionPlayerCounter</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition /> -->
+                        <!-- <ConditionPlayerCounter> -->
+                          <!-- <PlayerCounter>ObjectBuilt</PlayerCounter> -->
+                          <!-- <Context>1500002176</Context> -->
+                          <!-- <CounterAmount>1</CounterAmount> -->
+                          <!-- <RelativeToQuestStart>1</RelativeToQuestStart> -->
+                        <!-- </ConditionPlayerCounter> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionAddResource</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionAddResource> -->
+                              <!-- <Resource>1500002163</Resource> -->
+                              <!-- <ResourceAmount>1</ResourceAmount> -->
+                            <!-- </ActionAddResource> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionAddGoodsToItemContainer</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionAddGoodsToItemContainer> -->
+                              <!-- <Goods> -->
+                                <!-- <Item> -->
+                                  <!-- <Good>ZZZ</Good> -->
+                                  <!-- <Amount>1</Amount> -->
+                                <!-- </Item> -->
+                              <!-- </Goods> -->
+                              <!-- <ItemContainerObjects> -->
+                                <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                                <!-- <Values> -->
+                                  <!-- <ObjectFilter> -->
+                                    <!-- <ObjectGUID>1500001173</ObjectGUID> -->
+                                    <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                                    <!-- <CheckProcessingParticipantID>1</CheckProcessingParticipantID> -->
+                                  <!-- </ObjectFilter> -->
+                                <!-- </Values> -->
+                              <!-- </ItemContainerObjects> -->
+                            <!-- </ActionAddGoodsToItemContainer> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    
+    <!-- TODO... ConditionItemUsed funzt leider nicht für schuss-items... -->
+     <!-- bleibt also nur der Weg jedem item-projektil ein eigenes SpawnOnImpact zu geben.. -->
+    <!-- <Asset> -->
+      <!-- <Template>Trigger</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001589</GUID> -->
+          <!-- <Name>substract Ressource on Item Use</Name> -->
+        <!-- </Standard> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+            <!-- <Values> -->
+              <!-- <Condition> -->
+                <!-- <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> -->
+              <!-- </Condition> -->
+              <!-- <ConditionAlwaysTrue /> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <!-- <SubTriggers> -->
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Values> -->
+                        <!-- <Condition /> -->
+                        <!-- <ConditionItemUsed> -->
+                          <!-- <TargetItem>1500001180</TargetItem> -->
+                          <!-- <ItemAmount>1</ItemAmount> -->
+                          <!-- <ItemTargetObject>0</ItemTargetObject> -->
+                          <!-- <ItemNeedsActivation>1</ItemNeedsActivation> -->
+                        <!-- </ConditionItemUsed> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionAddResource</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionAddResource> -->
+                              <!-- <Resource>1500002151</Resource> -->
+                              <!-- <ResourceAmount>-1</ResourceAmount> -->
+                            <!-- </ActionAddResource> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+
+          <!-- </SubTriggers> -->
+          <!-- <ResetTrigger> -->
+            <!-- <Template>AutoCreateTrigger</Template> -->
+            <!-- <Values> -->
+              <!-- <Trigger> -->
+                <!-- <TriggerCondition> -->
+                  <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                  <!-- <Values> -->
+                    <!-- <Condition /> -->
+                    <!-- <ConditionAlwaysTrue /> -->
+                  <!-- </Values> -->
+                <!-- </TriggerCondition> -->
+              <!-- </Trigger> -->
+            <!-- </Values> -->
+          <!-- </ResetTrigger> -->
+        <!-- </Trigger> -->
+        <!-- <TriggerSetup> -->
+          <!-- <AutoRegisterTrigger>0</AutoRegisterTrigger> -->
+          <!-- <UsedBySecondParties>0</UsedBySecondParties> -->
+        <!-- </TriggerSetup> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+    
+  </ModOp>
+  
+
+    
+</ModOps>

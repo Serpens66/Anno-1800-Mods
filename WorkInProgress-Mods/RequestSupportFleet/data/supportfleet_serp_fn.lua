@@ -21,6 +21,24 @@
  -- lua ist vorallem im MP zu unberechenbar, auch desync usw...
 
 
+-- TODO:
+ -- beim schenken von Schiffen evlt auch AI notification starten mit Rep bonus?
+  -- bei wir das ja nicht gemeinsam anzeigen können, da müssten wir wieder dummyschiffe sich versenken lassen...
+  -- aber bei Reactions könnten wir dann auch ne Chance einbauen.
+ -- und bei schenken evlt. kurzzetig ein FeatureUnlock pro KI/Pirat unlocken für 1 sekunde, damit andere Mods das erkennen können?
+  -- (oder falls ich dummy schiffe spawne, kann mans auch daran erkennen)
+  -- damit andere mods zb Quests darauf basierend einbauen können, dass man schiffe schenken soll (zb PirateDemand Mod)
+  
+
+-- für coop compatibility könnte man die mengen und chancen mit der anzahl der coop spieler die aktiv sind verrehcnen,
+ -- sodass gesamtzahl/chance ungefähr aufs selbe rauskommt, egal ob script 1 oder 4 mal ausgeführt wird.
+--  dazu global_CoopCount_Serp nutzen
+-- alternativ kann man auch vermehrt unlocks nehmen, also zb wenn schiffspawn-trigger gestartet werden soll,
+ -- dann etwas unlocken (evlt trigger selbst als FeatureUnlock) und dieser ist von von anfang an registered, löst aber bei unlock aus
+  -- auf diese weise wird er auch nur einmalig getriggered, auch wenn lua code es bis zu 4 mal zurselben Zeit unlocked
+
+
+
 -- outcommented EnableLightCodeSupport because we can not change owner in lua, so makes no sense and is dangerous anyways
 -- local EnableLightCodeSupport = false -- set this to "true" if you want the code to also transform ships which GUIDs are not hardcoded here. It should work as long as the ships use the normal vanilla templates and no additional properties. but if a mod added new properties, the game might crash on transform, that it is way it is disabled by default
 
@@ -77,7 +95,7 @@ local function table_contains_key(tbl, x)
   end
   return found
 end
-function RemoveByValueOnce(t, value)
+local function RemoveByValueOnce(t, value)
   if t ~= nil then
     for i,v in ipairs(t) do
       if v == value then
@@ -130,6 +148,7 @@ local function GetSessionObjectsFromHuman(propertyID)
   return {SessionGUID=SessionGUID, ParticipantID=ParticipantID, Objects=Objects}
 end
 
+
 -- ##################################################################################################################
 --  
 -- ##################################################################################################################
@@ -152,10 +171,9 @@ local ParticipantIDs = {human0 = 0,human1 = 1,human2 = 2,human3 = 3,queen = 15,j
 
 local CurrentSpawnProcess = CurrentSpawnProcess or {[0]={},[1]={},[2]={},[3]={}}
 
+-- only changes the GUID of selection to helper ships. the owner change and back to previous GUIDs is done in xml (decision eg after calling supportfleetgift_serp_human0.lua)
 local function SelectionToUniqueGUID(Human_ID)
-
   local local_PID = ts.Participants.GetGetCurrentParticipantID()
-  
   if local_PID==Human_ID then
     if session.selection~=nil and type(session.selection)=="table" and #session.selection > 0 then
       for i,userdata in ipairs(session.selection) do
@@ -218,6 +236,8 @@ local function FinishSpawnSupportFleet(SessionGUID,Human_ID,AI_ID)
       end
     end
     
+    -- crediting items in lua also does not work well in coop, because they get credited multiple times, even when using SetClearSlot before, because the scripts are executed simultaneous
+
     system.start(function ()
       local Ships = GetSessionObjectsFromHuman(367)
       -- modlog(Ships,#Ships)
@@ -228,7 +248,15 @@ local function FinishSpawnSupportFleet(SessionGUID,Human_ID,AI_ID)
           if AI_ID~=nil then -- spawn some ai specific items in the ship (if not enough slots, no item will be spawned automatically)
             -- modlog(weighted_random_choice(ShipItems[AI_ID]))
             GameObject = ts.Objects.GetObject(OID) -- GameObject must be renewed as usual.., so dont use the one in Ships
-            GameObject.ItemContainer.SetCheatItemInSlot(weighted_random_choice(ShipItems[AI_ID]),1)
+            
+            for islot=0,50,1 do -- empty all slots, because in coop code is executed multiple times, to make sure we still have the correct number of items
+              GameObject.ItemContainer.SetClearSlot(islot) -- not sure if this properly works in coop this way.. TODO test if this works always to have items only once...
+            end
+            -- if this does not help, we could also use a chance to credit an item and try to balance the chance based on coop players
+            -- if nothing helps, können wir auch pro KI helper-schiffkopien machen, welche initslot mit rewardpool nutzen
+            -- system.waitForGameTimeDelta(1000) -- wait ? does not help I guess
+            
+            -- GameObject.ItemContainer.SetCheatItemInSlot(weighted_random_choice(ShipItems[AI_ID]),1)
             GameObject = ts.Objects.GetObject(OID) -- GameObject must be renewed as usual.., so dont use the one in Ships
             GameObject.ItemContainer.SetCheatItemInSlot(weighted_random_choice(ShipItems[AI_ID]),1)
           end
@@ -257,11 +285,12 @@ local function PrepareSupportFleet(Human_ID,AI_ID,SpawnShipsTrigger)
     if AIHasShipyardInOldWorld==nil or AIHasShipyardInOldWorld < 1 then 
       AIHasShipyardInOldWorld = ts.Participants.GetParticipant(AI_ID).GetProfileCounter().GetStats().GetCounter(0,0,1010521,1,180023)
     end
-    AIHasShipyardInOldWorld = 1 -- TODO test value
+    AIHasShipyardInOldWorld = 1 -- TODO test value . TODO: diese Prüfung besser in xml packen und dann gibts halt die optio der supportfleet nicht in decisionquest
     if AIHasShipyardInOldWorld and AIHasShipyardInOldWorld >= 1 then
+      local max_reputation = 100
       local reputation = ts.Participants.GetParticipantReputation(AI_ID)
-      local randonnumber = math.random(0,100)
-      reputation = 100 -- todo test
+      local randonnumber = math.random(0,max_reputation)
+      reputation = max_reputation -- todo test
       if reputation >= randonnumber then -- the higher the opinion from AI towards you is, the higher the chance for success
         -- costs reputation? TODO if we keep it this way, add it somehow to the tooltip of decisionquest, so you know it costs rep
         -- ts.Participants.SetChangeParticipantReputationTo(AI_ID, Human_ID, -5) -- todo test
@@ -272,18 +301,22 @@ local function PrepareSupportFleet(Human_ID,AI_ID,SpawnShipsTrigger)
     end
     if not success then
       -- credit payed money/honor back if no success
-      ts.Economy.MetaStorage.AddAmount(1010017, 5000)
-      ts.Economy.MetaStorage.AddAmount(1500000240, 20)
+      -- ts.Economy.MetaStorage.AddAmount(1010017, 5000)
+      -- ts.Economy.MetaStorage.AddAmount(1500000240, 20)
+      ts.Unlock.SetUnlockNet(1500003870) -- we unlock a trigger to make sure it is also in coop only executed once
     else -- success
       system.start(function ()
         system.waitForGameTimeDelta(SpawnSupportFleet_DELAY) -- some delay simulating the AI kind of building the ships, todo test value
         ts.Unlock.SetRelockNet(GiftShipsLockTriggerGUID) -- lock the gift ships option because it uses same helper ships
-        ts.Conditions.RegisterTriggerForCurrentParticipant(SpawnShipsTrigger)
+        
+        -- ts.Conditions.RegisterTriggerForCurrentParticipant(SpawnShipsTrigger)
+        ts.Unlock.SetUnlockNet(SpawnShipsTrigger) -- we use unlock instead of RegisterTrigger to make sure it is also in coop only executed once
+        
         system.waitForGameTimeDelta(1000) -- wait for the trigger to spawn the ships
         local SessionGUID = session.getSessionGUID()
         if SessionGUID == 180023 then -- we only spawn them in old world, because spawn action sucks. and also lua code can only check a single session (the player is in)
           FinishSpawnSupportFleet(SessionGUID,Human_ID,AI_ID)
-        else -- then register an event
+        else -- then register an event to execute the code as soon as we enter old world session (because we can only get objects in current active session)
           table.insert(CurrentSpawnProcess[Human_ID],AI_ID)
           table.insert(event.OnSessionEnter, FinishSpawnSupportFleet)
         end

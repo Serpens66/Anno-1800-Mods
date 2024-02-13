@@ -1,0 +1,2401 @@
+<ModOps>
+   
+   <!-- Attention: -->
+   <!-- v1.02 changed quite alot of code compared to v 1.01 but mods relying on the code from older versions should still work as before. -->
+    <!-- But it is better to update your code to the newest version, it is more efficient and makes multiple mods using this shared mod better compatible to each other. -->
+   <!-- FeatureUnlock checking for defeat/resettle are unlocking also for AI in case you need this. (AI do not get Quests, so nothing for them regarding comebackfleet) -->
+   <!-- and it also should work regardless of loading order, since you do not need to add anything to my GUIDs anymore, create your own triggers -->
+   
+
+  
+  
+   <!-- ################################ -->
+   
+    <!-- There is no event when Pirates or their comebackfleet is defeated or if a player participated in it -->
+    <!-- This mod adds possibilites to track this, see below for more info -->
+
+    
+    <!-- used GUIDS: 1500001131 bis einschließlich 1500001149 (freigehalten bis einschließlich 1500001150) -->
+    
+  
+  <!-- Pirates Defeated / not Defeated: -->
+  
+  <!-- FeatureUnlock 1500001147 (Harlow) and 1500001148 (LaFortune) will be unlocked as long as pirate is defeated (lighthouse is ruin).  -->
+    <!-- 1500001145 and 1500001146 will be unlocked as long a lighthouse is no ruin==not defeated -->
+    <!-- Do NOT use a check "is locked", because this does not say anything, it also could be the "not-initialized status" -->
+  <!-- Eg. as precondition for Quests you can use the following to make sure it is only allowed while pirate is not defeated: -->
+    <!-- <Template>ConditionUnlocked</Template> -->
+    <!-- <Values> -->
+      <!-- <Condition /> -->
+      <!-- <ConditionUnlocked> -->
+        <!-- <UnlockNeeded>1500001145</UnlockNeeded> -->
+      <!-- </ConditionUnlocked> -->
+      <!-- <ConditionPropsNegatable /> -->
+    <!-- </Values> -->
+    
+    <!-- Event: -->
+    <!--  On Pirate Defeated 1500001149 (Harlow) and 1500004533 (LaFortune) -->
+    <!-- create trigger using: -->
+    <!-- <TriggerCondition> -->
+      <!-- <Template>ConditionEvent</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition/> -->
+        <!-- <ConditionEvent> -->
+          <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+          <!-- <ContextAsset>1500001149</ContextAsset> -->
+          <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+        <!-- </ConditionEvent> -->
+        <!-- <ConditionPropsNegatable/> -->
+      <!-- </Values> -->
+    <!-- </TriggerCondition> -->
+    
+    <!--  On Pirate Resettled 1500001150 (Harlow) and 1500004532 (LaFortune) -->
+    <!-- create trigger using: -->
+    <!-- <TriggerCondition> -->
+      <!-- <Template>ConditionEvent</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition/> -->
+        <!-- <ConditionEvent> -->
+          <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+          <!-- <ContextAsset>1500001150</ContextAsset> -->
+          <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+        <!-- </ConditionEvent> -->
+        <!-- <ConditionPropsNegatable/> -->
+      <!-- </Values> -->
+    <!-- </TriggerCondition> -->
+
+
+    
+    <!-- Quest 1500001136/1500001137 -> Questplayer was part of destroying Harlow/LaFortune Island (at least 2 towers or harbour destroyed) -->
+     <!-- create your own conditions to check for QuestSolved (eg to credit the player rewards) -->
+      <!-- <TriggerCondition> -->
+        <!-- <Template>ConditionPlayerCounter</Template> -->
+        <!-- <Values> -->
+          <!-- <Condition /> -->
+          <!-- <ConditionPlayerCounter> -->
+            <!-- <PlayerCounter>QuestSolved</PlayerCounter> -->
+            <!-- <Context>1500001136</Context> -->
+            <!-- <CounterAmount>1</CounterAmount> -->
+            <!-- <RelativeToQuestStart>1</RelativeToQuestStart> -->
+          <!-- </ConditionPlayerCounter> -->
+        <!-- </Values> -->
+      <!-- </TriggerCondition> -->
+      <!-- Oder als Quest Objective: -->
+      <!-- <Item> -->
+          <!-- <Objective> -->
+            <!-- <Template>StatusQuoObjective</Template> -->
+            <!-- <Values> -->
+              <!-- <ConditionQuestObjective /> -->
+              <!-- <ConditionPlayerCounter> -->
+                <!-- <PlayerCounter>QuestSolved</PlayerCounter> -->
+                <!-- <Context>1500001136</Context> -->
+                <!-- <CounterAmount>1</CounterAmount> -->
+                <!-- <RelativeToQuestStart>1</RelativeToQuestStart> -->
+              <!-- </ConditionPlayerCounter> -->
+              <!-- <ConditionQuestStatusQuo /> -->
+              <!-- <ConditionPropsExecutionPlaceSettings /> -->
+            <!-- </Values> -->
+          <!-- </Objective> -->
+        <!-- </Item> -->
+    
+    
+   <!-- ####### -->
+
+    <!-- Comebackfleet Arrived / was Destroyed by anyone: -->
+      <!--  the vanilla Quests 153262(Harlow)/153272(LaFortune) are relevant. On their start the fleet is spawned. They succeed when the fleet is destroyed -->
+      <!-- .. -->
+    <!-- PlayerCounter, zb: QuestCalled, QuestEnded, QuestSolved, QuestAbortedManually, QuestPoolQuestsSolved, QuestFailed -->
+     <!-- (ConditionEvent scheint nicht so zuverlässig zu sein) -->
+    <!-- <TriggerCondition> -->
+      <!-- <Template>ConditionPlayerCounter</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition /> -->
+        <!-- <ConditionPlayerCounter> -->
+          <!-- <PlayerCounter>QuestCalled</PlayerCounter> -->
+          <!-- <Context>153262</Context> -->
+          <!-- <CounterAmount>1</CounterAmount> -->
+          <!-- <RelativeToQuestStart>1</RelativeToQuestStart> -->
+        <!-- </ConditionPlayerCounter> -->
+      <!-- </Values> -->
+    <!-- </TriggerCondition> -->
+    <!-- ..  -->
+    <!-- BEWARE: -->
+      <!-- 153262/153272 might End (OnQuestEnd) if: failed/succeded or even savegame loaded (most likely AbortQuestExceptionally)! But checking for "success" should be save -->
+      <!-- 153262/153272 does not start for players not being at war with pirates (vanilla bug, kind of fixed with my pirate comebackfleetfix mod, which makes all humans be at war with destroyed pirates) -->
+    
+    
+    <!-- Quest 1500001138/1500001139 -> Questplayer was part of destroying Harlow/LaFortune comebackfleet (at least 2 ships destroyed) -->
+    <!-- <TriggerCondition> -->
+      <!-- <Template>ConditionPlayerCounter</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition /> -->
+        <!-- <ConditionPlayerCounter> -->
+          <!-- <PlayerCounter>QuestSolved</PlayerCounter> -->
+          <!-- <Context>1500001138</Context> -->
+          <!-- <CounterAmount>1</CounterAmount> -->
+          <!-- <RelativeToQuestStart>1</RelativeToQuestStart> -->
+        <!-- </ConditionPlayerCounter> -->
+      <!-- </Values> -->
+    <!-- </TriggerCondition> -->
+    
+    
+    <!-- multi session pirates not yet supported: -->
+    <!-- code geht aktuell an mehreren stellen davon aus, dass die piraten nur in jeweils einer session aktiv sind, also 180023 und 180025 -->
+    <!-- wenn iwelche map mods dieselben piraten GUID auch zu anderen sessions zufügt, könnte es sein, dass vanillacode dann eh schon nicht mehr funzt. -->
+     <!-- deswegen mach ich mir erstmal nicht die mühe darauf zu achten, dass dieser code hier dann noch funzt. Aber theoretisch könnte es möglich sein -->
+      <!-- ihn so anzupassen, dass er unabhängig von der session funktioniert -->
+
+
+  <!-- ############################################################################################################ -->
+  <!-- ############################################################################################################ -->
+  <!-- ############################################################################################################ -->
+
+
+  <!-- Attention: ConditionIsParticipantInGame does NOT work for LaFortune! So instead use ConditionPayerCounter ObjectBuilt to see if the pirates lighthouse exists  -->
+
+  
+  <!-- We allow RuinState for the lighthouse, but still unattackable -->
+  <!--  this way we will know for sure pirate is defeated, if RuinCount of lighthouse is 1 -->
+  <ModOp Type="merge" GUID="100707,100708" Path="/Values">
+    <Attackable>
+      <HasRuinState>1</HasRuinState>
+      <AttackableType>[NONE]</AttackableType>
+    </Attackable>
+  </ModOp>
+  
+  
+  <ModOp GUID="130248" Type="AddNextSibling">
+    
+    <!-- FeatureUnlock 1500001147 and 1500001148 will be unlocked as long as pirate is defeated (lighthouse is ruin).  -->
+    <!--  1500001145 and 1500001146 will be unlocked as long a lighthouse is no ruin==not defeated -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001147</GUID>
+          <Name>Pirate Is Currently Defeated Harlow</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100707</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                <CounterScope>Session</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CounterScopeContext>180023</CounterScopeContext>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>RuinCount</PlayerCounter>
+                          <Context>100707</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                          <CounterScope>Session</CounterScope>
+                          <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                          <CounterScopeContext>180023</CounterScopeContext>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions />
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <!-- <TriggerCondition> -->
+                  <!-- <Template>ConditionUnlocked</Template> -->
+                  <!-- <Values> -->
+                    <!-- <Condition /> -->
+                    <!-- <ConditionUnlocked> -->
+                      <!-- <UnlockNeeded>1500001145</UnlockNeeded> -->
+                    <!-- </ConditionUnlocked> -->
+                    <!-- <ConditionPropsNegatable /> -->
+                  <!-- </Values> -->
+                <!-- </TriggerCondition> -->
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition/>
+                    <ConditionEvent>
+                      <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                      <ContextAsset>1500001145</ContextAsset>
+                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                    </ConditionEvent>
+                    <ConditionPropsNegatable/>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500001147</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001148</GUID>
+          <Name>Pirate Is Currently Defeated LaFortune</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100708</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                <CounterScope>Session</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CounterScopeContext>180025</CounterScopeContext>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>RuinCount</PlayerCounter>
+                          <Context>100708</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                          <CounterScope>Session</CounterScope>
+                          <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                          <CounterScopeContext>180025</CounterScopeContext>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions />
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <!-- <TriggerCondition> -->
+                  <!-- <Template>ConditionUnlocked</Template> -->
+                  <!-- <Values> -->
+                    <!-- <Condition /> -->
+                    <!-- <ConditionUnlocked> -->
+                      <!-- <UnlockNeeded>1500001146</UnlockNeeded> -->
+                    <!-- </ConditionUnlocked> -->
+                    <!-- <ConditionPropsNegatable /> -->
+                  <!-- </Values> -->
+                <!-- </TriggerCondition> -->
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition/>
+                    <ConditionEvent>
+                      <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                      <ContextAsset>1500001146</ContextAsset>
+                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                    </ConditionEvent>
+                    <ConditionPropsNegatable/>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500001148</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+   <!-- We use 2 FeatureUnlock per pirate, to be on the save side. Only having one FeatureUnlock that shows "is defeated AND is not defeated" is not good, because Locked/Unlock can only show 2 states, while there is also the third state of "not yet checked" at the start of a game/savegame, which could lead to wrong behaviour -->
+  <!-- dont use OnQuestFailed 153264/153273 because right now this quest is only active for players who are in war with pirates. -->
+  <!-- so instead we will look it the lighthouse was repaired -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001145</GUID>
+          <Name>Pirates Is Currently NOT Defeated Harlow</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100707</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                <CounterScope>Session</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CounterScopeContext>180023</CounterScopeContext>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>RuinCount</PlayerCounter>
+                          <Context>100707</Context>
+                          <CounterAmount>0</CounterAmount>
+                          <ComparisonOp>AtMost</ComparisonOp>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                          <CounterScope>Session</CounterScope>
+                          <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                          <CounterScopeContext>180023</CounterScopeContext>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions />
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <!-- <TriggerCondition> -->
+                  <!-- <Template>ConditionUnlocked</Template> -->
+                  <!-- <Values> -->
+                    <!-- <Condition /> -->
+                    <!-- <ConditionUnlocked> -->
+                      <!-- <UnlockNeeded>1500001147</UnlockNeeded> -->
+                    <!-- </ConditionUnlocked> -->
+                    <!-- <ConditionPropsNegatable /> -->
+                  <!-- </Values> -->
+                <!-- </TriggerCondition> -->
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition/>
+                    <ConditionEvent>
+                      <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                      <ContextAsset>1500001147</ContextAsset>
+                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                    </ConditionEvent>
+                    <ConditionPropsNegatable/>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500001145</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001146</GUID>
+          <Name>Pirates Is Currently NOT Defeated LaFortune</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100708</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                <CounterScope>Session</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CounterScopeContext>180025</CounterScopeContext>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>RuinCount</PlayerCounter>
+                          <Context>100708</Context>
+                          <CounterAmount>0</CounterAmount>
+                          <ComparisonOp>AtMost</ComparisonOp>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                          <CounterScope>Session</CounterScope>
+                          <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                          <CounterScopeContext>180025</CounterScopeContext>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions />
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <!-- <TriggerCondition> -->
+                  <!-- <Template>ConditionUnlocked</Template> -->
+                  <!-- <Values> -->
+                    <!-- <Condition /> -->
+                    <!-- <ConditionUnlocked> -->
+                      <!-- <UnlockNeeded>1500001148</UnlockNeeded> -->
+                    <!-- </ConditionUnlocked> -->
+                    <!-- <ConditionPropsNegatable /> -->
+                  <!-- </Values> -->
+                <!-- </TriggerCondition> -->
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition/>
+                    <ConditionEvent>
+                      <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                      <ContextAsset>1500001148</ContextAsset>
+                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                    </ConditionEvent>
+                    <ConditionPropsNegatable/>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionLockAsset>
+                          <LockAssets>
+                            <Item>
+                              <Asset>1500001146</Asset>
+                            </Item>
+                          </LockAssets>
+                        </ActionLockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- ################ -->
+    <!-- Events -->
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001149</GUID>
+          <Name>Event: On Pirate Defeated Harlow</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <!-- no ConditionEvent here, because it already fired for the reset. and also at game start it is better to use UnlockNeeded first -->
+                          <UnlockNeeded>1500001145</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition/>
+                        <ConditionEvent>
+                          <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                          <ContextAsset>1500001147</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable/>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500001149</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition/>
+                    <ConditionEvent>
+                      <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                      <ContextAsset>1500001145</ContextAsset>
+                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                    </ConditionEvent>
+                    <ConditionPropsNegatable/>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004533</GUID>
+          <Name>Event: On Pirate Defeated LaFortune</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <!-- no ConditionEvent here, because it already fired for the reset. and also at game start it is better to use UnlockNeeded first -->
+                          <UnlockNeeded>1500001146</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition/>
+                        <ConditionEvent>
+                          <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                          <ContextAsset>1500001148</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable/>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500004533</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition/>
+                    <ConditionEvent>
+                      <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                      <ContextAsset>1500001146</ContextAsset>
+                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                    </ConditionEvent>
+                    <ConditionPropsNegatable/>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001150</GUID>
+          <Name>Event: On Pirate Resettled Harlow</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <!-- no ConditionEvent here, because it already fired for the reset. and also at game start it is better to use UnlockNeeded first -->
+                          <UnlockNeeded>1500001147</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition/>
+                        <ConditionEvent>
+                          <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                          <ContextAsset>1500001145</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable/>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500001150</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition/>
+                    <ConditionEvent>
+                      <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                      <ContextAsset>1500001147</ContextAsset>
+                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                    </ConditionEvent>
+                    <ConditionPropsNegatable/>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004532</GUID>
+          <Name>Event: On Pirate Defeated LaFortune</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <!-- no ConditionEvent here, because it already fired for the reset. and also at game start it is better to use UnlockNeeded first -->
+                          <UnlockNeeded>1500001148</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition/>
+                        <ConditionEvent>
+                          <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                          <ContextAsset>1500001146</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable/>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500004532</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition/>
+                    <ConditionEvent>
+                      <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                      <ContextAsset>1500001148</ContextAsset>
+                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                    </ConditionEvent>
+                    <ConditionPropsNegatable/>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    
+  </ModOp>
+  
+  
+  
+  <!-- ########### -->
+  
+  <!-- some tower GUIDs also might be used by neutral traders, but this is no problem I think -->
+  <!-- But it is important that they are not used by the players, because we can not check owner when we check if the player destroyed enough of them -->
+  <ModOp GUID="700138" Type="AddNextSibling">
+    <Asset>
+      <Template>PlayerCounterContextPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001131</GUID>
+          <Name>All Pirate Towers</Name>
+        </Standard>
+        <PlayerCounterContextPool>
+          <Contexts>
+            <Item>
+              <Asset>102448</Asset>
+            </Item>
+            <Item>
+              <Asset>102449</Asset>
+            </Item>
+            <Item>
+              <Asset>102450</Asset>
+            </Item>
+            <!-- New world variants, are not used by the game right now, but just to be sure -->
+            <Item>
+              <Asset>80038</Asset>
+            </Item>
+            <Item>
+              <Asset>80035</Asset>
+            </Item>
+            <Item>
+              <Asset>80036</Asset>
+            </Item>
+            <!-- Flak, not used by the game but just to be sure -->
+            <Item>
+              <Asset>736</Asset>
+            </Item>
+            <Item>
+              <Asset>2968</Asset>
+            </Item>
+            <Item>
+              <Asset>1500001031</Asset>
+            </Item>
+            <Item>
+              <Asset>1500001037</Asset>
+            </Item>
+          </Contexts>
+        </PlayerCounterContextPool>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <!-- use ConditionIsDiscovered here, because it is for specific player starting the init quest -->
+  <ModOp GUID="153263" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001132</GUID>
+          <Name>Start -Destroy Pirates Quest Harlow- Questplayer</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <!-- need a delay here, otherwise it wont work, guess because intilaitation is not done yet at gamestart, whatever -->
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>5000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionStartQuest</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionStartQuest>
+                                    <Quest>1500001134</Quest>
+                                    <QuestSession>180023</QuestSession>
+                                  </ActionStartQuest>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  <ModOp GUID="153263" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001133</GUID>
+          <Name>Start -Destroy Pirates Quest LaFortune- Questplayer</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_04_Pirate_LaFortune</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <!-- need a delay here, otherwise it wont work, guess because intilaitation is not done yet at gamestart, whatever -->
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>5000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionStartQuest</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionStartQuest>
+                                    <Quest>1500001135</Quest>
+                                    <QuestSession>180025</QuestSession>
+                                  </ActionStartQuest>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- dont use pirates as QuestGiver, so they do not abort on defeat of pirate -->
+  
+  <!-- kind of precondition. you must destroy at least 2 towers or harbor to trigger the defeat for you -->
+  <!-- I think we can not simply put these WinConditions into the other quest, because here we want an "or"=MutuallyExclusive logic, while in the other quest we want "and" logic (and there are no subconditions for winconditions) -->
+  <ModOp Type="AddNextSibling" GUID="110746">
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001134</GUID>
+          <Name>Pirates Defeated Harlow init Questplayer</Name>
+        </Standard>
+        <Quest>
+          <OnQuestEnd>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>1000</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionStartQuest</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionStartQuest>
+                                          <Quest>1500001136</Quest>
+                                          <QuestSession>180023</QuestSession>
+                                        </ActionStartQuest>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestEnd>
+          <QuestGiver>86</QuestGiver>
+          <StoryText>17246</StoryText>
+          <QuestActivation>QuestStart</QuestActivation>
+          <IsAbortable>0</IsAbortable>
+          <CountForQuestLimit>0</CountForQuestLimit>
+          <HasReminderMessage>0</HasReminderMessage>
+          <QuestTimeLimit>0</QuestTimeLimit>
+          <QuestTrackerVisibility>Never</QuestTrackerVisibility>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180023</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+        </Quest>
+        <Objectives>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>StatusQuoObjective</Template>
+                <Values>
+                  <ConditionQuestObjective />
+                  <ConditionPlayerCounter>
+                    <CounterAmount>1</CounterAmount>
+                    <PlayerCounter>ObjectDestroyed</PlayerCounter>
+                    <Context>100681</Context>
+                    <RelativeToQuestStart>1</RelativeToQuestStart>
+                    <CounterScope>Session</CounterScope>
+                    <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                    <CounterScopeContext>180023</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestStatusQuo />
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>StatusQuoObjective</Template>
+                <Values>
+                  <ConditionQuestObjective />
+                  <ConditionPlayerCounter>
+                    <CounterAmount>2</CounterAmount>
+                    <PlayerCounter>ObjectDestroyed</PlayerCounter>
+                    <Context>1500001131</Context>
+                    <RelativeToQuestStart>1</RelativeToQuestStart>
+                    <CounterScope>Session</CounterScope>
+                    <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                    <CounterScopeContext>180023</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestStatusQuo>
+                    <CombinePoolAssets>1</CombinePoolAssets>
+                  </ConditionQuestStatusQuo>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+          <WinConditionCompletionOrder>MutuallyExclusive</WinConditionCompletionOrder>
+        </Objectives>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001135</GUID>
+          <Name>Pirates Defeated LaFortune init Questplayer</Name>
+        </Standard>
+        <Quest>
+          <OnQuestEnd>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>1000</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionStartQuest</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionStartQuest>
+                                          <Quest>1500001137</Quest>
+                                          <QuestSession>180025</QuestSession>
+                                        </ActionStartQuest>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestEnd>
+          <QuestGiver>186</QuestGiver>
+          <StoryText>17246</StoryText>
+          <CountForQuestLimit>0</CountForQuestLimit>
+          <HasReminderMessage>0</HasReminderMessage>
+          <QuestActivation>QuestStart</QuestActivation>
+          <IsAbortable>0</IsAbortable>
+          <QuestTimeLimit>0</QuestTimeLimit>
+          <QuestTrackerVisibility>Never</QuestTrackerVisibility>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180025</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+        </Quest>
+        <Objectives>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>StatusQuoObjective</Template>
+                <Values>
+                  <ConditionQuestObjective />
+                  <ConditionPlayerCounter>
+                    <CounterAmount>1</CounterAmount>
+                    <PlayerCounter>ObjectDestroyed</PlayerCounter>
+                    <Context>100682</Context>
+                    <RelativeToQuestStart>1</RelativeToQuestStart>
+                    <CounterScope>Session</CounterScope>
+                    <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                    <CounterScopeContext>180025</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestStatusQuo />
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>StatusQuoObjective</Template>
+                <Values>
+                  <ConditionQuestObjective />
+                  <ConditionPlayerCounter>
+                    <CounterAmount>2</CounterAmount>
+                    <PlayerCounter>ObjectDestroyed</PlayerCounter>
+                    <Context>1500001131</Context>
+                    <RelativeToQuestStart>1</RelativeToQuestStart>
+                    <CounterScope>Session</CounterScope>
+                    <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                    <CounterScopeContext>180025</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestStatusQuo>
+                    <CombinePoolAssets>1</CombinePoolAssets>
+                  </ConditionQuestStatusQuo>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+          <WinConditionCompletionOrder>MutuallyExclusive</WinConditionCompletionOrder>
+        </Objectives>
+      </Values>
+    </Asset>
+    
+    <!-- the Quests 1500001136/1500001137 are started after you destryoed a part of the pirates base (1500001134/1500001135) and check if the pirate was finally defeated, before they start 1500001134/1500001135 again. -->
+     <!-- sind teilweise ein wenig überflüssig könnte man auch mit Triggern machen, aber ist schon ok so -->
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001136</GUID>
+          <Name>Pirates Defeated Harlow Questplayer</Name>
+        </Standard>
+        <Quest>
+          <OnQuestEnd>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>6000</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionStartQuest</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionStartQuest>
+                                          <Quest>1500001134</Quest>
+                                          <QuestSession>180023</QuestSession>
+                                        </ActionStartQuest>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestEnd>
+          <QuestGiver>86</QuestGiver>
+          <StoryText>17246</StoryText>
+          <QuestActivation>QuestStart</QuestActivation>
+          <IsAbortable>0</IsAbortable>
+          <CountForQuestLimit>0</CountForQuestLimit>
+          <HasReminderMessage>0</HasReminderMessage>
+          <QuestTimeLimit>0</QuestTimeLimit>
+          <QuestTrackerVisibility>Never</QuestTrackerVisibility>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180023</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+        </Quest>
+        <Objectives>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>StatusQuoObjective</Template>
+                <Values>
+                  <ConditionQuestObjective />
+                  <ConditionPlayerCounter>
+                    <PlayerCounter>RuinCount</PlayerCounter>
+                    <Context>100707</Context>
+                    <CounterAmount>1</CounterAmount>
+                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                    <CounterScope>Session</CounterScope>
+                    <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                    <CounterScopeContext>180023</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestStatusQuo />
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+        <QuestOptional />
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001137</GUID>
+          <Name>Pirates Defeated LaFortune Questplayer</Name>
+        </Standard>
+        <Quest>
+          <OnQuestEnd>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>6000</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionStartQuest</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionStartQuest>
+                                          <Quest>1500001135</Quest>
+                                          <QuestSession>180025</QuestSession>
+                                        </ActionStartQuest>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestEnd>
+          <QuestGiver>186</QuestGiver>
+          <StoryText>17246</StoryText>
+          <QuestActivation>QuestStart</QuestActivation>
+          <IsAbortable>0</IsAbortable>
+          <CountForQuestLimit>0</CountForQuestLimit>
+          <HasReminderMessage>0</HasReminderMessage>
+          <QuestTimeLimit>0</QuestTimeLimit>
+          <QuestTrackerVisibility>Never</QuestTrackerVisibility>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180025</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+        </Quest>
+        <Objectives>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>StatusQuoObjective</Template>
+                <Values>
+                  <ConditionQuestObjective />
+                  <ConditionPlayerCounter>
+                    <PlayerCounter>RuinCount</PlayerCounter>
+                    <Context>100708</Context>
+                    <CounterAmount>1</CounterAmount>
+                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                    <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                    <CounterScope>Session</CounterScope>
+                    <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                    <CounterScopeContext>180025</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestStatusQuo />
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+        <QuestOptional />
+      </Values>
+    </Asset>
+    
+    
+    
+  </ModOp>
+  
+  
+  
+  
+  
+  <!-- ############################################ -->
+  <!-- comebackfleet destroyed. For anyone just hook into 153262/153272 OnQuestSucceeded -->
+  
+  <!-- When the vanilla quest to destroy comebackfleet starts, also start our quests -->
+  <!-- 1500001138/1500001139 which checks additionally if you destroyed at least 2 ships (the vanilla quest is success regardless who destroys something) -->
+  <!-- Harlow -->
+  <ModOp Type="add" GUID="153262" Path="/Values/Quest/OnQuestStart/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionDelayedActions</Template>
+        <Values>
+          <Action />
+          <ActionDelayedActions>
+            <ExecutionDelay>1000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionStartQuest</Template>
+                        <Values>
+                          <Action />
+                          <ActionStartQuest>
+                            <Quest>1500001138</Quest>
+                            <InheritQuestArea>1</InheritQuestArea>
+                            <InheritQuestSession>1</InheritQuestSession>
+                          </ActionStartQuest>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <!-- OnQuestEnd can be success, fail and also forced end by the game, eg. when loading a savegame -->
+  <ModOp Type="add" GUID="153262" Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionDelayedActions</Template>
+        <Values>
+          <Action />
+          <ActionDelayedActions>
+            <!-- a delay to give the quest 1500001138 enough time to trigger successful if fleet was destroyed -->
+            <ExecutionDelay>5000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionEndQuest</Template>
+                        <Values>
+                          <Action />
+                          <ActionEndQuest>
+                            <Quest>1500001138</Quest>
+                            <WinQuest>0</WinQuest>
+                          </ActionEndQuest>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <!-- LaFortune -->
+  <ModOp Type="add" GUID="153272" Path="/Values/Quest/OnQuestStart/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionDelayedActions</Template>
+        <Values>
+          <Action />
+          <ActionDelayedActions>
+            <ExecutionDelay>1000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionStartQuest</Template>
+                        <Values>
+                          <Action />
+                          <ActionStartQuest>
+                            <Quest>1500001139</Quest>
+                            <InheritQuestArea>1</InheritQuestArea>
+                            <InheritQuestSession>1</InheritQuestSession>
+                          </ActionStartQuest>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <ModOp Type="add" GUID="153272" Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionDelayedActions</Template>
+        <Values>
+          <Action />
+          <ActionDelayedActions>
+            <ExecutionDelay>5000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionEndQuest</Template>
+                        <Values>
+                          <Action />
+                          <ActionEndQuest>
+                            <Quest>1500001139</Quest>
+                            <WinQuest>0</WinQuest>
+                          </ActionEndQuest>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  
+  <ModOp Type="AddNextSibling" GUID="110746">
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001138</GUID>
+          <Name>Pirates Defeated Fleet Harlow Questplayer</Name>
+        </Standard>
+        <Quest>
+          <QuestGiver>86</QuestGiver>
+          <StoryText>17246</StoryText>
+          <QuestActivation>QuestStart</QuestActivation>
+          <IsAbortable>0</IsAbortable>
+          <CountForQuestLimit>0</CountForQuestLimit>
+          <HasReminderMessage>0</HasReminderMessage>
+          <QuestTimeLimit>0</QuestTimeLimit>
+          <QuestTrackerVisibility>Never</QuestTrackerVisibility>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180023</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+        </Quest>
+        <Objectives>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>StatusQuoObjective</Template>
+                <Values>
+                  <ConditionQuestObjective />
+                  <ConditionPlayerCounter>
+                    <CounterAmount>2</CounterAmount>
+                    <PlayerCounter>ObjectDestroyed</PlayerCounter>
+                    <Context>700138</Context>
+                    <RelativeToQuestStart>1</RelativeToQuestStart>
+                    <CounterScope>Session</CounterScope>
+                    <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                    <CounterScopeContext>180023</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestStatusQuo>
+                    <CombinePoolAssets>1</CombinePoolAssets>
+                  </ConditionQuestStatusQuo>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>DestroyObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <ObjectiveSignsAndFeedback>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ConditionObjectiveSignsAndFeedback>
+                          <Infolayer>0</Infolayer>
+                          <MinimapToken>0</MinimapToken>
+                          <ShowMinimapToken>0</ShowMinimapToken>
+                        </ConditionObjectiveSignsAndFeedback>
+                      </Values>
+                    </ObjectiveSignsAndFeedback>
+                    <JumpToVisibility>Hide</JumpToVisibility>
+                  </ConditionQuestObjective>
+                  <ConditionQuestDestroy>
+                    <DestroyObjectsPrebuilt>
+                      <Item>
+                        <DestroyObject>
+                          <Template>ConditionObjectPrebuiltObject</Template>
+                          <Values>
+                            <ConditionObjectPrebuiltObject>
+                              <PrebuiltObjectLabel>PirateHarlowResettleGroup</PrebuiltObjectLabel>
+                            </ConditionObjectPrebuiltObject>
+                            <ConditionScanner />
+                            <ConditionObjectiveSignsAndFeedback>
+                              <Infolayer>0</Infolayer>
+                              <MinimapToken>0</MinimapToken>
+                              <ShowMinimapToken>0</ShowMinimapToken>
+                            </ConditionObjectiveSignsAndFeedback>
+                          </Values>
+                        </DestroyObject>
+                      </Item>
+                    </DestroyObjectsPrebuilt>
+                    <ObjectsBehaviour>StandStill</ObjectsBehaviour>
+                    <AllowShipToCancelMovementToDefendItself>0</AllowShipToCancelMovementToDefendItself>
+                  </ConditionQuestDestroy>
+                  <SpawnArea />
+                  <ConditionPropsSessionSettings />
+                  <ConditionPropsExecutionPlaceSettings>
+                    <ExecutionPlace>
+                      <Template>ConditionObjectAnywhere</Template>
+                      <Values>
+                        <ConditionObjectAnywhere />
+                      </Values>
+                    </ExecutionPlace>
+                    <ExecutionPlaceText>0</ExecutionPlaceText>
+                    <ExecutionPlaceConfirmOnReached>0</ExecutionPlaceConfirmOnReached>
+                  </ConditionPropsExecutionPlaceSettings>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+        <QuestOptional />
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001139</GUID>
+          <Name>Pirates Defeated Fleet LaFortune Questplayer</Name>
+        </Standard>
+        <Quest>
+          <QuestGiver>186</QuestGiver>
+          <StoryText>17246</StoryText>
+          <CountForQuestLimit>0</CountForQuestLimit>
+          <HasReminderMessage>0</HasReminderMessage>
+          <QuestActivation>QuestStart</QuestActivation>
+          <IsAbortable>0</IsAbortable>
+          <QuestTimeLimit>0</QuestTimeLimit>
+          <QuestTrackerVisibility>Never</QuestTrackerVisibility>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180025</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+        </Quest>
+        <Objectives>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>StatusQuoObjective</Template>
+                <Values>
+                  <ConditionQuestObjective />
+                  <ConditionPlayerCounter>
+                    <CounterAmount>2</CounterAmount>
+                    <PlayerCounter>ObjectDestroyed</PlayerCounter>
+                    <Context>700138</Context>
+                    <RelativeToQuestStart>1</RelativeToQuestStart>
+                    <CounterScope>Session</CounterScope>
+                    <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                    <CounterScopeContext>180025</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestStatusQuo>
+                    <CombinePoolAssets>1</CombinePoolAssets>
+                  </ConditionQuestStatusQuo>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>DestroyObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <ObjectiveSignsAndFeedback>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ConditionObjectiveSignsAndFeedback>
+                          <Infolayer>0</Infolayer>
+                          <MinimapToken>0</MinimapToken>
+                          <ShowMinimapToken>0</ShowMinimapToken>
+                        </ConditionObjectiveSignsAndFeedback>
+                      </Values>
+                    </ObjectiveSignsAndFeedback>
+                    <JumpToVisibility>Hide</JumpToVisibility>
+                  </ConditionQuestObjective>
+                  <ConditionQuestDestroy>
+                    <DestroyObjectsPrebuilt>
+                      <Item>
+                        <DestroyObject>
+                          <Template>ConditionObjectPrebuiltObject</Template>
+                          <Values>
+                            <ConditionObjectPrebuiltObject>
+                              <PrebuiltObjectLabel>PirateLafortuneResettleGroup</PrebuiltObjectLabel>
+                            </ConditionObjectPrebuiltObject>
+                            <ConditionScanner />
+                            <ConditionObjectiveSignsAndFeedback>
+                              <Infolayer>0</Infolayer>
+                              <MinimapToken>0</MinimapToken>
+                              <ShowMinimapToken>0</ShowMinimapToken>
+                            </ConditionObjectiveSignsAndFeedback>
+                          </Values>
+                        </DestroyObject>
+                      </Item>
+                    </DestroyObjectsPrebuilt>
+                    <ObjectsBehaviour>StandStill</ObjectsBehaviour>
+                    <AllowShipToCancelMovementToDefendItself>0</AllowShipToCancelMovementToDefendItself>
+                  </ConditionQuestDestroy>
+                  <SpawnArea />
+                  <ConditionPropsSessionSettings />
+                  <ConditionPropsExecutionPlaceSettings>
+                    <ExecutionPlace>
+                      <Template>ConditionObjectAnywhere</Template>
+                      <Values>
+                        <ConditionObjectAnywhere />
+                      </Values>
+                    </ExecutionPlace>
+                    <ExecutionPlaceText>0</ExecutionPlaceText>
+                    <ExecutionPlaceConfirmOnReached>0</ExecutionPlaceConfirmOnReached>
+                  </ConditionPropsExecutionPlaceSettings>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+        <QuestOptional />
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- ################################################################# -->
+  <!-- ################################################################# -->
+  <!-- #################################################################  -->
+  
+  
+  <!-- Compatibility code for mods based on an older version of this mod. this code is no longer needed, but still functional for compatibility -->
+  
+  <!-- trigger if pirates were defeated (by anyone) for human players. your mod might add actions to this or do their own trigger like this -->
+  <!-- I use ObjectBuilt here, because it is for "anyone", while ConditionIsDiscovered is only for specific player -->
+  <ModOp GUID="130248" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001140</GUID>
+          <Name>Pirates Defeated Harlow Anyone</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100707</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>RuinCount</PlayerCounter>
+                          <Context>100707</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001142</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001144</GUID>
+          <Name>Pirates Defeated LaFortune Anyone</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100708</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>RuinCount</PlayerCounter>
+                          <Context>100708</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001143</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001141</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <!-- reset the "anyone defeated" when pirates rebuild their island -->
+    <!-- dont use OnQuestFailed 153264/153273 because right now this quest is only active for players who are in war with pirates. not sure if this gets fixed -->
+    <!-- so instead we will look it the lighthouse was repaired -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001142</GUID>
+          <Name>Pirates Resettled Harlow</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100707</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>RuinCount</PlayerCounter>
+                          <Context>100707</Context>
+                          <CounterAmount>0</CounterAmount>
+                          <ComparisonOp>AtMost</ComparisonOp>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001140</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001143</GUID>
+          <Name>Pirates Resettled LaFortune</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100708</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>RuinCount</PlayerCounter>
+                          <Context>100708</Context>
+                          <CounterAmount>0</CounterAmount>
+                          <ComparisonOp>AtMost</ComparisonOp>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001144</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  
+    <!-- exist for compatibility reasons. We had to replace the original 1500001141 with 1500001144 to fix sth also for savegames. -->
+    <!-- but to not break mods already relying on 1500001141, we will also trigger this one everytime 1500001144 triggers -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001141</GUID>
+          <Name>Pirates Defeated LaFortune Anyone Compatibility</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>100708</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                <CounterScope>Session</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CounterScopeContext>180025</CounterScopeContext>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions />
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  
+</ModOps>
