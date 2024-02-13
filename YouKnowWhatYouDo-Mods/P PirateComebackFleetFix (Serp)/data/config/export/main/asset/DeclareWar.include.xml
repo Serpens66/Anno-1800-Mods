@@ -1,0 +1,460 @@
+<ModOps>
+  
+  <!-- if human is not at war with pirates while the comeback fleet spawns (eg. AI destroyed them or human with pirate flag), the resettle quest is not started by the game -->
+    <!-- Since this is hardcoded we can not really fix this.  -->
+    <!-- A workaround is to force war between human and pirate as soon as the base is destryoed  -->
+      <!-- I also made code to restore previous relation, but removed it, because it makes sense that pirates declare war to everyone on destroy, because if you are friend, you did not prevent the destroy of pirates. -->
+       <!-- And making and leaving it at war also "solves" the "issue" that comeback fleet is shooting even at players allied with pirates (now every Human is at war with them) -->
+  
+  <!-- luckily ActionExecuteDiplomaticAction DeclareWar/ActionForceDiplomaticRelation also works during No-attack-agreement and ceasefire does not cause problems. -->
+  
+  <!-- For now only declare war on every human player, not AIs, because I don't want to mess with their personalities (like some that never would be at war with pirates) -->
+  
+  
+  <!-- 1500001147 is unlocked as long as pirate Harlow is defeated -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001118</GUID>
+          <Name>Declar War on Pirate Destroy</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001147</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionQuestState</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionQuestState>
+                                    <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                                    <ConditionQuestStateQuestGUID>153262</ConditionQuestStateQuestGUID>
+                                    <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                                  </ConditionQuestState>
+                                </Values>
+                              </TriggerCondition>
+                              <SubTriggers>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <!-- need a short delay here, because Quest 153262 ends an only few ms after the pirate base is completed again -->
+                                        <TriggerCondition>
+                                          <Template>ConditionTimer</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionTimer>
+                                              <TimeLimit>1000</TimeLimit>
+                                            </ConditionTimer>
+                                          </Values>
+                                        </TriggerCondition>
+                                        <SubTriggers>
+                                          <Item>
+                                            <SubTrigger>
+                                              <Template>AutoCreateTrigger</Template>
+                                              <Values>
+                                                <Trigger>
+                                                  <TriggerCondition>
+                                                    <Template>ConditionDiplomaticState</Template>
+                                                    <Values>
+                                                      <Condition />
+                                                      <ConditionDiplomaticState>
+                                                        <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                                                        <TargetParticipant2>Third_party_03_Pirate_Harlow</TargetParticipant2>
+                                                        <DesiredState>War</DesiredState>
+                                                      </ConditionDiplomaticState>
+                                                      <ConditionPropsNegatable>
+                                                        <NegateCondition>1</NegateCondition>
+                                                      </ConditionPropsNegatable>
+                                                    </Values>
+                                                  </TriggerCondition>
+                                                  <TriggerActions> 
+                                                    <Item>
+                                                      <TriggerAction>
+                                                        <Template>ActionStartQuest</Template>
+                                                        <Values>
+                                                          <Action />
+                                                          <ActionStartQuest>
+                                                            <Quest>1500001122</Quest>
+                                                            <QuestSession>180023</QuestSession>
+                                                          </ActionStartQuest>
+                                                        </Values>
+                                                      </TriggerAction>
+                                                    </Item>
+                                                  </TriggerActions>
+                                                </Trigger>
+                                              </Values>
+                                            </SubTrigger>
+                                          </Item>
+                                        </SubTriggers>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                              </SubTriggers>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001148</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionQuestState</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionQuestState>
+                                    <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                                    <ConditionQuestStateQuestGUID>153272</ConditionQuestStateQuestGUID>
+                                    <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                                  </ConditionQuestState>
+                                </Values>
+                              </TriggerCondition>
+                              <SubTriggers>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <!-- need a short delay here, because Quest 153262 ends an only few ms after the pirate base is completed again -->
+                                        <TriggerCondition>
+                                          <Template>ConditionTimer</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionTimer>
+                                              <TimeLimit>1000</TimeLimit>
+                                            </ConditionTimer>
+                                          </Values>
+                                        </TriggerCondition>
+                                        <SubTriggers>
+                                          <Item>
+                                            <SubTrigger>
+                                              <Template>AutoCreateTrigger</Template>
+                                              <Values>
+                                                <Trigger>
+                                                  <TriggerCondition>
+                                                    <Template>ConditionDiplomaticState</Template>
+                                                    <Values>
+                                                      <Condition />
+                                                      <ConditionDiplomaticState>
+                                                        <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                                                        <TargetParticipant2>Third_party_04_Pirate_LaFortune</TargetParticipant2>
+                                                        <DesiredState>War</DesiredState>
+                                                      </ConditionDiplomaticState>
+                                                      <ConditionPropsNegatable>
+                                                        <NegateCondition>1</NegateCondition>
+                                                      </ConditionPropsNegatable>
+                                                    </Values>
+                                                  </TriggerCondition>
+                                                  <TriggerActions> 
+                                                    <Item>
+                                                      <TriggerAction>
+                                                        <Template>ActionStartQuest</Template>
+                                                        <Values>
+                                                          <Action />
+                                                          <ActionStartQuest>
+                                                            <Quest>1500001123</Quest>
+                                                            <QuestSession>180025</QuestSession>
+                                                          </ActionStartQuest>
+                                                        </Values>
+                                                      </TriggerAction>
+                                                    </Item>
+                                                  </TriggerActions>
+                                                </Trigger>
+                                              </Values>
+                                            </SubTrigger>
+                                          </Item>
+                                        </SubTriggers>
+                                      </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                              </SubTriggers>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <!-- need a short delay here, otherwise its executed multiple times and bugs out the Quest -->
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>5000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  <!-- We also could use ActionExecuteDiplomaticAction DeclareWar instead of ActionForceDiplomaticRelation, but the game shows one a Sideotification per human player for them for whatever reason. -->
+   <!-- and we also get not portrait notification since pirate is no longer there. ActionForceDiplomaticRelation to set it to War works fine (other treaties dont work so well, eg. TradeRights will be without Peace and such problems) -->
+    <!-- I think ActionExecuteDiplomaticAction also causes a newspaper article, while ActionForceDiplomaticRelation does not -->
+   <!-- A7_QuestDummyQuest requires my shared_ObjectDummies mod, but it is included in shared_PirateDefeatHelpers which is also included here -->
+  <ModOp Type="AddNextSibling" GUID="152264">
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001122</GUID>
+          <Name>Pirate Declare War and Minus Rep - Harlow</Name>
+        </Standard>
+        <Quest>
+          <SuccessMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <Profile>73</Profile>
+                  <NotificationTextFemale>3232</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationText>3272</NotificationText>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <SubtitleGroup>1593098998</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+            <SuppressMessage>0</SuppressMessage>
+          </SuccessMessage>
+          <OnQuestSucceeded>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionForceDiplomaticRelation</Template>
+                      <Values>
+                        <Action />
+                        <ActionForceDiplomaticRelation>
+                          <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                          <ForceRelationTargetParticipant>Third_party_03_Pirate_Harlow</ForceRelationTargetParticipant>
+                          <ForcedRelationType>War</ForcedRelationType>
+                        </ActionForceDiplomaticRelation>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionNotification</Template>
+                      <Values>
+                        <Action />
+                        <ActionNotification>
+                          <Notification>
+                            <Template>SideNotification</Template>
+                            <Values>
+                              <SideNotification>
+                                <IconAsset>501449</IconAsset>
+                                <NotificationSideTitle>14326</NotificationSideTitle>
+                                <FilterType>DiplomaticRelations</FilterType>
+                                <IsWarning>1</IsWarning>
+                                <HasJumpLocation>0</HasJumpLocation>
+                              </SideNotification>
+                              <BaseNotification>
+                                <NotificationText>73</NotificationText>
+                                <NotificationAudioAsset>239732</NotificationAudioAsset>
+                                <DisplayTimeout>0</DisplayTimeout>
+                                <NotificationPriority>600</NotificationPriority>
+                              </BaseNotification>
+                              <NotificationSubtitle />
+                            </Values>
+                          </Notification>
+                        </ActionNotification>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestSucceeded>
+          <QuestGiver>86</QuestGiver>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180023</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+        </Quest>
+        <Reward>
+          <RewardReputation>
+            <Item>
+              <ReputationParticipant>Third_party_03_Pirate_Harlow</ReputationParticipant>
+              <ReputationAmount>-70</ReputationAmount>
+            </Item>
+          </RewardReputation>
+        </Reward>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001123</GUID>
+          <Name>Pirate Declare War and Minus Rep - LaFortune</Name>
+        </Standard>
+        <Quest>
+          <SuccessMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <Profile>76</Profile>
+                  <NotificationTextFemale>3232</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationText>3272</NotificationText>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <SubtitleGroup>1444151020</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+            <SuppressMessage>0</SuppressMessage>
+          </SuccessMessage>
+          <OnQuestSucceeded>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionForceDiplomaticRelation</Template>
+                      <Values>
+                        <Action />
+                        <ActionForceDiplomaticRelation>
+                          <ForceRelationUseProcessingParticipantAsSource>1</ForceRelationUseProcessingParticipantAsSource>
+                          <ForceRelationTargetParticipant>Third_party_04_Pirate_LaFortune</ForceRelationTargetParticipant>
+                          <ForcedRelationType>War</ForcedRelationType>
+                        </ActionForceDiplomaticRelation>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionNotification</Template>
+                      <Values>
+                        <Action />
+                        <ActionNotification>
+                          <Notification>
+                            <Template>SideNotification</Template>
+                            <Values>
+                              <SideNotification>
+                                <IconAsset>501449</IconAsset>
+                                <NotificationSideTitle>14326</NotificationSideTitle>
+                                <FilterType>DiplomaticRelations</FilterType>
+                                <IsWarning>1</IsWarning>
+                                <HasJumpLocation>0</HasJumpLocation>
+                              </SideNotification>
+                              <BaseNotification>
+                                <NotificationText>76</NotificationText>
+                                <NotificationAudioAsset>239732</NotificationAudioAsset>
+                                <DisplayTimeout>0</DisplayTimeout>
+                                <NotificationPriority>600</NotificationPriority>
+                              </BaseNotification>
+                              <NotificationSubtitle />
+                            </Values>
+                          </Notification>
+                        </ActionNotification>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestSucceeded>
+          <QuestGiver>186</QuestGiver>
+          <QuestSessionDependencies>
+            <Item>
+              <SessionOrRegion>180025</SessionOrRegion>
+            </Item>
+          </QuestSessionDependencies>
+        </Quest>
+        <Reward>
+          <RewardReputation>
+            <Item>
+              <ReputationParticipant>Third_party_04_Pirate_LaFortune</ReputationParticipant>
+              <ReputationAmount>-70</ReputationAmount>
+            </Item>
+          </RewardReputation>
+        </Reward>
+      </Values>
+    </Asset>
+  
+  
+</ModOps>
