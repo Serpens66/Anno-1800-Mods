@@ -481,7 +481,44 @@
                 </Values>
               </TriggerAction>
             </Item>
+            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500003870</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
           </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
           <ResetTrigger>
             <Template>AutoCreateTrigger</Template>
             <Values>
@@ -491,27 +528,10 @@
                   <Values>
                     <Condition />
                     <ConditionTimer>
-                      <TimeLimit>5000</TimeLimit>
+                      <TimeLimit>1000</TimeLimit>
                     </ConditionTimer>
                   </Values>
                 </TriggerCondition>
-                <TriggerActions>
-                  <Item>
-                    <TriggerAction>
-                      <Template>ActionLockAsset</Template>
-                      <Values>
-                        <Action />
-                        <ActionLockAsset>
-                          <LockAssets>
-                            <Item>
-                              <Asset>1500003870</Asset>
-                            </Item>
-                          </LockAssets>
-                        </ActionLockAsset>
-                      </Values>
-                    </TriggerAction>
-                  </Item>
-                </TriggerActions>
               </Trigger>
             </Values>
           </ResetTrigger>
@@ -546,7 +566,9 @@
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
             <Values>
-              <Condition />
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
               <ConditionUnlocked>
                 <UnlockNeeded>1500003872</UnlockNeeded>
               </ConditionUnlocked>
@@ -943,7 +965,44 @@
                 </Values>
               </TriggerAction>
             </Item>
+            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500003872</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
           </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
           <ResetTrigger>
             <Template>AutoCreateTrigger</Template>
             <Values>
@@ -953,27 +1012,10 @@
                   <Values>
                     <Condition />
                     <ConditionTimer>
-                      <TimeLimit>5000</TimeLimit>
+                      <TimeLimit>1000</TimeLimit>
                     </ConditionTimer>
                   </Values>
                 </TriggerCondition>
-                <TriggerActions>
-                  <Item>
-                    <TriggerAction>
-                      <Template>ActionLockAsset</Template>
-                      <Values>
-                        <Action />
-                        <ActionLockAsset>
-                          <LockAssets>
-                            <Item>
-                              <Asset>1500003872</Asset>
-                            </Item>
-                          </LockAssets>
-                        </ActionLockAsset>
-                      </Values>
-                    </TriggerAction>
-                  </Item>
-                </TriggerActions>
               </Trigger>
             </Values>
           </ResetTrigger>
@@ -986,6 +1028,7 @@
       </Values>
     </Asset>
     
+    
     <Asset>
       <BaseAssetGUID>1500003872</BaseAssetGUID>
       <Values>
@@ -997,41 +1040,128 @@
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
             <Values>
-              <Condition />
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
               <ConditionUnlocked>
                 <UnlockNeeded>1500003873</UnlockNeeded>
               </ConditionUnlocked>
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
+          <!-- TODO SubTriggers hier erstellen -->
           <SubTriggers>
             
           </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerActions>
-                  <Item>
-                    <TriggerAction>
-                      <Template>ActionLockAsset</Template>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionTriggerMinimapPing</Template>
+                <Values>
+                  <Action />
+                  <ActionTriggerMinimapPing>
+                    <PingDuration>5000</PingDuration>
+                    <PingObjectList>
+                      <Item>
+                        <Object>
+                          <Template>ObjectFilter</Template>
+                          <Values>
+                            <ObjectFilter>
+                              <ObjectGUID>1500001290</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                            </ObjectFilter>
+                          </Values>
+                        </Object>
+                      </Item>
+                    </PingObjectList>
+                  </ActionTriggerMinimapPing>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500001342</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>3600000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                       <Values>
-                        <Action />
-                        <ActionLockAsset>
-                          <LockAssets>
+                        <ActionList>
+                          <Actions>
                             <Item>
-                              <Asset>1500003873</Asset>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001342</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
                             </Item>
-                          </LockAssets>
-                        </ActionLockAsset>
+                          </Actions>
+                        </ActionList>
                       </Values>
-                    </TriggerAction>
-                  </Item>
-                </TriggerActions>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500003873</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
         </Trigger>
       </Values>
     </Asset>
@@ -1046,7 +1176,9 @@
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
             <Values>
-              <Condition />
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
               <ConditionUnlocked>
                 <UnlockNeeded>1500003874</UnlockNeeded>
               </ConditionUnlocked>
@@ -1057,30 +1189,115 @@
           <SubTriggers>
             
           </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerActions>
-                  <Item>
-                    <TriggerAction>
-                      <Template>ActionLockAsset</Template>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionTriggerMinimapPing</Template>
+                <Values>
+                  <Action />
+                  <ActionTriggerMinimapPing>
+                    <PingDuration>5000</PingDuration>
+                    <PingObjectList>
+                      <Item>
+                        <Object>
+                          <Template>ObjectFilter</Template>
+                          <Values>
+                            <ObjectFilter>
+                              <ObjectGUID>1500001290</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                            </ObjectFilter>
+                          </Values>
+                        </Object>
+                      </Item>
+                    </PingObjectList>
+                  </ActionTriggerMinimapPing>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500001342</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>3600000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                       <Values>
-                        <Action />
-                        <ActionLockAsset>
-                          <LockAssets>
+                        <ActionList>
+                          <Actions>
                             <Item>
-                              <Asset>1500003874</Asset>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001342</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
                             </Item>
-                          </LockAssets>
-                        </ActionLockAsset>
+                          </Actions>
+                        </ActionList>
                       </Values>
-                    </TriggerAction>
-                  </Item>
-                </TriggerActions>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500003874</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
         </Trigger>
       </Values>
     </Asset>
@@ -1095,7 +1312,9 @@
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
             <Values>
-              <Condition />
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
               <ConditionUnlocked>
                 <UnlockNeeded>1500003875</UnlockNeeded>
               </ConditionUnlocked>
@@ -1106,30 +1325,115 @@
           <SubTriggers>
             
           </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerActions>
-                  <Item>
-                    <TriggerAction>
-                      <Template>ActionLockAsset</Template>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionTriggerMinimapPing</Template>
+                <Values>
+                  <Action />
+                  <ActionTriggerMinimapPing>
+                    <PingDuration>5000</PingDuration>
+                    <PingObjectList>
+                      <Item>
+                        <Object>
+                          <Template>ObjectFilter</Template>
+                          <Values>
+                            <ObjectFilter>
+                              <ObjectGUID>1500001290</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                            </ObjectFilter>
+                          </Values>
+                        </Object>
+                      </Item>
+                    </PingObjectList>
+                  </ActionTriggerMinimapPing>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500001342</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>3600000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                       <Values>
-                        <Action />
-                        <ActionLockAsset>
-                          <LockAssets>
+                        <ActionList>
+                          <Actions>
                             <Item>
-                              <Asset>1500003875</Asset>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001342</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
                             </Item>
-                          </LockAssets>
-                        </ActionLockAsset>
+                          </Actions>
+                        </ActionList>
                       </Values>
-                    </TriggerAction>
-                  </Item>
-                </TriggerActions>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500003875</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
         </Trigger>
       </Values>
     </Asset>
@@ -1144,7 +1448,9 @@
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
             <Values>
-              <Condition />
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
               <ConditionUnlocked>
                 <UnlockNeeded>1500003876</UnlockNeeded>
               </ConditionUnlocked>
@@ -1155,30 +1461,115 @@
           <SubTriggers>
             
           </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerActions>
-                  <Item>
-                    <TriggerAction>
-                      <Template>ActionLockAsset</Template>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionTriggerMinimapPing</Template>
+                <Values>
+                  <Action />
+                  <ActionTriggerMinimapPing>
+                    <PingDuration>5000</PingDuration>
+                    <PingObjectList>
+                      <Item>
+                        <Object>
+                          <Template>ObjectFilter</Template>
+                          <Values>
+                            <ObjectFilter>
+                              <ObjectGUID>1500001290</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                            </ObjectFilter>
+                          </Values>
+                        </Object>
+                      </Item>
+                    </PingObjectList>
+                  </ActionTriggerMinimapPing>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500001342</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>3600000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                       <Values>
-                        <Action />
-                        <ActionLockAsset>
-                          <LockAssets>
+                        <ActionList>
+                          <Actions>
                             <Item>
-                              <Asset>1500003876</Asset>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001342</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
                             </Item>
-                          </LockAssets>
-                        </ActionLockAsset>
+                          </Actions>
+                        </ActionList>
                       </Values>
-                    </TriggerAction>
-                  </Item>
-                </TriggerActions>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500003876</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
         </Trigger>
       </Values>
     </Asset>
@@ -1193,7 +1584,9 @@
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
             <Values>
-              <Condition />
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
               <ConditionUnlocked>
                 <UnlockNeeded>1500003877</UnlockNeeded>
               </ConditionUnlocked>
@@ -1204,30 +1597,115 @@
           <SubTriggers>
             
           </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerActions>
-                  <Item>
-                    <TriggerAction>
-                      <Template>ActionLockAsset</Template>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionTriggerMinimapPing</Template>
+                <Values>
+                  <Action />
+                  <ActionTriggerMinimapPing>
+                    <PingDuration>5000</PingDuration>
+                    <PingObjectList>
+                      <Item>
+                        <Object>
+                          <Template>ObjectFilter</Template>
+                          <Values>
+                            <ObjectFilter>
+                              <ObjectGUID>1500001290</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                            </ObjectFilter>
+                          </Values>
+                        </Object>
+                      </Item>
+                    </PingObjectList>
+                  </ActionTriggerMinimapPing>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500001342</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>3600000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                       <Values>
-                        <Action />
-                        <ActionLockAsset>
-                          <LockAssets>
+                        <ActionList>
+                          <Actions>
                             <Item>
-                              <Asset>1500003877</Asset>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001342</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
                             </Item>
-                          </LockAssets>
-                        </ActionLockAsset>
+                          </Actions>
+                        </ActionList>
                       </Values>
-                    </TriggerAction>
-                  </Item>
-                </TriggerActions>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500003877</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
         </Trigger>
       </Values>
     </Asset>
@@ -1242,7 +1720,9 @@
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
             <Values>
-              <Condition />
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
               <ConditionUnlocked>
                 <UnlockNeeded>1500003878</UnlockNeeded>
               </ConditionUnlocked>
@@ -1253,30 +1733,115 @@
           <SubTriggers>
             
           </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerActions>
-                  <Item>
-                    <TriggerAction>
-                      <Template>ActionLockAsset</Template>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionTriggerMinimapPing</Template>
+                <Values>
+                  <Action />
+                  <ActionTriggerMinimapPing>
+                    <PingDuration>5000</PingDuration>
+                    <PingObjectList>
+                      <Item>
+                        <Object>
+                          <Template>ObjectFilter</Template>
+                          <Values>
+                            <ObjectFilter>
+                              <ObjectGUID>1500001290</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                            </ObjectFilter>
+                          </Values>
+                        </Object>
+                      </Item>
+                    </PingObjectList>
+                  </ActionTriggerMinimapPing>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500001342</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>3600000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                       <Values>
-                        <Action />
-                        <ActionLockAsset>
-                          <LockAssets>
+                        <ActionList>
+                          <Actions>
                             <Item>
-                              <Asset>1500003878</Asset>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>1500001342</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
                             </Item>
-                          </LockAssets>
-                        </ActionLockAsset>
+                          </Actions>
+                        </ActionList>
                       </Values>
-                    </TriggerAction>
-                  </Item>
-                </TriggerActions>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500003878</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
         </Trigger>
       </Values>
     </Asset>

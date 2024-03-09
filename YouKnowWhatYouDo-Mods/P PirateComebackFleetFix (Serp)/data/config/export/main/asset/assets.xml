@@ -2,15 +2,25 @@
     
 
     
-   <!-- verwendet Serp GUIDs von 1500001101 bis einschließlich 1500001126 (freigehalten bis einschließlich 1500001130) -->
+   <!-- verwendet Serp GUIDs von 1500001101 bis einschließlich 1500001129 (freigehalten bis einschließlich 1500001130) -->
 
-    <!-- Mods adding new pirate ships to the game need to add them to the vanilla Pool with GUID 700138 -->
+    <!-- Mods adding new pirate ships to the game need to add them to the vanilla Pool with GUID 700138 (only piarte ships used by the pirates, not pirate ships used by the players or quests) -->
+    
+    <!-- (some vanilla quests are using ships from this pool, which is just stupid from them, but luckily always with General_Enemy as owner, so does not conflict with this mod) -->
     
     
+    
+
+      <!-- Minor Problem: -->
+       <!-- die zurückgerufene Warfleet zählt nicht mehr intern zur warfleet, weshalb das spiel intern eine neue warfleet spawned (sofern Kontor ohne komplett Zerstörung repariert wird und von der warfleet mindestens ein schiff fehlt, wird eine komplette neue warlfeet gespawned) -->
+       <!-- ich könnte die warfleet stattdessen die map verlassen lassen und direkt instant ne neue warfleet mit derselben Menge spawnen, aber das sieht auch komisch aus. -->
+       <!-- stattdessen belassen wir es dabei und die warfleet die bei zerstörung des Kontors dan umgewandelt wird, wird vermutlich eh nicht so groß sein, weshalbs nicht schlimm ist, -->
+        <!-- wenn bei reparieren dann zusätzlich eine neue warfleet spawned. -->
+        
     <!-- ############### -->
     
     
-   <!-- This mod fill fix: -->
+   <!-- This mod fill fix: (see also piratecomebackfleetbugs.txt) -->
    <!-- Spawned pirate ships, eg by my SpawnShips.xml, but also by the game (the ComeBackFleet) do not leave the map when the pirates are defeated. -->
     <!-- (the others leave map as soon as harbor is destroyed, even if pirate is not defeated this way) -->
     <!-- This "not leaving" also resulted in ships not moving anymore, after pirates resettled without you destroying these not left ships -->
@@ -30,7 +40,7 @@
     <!--      I did not make the pirates declare war on other AIs, because I don't want to risk to mess with AI and Ais personality to like pirates and never declare war and so on -->
     
     <!-- Not fixed: -->
-    <!-- 8) Although the comebackfleet as "UseDangerLayer=1" defined, they still simply drive through island denfense and get shot.  -->
+    <!-- Although the comebackfleet as "UseDangerLayer=1" defined, they still simply drive through island denfense and get shot.  -->
     <!--    I see no way to fix this beside making the owner "Neutral" while the ships drive to the harbor. But I think this is not a good solution. -->
 
 
@@ -40,545 +50,20 @@
     <!-- just like nearly everything in regards to pirates defeated, we can not trigger anything on the real defeat (pirate is initiator of DiplomacyPiratesDefeated, wtf..) -->
       <!-- but for this we use the shared_PirateDefeatHelpers mod that makes the lighthouse ruins to find out if pirate is destroyed or not -->
     
-    <!-- <UnlockNeeded>1500001613</UnlockNeeded> makes sure code is only executed for Human0, to make sure it is also in MP only executed once at a time -->
-    
-    <!-- remove the comebackfleet ships one by one every 45 minutes to in the end have none left and only the warfleet (because both fleets at once is just too much and for sure not intended) -->
-    <!-- But since Ac3s likes the extreme in his Combat Overhaul mod, we wont remove them if that mod is active -->
-    <Group Condition="!#[Gameplay] 03 Combat Overhaul Pirates">
-      <!-- 1500001145 is unlocked as long as pirate Harlow is not defeated -->
-      <!-- ActionChangeParticipant with ObjectLabel seems to crash the game and even if not we would not be sure MaxObjectCount hits the very same ship both times. -->
-       <!-- so simple tell thje pirate ships to leave map without converting them to neutral first, this may be aborted if they get shot, but it is not super important -->
-      <ModOp Type="addNextSibling" GUID="130248">
-        <Asset>
-          <Template>Trigger</Template>
-          <Values>
-            <Standard>
-              <GUID>1500001125</GUID>
-              <Name>Reduce ComeBackFleet slowly while Pirate is not defeated - Harlow</Name>
-            </Standard>
-            <Trigger>
-              <TriggerCondition>
-                <Template>ConditionUnlocked</Template>
-                <Values>
-                  <Condition />
-                  <ConditionUnlocked>
-                    <UnlockNeeded>1500001613</UnlockNeeded>
-                  </ConditionUnlocked>
-                  <ConditionPropsNegatable />
-                </Values>
-              </TriggerCondition>
-              <SubTriggers>
-                <Item>
-                  <SubTrigger>
-                    <Template>AutoCreateTrigger</Template>
-                    <Values>
-                      <Trigger>
-                        <TriggerCondition>
-                          <Template>ConditionUnlocked</Template>
-                          <Values>
-                            <Condition />
-                            <ConditionUnlocked>
-                              <UnlockNeeded>1500001145</UnlockNeeded>
-                            </ConditionUnlocked>
-                            <ConditionPropsNegatable />
-                          </Values>
-                        </TriggerCondition>
-                        <SubTriggers>
-                          <Item>
-                            <SubTrigger>
-                              <Template>AutoCreateTrigger</Template>
-                              <Values>
-                                <Trigger>
-                                  <TriggerCondition>
-                                    <Template>ConditionTimer</Template>
-                                    <Values>
-                                      <Condition />
-                                      <ConditionTimer>
-                                        <TimeLimit>2700000</TimeLimit>
-                                      </ConditionTimer>
-                                    </Values>
-                                  </TriggerCondition>
-                                </Trigger>
-                              </Values>
-                            </SubTrigger>
-                          </Item>
-                        </SubTriggers>
-                      </Trigger>
-                    </Values>
-                  </SubTrigger>
-                </Item>
-              </SubTriggers>
-              <TriggerActions>
-                <Item>
-                  <TriggerAction>
-                    <Template>ActionDeleteObjects</Template>
-                    <Values>
-                      <Action />
-                      <ActionDeleteObjects>
-                        <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
-                      </ActionDeleteObjects>
-                      <ObjectFilter>
-                        <ObjectLabel>PirateHarlowResettleGroup</ObjectLabel>
-                        <MaxObjectCount>1</MaxObjectCount>
-                        <ObjectSession>180023</ObjectSession>
-                      </ObjectFilter>
-                    </Values>
-                  </TriggerAction>
-                </Item>
-              </TriggerActions>
-              <ResetTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionTimer</Template>
-                      <Values>
-                        <Condition />
-                        <ConditionTimer>
-                          <TimeLimit>5000</TimeLimit>
-                        </ConditionTimer>
-                      </Values>
-                    </TriggerCondition>
-                  </Trigger>
-                </Values>
-              </ResetTrigger>
-            </Trigger>
-            <TriggerSetup>
-              <AutoRegisterTrigger>1</AutoRegisterTrigger>
-              <UsedBySecondParties>0</UsedBySecondParties>
-            </TriggerSetup>
-          </Values>
-        </Asset>
-        
-        <Asset>
-          <Template>Trigger</Template>
-          <Values>
-            <Standard>
-              <GUID>1500001126</GUID>
-              <Name>Reduce ComeBackFleet slowly while Pirate is not defeated - LaFortune</Name>
-            </Standard>
-            <Trigger>
-              <TriggerCondition>
-                <Template>ConditionUnlocked</Template>
-                <Values>
-                  <Condition />
-                  <ConditionUnlocked>
-                    <UnlockNeeded>1500001613</UnlockNeeded>
-                  </ConditionUnlocked>
-                  <ConditionPropsNegatable />
-                </Values>
-              </TriggerCondition>
-              <SubTriggers>
-                <Item>
-                  <SubTrigger>
-                    <Template>AutoCreateTrigger</Template>
-                    <Values>
-                      <Trigger>
-                        <TriggerCondition>
-                          <Template>ConditionUnlocked</Template>
-                          <Values>
-                            <Condition />
-                            <ConditionUnlocked>
-                              <UnlockNeeded>1500001146</UnlockNeeded>
-                            </ConditionUnlocked>
-                            <ConditionPropsNegatable />
-                          </Values>
-                        </TriggerCondition>
-                        <SubTriggers>
-                          <Item>
-                            <SubTrigger>
-                              <Template>AutoCreateTrigger</Template>
-                              <Values>
-                                <Trigger>
-                                  <TriggerCondition>
-                                    <Template>ConditionTimer</Template>
-                                    <Values>
-                                      <Condition />
-                                      <ConditionTimer>
-                                        <TimeLimit>2700000</TimeLimit>
-                                      </ConditionTimer>
-                                    </Values>
-                                  </TriggerCondition>
-                                </Trigger>
-                              </Values>
-                            </SubTrigger>
-                          </Item>
-                        </SubTriggers>
-                      </Trigger>
-                    </Values>
-                  </SubTrigger>
-                </Item>
-              </SubTriggers>
-              <TriggerActions>
-                <Item>
-                  <TriggerAction>
-                    <Template>ActionDeleteObjects</Template>
-                    <Values>
-                      <Action />
-                      <ActionDeleteObjects>
-                        <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
-                      </ActionDeleteObjects>
-                      <ObjectFilter>
-                        <ObjectLabel>PirateLafortuneResettleGroup</ObjectLabel>
-                        <MaxObjectCount>1</MaxObjectCount>
-                        <ObjectSession>180025</ObjectSession>
-                      </ObjectFilter>
-                    </Values>
-                  </TriggerAction>
-                </Item>
-              </TriggerActions>
-              <ResetTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionTimer</Template>
-                      <Values>
-                        <Condition />
-                        <ConditionTimer>
-                          <TimeLimit>5000</TimeLimit>
-                        </ConditionTimer>
-                      </Values>
-                    </TriggerCondition>
-                  </Trigger>
-                </Values>
-              </ResetTrigger>
-            </Trigger>
-            <TriggerSetup>
-              <AutoRegisterTrigger>1</AutoRegisterTrigger>
-              <UsedBySecondParties>0</UsedBySecondParties>
-            </TriggerSetup>
-          </Values>
-        </Asset>
-        
-      </ModOp>
-    
-    </Group>
-    
-    
+  <!-- <UnlockNeeded>1500001613</UnlockNeeded> makes sure code is only executed for Human0, to make sure it is also in MP only executed once at a time -->
+  
+  <!-- Event: On Pirate Defeated 1500001149 (Harlow) and 1500004533 (LaFortune)  -->
+  <!-- 1500001145/1500001146 is unlocked as long as pirate is not defeated -->
 
-    <!-- On Comebackfleet arrived: Remove all old resettle group ships instantly, if there are still some left on the map (because they are most likey Neutral meanwhile and can not be destryoed anymore) -->
-    <!-- remove all neutral pirate ships instead of just comebackfleet, because with ObjectLabel ObjectParticipantID is ignored and some mods add multiple Trigger to PossibleQuests, so it would remove the ones the previous trigger spawned otherwise -->
-      <!-- Damit meine ich: -->
-       <!-- anstatt dass CO einfach weitere "ActionSpawnObjects" zu den vorhandenen Triggern zufügt, wie mans machen sollte -->
-        <!-- fügt er zb 153266 mehrfach zu, sodass der Trigger 153266 mehrfach ausgeführt wird. -->
-         <!-- ObjectLabel ignoriert leider den Owner den man abfragen will, sodass das nutzen des Labels dann dazu führen würde, dass der zweite 153266 die schiffe -->
-          <!-- vom erstern 153266 wieder löschen würde. -->
-         <!-- Wenn ich stattdessen ObjectGUID nehme mit Owner=Neutral, dann trifft es nur die neutralen Schiffe, die evlt noch von der Zerstörung -->
-          <!-- übrig sind, was ja auch so sein soll -->
-    <!-- Harlow -->
-    <ModOp Type="AddPrevSibling" GUID='153266,153269,153236,153270,153271,153233' Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Template='ActionSpawnObjects']">
-      <Item>
-        <TriggerAction>
-          <Template>ActionRegisterTrigger</Template>
-          <Values>
-            <Action />
-            <ActionRegisterTrigger>
-              <TriggerAsset>1500001120</TriggerAsset>
-            </ActionRegisterTrigger>
-          </Values>
-        </TriggerAction>
-      </Item>
-    </ModOp>
-    <!-- LaFortune -->
-    <ModOp Type="AddPrevSibling" GUID='153274,153275,153240,153276,153277,153241' Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Template='ActionSpawnObjects']">
-      <Item>
-        <TriggerAction>
-          <Template>ActionRegisterTrigger</Template>
-          <Values>
-            <Action />
-            <ActionRegisterTrigger>
-              <TriggerAsset>1500001121</TriggerAsset>
-            </ActionRegisterTrigger>
-          </Values>
-        </TriggerAction>
-      </Item>
-    </ModOp>
-    
-    
-    <!-- Bug: -->
-    <!-- If you save and load a savegame, while the Quest to destroy the comeback fleet is active, this quest will vanish and a new comeback fleet will soon arive, resulting in 2 or more comeback fleets -->
-    <!-- Solution: -->
-    <!-- Removing the first useless combackfleet when the resttle quest is aborted on loading a savegame -->
-    
-    <!-- seems we have to use OnQuestEnd, because Aborted and everything else is not fired for this most likely exceptional abort -.- -->
-    <!-- so we need to check if pirate harbour is repaired afterwards or not, to decide if we remove the resettlefleet or not -->
-    <!-- Harlow -->
-    <ModOp Type="add" GUID="153262" Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions">
-        <Item>
-          <Action>
-            <Template>ActionDelayedActions</Template>
-            <Values>
-              <Action />
-              <ActionDelayedActions>
-                <ExecutionDelay>1000</ExecutionDelay>
-                <DelayedActions>
-                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                  <Values>
-                    <ActionList>
-                      <Actions>
-                        <Item>
-                          <Action>
-                            <Template>ActionRegisterTrigger</Template>
-                            <Values>
-                              <Action />
-                              <ActionRegisterTrigger>
-                                <TriggerAsset>1500001103</TriggerAsset>
-                              </ActionRegisterTrigger>
-                            </Values>
-                          </Action>
-                        </Item>
-                      </Actions>
-                    </ActionList>
-                  </Values>
-                </DelayedActions>
-              </ActionDelayedActions>
-            </Values>
-          </Action>
-        </Item>
-    </ModOp>
-    <!-- LaFortune -->
-    <ModOp Type="add" GUID="153272" Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions">
-        <Item>
-          <Action>
-            <Template>ActionDelayedActions</Template>
-            <Values>
-              <Action />
-              <ActionDelayedActions>
-                <ExecutionDelay>1000</ExecutionDelay>
-                <DelayedActions>
-                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                  <Values>
-                    <ActionList>
-                      <Actions>
-                        <Item>
-                          <Action>
-                            <Template>ActionRegisterTrigger</Template>
-                            <Values>
-                              <Action />
-                              <ActionRegisterTrigger>
-                                <TriggerAsset>1500001104</TriggerAsset>
-                              </ActionRegisterTrigger>
-                            </Values>
-                          </Action>
-                        </Item>
-                      </Actions>
-                    </ActionList>
-                  </Values>
-                </DelayedActions>
-              </ActionDelayedActions>
-            </Values>
-          </Action>
-        </Item>
-    </ModOp>
-    
-    
-    <!-- check if after the resettle quest ended, the pirate base is repaired again (does not matter if we check harbor or lighthouse here). -->
-     <!-- (we dont use ConditionEvent PirateResettled, because I dont know how to check for specific pirate, guid as ContextAsset does not work) -->
-    <!-- if it is not, it was most likely loading a savegame while pirate is resettling -->
-    <!--  then remove the current comebackfleet, because the vanilla game will sent a new one after a while (we can not prevent this) -->
-    <!--  and we dont want 2 comebackfleets at once, because it gets simply too much ships -->
-    <!-- This also triggers if we successfully destryoed the comebackfleet, but ActionDeleteObjects does nothing in this case -->
-     <!-- AND we want to to trigger in that case too -->
-  <ModOp GUID="130248" Type="AddNextSibling">
-		<Asset>
-			<Template>Trigger</Template>
-			<Values>
-				<Standard>
-					<GUID>1500001103</GUID>
-          <Name>Delete now useless comebackfleet on load - Harlow</Name>
-				</Standard>
-				<Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition />
-              <ConditionUnlocked>
-                <UnlockNeeded>1500001613</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <SubTriggers>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                        <Template>ConditionPlayerCounter</Template>
-                        <Values>
-                          <Condition>
-                            <!-- use IsOptional because we want to "defuse" this trigger regardless what the case is. but if it is ruin, do the action below -->
-                            <IsOptional>1</IsOptional>
-                          </Condition>
-                          <ConditionPlayerCounter>
-                            <PlayerCounter>RuinCount</PlayerCounter>
-                            <Context>100681</Context>
-                            <CounterAmount>1</CounterAmount>
-                            <ComparisonOp>AtLeast</ComparisonOp>
-                            <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                            <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
-                          </ConditionPlayerCounter>
-                        </Values>
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionDeleteObjects</Template>
-                          <Values>
-                            <Action />
-                            <ActionDeleteObjects>
-                              <ShipsLeaveMapFirst>0</ShipsLeaveMapFirst>
-                            </ActionDeleteObjects>
-                            <ObjectFilter>
-                              <ObjectLabel>PirateHarlowResettleGroup</ObjectLabel>
-                              <ObjectSession>180023</ObjectSession>
-                            </ObjectFilter>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-          </SubTriggers>
-				</Trigger>
-				<TriggerSetup>
-					<AutoRegisterTrigger>0</AutoRegisterTrigger>
-					<UsedBySecondParties>0</UsedBySecondParties>
-				</TriggerSetup>
-			</Values>
-		</Asset>
-    
-		<Asset>
-			<Template>Trigger</Template>
-			<Values>
-				<Standard>
-					<GUID>1500001104</GUID>
-          <Name>Delete now useless comebackfleet on load - LaFortune</Name>
-				</Standard>
-				<Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition />
-              <ConditionUnlocked>
-                <UnlockNeeded>1500001613</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <SubTriggers>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                        <Template>ConditionPlayerCounter</Template>
-                        <Values>
-                          <Condition>
-                            <!-- use IsOptional because we want to "defuse" this trigger regardless what the case is -->
-                            <IsOptional>1</IsOptional>
-                          </Condition>
-                          <ConditionPlayerCounter>
-                            <PlayerCounter>RuinCount</PlayerCounter>
-                            <Context>100682</Context>
-                            <CounterAmount>1</CounterAmount>
-                            <ComparisonOp>AtLeast</ComparisonOp>
-                            <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                            <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
-                          </ConditionPlayerCounter>
-                        </Values>
-                    </TriggerCondition>
-                    <TriggerActions>
-                        <Item>
-                          <TriggerAction>
-                            <Template>ActionDeleteObjects</Template>
-                            <Values>
-                              <Action />
-                              <ActionDeleteObjects>
-                                <ShipsLeaveMapFirst>0</ShipsLeaveMapFirst>
-                              </ActionDeleteObjects>
-                              <ObjectFilter>
-                                <ObjectLabel>PirateLafortuneResettleGroup</ObjectLabel>
-                                <ObjectSession>180025</ObjectSession>
-                              </ObjectFilter>
-                            </Values>
-                          </TriggerAction>
-                        </Item>
-                    </TriggerActions>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-          </SubTriggers>
-				</Trigger>
-				<TriggerSetup>
-					<AutoRegisterTrigger>0</AutoRegisterTrigger>
-					<UsedBySecondParties>0</UsedBySecondParties>
-				</TriggerSetup>
-			</Values>
-		</Asset>
-    
-    
-    <!-- On Comebackfleet arrived: Remove all old resettle group ships instantly. The triggers started in the quests above -->
-    <!-- made in a trigger to be able to check for <UnlockNeeded>1500001613</UnlockNeeded> to make sure it is only executed for Human0, so only once at a time regardless of number of human palyers in the game -->
+  <ModOp Type="addNextSibling" GUID="130248">
     <Asset>
-			<Template>Trigger</Template>
-			<Values>
-				<Standard>
-					<GUID>1500001120</GUID>
-          <Name>Delete all neutral pirate ships, if there are any left from last destroy - Harlow</Name>
-				</Standard>
-				<Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition />
-              <ConditionUnlocked>
-                <UnlockNeeded>1500001613</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <TriggerActions>
-            <Item>
-              <TriggerAction>
-                <Template>ActionDeleteObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionDeleteObjects>
-                    <ShipsLeaveMapFirst>0</ShipsLeaveMapFirst>
-                  </ActionDeleteObjects>
-                  <ObjectFilter>
-                    <ObjectGUID>700138</ObjectGUID>
-                    <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Neutral</ObjectParticipantID>
-                    <ObjectSession>180023</ObjectSession>
-                  </ObjectFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-				</Trigger>
-				<TriggerSetup>
-					<AutoRegisterTrigger>0</AutoRegisterTrigger>
-					<UsedBySecondParties>0</UsedBySecondParties>
-				</TriggerSetup>
-			</Values>
-		</Asset>
-    
-    <Asset>
-			<Template>Trigger</Template>
-			<Values>
-				<Standard>
-					<GUID>1500001121</GUID>
-          <Name>Delete all neutral pirate ships, if there are any left from last destroy - LaFortune</Name>
-				</Standard>
-				<Trigger>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001119</GUID>
+          <Name>All Pirate Ships Leave Map On Defeat</Name>
+        </Standard>
+        <Trigger>
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
             <Values>
@@ -591,45 +76,398 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions>
+          <SubTriggers>
             <Item>
-              <TriggerAction>
-                <Template>ActionDeleteObjects</Template>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
                 <Values>
-                  <Action />
-                  <ActionDeleteObjects>
-                    <ShipsLeaveMapFirst>0</ShipsLeaveMapFirst>
-                  </ActionDeleteObjects>
-                  <ObjectFilter>
-                    <ObjectGUID>700138</ObjectGUID>
-                    <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Neutral</ObjectParticipantID>
-                    <ObjectSession>180025</ObjectSession>
-                  </ObjectFilter>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition/>
+                        <ConditionEvent>
+                          <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                          <ContextAsset>1500001149</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable/>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions> 
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionDelayedActions</Template>
+                          <Values>
+                            <Action />
+                            <ActionDelayedActions>
+                              <ExecutionDelay>1000</ExecutionDelay>
+                              <DelayedActions>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ActionList>
+                                    <Actions>
+                                      <Item>
+                                        <Action>
+                                          <Template>ActionChangeParticipant</Template>
+                                          <Values>
+                                            <Action />
+                                            <ActionChangeParticipant>
+                                              <NewParticipantID>Neutral</NewParticipantID>
+                                            </ActionChangeParticipant>
+                                            <ObjectFilter>
+                                              <ObjectGUID>700138</ObjectGUID>
+                                              <ObjectSession>180023</ObjectSession>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </Action>
+                                      </Item>
+                                    </Actions>
+                                  </ActionList>
+                                </Values>
+                              </DelayedActions>
+                            </ActionDelayedActions>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionDelayedActions</Template>
+                          <Values>
+                            <Action />
+                            <ActionDelayedActions>
+                              <ExecutionDelay>1500</ExecutionDelay>
+                              <DelayedActions>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ActionList>
+                                    <Actions>
+                                      <Item>
+                                        <Action>
+                                          <Template>ActionDeleteObjects</Template>
+                                          <Values>
+                                            <Action />
+                                            <ActionDeleteObjects>
+                                              <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                            </ActionDeleteObjects>
+                                            <ObjectFilter>
+                                              <ObjectGUID>700138</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                              <ObjectSession>180023</ObjectSession>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </Action>
+                                      </Item>
+                                    </Actions>
+                                  </ActionList>
+                                </Values>
+                              </DelayedActions>
+                            </ActionDelayedActions>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
                 </Values>
-              </TriggerAction>
+              </SubTrigger>
             </Item>
-          </TriggerActions>
-				</Trigger>
-				<TriggerSetup>
-					<AutoRegisterTrigger>0</AutoRegisterTrigger>
-					<UsedBySecondParties>0</UsedBySecondParties>
-				</TriggerSetup>
-			</Values>
-		</Asset>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition/>
+                        <ConditionEvent>
+                          <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                          <ContextAsset>1500004533</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable/>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions> 
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionDelayedActions</Template>
+                          <Values>
+                            <Action />
+                            <ActionDelayedActions>
+                              <ExecutionDelay>1000</ExecutionDelay>
+                              <DelayedActions>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ActionList>
+                                    <Actions>
+                                      <Item>
+                                        <Action>
+                                          <Template>ActionChangeParticipant</Template>
+                                          <Values>
+                                            <Action />
+                                            <ActionChangeParticipant>
+                                              <NewParticipantID>Neutral</NewParticipantID>
+                                            </ActionChangeParticipant>
+                                            <ObjectFilter>
+                                              <ObjectGUID>700138</ObjectGUID>
+                                              <ObjectSession>180025</ObjectSession>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <ObjectParticipantID>Third_party_04_Pirate_LaFortune</ObjectParticipantID>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </Action>
+                                      </Item>
+                                    </Actions>
+                                  </ActionList>
+                                </Values>
+                              </DelayedActions>
+                            </ActionDelayedActions>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionDelayedActions</Template>
+                          <Values>
+                            <Action />
+                            <ActionDelayedActions>
+                              <ExecutionDelay>1500</ExecutionDelay>
+                              <DelayedActions>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ActionList>
+                                    <Actions>
+                                      <Item>
+                                        <Action>
+                                          <Template>ActionDeleteObjects</Template>
+                                          <Values>
+                                            <Action />
+                                            <ActionDeleteObjects>
+                                              <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                            </ActionDeleteObjects>
+                                            <ObjectFilter>
+                                              <ObjectGUID>700138</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                              <ObjectSession>180025</ObjectSession>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </Action>
+                                      </Item>
+                                    </Actions>
+                                  </ActionList>
+                                </Values>
+                              </DelayedActions>
+                            </ActionDelayedActions>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
     
-	</ModOp>
+    <!-- every ~30 minutes: -->
+    <!-- change again owner back and forth to restart pirates SquadLogic for ships not part of the WarFleet (eg comebackfleet and the warfleet that turned neutral on harbor destroy) -->
+    <!-- Changing the owner back and forth causes no harm for the ships and also not the current warfleet, beside that they will stand still for a second before getting their new command. -->
+     <!-- (it also does not abort an active defend/attack command) -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001129</GUID>
+          <Name>Make non-warfleet ships again follow SquadLogic (roaming around)</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500001613</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001145</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions> 
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionChangeParticipant</Template>
+                          <Values>
+                            <Action />
+                            <ActionChangeParticipant>
+                              <NewParticipantID>Neutral</NewParticipantID>
+                            </ActionChangeParticipant>
+                            <ObjectFilter>
+                              <ObjectGUID>700138</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID>
+                              <ObjectSession>180023</ObjectSession>
+                            </ObjectFilter>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionChangeParticipant</Template>
+                          <Values>
+                            <Action />
+                            <ActionChangeParticipant>
+                              <NewParticipantID>Third_party_03_Pirate_Harlow</NewParticipantID>
+                            </ActionChangeParticipant>
+                            <ObjectFilter>
+                              <ObjectGUID>700138</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <ObjectParticipantID>Neutral</ObjectParticipantID>
+                              <ObjectSession>180023</ObjectSession>
+                            </ObjectFilter>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001146</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions> 
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionChangeParticipant</Template>
+                          <Values>
+                            <Action />
+                            <ActionChangeParticipant>
+                              <NewParticipantID>Neutral</NewParticipantID>
+                            </ActionChangeParticipant>
+                            <ObjectFilter>
+                              <ObjectGUID>700138</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <ObjectParticipantID>Third_party_04_Pirate_LaFortune</ObjectParticipantID>
+                              <ObjectSession>180025</ObjectSession>
+                            </ObjectFilter>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionChangeParticipant</Template>
+                          <Values>
+                            <Action />
+                            <ActionChangeParticipant>
+                              <NewParticipantID>Third_party_04_Pirate_LaFortune</NewParticipantID>
+                            </ActionChangeParticipant>
+                            <ObjectFilter>
+                              <ObjectGUID>700138</ObjectGUID>
+                              <CheckParticipantID>1</CheckParticipantID>
+                              <ObjectParticipantID>Neutral</ObjectParticipantID>
+                              <ObjectSession>180025</ObjectSession>
+                            </ObjectFilter>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1800000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>   
+  </ModOp>
     
 
     <!-- ######################################################## -->
     <!-- ######################################################## -->
     
-    
+    <!-- Triggers dealing with the ComebackFleet -->
+    <Include File="/data/config/export/main/asset/ComebackFleet.include.xml" />
     
     <!-- Triggers to declare war on defeat for humans to pirates -->
     <Include File="/data/config/export/main/asset/DeclareWar.include.xml" />
     
-    <!-- Triggers to make all ships leave mpa on priate defeat and warfleet not leave map only on harbor destroy -->
+    <!-- Triggers to make warfleet not leave map only on harbor destroy -->
     <Include File="/data/config/export/main/asset/WarFleet.include.xml" />
     
     

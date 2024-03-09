@@ -7,6 +7,12 @@
  -- deshalb machen wir im skript nun nur changeGUID zu einer einzigartigen guid, und im trigger zielen wir auf diese GUID dann mit ActionChangeParticipant
 
 
+-- TODO: 
+ -- wenn man Piraten ein Schiff schenkt, dann dieses in eine Piratenversion davon umwandeln. Pirat sollte nur Schiffe besitzen können, die auch in All Pirate Ships
+  -- Pools sind und nicht vom Spieler besessen werden können!
+  -- dabei alle schiffe supporten die cih kenne. und bei allen anderen wird schiff neutral verlsst map und es wird ein forcebuild gemacht
+
+
 -- TODO:
  -- nochmal MetaGameLoaded testen, erstens mit quest siehe ModsTodo und auch was passiert wenn 2 mods conditionevent MetaGameLoaded nutzen
   -- und nacheinander aktiviert werden, ob dann tatäshclich nur einer triggert.
@@ -36,14 +42,21 @@
 -- alternativ kann man auch vermehrt unlocks nehmen, also zb wenn schiffspawn-trigger gestartet werden soll,
  -- dann etwas unlocken (evlt trigger selbst als FeatureUnlock) und dieser ist von von anfang an registered, löst aber bei unlock aus
   -- auf diese weise wird er auch nur einmalig getriggered, auch wenn lua code es bis zu 4 mal zurselben Zeit unlocked
+-- CheatItemInSlot funzt in coop nicht, da die spieler ja in anderen session sein können und mit sessionenter code würde dann wieder
+ -- ein item gecheatet soalbd ein weiterer coop spieler in die session kommt (nachdem einer die items vllt schon rausgenommen hat)
 
 
+-- TODO:
+ -- game.TextSourceManager.setDebugTextSource("[MetaObjects SessionGameObject("..tostring(OID)..") ItemContainer CheatItemInSlot(193195,1)]")
+-- nutzen für CheatItemInSlot ohne dass man auf die Session achten muss.
+-- Wobei das nur klappt, wenn wir zum Zeitpunkt des Spawns in deren session sind und uns so die OIDs abspeichern können
+ -- was vermutlich nicht der Fall ist, also ist SessionEnter wohl doch besser :D
 
 -- outcommented EnableLightCodeSupport because we can not change owner in lua, so makes no sense and is dangerous anyways
 -- local EnableLightCodeSupport = false -- set this to "true" if you want the code to also transform ships which GUIDs are not hardcoded here. It should work as long as the ships use the normal vanilla templates and no additional properties. but if a mod added new properties, the game might crash on transform, that it is way it is disabled by default
 
 local SpawnSupportFleet_DELAY = 5000 -- after how many ms the supportfleet will spawn after the AI accepted to send some
-
+-- TODO: delay darf nicht mehr als weniger sekunden sein wegen savegames, sonst einfach trigger mit timer starten, wenns länger sein soll
 
 
 
@@ -156,6 +169,9 @@ end
 local GiftShipsLockTriggerGUID = 1500001341
 
 -- TODO luftschiffe zufügen und dann auch unten im else zweig
+-- TODO: eig sollte eine Kopie pro Template reichen, damits nicht crashed. Und die rückwandlung in vorherige GUID machen wir in lua, indem wir 
+ -- nach dem start des triggers für den changeparticipant kurz warten (evlt auf nen unlock/lock der uns das signalisiert) und dann die userdata wieder zurück zu original guid wnadeln
+  -- vllt auch spy supporten zum verschenken
 local GUID_Transforms = {
   -- schiffe
   [100437]=1500001298,[100439]=1500001291,[100440]=1500001292,[100443]=1500001293,[100442]=1500001294,[100438]=1500001295,[100441]=1500001296,[1010062]=1500001297,[968]=1500001299,[720]=1500001300,
@@ -173,6 +189,10 @@ local CurrentSpawnProcess = CurrentSpawnProcess or {[0]={},[1]={},[2]={},[3]={}}
 
 -- only changes the GUID of selection to helper ships. the owner change and back to previous GUIDs is done in xml (decision eg after calling supportfleetgift_serp_human0.lua)
 local function SelectionToUniqueGUID(Human_ID)
+  
+  -- TODO:
+    -- evtl hier multiplayer-check machen. wenns singleplayer ist, dann ist condition.changeOwnerOfSelected(ParticicantID) ok, das kein desync geben kann
+  
   local local_PID = ts.Participants.GetGetCurrentParticipantID()
   if local_PID==Human_ID then
     if session.selection~=nil and type(session.selection)=="table" and #session.selection > 0 then
@@ -191,7 +211,9 @@ local function SelectionToUniqueGUID(Human_ID)
           userdata:changeGUID(GUID_Transforms[GUID])
         else
           modlog("Gift Ship code: GUID "..tostring(GUID).." not found in lua GUID_Transforms table, so not gifted. You might add it in lua and a copy of the ship in xml to also support it.")
-          -- following disabled because: could crash, could loose items/cargo when targetguid has less AND we have no ChangeOwner within lua, so we need to know from what guid to what guid something should be changed back. if we could change owner in lua, we could simply change guid and owner and back in one step and then we could use general fake guids
+          -- TODO: evlt doch so gut es iwie geht supporten, aber vorher das spiel speichern lassen?
+          -- ts.Game.SetSaveGame() -- und danach kurz warten, zb. 2-3 sekunden
+          -- following disabled because: could crash, could loose items/cargo when targetguid has less
           -- if EnableLightCodeSupport then -- then try to find the best fitting object.. might cause crash if properties from previous to new does not fit, so dangerous
             -- local HasWalking = GameObject.Walking.BaseSpeedWithUpgrades ~= 0
             -- if HasWalking then
@@ -199,6 +221,10 @@ local function SelectionToUniqueGUID(Human_ID)
               -- local HasAttacker = GameObject.Attacker.DPS ~= 0
               -- GameObject = ts.Objects.GetObject(OID)
               -- local HasBombarder = GameObject.Bombarder.ShaftCount ~= 0
+              -- GameObject = ts.Objects.GetObject(OID)
+              -- local NeedsBuildPermt = ts.BuildPermits.GetNeedsBuildPermit(GUID)
+              -- local HasCommandQueue = GameObject.CommandQueue.UI_IsNonMoving or GameObject.CommandQueue.UI_IsMoving -- scheint immer eins von beiden wahr zu sein, auch zb auf patroullie/traderoute
+              -- gibt dennoch zuviele dinge die wir nicht prüfen können, dh. bei unbekannten objecten ist crash schon sehr wahrscheinlich...
               -- if HasBombarder then -- Airships
                 -- if HasAttacker then
                   -- userdata:changeGUID(1500001301)
@@ -238,7 +264,7 @@ local function FinishSpawnSupportFleet(SessionGUID,Human_ID,AI_ID)
     
     -- crediting items in lua also does not work well in coop, because they get credited multiple times, even when using SetClearSlot before, because the scripts are executed simultaneous
 
-    system.start(function ()
+    system.start(function()
       local Ships = GetSessionObjectsFromHuman(367)
       -- modlog(Ships,#Ships)
       local GameObject
@@ -305,7 +331,7 @@ local function PrepareSupportFleet(Human_ID,AI_ID,SpawnShipsTrigger)
       -- ts.Economy.MetaStorage.AddAmount(1500000240, 20)
       ts.Unlock.SetUnlockNet(1500003870) -- we unlock a trigger to make sure it is also in coop only executed once
     else -- success
-      system.start(function ()
+      system.start(function()
         system.waitForGameTimeDelta(SpawnSupportFleet_DELAY) -- some delay simulating the AI kind of building the ships, todo test value
         ts.Unlock.SetRelockNet(GiftShipsLockTriggerGUID) -- lock the gift ships option because it uses same helper ships
         

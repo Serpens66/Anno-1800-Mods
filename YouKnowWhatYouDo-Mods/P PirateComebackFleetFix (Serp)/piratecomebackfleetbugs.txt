@@ -2,12 +2,20 @@ This mod fixes:
 
 - Warfleet of pirates get neutral and leaves map when pirate harbor is destroyed, even if the pirate itself is not defeated yet and can rebuild harbor if not completely defeated in time.
 -> fixed by commanding on harbor destroy all neutral pirate ships to move back to pirate harbor and change owner to pirate again, if pirate is not defeated yet.
+  Unfortunately this way the warfleet is no longer recognized as warfleet from pirate (but still properly used), so if the pirate repairs his kontor without being defeated, he will spawn a new warfleet over time, resulting in more ships then intended. There is no good way to solve this, but I also think it is ok, since the leftover warfleet will most likely be quite small anyways.
 
 - Comeback Fleet does not count to the WarFleet count of pirates (so pirates will have the comeback fleet plus the warfleet amount after resettle -> more than intended)
 -> fixed by commanding one of the resettle ships every 45 minutes to leave map (without changing to neutral) as long as pirate is not defeated. But since you (Ac3s) likes the extreme, this trigger is not active if Combat Overhaul-Pirates mod is active.
 
+- Warfleet does not spawn again after comeback if you defeated pirate while he had full warfleet. It does start spawn again after you destroyed at least one comebackfleet ship after rebuild.
+-> also fixed by the previous fix which removes a comebackfleet ship every 45 minutes (starting 15 minutes after rebuild)
+
 - Comeback Fleet does not change to neutral and not leaving the map, after pirate island is destroyed again.
 -> fixed by changing owner of all pirate ships from pirate to neutral and tell them to leave map, as soon as pirate is defeated.
+
+- comebackfleet regulary aborts the default pirates SquadLogic (roaming around) and stand still doing nothing, eg whenever there is a attack/defend Command (which is when island building gets attacked or a fixed time intervall for attacks).
+  It seems the game devs only implemented this for the internally spawned WarFleet, while ships spawned differently or ships that left the warfleet (which happens on harbor destroy for the current warfleet) only activate this "roaming around" once after the owner of the ships was changed to Pirate.
+  -> fixed by: Every 30 minutes this fixmod will change the owner of all pirate ships for a milisecond to neutral and then back to pirate, to make sure all ships are doing their job (will make the ships stop moving 1 second, but then they will continue doing what they did before).
 
 - If the Comeback Fleet arrives while you are not at war with pirates (eg. AI destroyed them or you used pirate flag item), then the ships will simply stand next to the harbor doing nothing. You have to save+load the game, declare war and wait for the next fleet to bypass this.
 -> fixed by making pirates declare war on every human they not already have war with while they are defeated. I removed my complicated code that was ment to restore previous relation as soon as comebackfleet arrives, because I agree, that it is fine to get this kind of punishment for not helping the pirates to not be defeated.
@@ -21,11 +29,11 @@ Pirates do not declare war to AIs with this fix, because I do not wanted to mess
 
 - Although the comebackfleet as "UseDangerLayer=1" defined, they still simply drive through island denfense and get shot. 
 -> not fixed. See no proper way to fix this, beside making the ComebackFleet Neutral until it reaches the harbor, but I don't think this would be a good solution.
-
+ Combat Overhaul spawns the comebackfleet in multiple smaller fleets with different spawnpoints to reduce the chance all ships drive towards a defense. But this also increases the chance that some ships will drive towards defense. I will keep this untouched.
 
 ...
 
-Mods adding new pirate ships to the game need to add them to the vanilla Pool with GUID 700138
+Mods adding new pirate ships to the game need to add them to the vanilla Pool with GUID 700138 (only piarte ships used by the pirates, not pirate ships used by the players or quests)
 
 
 

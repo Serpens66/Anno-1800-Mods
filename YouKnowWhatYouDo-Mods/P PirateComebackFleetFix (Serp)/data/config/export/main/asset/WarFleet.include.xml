@@ -6,9 +6,26 @@
    <!-- we make sure they are only executed for Human0 with help of my WhichPlayer shared mod checking for Unlock 1500001613 -->
      <!-- Even if Human0 is defeated andMP game continued without him, he will still continue executing Triggers -->
 
+ <!-- Minor Problem: -->
+   <!-- die zurückgerufene Warfleet zählt nicht mehr intern zur warfleet, weshalb das spiel intern eine neue warfleet spawned (sofern Kontor ohne komplett Zerstörung repariert wird und von der warfleet mindestens ein schiff fehlt, wird eine komplette neue warlfeet gespawned) -->
+   <!-- ich könnte die warfleet stattdessen die map verlassen lassen und direkt instant ne neue warfleet mit derselben Menge spawnen, aber das sieht auch komisch aus. -->
+   <!-- stattdessen belassen wir es dabei und die warfleet die bei zerstörung des Kontors dan umgewandelt wird, wird vermutlich eh nicht so groß sein, weshalbs nicht schlimm ist, -->
+    <!-- wenn bei reparieren dann zusätzlich eine neue warfleet spawned. -->
+
+
+  <!-- dass schiffe stehen bleiben liegt am vanilla defend befehl. alle nicht-warfleet schiffe bleiben dabei dann endlos stehen, bzw. führen kein Patrol (SquadLogic) mehr aus (nur noch ab und zu attack) -->
+   <!-- ein changeowner zu neutral und zurück zu pirat unlocked sie wieder. (trigger 1500001129) -->
+
+  <!-- Der Rauswurf aus der offiziellen Warfleet passiert nur im internen Code bei Zerstörung des Kontors.  -->
+   <!-- Es passiert also nicht, wenn ich von allen schiffen den owner auf neutral und wieder pirat wechsel, damit sie wieder patrollieren (SquadLogic). -->
+
+  <!-- offensichtlich wird kein (oder nur sehr selten) Defend Befehl des piratn ausgelöst, wenn das angegriffene Gebäude instant zerstört ist. -->
+   <!-- nur wenn es "noch zu retten" wäre, schickt pirat schiffe hin (die dann feststecken, wenn sie keine warfleet schiffe sind) -->
+
 
   <!-- 1500001145 is unlocked as long as pirate Harlow is not defeated -->
   <ModOp Type="addNextSibling" GUID="130248">
+    
     <Asset>
       <Template>Trigger</Template>
       <Values>
@@ -63,7 +80,7 @@
                                 <Values>
                                   <Condition />
                                   <ConditionTimer>
-                                    <TimeLimit>1000</TimeLimit>
+                                    <TimeLimit>500</TimeLimit>
                                   </ConditionTimer>
                                 </Values>
                               </TriggerCondition>
@@ -90,34 +107,25 @@
                                               <Values>
                                                 <Action />
                                                 <ActionDelayedActions>
-                                                  <ExecutionDelay>1000</ExecutionDelay>
+                                                  <ExecutionDelay>500</ExecutionDelay>
                                                   <DelayedActions>
                                                     <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                                     <Values>
                                                       <ActionList>
                                                         <Actions>
+                                                          <!-- abort the leavemap+delete command the game gave the ships, must be done before change of owner, because otherwise they got instant deleted -->
                                                           <Item>
                                                             <Action>
-                                                              <Template>ActionMoveObject</Template>
+                                                              <Template>ActionStopObjectMovement</Template>
                                                               <Values>
                                                                 <Action />
+                                                                <ActionStopObjectMovement />
                                                                 <ObjectFilter>
                                                                   <ObjectGUID>700138</ObjectGUID>
                                                                   <CheckParticipantID>1</CheckParticipantID>
                                                                   <ObjectParticipantID>Neutral</ObjectParticipantID>
                                                                   <ObjectSession>180023</ObjectSession>
                                                                 </ObjectFilter>
-                                                                <ObjectTargetFilter>
-                                                                  <TargetGUID>100681</TargetGUID>
-                                                                  <TargetCheckParticipantID>1</TargetCheckParticipantID>
-                                                                  <TargetParticipantID>Third_party_03_Pirate_Harlow</TargetParticipantID>
-                                                                  <TargetObjectSession>180023</TargetObjectSession>
-                                                                </ObjectTargetFilter>
-                                                                <ActionMoveObject>
-                                                                  <IgnoreEveryDistractionDuringMove>0</IgnoreEveryDistractionDuringMove>
-                                                                  <UseDangerLayer>1</UseDangerLayer>
-                                                                  <SearchMode>Closest</SearchMode>
-                                                                </ActionMoveObject>
                                                               </Values>
                                                             </Action>
                                                           </Item>
@@ -199,7 +207,7 @@
       <Template>Trigger</Template>
       <Values>
         <Standard>
-          <GUID>1500001118</GUID>
+          <GUID>1500001127</GUID>
           <Name>WarFleet not leave map on Harbor Destroy LaFortune</Name>
         </Standard>
         <Trigger>
@@ -249,7 +257,7 @@
                                 <Values>
                                   <Condition />
                                   <ConditionTimer>
-                                    <TimeLimit>1000</TimeLimit>
+                                    <TimeLimit>500</TimeLimit>
                                   </ConditionTimer>
                                 </Values>
                               </TriggerCondition>
@@ -276,34 +284,25 @@
                                               <Values>
                                                 <Action />
                                                 <ActionDelayedActions>
-                                                  <ExecutionDelay>1000</ExecutionDelay>
+                                                  <ExecutionDelay>500</ExecutionDelay>
                                                   <DelayedActions>
                                                     <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                                     <Values>
                                                       <ActionList>
                                                         <Actions>
+                                                          <!-- abort the leavemap+delete command the game gave the ships, must be done before change of owner, because otherwise they got instant deleted -->
                                                           <Item>
                                                             <Action>
-                                                              <Template>ActionMoveObject</Template>
+                                                              <Template>ActionStopObjectMovement</Template>
                                                               <Values>
                                                                 <Action />
+                                                                <ActionStopObjectMovement />
                                                                 <ObjectFilter>
                                                                   <ObjectGUID>700138</ObjectGUID>
                                                                   <CheckParticipantID>1</CheckParticipantID>
                                                                   <ObjectParticipantID>Neutral</ObjectParticipantID>
                                                                   <ObjectSession>180025</ObjectSession>
                                                                 </ObjectFilter>
-                                                                <ObjectTargetFilter>
-                                                                  <TargetGUID>100682</TargetGUID>
-                                                                  <TargetCheckParticipantID>1</TargetCheckParticipantID>
-                                                                  <TargetParticipantID>Third_party_04_Pirate_LaFortune</TargetParticipantID>
-                                                                  <TargetObjectSession>180025</TargetObjectSession>
-                                                                </ObjectTargetFilter>
-                                                                <ActionMoveObject>
-                                                                  <IgnoreEveryDistractionDuringMove>0</IgnoreEveryDistractionDuringMove>
-                                                                  <UseDangerLayer>1</UseDangerLayer>
-                                                                  <SearchMode>Closest</SearchMode>
-                                                                </ActionMoveObject>
                                                               </Values>
                                                             </Action>
                                                           </Item>
@@ -381,244 +380,47 @@
     </Asset>
     
     
-    <Asset>
-      <Template>Trigger</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001119</GUID>
-          <Name>All Pirate Ships Leave Map On Destroy</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionUnlocked>
-                <UnlockNeeded>1500001613</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <SubTriggers>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionEvent</Template>
-                      <Values>
-                        <Condition/>
-                        <ConditionEvent>
-                          <ConditionEvent>GUIDUnlocked</ConditionEvent>
-                          <ContextAsset>1500001149</ContextAsset>
-                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
-                        </ConditionEvent>
-                        <ConditionPropsNegatable/>
-                      </Values>
-                    </TriggerCondition>
-                    <TriggerActions> 
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionDelayedActions</Template>
-                          <Values>
-                            <Action />
-                            <ActionDelayedActions>
-                              <ExecutionDelay>2000</ExecutionDelay>
-                              <DelayedActions>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <ActionList>
-                                    <Actions>
-                                      <Item>
-                                        <Action>
-                                          <Template>ActionChangeParticipant</Template>
-                                          <Values>
-                                            <Action />
-                                            <ActionChangeParticipant>
-                                              <NewParticipantID>Neutral</NewParticipantID>
-                                            </ActionChangeParticipant>
-                                            <ObjectFilter>
-                                              <ObjectGUID>700138</ObjectGUID>
-                                              <ObjectSession>180023</ObjectSession>
-                                              <CheckParticipantID>1</CheckParticipantID>
-                                              <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID>
-                                            </ObjectFilter>
-                                          </Values>
-                                        </Action>
-                                      </Item>
-                                    </Actions>
-                                  </ActionList>
-                                </Values>
-                              </DelayedActions>
-                            </ActionDelayedActions>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionDelayedActions</Template>
-                          <Values>
-                            <Action />
-                            <ActionDelayedActions>
-                              <ExecutionDelay>3000</ExecutionDelay>
-                              <DelayedActions>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <ActionList>
-                                    <Actions>
-                                      <Item>
-                                        <Action>
-                                          <Template>ActionDeleteObjects</Template>
-                                          <Values>
-                                            <Action />
-                                            <ActionDeleteObjects>
-                                              <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
-                                            </ActionDeleteObjects>
-                                            <ObjectFilter>
-                                              <ObjectGUID>700138</ObjectGUID>
-                                              <CheckParticipantID>1</CheckParticipantID>
-                                              <ObjectParticipantID>Neutral</ObjectParticipantID>
-                                              <ObjectSession>180023</ObjectSession>
-                                            </ObjectFilter>
-                                          </Values>
-                                        </Action>
-                                      </Item>
-                                    </Actions>
-                                  </ActionList>
-                                </Values>
-                              </DelayedActions>
-                            </ActionDelayedActions>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionEvent</Template>
-                      <Values>
-                        <Condition/>
-                        <ConditionEvent>
-                          <ConditionEvent>GUIDUnlocked</ConditionEvent>
-                          <ContextAsset>1500004533</ContextAsset>
-                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
-                        </ConditionEvent>
-                        <ConditionPropsNegatable/>
-                      </Values>
-                    </TriggerCondition>
-                    <TriggerActions> 
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionDelayedActions</Template>
-                          <Values>
-                            <Action />
-                            <ActionDelayedActions>
-                              <ExecutionDelay>2000</ExecutionDelay>
-                              <DelayedActions>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <ActionList>
-                                    <Actions>
-                                      <Item>
-                                        <Action>
-                                          <Template>ActionChangeParticipant</Template>
-                                          <Values>
-                                            <Action />
-                                            <ActionChangeParticipant>
-                                              <NewParticipantID>Neutral</NewParticipantID>
-                                            </ActionChangeParticipant>
-                                            <ObjectFilter>
-                                              <ObjectGUID>700138</ObjectGUID>
-                                              <ObjectSession>180025</ObjectSession>
-                                              <CheckParticipantID>1</CheckParticipantID>
-                                              <ObjectParticipantID>Third_party_04_Pirate_LaFortune</ObjectParticipantID>
-                                            </ObjectFilter>
-                                          </Values>
-                                        </Action>
-                                      </Item>
-                                    </Actions>
-                                  </ActionList>
-                                </Values>
-                              </DelayedActions>
-                            </ActionDelayedActions>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionDelayedActions</Template>
-                          <Values>
-                            <Action />
-                            <ActionDelayedActions>
-                              <ExecutionDelay>3000</ExecutionDelay>
-                              <DelayedActions>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <ActionList>
-                                    <Actions>
-                                      <Item>
-                                        <Action>
-                                          <Template>ActionDeleteObjects</Template>
-                                          <Values>
-                                            <Action />
-                                            <ActionDeleteObjects>
-                                              <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
-                                            </ActionDeleteObjects>
-                                            <ObjectFilter>
-                                              <ObjectGUID>700138</ObjectGUID>
-                                              <CheckParticipantID>1</CheckParticipantID>
-                                              <ObjectParticipantID>Neutral</ObjectParticipantID>
-                                              <ObjectSession>180025</ObjectSession>
-                                            </ObjectFilter>
-                                          </Values>
-                                        </Action>
-                                      </Item>
-                                    </Actions>
-                                  </ActionList>
-                                </Values>
-                              </DelayedActions>
-                            </ActionDelayedActions>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-          </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerCondition>
-                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                  <Values>
-                    <Condition />
-                    <ConditionAlwaysTrue />
-                  </Values>
-                </TriggerCondition>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
-        </Trigger>
-        <TriggerSetup>
-          <AutoRegisterTrigger>1</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-        </TriggerSetup>
-      </Values>
-    </Asset>
-    
   </ModOp>
+  
+  <!-- ######################################## -->
+  
+  <!-- instead of working around with triggers for warfleet on harbor destroy (1500001117 and 1500001127), we might make the pirate be defeated as soon as the harbor is destryoed, by increasing the moral value from it ( or set it to not and change attackabletype to none): -->
+  
+  <!-- <ModOp Type="merge" GUID='100681,100682' Path="/Values"> -->
+    <!-- <Attackable> -->
+      <!-- <MoralePower>5000</MoralePower> -->
+    <!-- </Attackable> -->
+    <!-- <UpgradeList> -->
+      <!-- <DefaultBuff>1500001128</DefaultBuff> -->
+    <!-- </UpgradeList> -->
+  <!-- </ModOp> -->
+  <!-- <ModOp Type="addNextSibling" GUID="192176"> -->
+    <!-- <Asset> -->
+      <!-- <Template>HarbourOfficeBuff</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001128</GUID> -->
+          <!-- <Name>50% Less Damage from everything</Name> -->
+        <!-- </Standard> -->
+        <!-- <AttackableUpgrade> -->
+          <!-- <DamageReceiveFactor> -->
+            <!-- <Cannon> -->
+              <!-- <Factor>0.5</Factor> -->
+            <!-- </Cannon> -->
+            <!-- <Normal> -->
+              <!-- <Factor>0.5</Factor> -->
+            <!-- </Normal> -->
+            <!-- <Torpedo> -->
+              <!-- <Factor>0.5</Factor> -->
+            <!-- </Torpedo> -->
+            <!-- <BigBertha> -->
+              <!-- <Factor>0.5</Factor> -->
+            <!-- </BigBertha> -->
+          <!-- </DamageReceiveFactor> -->
+        <!-- </AttackableUpgrade> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+  
   
 </ModOps>

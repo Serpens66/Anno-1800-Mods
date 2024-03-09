@@ -4,9 +4,11 @@
     <!-- this is mostly to make siege of the pirate island a bit more difficult, in vanilla you can simply put ~3 ships around pirate island and destroy the single ships spawed by pirates easily -->
       <!-- with this the pirate will spawn 4*humanplayerslots of ships at once after a while, so it is a bit harder to siege -->
 
-      <!-- TODO: test ob IsOption bei Main reicht, um ganzen trigger zu erledigen, auch wenn einer der subconditions unwahr ist -->
+  <!-- beißt sich evlt mit meinem Stronger pirate mod spawnships (evlt eh in einen mod mergen) -->
+   <!-- weil dadurch ja 1 schiff pro human spawnen kann für variation, was dann den check hier obs maxmial 2 aktive schiffe gibt, jedesmal sprengt -->
+   <!-- erhöhe den maximal check auf 3 -->
 
-  
+  <!-- 1500001145 and 1500001146 will be unlocked as long a pirate lighthouse is no ruin==not defeated -->
   <ModOp Type="addNextSibling" GUID="130248">
     <Asset>
       <Template>Trigger</Template>
@@ -35,16 +37,13 @@
                 <Values>
                   <Trigger>
                     <TriggerCondition>
-                      <Template>ConditionPlayerCounter</Template>
+                      <Template>ConditionUnlocked</Template>
                       <Values>
                         <Condition />
-                        <ConditionPlayerCounter>
-                          <PlayerCounter>ObjectBuilt</PlayerCounter>
-                          <Context>100707</Context>
-                          <CounterAmount>1</CounterAmount>
-                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
-                        </ConditionPlayerCounter>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001145</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
                     <SubTriggers>
@@ -58,9 +57,9 @@
                                 <Values>
                                   <Condition />
                                   <ConditionPlayerCounter>
-                                    <PlayerCounter>RuinCount</PlayerCounter>
-                                    <Context>100707</Context>
-                                    <CounterAmount>0</CounterAmount>
+                                    <PlayerCounter>ObjectBuilt</PlayerCounter>
+                                    <Context>700138</Context>
+                                    <CounterAmount>3</CounterAmount>
                                     <ComparisonOp>AtMost</ComparisonOp>
                                     <CheckSpecificParticipant>1</CheckSpecificParticipant>
                                     <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
@@ -74,172 +73,120 @@
                                     <Values>
                                       <Trigger>
                                         <TriggerCondition>
-                                          <Template>ConditionPlayerCounter</Template>
+                                          <Template>ConditionTimer</Template>
                                           <Values>
                                             <Condition />
-                                            <ConditionPlayerCounter>
-                                              <PlayerCounter>ObjectBuilt</PlayerCounter>
-                                              <Context>700138</Context>
-                                              <CounterAmount>2</CounterAmount>
-                                              <ComparisonOp>AtMost</ComparisonOp>
-                                              <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                              <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
-                                            </ConditionPlayerCounter>
+                                            <ConditionTimer>
+                                              <TimeLimit>3600000</TimeLimit>
+                                            </ConditionTimer>
                                           </Values>
                                         </TriggerCondition>
-                                        <SubTriggers>
+                                        <TriggerActions> 
                                           <Item>
-                                            <SubTrigger>
-                                              <Template>AutoCreateTrigger</Template>
+                                            <TriggerAction>
+                                              <Template>ActionRegisterTrigger</Template>
                                               <Values>
-                                                <Trigger>
-                                                  <TriggerCondition>
-                                                    <Template>ConditionTimer</Template>
-                                                    <Values>
-                                                      <Condition />
-                                                      <ConditionTimer>
-                                                        <TimeLimit>3600000</TimeLimit>
-                                                      </ConditionTimer>
-                                                    </Values>
-                                                  </TriggerCondition>
-                                                  <SubTriggers>
-                                                    <Item>
-                                                      <SubTrigger>
-                                                        <Template>AutoCreateTrigger</Template>
-                                                        <Values>
-                                                          <Trigger>
-                                                            <TriggerCondition>
-                                                              <Template>ConditionPlayerCounter</Template>
-                                                              <Values>
-                                                                <Condition>
-                                                                  <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                                                                </Condition>
-                                                                <ConditionPlayerCounter>
-                                                                  <PlayerCounter>ObjectBuilt</PlayerCounter>
-                                                                  <Context>700138</Context>
-                                                                  <CounterAmount>2</CounterAmount>
-                                                                  <ComparisonOp>AtMost</ComparisonOp>
-                                                                  <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                                                  <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
-                                                                </ConditionPlayerCounter>
-                                                              </Values>
-                                                            </TriggerCondition>
-                                                            <TriggerActions> 
-                                                              <Item>
-                                                                <TriggerAction>
-                                                                  <Template>ActionRegisterTrigger</Template>
-                                                                  <Values>
-                                                                    <Action />
-                                                                    <ActionRegisterTrigger>
-                                                                      <TriggerAsset>1500003835</TriggerAsset>
-                                                                    </ActionRegisterTrigger>
-                                                                  </Values>
-                                                                </TriggerAction>
-                                                              </Item>
-                                                              <Item>
-                                                                <TriggerAction>
-                                                                  <Template>ActionDelayedActions</Template>
-                                                                  <Values>
-                                                                    <Action />
-                                                                    <ActionDelayedActions>
-                                                                      <ExecutionDelay>500</ExecutionDelay>
-                                                                      <DelayedActions>
-                                                                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                                                        <Values>
-                                                                          <ActionList>
-                                                                            <Actions>
-                                                                              <Item>
-                                                                                <Action>
-                                                                                  <Template>ActionRegisterTrigger</Template>
-                                                                                  <Values>
-                                                                                    <Action />
-                                                                                    <ActionRegisterTrigger>
-                                                                                      <TriggerAsset>1500003835</TriggerAsset>
-                                                                                    </ActionRegisterTrigger>
-                                                                                  </Values>
-                                                                                </Action>
-                                                                              </Item>
-                                                                            </Actions>
-                                                                          </ActionList>
-                                                                        </Values>
-                                                                      </DelayedActions>
-                                                                    </ActionDelayedActions>
-                                                                  </Values>
-                                                                </TriggerAction>
-                                                              </Item>
-                                                              <Item>
-                                                                <TriggerAction>
-                                                                  <Template>ActionDelayedActions</Template>
-                                                                  <Values>
-                                                                    <Action />
-                                                                    <ActionDelayedActions>
-                                                                      <ExecutionDelay>1000</ExecutionDelay>
-                                                                      <DelayedActions>
-                                                                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                                                        <Values>
-                                                                          <ActionList>
-                                                                            <Actions>
-                                                                              <Item>
-                                                                                <Action>
-                                                                                  <Template>ActionRegisterTrigger</Template>
-                                                                                  <Values>
-                                                                                    <Action />
-                                                                                    <ActionRegisterTrigger>
-                                                                                      <TriggerAsset>1500003835</TriggerAsset>
-                                                                                    </ActionRegisterTrigger>
-                                                                                  </Values>
-                                                                                </Action>
-                                                                              </Item>
-                                                                            </Actions>
-                                                                          </ActionList>
-                                                                        </Values>
-                                                                      </DelayedActions>
-                                                                    </ActionDelayedActions>
-                                                                  </Values>
-                                                                </TriggerAction>
-                                                              </Item>
-                                                              <Item>
-                                                                <TriggerAction>
-                                                                  <Template>ActionDelayedActions</Template>
-                                                                  <Values>
-                                                                    <Action />
-                                                                    <ActionDelayedActions>
-                                                                      <ExecutionDelay>1500</ExecutionDelay>
-                                                                      <DelayedActions>
-                                                                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                                                        <Values>
-                                                                          <ActionList>
-                                                                            <Actions>
-                                                                              <Item>
-                                                                                <Action>
-                                                                                  <Template>ActionRegisterTrigger</Template>
-                                                                                  <Values>
-                                                                                    <Action />
-                                                                                    <ActionRegisterTrigger>
-                                                                                      <TriggerAsset>1500003835</TriggerAsset>
-                                                                                    </ActionRegisterTrigger>
-                                                                                  </Values>
-                                                                                </Action>
-                                                                              </Item>
-                                                                            </Actions>
-                                                                          </ActionList>
-                                                                        </Values>
-                                                                      </DelayedActions>
-                                                                    </ActionDelayedActions>
-                                                                  </Values>
-                                                                </TriggerAction>
-                                                              </Item>
-                                                            </TriggerActions>
-                                                          </Trigger>
-                                                        </Values>
-                                                      </SubTrigger>
-                                                    </Item>
-                                                  </SubTriggers>
-                                                </Trigger>
+                                                <Action />
+                                                <ActionRegisterTrigger>
+                                                  <TriggerAsset>1500003835</TriggerAsset>
+                                                </ActionRegisterTrigger>
                                               </Values>
-                                            </SubTrigger>
+                                            </TriggerAction>
                                           </Item>
-                                        </SubTriggers>
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionDelayedActions</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionDelayedActions>
+                                                  <ExecutionDelay>500</ExecutionDelay>
+                                                  <DelayedActions>
+                                                    <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                    <Values>
+                                                      <ActionList>
+                                                        <Actions>
+                                                          <Item>
+                                                            <Action>
+                                                              <Template>ActionRegisterTrigger</Template>
+                                                              <Values>
+                                                                <Action />
+                                                                <ActionRegisterTrigger>
+                                                                  <TriggerAsset>1500003835</TriggerAsset>
+                                                                </ActionRegisterTrigger>
+                                                              </Values>
+                                                            </Action>
+                                                          </Item>
+                                                        </Actions>
+                                                      </ActionList>
+                                                    </Values>
+                                                  </DelayedActions>
+                                                </ActionDelayedActions>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionDelayedActions</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionDelayedActions>
+                                                  <ExecutionDelay>1000</ExecutionDelay>
+                                                  <DelayedActions>
+                                                    <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                    <Values>
+                                                      <ActionList>
+                                                        <Actions>
+                                                          <Item>
+                                                            <Action>
+                                                              <Template>ActionRegisterTrigger</Template>
+                                                              <Values>
+                                                                <Action />
+                                                                <ActionRegisterTrigger>
+                                                                  <TriggerAsset>1500003835</TriggerAsset>
+                                                                </ActionRegisterTrigger>
+                                                              </Values>
+                                                            </Action>
+                                                          </Item>
+                                                        </Actions>
+                                                      </ActionList>
+                                                    </Values>
+                                                  </DelayedActions>
+                                                </ActionDelayedActions>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionDelayedActions</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionDelayedActions>
+                                                  <ExecutionDelay>1500</ExecutionDelay>
+                                                  <DelayedActions>
+                                                    <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                    <Values>
+                                                      <ActionList>
+                                                        <Actions>
+                                                          <Item>
+                                                            <Action>
+                                                              <Template>ActionRegisterTrigger</Template>
+                                                              <Values>
+                                                                <Action />
+                                                                <ActionRegisterTrigger>
+                                                                  <TriggerAsset>1500003835</TriggerAsset>
+                                                                </ActionRegisterTrigger>
+                                                              </Values>
+                                                            </Action>
+                                                          </Item>
+                                                        </Actions>
+                                                      </ActionList>
+                                                    </Values>
+                                                  </DelayedActions>
+                                                </ActionDelayedActions>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
                                       </Trigger>
                                     </Values>
                                   </SubTrigger>
@@ -306,16 +253,13 @@
                 <Values>
                   <Trigger>
                     <TriggerCondition>
-                      <Template>ConditionPlayerCounter</Template>
+                      <Template>ConditionUnlocked</Template>
                       <Values>
                         <Condition />
-                        <ConditionPlayerCounter>
-                          <PlayerCounter>ObjectBuilt</PlayerCounter>
-                          <Context>100708</Context>
-                          <CounterAmount>1</CounterAmount>
-                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                          <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
-                        </ConditionPlayerCounter>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001146</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
                     <SubTriggers>
@@ -329,9 +273,9 @@
                                 <Values>
                                   <Condition />
                                   <ConditionPlayerCounter>
-                                    <PlayerCounter>RuinCount</PlayerCounter>
-                                    <Context>100708</Context>
-                                    <CounterAmount>0</CounterAmount>
+                                    <PlayerCounter>ObjectBuilt</PlayerCounter>
+                                    <Context>700138</Context>
+                                    <CounterAmount>3</CounterAmount>
                                     <ComparisonOp>AtMost</ComparisonOp>
                                     <CheckSpecificParticipant>1</CheckSpecificParticipant>
                                     <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
@@ -345,172 +289,120 @@
                                     <Values>
                                       <Trigger>
                                         <TriggerCondition>
-                                          <Template>ConditionPlayerCounter</Template>
+                                          <Template>ConditionTimer</Template>
                                           <Values>
                                             <Condition />
-                                            <ConditionPlayerCounter>
-                                              <PlayerCounter>ObjectBuilt</PlayerCounter>
-                                              <Context>700138</Context>
-                                              <CounterAmount>2</CounterAmount>
-                                              <ComparisonOp>AtMost</ComparisonOp>
-                                              <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                              <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
-                                            </ConditionPlayerCounter>
+                                            <ConditionTimer>
+                                              <TimeLimit>3600000</TimeLimit>
+                                            </ConditionTimer>
                                           </Values>
                                         </TriggerCondition>
-                                        <SubTriggers>
+                                        <TriggerActions> 
                                           <Item>
-                                            <SubTrigger>
-                                              <Template>AutoCreateTrigger</Template>
+                                            <TriggerAction>
+                                              <Template>ActionRegisterTrigger</Template>
                                               <Values>
-                                                <Trigger>
-                                                  <TriggerCondition>
-                                                    <Template>ConditionTimer</Template>
-                                                    <Values>
-                                                      <Condition />
-                                                      <ConditionTimer>
-                                                        <TimeLimit>3600000</TimeLimit>
-                                                      </ConditionTimer>
-                                                    </Values>
-                                                  </TriggerCondition>
-                                                  <SubTriggers>
-                                                    <Item>
-                                                      <SubTrigger>
-                                                        <Template>AutoCreateTrigger</Template>
-                                                        <Values>
-                                                          <Trigger>
-                                                            <TriggerCondition>
-                                                              <Template>ConditionPlayerCounter</Template>
-                                                              <Values>
-                                                                <Condition>
-                                                                  <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                                                                </Condition>
-                                                                <ConditionPlayerCounter>
-                                                                  <PlayerCounter>ObjectBuilt</PlayerCounter>
-                                                                  <Context>700138</Context>
-                                                                  <CounterAmount>2</CounterAmount>
-                                                                  <ComparisonOp>AtMost</ComparisonOp>
-                                                                  <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                                                  <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
-                                                                </ConditionPlayerCounter>
-                                                              </Values>
-                                                            </TriggerCondition>
-                                                            <TriggerActions> 
-                                                              <Item>
-                                                                <TriggerAction>
-                                                                  <Template>ActionRegisterTrigger</Template>
-                                                                  <Values>
-                                                                    <Action />
-                                                                    <ActionRegisterTrigger>
-                                                                      <TriggerAsset>1500003836</TriggerAsset>
-                                                                    </ActionRegisterTrigger>
-                                                                  </Values>
-                                                                </TriggerAction>
-                                                              </Item>
-                                                              <Item>
-                                                                <TriggerAction>
-                                                                  <Template>ActionDelayedActions</Template>
-                                                                  <Values>
-                                                                    <Action />
-                                                                    <ActionDelayedActions>
-                                                                      <ExecutionDelay>500</ExecutionDelay>
-                                                                      <DelayedActions>
-                                                                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                                                        <Values>
-                                                                          <ActionList>
-                                                                            <Actions>
-                                                                              <Item>
-                                                                                <Action>
-                                                                                  <Template>ActionRegisterTrigger</Template>
-                                                                                  <Values>
-                                                                                    <Action />
-                                                                                    <ActionRegisterTrigger>
-                                                                                      <TriggerAsset>1500003836</TriggerAsset>
-                                                                                    </ActionRegisterTrigger>
-                                                                                  </Values>
-                                                                                </Action>
-                                                                              </Item>
-                                                                            </Actions>
-                                                                          </ActionList>
-                                                                        </Values>
-                                                                      </DelayedActions>
-                                                                    </ActionDelayedActions>
-                                                                  </Values>
-                                                                </TriggerAction>
-                                                              </Item>
-                                                              <Item>
-                                                                <TriggerAction>
-                                                                  <Template>ActionDelayedActions</Template>
-                                                                  <Values>
-                                                                    <Action />
-                                                                    <ActionDelayedActions>
-                                                                      <ExecutionDelay>1000</ExecutionDelay>
-                                                                      <DelayedActions>
-                                                                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                                                        <Values>
-                                                                          <ActionList>
-                                                                            <Actions>
-                                                                              <Item>
-                                                                                <Action>
-                                                                                  <Template>ActionRegisterTrigger</Template>
-                                                                                  <Values>
-                                                                                    <Action />
-                                                                                    <ActionRegisterTrigger>
-                                                                                      <TriggerAsset>1500003836</TriggerAsset>
-                                                                                    </ActionRegisterTrigger>
-                                                                                  </Values>
-                                                                                </Action>
-                                                                              </Item>
-                                                                            </Actions>
-                                                                          </ActionList>
-                                                                        </Values>
-                                                                      </DelayedActions>
-                                                                    </ActionDelayedActions>
-                                                                  </Values>
-                                                                </TriggerAction>
-                                                              </Item>
-                                                              <Item>
-                                                                <TriggerAction>
-                                                                  <Template>ActionDelayedActions</Template>
-                                                                  <Values>
-                                                                    <Action />
-                                                                    <ActionDelayedActions>
-                                                                      <ExecutionDelay>1500</ExecutionDelay>
-                                                                      <DelayedActions>
-                                                                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                                                        <Values>
-                                                                          <ActionList>
-                                                                            <Actions>
-                                                                              <Item>
-                                                                                <Action>
-                                                                                  <Template>ActionRegisterTrigger</Template>
-                                                                                  <Values>
-                                                                                    <Action />
-                                                                                    <ActionRegisterTrigger>
-                                                                                      <TriggerAsset>1500003836</TriggerAsset>
-                                                                                    </ActionRegisterTrigger>
-                                                                                  </Values>
-                                                                                </Action>
-                                                                              </Item>
-                                                                            </Actions>
-                                                                          </ActionList>
-                                                                        </Values>
-                                                                      </DelayedActions>
-                                                                    </ActionDelayedActions>
-                                                                  </Values>
-                                                                </TriggerAction>
-                                                              </Item>
-                                                            </TriggerActions>
-                                                          </Trigger>
-                                                        </Values>
-                                                      </SubTrigger>
-                                                    </Item>
-                                                  </SubTriggers>
-                                                </Trigger>
+                                                <Action />
+                                                <ActionRegisterTrigger>
+                                                  <TriggerAsset>1500003836</TriggerAsset>
+                                                </ActionRegisterTrigger>
                                               </Values>
-                                            </SubTrigger>
+                                            </TriggerAction>
                                           </Item>
-                                        </SubTriggers>
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionDelayedActions</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionDelayedActions>
+                                                  <ExecutionDelay>500</ExecutionDelay>
+                                                  <DelayedActions>
+                                                    <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                    <Values>
+                                                      <ActionList>
+                                                        <Actions>
+                                                          <Item>
+                                                            <Action>
+                                                              <Template>ActionRegisterTrigger</Template>
+                                                              <Values>
+                                                                <Action />
+                                                                <ActionRegisterTrigger>
+                                                                  <TriggerAsset>1500003836</TriggerAsset>
+                                                                </ActionRegisterTrigger>
+                                                              </Values>
+                                                            </Action>
+                                                          </Item>
+                                                        </Actions>
+                                                      </ActionList>
+                                                    </Values>
+                                                  </DelayedActions>
+                                                </ActionDelayedActions>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionDelayedActions</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionDelayedActions>
+                                                  <ExecutionDelay>1000</ExecutionDelay>
+                                                  <DelayedActions>
+                                                    <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                    <Values>
+                                                      <ActionList>
+                                                        <Actions>
+                                                          <Item>
+                                                            <Action>
+                                                              <Template>ActionRegisterTrigger</Template>
+                                                              <Values>
+                                                                <Action />
+                                                                <ActionRegisterTrigger>
+                                                                  <TriggerAsset>1500003836</TriggerAsset>
+                                                                </ActionRegisterTrigger>
+                                                              </Values>
+                                                            </Action>
+                                                          </Item>
+                                                        </Actions>
+                                                      </ActionList>
+                                                    </Values>
+                                                  </DelayedActions>
+                                                </ActionDelayedActions>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                          <Item>
+                                            <TriggerAction>
+                                              <Template>ActionDelayedActions</Template>
+                                              <Values>
+                                                <Action />
+                                                <ActionDelayedActions>
+                                                  <ExecutionDelay>1500</ExecutionDelay>
+                                                  <DelayedActions>
+                                                    <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                                    <Values>
+                                                      <ActionList>
+                                                        <Actions>
+                                                          <Item>
+                                                            <Action>
+                                                              <Template>ActionRegisterTrigger</Template>
+                                                              <Values>
+                                                                <Action />
+                                                                <ActionRegisterTrigger>
+                                                                  <TriggerAsset>1500003836</TriggerAsset>
+                                                                </ActionRegisterTrigger>
+                                                              </Values>
+                                                            </Action>
+                                                          </Item>
+                                                        </Actions>
+                                                      </ActionList>
+                                                    </Values>
+                                                  </DelayedActions>
+                                                </ActionDelayedActions>
+                                              </Values>
+                                            </TriggerAction>
+                                          </Item>
+                                        </TriggerActions>
                                       </Trigger>
                                     </Values>
                                   </SubTrigger>
@@ -550,7 +442,7 @@
       </Values>
     </Asset>
     
-    
+    <!-- using IsOptional on each subtrigger level is important if we want the main trigger to clear, regardless if anything is true or not.  -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
@@ -580,61 +472,30 @@
                 <Values>
                   <Trigger>
                     <TriggerCondition>
-                      <Template>ConditionPlayerCounter</Template>
+                      <Template>ConditionUnlocked</Template>
                       <Values>
                         <Condition>
                           <IsOptional>1</IsOptional>
                         </Condition>
-                        <ConditionPlayerCounter>
-                          <PlayerCounter>ObjectBuilt</PlayerCounter>
-                          <Context>100707</Context>
-                          <CounterAmount>1</CounterAmount>
-                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                          <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
-                        </ConditionPlayerCounter>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001145</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
-                    <SubTriggers>
+                    <TriggerActions>
                       <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
                           <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionPlayerCounter</Template>
-                                <Values>
-                                  <Condition>
-                                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                                    <IsOptional>1</IsOptional>
-                                  </Condition>
-                                  <ConditionPlayerCounter>
-                                    <PlayerCounter>RuinCount</PlayerCounter>
-                                    <Context>100707</Context>
-                                    <CounterAmount>0</CounterAmount>
-                                    <ComparisonOp>AtMost</ComparisonOp>
-                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                    <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
-                                  </ConditionPlayerCounter>
-                                </Values>
-                              </TriggerCondition>
-                              <TriggerActions>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionExecuteScript</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionExecuteScript>
-                                        <ScriptFileName>data/scripts_serp/forcebuild_harlow.lua</ScriptFileName>
-                                      </ActionExecuteScript>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                              </TriggerActions>
-                            </Trigger>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/forcebuild_harlow.lua</ScriptFileName>
+                            </ActionExecuteScript>
                           </Values>
-                        </SubTrigger>
+                        </TriggerAction>
                       </Item>
-                    </SubTriggers>
+                    </TriggerActions>
                   </Trigger>
                 </Values>
               </SubTrigger>
@@ -677,61 +538,30 @@
                 <Values>
                   <Trigger>
                     <TriggerCondition>
-                      <Template>ConditionPlayerCounter</Template>
+                      <Template>ConditionUnlocked</Template>
                       <Values>
                         <Condition>
                           <IsOptional>1</IsOptional>
                         </Condition>
-                        <ConditionPlayerCounter>
-                          <PlayerCounter>ObjectBuilt</PlayerCounter>
-                          <Context>100708</Context>
-                          <CounterAmount>1</CounterAmount>
-                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                          <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
-                        </ConditionPlayerCounter>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001145</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
-                    <SubTriggers>
+                    <TriggerActions>
                       <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
                           <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionPlayerCounter</Template>
-                                <Values>
-                                  <Condition>
-                                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                                    <IsOptional>1</IsOptional>
-                                  </Condition>
-                                  <ConditionPlayerCounter>
-                                    <PlayerCounter>RuinCount</PlayerCounter>
-                                    <Context>100708</Context>
-                                    <CounterAmount>0</CounterAmount>
-                                    <ComparisonOp>AtMost</ComparisonOp>
-                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                    <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
-                                  </ConditionPlayerCounter>
-                                </Values>
-                              </TriggerCondition>
-                              <TriggerActions>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionExecuteScript</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionExecuteScript>
-                                        <ScriptFileName>data/scripts_serp/forcebuild_lafortune.lua</ScriptFileName>
-                                      </ActionExecuteScript>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                              </TriggerActions>
-                            </Trigger>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/forcebuild_lafortune.lua</ScriptFileName>
+                            </ActionExecuteScript>
                           </Values>
-                        </SubTrigger>
+                        </TriggerAction>
                       </Item>
-                    </SubTriggers>
+                    </TriggerActions>
                   </Trigger>
                 </Values>
               </SubTrigger>

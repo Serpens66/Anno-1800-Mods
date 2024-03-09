@@ -11,7 +11,8 @@
   <!-- For now only declare war on every human player, not AIs, because I don't want to mess with their personalities (like some that never would be at war with pirates) -->
   
   
-  <!-- 1500001147 is unlocked as long as pirate Harlow is defeated -->
+  <!-- 1500001147 / 1500001148 is unlocked as long as pirate is defeated -->
+   <!-- we want this not only to be executed directly at defeat, but also while pirate is defeated (and while there is not comebackfleet currently repairing) if a human somehow achieves not-war with pirates (eg. because pirate offered it shortly before defeat, but the message only comes through after defeat) -->
   <ModOp Type="addNextSibling" GUID="130248">
     <Asset>
       <Template>Trigger</Template>
@@ -69,7 +70,7 @@
                                     <Template>AutoCreateTrigger</Template>
                                     <Values>
                                       <Trigger>
-                                        <!-- need a short delay here, because Quest 153262 ends an only few ms after the pirate base is completed again -->
+                                        <!-- need a short delay here, because Quest 153262 ends and only few ms after the pirate base is completed again -->
                                         <TriggerCondition>
                                           <Template>ConditionTimer</Template>
                                           <Values>
@@ -170,7 +171,7 @@
                                     <Template>AutoCreateTrigger</Template>
                                     <Values>
                                       <Trigger>
-                                        <!-- need a short delay here, because Quest 153262 ends an only few ms after the pirate base is completed again -->
+                                        <!-- need a short delay here, because Quest 153262 ends and only few ms after the pirate base is completed again -->
                                         <TriggerCondition>
                                           <Template>ConditionTimer</Template>
                                           <Values>
@@ -261,10 +262,11 @@
     
   </ModOp>
   
-  <!-- We also could use ActionExecuteDiplomaticAction DeclareWar instead of ActionForceDiplomaticRelation, but the game shows one a Sideotification per human player for them for whatever reason. -->
+  <!-- We also could use ActionExecuteDiplomaticAction DeclareWar instead of ActionForceDiplomaticRelation, but the game shows one Sideotification per human player for them for whatever reason. -->
    <!-- and we also get not portrait notification since pirate is no longer there. ActionForceDiplomaticRelation to set it to War works fine (other treaties dont work so well, eg. TradeRights will be without Peace and such problems) -->
-    <!-- I think ActionExecuteDiplomaticAction also causes a newspaper article, while ActionForceDiplomaticRelation does not -->
+    <!-- I think ActionExecuteDiplomaticAction also causes a negative newspaper article, while ActionForceDiplomaticRelation does not -->
    <!-- A7_QuestDummyQuest requires my shared_ObjectDummies mod, but it is included in shared_PirateDefeatHelpers which is also included here -->
+    <!-- we will start and instantly solve this dummy quest to show a portrait notification with -70 reputation on "success" and Text that war was declared -->
   <ModOp Type="AddNextSibling" GUID="152264">
     <Asset>
       <Template>A7_QuestDummyQuest</Template>
@@ -455,6 +457,6 @@
         </Reward>
       </Values>
     </Asset>
-  
+  </ModOp>
   
 </ModOps>

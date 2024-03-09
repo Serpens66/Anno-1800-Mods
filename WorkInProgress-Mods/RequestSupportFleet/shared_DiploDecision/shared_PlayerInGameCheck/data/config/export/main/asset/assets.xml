@@ -1,12 +1,15 @@
 <ModOps>
     
     
-  <!-- FeatureUnlock to test if a player is discovered and alive -->
-  <!-- uses Serp GUIDS from 1500003850 to 1500003867 (up to 1500003869 is reserved) -->
+  <!-- FeatureUnlock to test if a player is discovered AND alive (still owns ships/Kontor) -->
+   <!-- Also contains a check if processing human player lost the game or not -->
+  <!-- uses Serp GUIDS from 1500003850 to 1500003868 (up to 1500003869 is reserved) -->
     <!-- 1500003867 im shared mod CP_KontorShips -->
     
     
-  <!-- USAGE: use the GUID from FeatureUnlock below, to check if executing player discovered the other and if the other is still alive: -->
+  <!-- USAGE: use the GUID from FeatureUnlocks below, to check if executing player discovered the other and if the other is still alive: -->
+   <!-- eg 1500003850 checks if Harlow is discovered currently not defeated -->
+     <!-- 1500003859 checks for Smith AI is discovered and still owns ships/Kontor -->
   <!-- <TriggerCondition> -->
     <!-- <Template>ConditionUnlocked</Template> -->
     <!-- <Values> -->
@@ -18,7 +21,7 @@
     <!-- </Values> -->
   <!-- </TriggerCondition> -->
     
-  <!-- to check if the processing player is alive you can simply use: -->
+  <!-- to check if the processing player still owns a ship/kontor you can simply use: -->
   
   <!-- <TriggerCondition> -->
     <!-- <Template>ConditionPlayerCounter</Template> -->
@@ -31,15 +34,111 @@
     <!-- </Values> -->
   <!-- </TriggerCondition> -->
   
+  <!-- ATTENTION: -->
+   <!-- Human players can still own ships/islands while they already lost the game !! So for them better use the "processing has not lost" check: -->
+    <!-- <UnlockNeeded>1500003868</UnlockNeeded> -->
+   <!-- eg useful if you want to spawn new ships for the processing human every x minutes, unless he always lost the game. -->
+    <!-- (if you want this for AI you can use the check above for ships/kontors) -->
   
   <!-- ########################################################################################################################################## -->
+  <!-- ########################################################################################################################################## -->
   
-  
-    
   
   <!-- ACHTUNG: ConditionIsParticipantInGame ist nicht zuverlässig (bei Piraten-zerstört und auch bei Spielern die nicht in start session sind, wie lafortune) und ConditionMetagameLoaded/HumanPlayerCount zählt auch coop player mit! -->
     <!-- stattdessen prüfen wir bei humans/KI ob sie einen Kontor/Schiff besitzen -->
     <!-- und bei Piraten ob der Leuchtturm kaputt ist oder nicht -->
+  
+  
+  <ModOp Type="addNextSibling" GUID="130248">
+    <!-- Human Participants which were in the game when it was started, will continue to execute Triggers forever (and still may own buildings/ships), while AI does not (AI can only loose game by loosing all islands, ships will leave session then). -->
+     <!-- So in some cases it might be good to add an extra condition like this one to make sure sth is no longer executed for humans who already lost the game -->
+    <!-- <ConditionEvent>GameEnded</ConditionEvent> wird für alle processings ausgeführt, auch wenn nur ein participant verliert und alle anderen noch drin sind und normal weitersoielen -->
+    <!-- does not work and is not needed for AI, because they do not execute triggers anymore after they are defeated (unless you reset a alwaystrue trigger with ActionRegisterTrigger or ActionResetTrigger, which you should not do. use ResetTrigger instead!) -->
+    <!-- one could also check WinLoseState=Win, but you can continue the game after that, so does not makes much sense here -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003868</GUID>
+          <Name>Procssing Human has not lost the Game</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionGameEnded</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionGameEnded>
+                          <WinLoseState>Lose</WinLoseState>
+                        </ConditionGameEnded>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionGameEnded</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionGameEnded>
+                          <WinLoseState>Defeat</WinLoseState>
+                        </ConditionGameEnded>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500003868</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
   
   
   <!-- We allow RuinState for the pirate lighthouse, but still unattackable -->
