@@ -1,0 +1,165 @@
+<ModOps>
+
+  <!-- Serp GUID 1500004630 -->
+  
+  <!-- call our register scripts on savegame load -->
+	<ModOp Type="AddPrevSibling" GUID="1500004525" Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Values/ActionDelayedActions/DelayedActions/Values/ActionList/Actions/Item/Action/Values/ActionExecuteScript[ScriptFileName='data/scripts_serp/event_savegameloaded.lua']]">
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/register_cooppeers_ongameloaded.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  <!-- show a small message when opening the diplo menu at load, to explain the user what is happening -->
+  <ModOp GUID="130248" Type="AddNextSibling">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004630</GUID>
+          <Name>Lua CoopCheck Notification</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004630</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>AudioNotification</Template>
+                      <Values>
+                        <BaseNotification>
+                          <NotificationBlockingTime>0</NotificationBlockingTime>
+                          <NotificationPriority>-1</NotificationPriority>
+                          <NotificationMinDisplayTime>4000</NotificationMinDisplayTime>
+                          <DisplayTimeout>60000</DisplayTimeout>
+                        </BaseNotification>
+                        <AudioNotification>
+                          <AudioNotificationPortrait>45</AudioNotificationPortrait>
+                        </AudioNotification>
+                        <NotificationSubtitle>
+                          <Subtitle>1500004630</Subtitle>
+                        </NotificationSubtitle>
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004630</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- lua game.GUIManager.showNotification(1500004630) causes desync if not ALL human players show the very same at the same time, so we are using a FeatureUnlock instead above -->
+  <!-- <ModOp Type="addNextSibling" GUID="501204"> -->
+    <!-- <Asset> -->
+      <!-- <Template>AudioNotification</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500004630</GUID> -->
+          <!-- <Name>Lua CoopCheck Notification</Name> -->
+        <!-- </Standard> -->
+        <!-- <Notification> -->
+          <!-- <NotificationType> -->
+            <!-- <Template>AudioNotification</Template> -->
+            <!-- <Values> -->
+              <!-- <BaseNotification> -->
+                <!-- <NotificationBlockingTime>0</NotificationBlockingTime> -->
+                <!-- <NotificationPriority>-1</NotificationPriority> -->
+                <!-- <NotificationMinDisplayTime>4000</NotificationMinDisplayTime> -->
+                <!-- <DisplayTimeout>60000</DisplayTimeout> -->
+              <!-- </BaseNotification> -->
+              <!-- <AudioNotification> -->
+                <!-- <AudioNotificationPortrait>45</AudioNotificationPortrait> -->
+              <!-- </AudioNotification> -->
+              <!-- <NotificationSubtitle> -->
+                <!-- <Subtitle>1500004630</Subtitle> -->
+              <!-- </NotificationSubtitle> -->
+            <!-- </Values> -->
+          <!-- </NotificationType> -->
+        <!-- </Notification> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+  
+
+</ModOps>
