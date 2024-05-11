@@ -33,8 +33,14 @@ Coming Changes:
 Planned Mods:
 - Sabotage Mod
 - Request Support Fleet Mod, combined with Honor
+- and other mods in the WIP folder
 
 Please report back any bugs and if the mods do well with a mod manager, cause I did not test the new modinfo.json format.
+
+Using/Uploading my code/mods:  
+-
+Always ask me for permission before using code/uploading them anywhere. You can try to contact me here at github, eg. in the "issues" section or "Serp" in the anno modding discord (see invitation link below). Only if I do not respond within 1 month you are allowed to use my code, but always with credits by mentioning me and linking to the source, eg. this github page.  
+
 
 For more mods see the mod collection:
 <p align="center">
