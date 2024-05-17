@@ -1,0 +1,637 @@
+<ModOps>
+  
+  
+  
+   <!-- "In Brand" infotip status fixen, wie ich schon in nem anderen wIP mod als todo beschrieben hab -->
+   
+  
+  <!-- GrafikStuff: -->
+  
+  <!-- - data\graphics\effects\decals\fire_decal klingt interessant und wird in vanilla noch in keiner xfg verwendet, -->
+  <!-- Aus inem Grund sorgt Exploder Property dafür, dass die Projektile aufm boden einschlagend keine feuerexplsion mehr machen.. -->
+   <!-- im wasser aber scheinbar schon noch..gut auch an nem Luftschiff zu sehen, wenn das über land fliegt und getroffen wird, gibts kein feuerexplo, wenn über wasser, dann schon... -->
+  <!-- TODO: muss Lion sich mal angucken, falls wir bei feuerball projectilen bleiben -->
+  <!-- TODO dabei dann auch direkt Krater object spawnen, zb. 101842 (oder 101168, aber das lässt sich glaub ich nicht spawnen) -->
+    <!-- (und rausfinden, ob man die Debriss Objekte da auch definieren kann, die default Dinger sehen scheiße aus, vermutlich wird "data\graphics\effects\debris\debris01.cfg" oderso in den cfg dateien vorkommen) -->
+  
+  
+  
+  
+  <ModOp Type="AddNextSibling" GUID='132370'>
+    
+    <!-- TODO: test ob Attractiveness/InsecurityAttractiveness auch ankommt, wenns nicht inselowner gehört -->
+    <!-- Adding UpgradeList and Attackable (with AttackableType=NONE), so it can be affected by buffs, but only for visual purpose in UI (drop water) -->
+    <!-- TODO: vulkan ist noch nicht blocking, testen obs an cfg liegt oder woran -->
+    <!-- TODO: gucken ob man das Portrait des Owners irgendwie weg bekommt... ParticipantMessageArcheType=[NONE] hilft nicht, -->
+     <!-- und VisualSpawnOwner geht nur bei Schiffen... wäre sonst einzige Option nen neuen Participant zu machen... -->
+      <!-- Ja denke auf lange Sicht einen eigenen Participant machen wäre sinnvoll, oder (auch damit zb Krieg mit Königin nicht meine Quests kaputt macht? -->
+    <Asset>
+      <Template>BuffFactoryDummy_WithOwner</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004655</GUID>
+          <Name>BuffBuilding Volcano</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_1404.png</IconFilename>
+          <InfoDescription>802116</InfoDescription>
+        </Standard>
+        
+        <Building>
+        </Building>
+        <Selection>
+          <Selectable>1</Selectable>
+        </Selection>
+        
+        <Blocking />
+        <Mesh />
+        <UpgradeList>
+          <!-- DefaultBuff does not accept a EffectContainer... -->
+          <DefaultBuff>1500005010</DefaultBuff>
+        </UpgradeList>
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+        </Attackable>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/buildings/3rd_party/3rd_party_05_kontor/rock_jungle_19_always_visible.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <MinimapToken>
+          <!-- TokenAsset is minimpa, while StrategicMapAsset is TradeRoute map -->
+          <TokenAsset>1500004653</TokenAsset>
+          <StrategicMapAsset>1500004653</StrategicMapAsset>
+        </MinimapToken>
+        <BuffFactory>
+          <BaseBuff>1500004658</BaseBuff>
+          <BaseBuffScope>Radius</BaseBuffScope>
+          <BaseBuffDistance>130</BaseBuffDistance>
+        </BuffFactory>
+        <Culture>
+          <HasPollution>1</HasPollution>
+          <Attractiveness>100</Attractiveness>
+          <CultureType>Natur</CultureType>
+        </Culture>
+      </Values>
+    </Asset>
+    
+    <!-- a marker QuestStarter Object, needed to fetch the QuestArea in the eruption quest -->
+     <!-- can not directly be 1500004656 because the starter can only have onwer=neutral, while we need to check its existance with playercounter (for starting notification-quest) (which does not work for neutral) -->
+    <Asset>
+      <Template>BuildingDummy_WithOwner</Template>
+      <!-- <Template>BuffFactoryDummy_WithOwner</Template> -->
+      <Values>
+        <Standard>
+          <GUID>1500004669</GUID>
+          <Name>Erupting Volcano Quest-StartObject for Area-marking</Name>
+        </Standard>
+      </Values>
+    </Asset>
+        
+
+      <!-- TODO: minimapicon mit Lava oderso machen (damit man auf map, zb auf trademap zwischen aktiv und nicht aktiv unterscheiden kann) -->
+    <Asset>
+      <Template>BuffFactoryDummy_WithOwner</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004656</GUID>
+          <Name>Erupting Volcano buffbuilding</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_1404.png</IconFilename>
+        </Standard>
+        
+        <!-- <Building> -->
+          <!-- <Destructable>1</Destructable> -->
+          <!-- <Movable>1</Movable> -->
+        <!-- </Building> -->
+        <!-- <Selection> -->
+          <!-- <MultiSelectable>1</MultiSelectable> -->
+          <!-- <Selectable>1</Selectable> -->
+        <!-- </Selection> -->
+        <!-- <Mesh /> -->
+        
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/buildings/3rd_party/3rd_party_05_kontor/rock_jungle_19_always_visible.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <BuffFactory>
+          <BaseBuff>1500004662</BaseBuff>
+          <BaseBuffScope>Radius</BaseBuffScope>
+          <BaseBuffDistance>130</BaseBuffDistance>
+        </BuffFactory>
+        <CommandQueue>
+          <IsDestructable>0</IsDestructable>
+          <IsPlayerControllableVehicle>0</IsPlayerControllableVehicle>
+          <InsecurityAttractiveness>1000</InsecurityAttractiveness>
+          <MilitaryShipPoints>100</MilitaryShipPoints>
+          <TradeShipPoints>0</TradeShipPoints>
+          <AirShipPoints>0</AirShipPoints>
+        </CommandQueue>
+        <Culture>
+          <HasPollution>1</HasPollution>
+          <Attractiveness>-2000</Attractiveness>
+          <CultureType>DisasterTourism</CultureType>
+        </Culture>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="101842" Type="AddNextSibling">
+    <!-- die auskommentierten cfgs sieht man scheinbar nicht, keine ahnung was man da anpassen muss.. -->
+    <Asset>
+      <Template>VisualObjectEditor</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004970</GUID>
+          <Name>Explosion Crater and Smoke</Name>
+        </Standard>
+        <Mesh />
+        <Object>
+          <Variations>
+            <!-- <Item> -->
+              <!-- <Filename>data/graphics/landscape/terrain/decals/impact_craters/impact_crater_01.cfg</Filename> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Filename>data/graphics/effects/decals/damage_decals/crater_01.cfg</Filename> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Filename>data/graphics/effects/city_incidents/fire/fire_smoke_01.cfg</Filename> -->
+            <!-- </Item> -->
+            <Item>
+              <Filename>data/graphics/effects/decals/damage_decals/crater_01_terrain.cfg</Filename>
+            </Item>
+            <Item>
+              <Filename>data/graphics/effects/decals/damage_decals/crater_02_terrain.cfg</Filename>
+            </Item>
+          </Variations>
+          <AssignDefaultParticipant>1</AssignDefaultParticipant>
+        </Object>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <ModOp GUID="117300" Type="AddNextSibling">
+    <Asset>
+      <Template>MinimapDot</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004653</GUID>
+          <Name>Volcano Icon - TradeRoute Map</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_1404.png</IconFilename>
+        </Standard>
+        <MinimapTokenSettings>
+          <Color>White</Color>
+          <Filter>Ships</Filter>
+          <!-- <Tooltip>1500004644</Tooltip> -->
+          <UsePlayerColor>0</UsePlayerColor>
+          <!-- <Outline>data/ui/2kimages/main/icons/icon_routemap_airship_outline.png</Outline> -->
+        </MinimapTokenSettings>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  
+  
+  <!-- #################################################################################### -->
+  <!-- Vulcano Eruption Helpers -->
+  
+  
+  <ModOp Type="AddNextSibling" GUID="1054">
+
+    <!-- IMPORTANT!!: BasicAttackType=HunterAirship only auto-shoots at objects with the Bombarder property. While Seamine (and maybe also others) won't auto shoot at objects with the Bombarder property. -->
+      <!-- so depending on the BasicAttackType of the Attacker, the Victim needs or should not have the Bombarder property! -->
+      <!-- This is true regardless of what is written in MilitaryFeature/CanAttackTable, so most likely hardcoded outside of xml ... -->
+               
+    <Asset>
+      <Template>ObjectDummyWithOwner_Attacker</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004645</GUID>
+          <Name>Fireballs From the Sky</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_1404.png</IconFilename>
+        </Standard>
+        
+        <!-- <Mesh /> -->
+        <!-- <Selection> -->
+          <!-- <MultiSelectable>1</MultiSelectable> -->
+          <!-- <Selectable>1</Selectable> -->
+        <!-- </Selection> -->
+        
+        <Walking>
+          <!-- StartHeight defines the height between object and ground at all times (unless landing). with normal zoomsettings the max heigt the player can see the object is roughly 100 (250 with extended settings), while its already difficult starting at 75 and starting to get difficult at 40  -->
+          <!-- <StartHeight>250</StartHeight>           -->
+          <StartHeight>200</StartHeight>          
+          <Acceleration>8</Acceleration>
+          <TurnDeceleration>0</TurnDeceleration>
+          <TurnMovement>0</TurnMovement>
+          <ForwardSpeed>15</ForwardSpeed>
+          <!-- <ForwardSpeed>5</ForwardSpeed> -->
+          <TurnAroundRadius>2</TurnAroundRadius>
+          <Deceleration>8</Deceleration>
+          <TurnRadius>2</TurnRadius>
+          <TurnSpeed>200</TurnSpeed>
+          <!-- <TurnSpeed>100</TurnSpeed> -->
+          <TurnSpeedInPlace>100</TurnSpeedInPlace>
+          <!-- <TurnSpeedInPlace>50</TurnSpeedInPlace> -->
+          <LeaningMaxAngle>0</LeaningMaxAngle>          
+        </Walking>
+        <ItemContainer>
+          <SocketCount>2</SocketCount>
+        </ItemContainer>
+        <CommandQueue>
+          <MilitaryAirShipPoints>10</MilitaryAirShipPoints>
+          <MilitaryShipPoints>10</MilitaryShipPoints>
+          <InsecurityAttractiveness>-100</InsecurityAttractiveness>
+        </CommandQueue>
+        <Infolayer>
+          <AdditionalYOffset>-260</AdditionalYOffset>
+        </Infolayer>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>TurretFixed</ShootingTracking>
+          <Turrets>
+            <Item>
+              <TurnSpan>360</TurnSpan>
+              <TurretCfg>data/dlc11/graphics/vehicle/airships/airship_gun_turret/airship_gun_turret_01.cfg</TurretCfg>
+            </Item>
+          </Turrets>
+          <TargetAngleVariation>360</TargetAngleVariation>
+          <LineOfSightRange>15</LineOfSightRange>
+          <AttackRange>0</AttackRange>
+          <!-- <AttackRange>12</AttackRange> -->
+          <!-- <BaseDamage>50</BaseDamage> -->
+          <BaseDamage>10</BaseDamage>
+          <ReloadTime>50</ReloadTime>
+          <ProjectileAsset>1500004646</ProjectileAsset>
+          <!-- <ProjectileAsset>1500001439</ProjectileAsset> -->
+          <TurretExplosionEffectAsset>0</TurretExplosionEffectAsset>
+          <MuzzleEffectAssets />
+          <AccuracyByDistance />
+          <!-- <AccuracyBase>10</AccuracyBase> -->
+          <AccuracyBase>0</AccuracyBase>
+          <AccuracySpeedDecay>3</AccuracySpeedDecay>
+          <AccuracyIncreaseOverDistance>100</AccuracyIncreaseOverDistance>
+          <!-- <AccuracyBase>100</AccuracyBase> -->
+        </Attacker>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004645</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004674</GUID>
+          <Name>Fireballs From the Sky - shooting at Airships</Name>
+        </Standard>
+        <Attacker>
+          <BasicAttackType>HunterAirship</BasicAttackType>
+          <AttackRange>10</AttackRange>
+        </Attacker>
+      </Values>
+    </Asset>
+    
+    <!-- TODO: -->
+     <!-- in der ifo sind die dummy hit_metal entries relevant, wo hingeschossen werden kann. -->
+      <!-- dh. ich könnte einfach ein riesgies unsichtbares objekt machen, was ich über die insel lege und alle luftschiffe schießen von -->
+       <!-- oben dann auf dasselbe objekt, aber eben an untersch. stellen. -->
+        <!-- Haken/Feature wäre dabei allerdings, dass sie nicht mehr gerade runter schießen, sondern jedes luftschiff auf jedes hit-punkt schieße kann -->
+         <!-- was evlt doof aussehen könnte? -->
+    <Asset>
+      <Template>BuildingDummy_WithOwner_Victim</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004659</GUID>
+          <Name>Fireballs Victim ground</Name>
+        </Standard>
+        
+        <!-- <Selection> -->
+          <!-- <MultiSelectable>1</MultiSelectable> -->
+          <!-- <Selectable>1</Selectable> -->
+        <!-- </Selection> -->
+        
+        <Mesh>
+          <MeshPlacement>OnTerrain</MeshPlacement>
+          <OnlyVisibleInEditor>1</OnlyVisibleInEditor>
+        </Mesh>
+        <Attackable>
+          <AttackableType>IslandBuilding</AttackableType>
+          <MaximumHitPoints>30000</MaximumHitPoints>
+        </Attackable>
+        <UpgradeList>
+          <DefaultBuff>1500004661</DefaultBuff>
+        </UpgradeList>
+      </Values>      
+    </Asset>
+    <!-- Adding Mesh here, to place the dummy ships on water and slightly below the surface. Also works without Mesh to place them on water, but then fireballs will explode on water surface -->
+     <!-- with MeshPlacement=Default they will only spawn on land, not on water (with IgnoreTerrain they spawn only on water) -->
+    <Asset>
+      <Template>ObjectDummyWithOwner_Victim_WaterShip</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004654</GUID>
+          <Name>Fireballs Victim water</Name>
+        </Standard>
+        <Mesh>
+          <MeshPlacement>OnWater</MeshPlacement>
+          <OnlyVisibleInEditor>1</OnlyVisibleInEditor>
+        </Mesh>
+        <Walking>
+          <StartHeight>-2</StartHeight>
+        </Walking>
+        <Attackable>
+          <AttackableType>IslandBuilding</AttackableType>
+          <MaximumHitPoints>30000</MaximumHitPoints>
+        </Attackable>
+        <UpgradeList>
+          <DefaultBuff>1500004661</DefaultBuff>
+        </UpgradeList>
+      </Values>      
+    </Asset>
+    
+    
+    
+    <!-- for whatever reason AccuracyBase=0 makes the shots more spreaded ?! I thought a value of 0 means never miss? and therefore 100 often miss, which should spread them more? -->
+    <Asset>
+      <Template>BuildingDummy_WithOwner_Attacker</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004651</GUID>
+          <Name>Fireballs shooting from gound in the Sky</Name>
+        </Standard>
+        
+        <!-- <Selection> -->
+          <!-- <MultiSelectable>1</MultiSelectable> -->
+          <!-- <Selectable>1</Selectable> -->
+        <!-- </Selection> -->
+        <!-- <Mesh /> -->
+        
+        <Attacker>
+          <BasicAttackType>Flak</BasicAttackType>
+          <ShootingTracking>TurretFixed</ShootingTracking>
+          <TargetAngleVariation>360</TargetAngleVariation>
+          <LineOfSightRange>1</LineOfSightRange>
+          <AttackRange>1</AttackRange>
+          <BaseDamage>0</BaseDamage>
+          <ReloadTime>7</ReloadTime>
+          <ProjectileAsset>1500004969</ProjectileAsset>
+          <TurretExplosionEffectAsset>0</TurretExplosionEffectAsset>
+          <MuzzleEffectAssets />
+          <AccuracyByDistance />
+          <!-- <AccuracyBase>100</AccuracyBase> -->
+          <AccuracyBase>0</AccuracyBase>
+        </Attacker>
+      </Values>
+    </Asset>
+    
+    <!-- needs ItemContainer (and ForwardSpeed), otherwise it won't move in HitMovingTargetObjective -->
+     <!-- spread_target.cfg is a copy of dlc11/graphics/vehicle/airships/airship_transport_big/airship_transport_big.cfg  -->
+      <!-- with an ifo file that does contain alot more of the Dummy entries "hit_metal_", thanks to modder Lion. -->
+       <!-- This makes the shots at it much more spreaded -->
+    <Asset>
+      <Template>ObjectDummyWithOwner_Victim</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004670</GUID>
+          <Name>Fireball Victim high in the Sky</Name>
+        </Standard>
+        
+        <!-- <Mesh /> -->
+        
+        <Object>
+          <Variations>
+            <Item>
+              <!-- problem: some ifo metal_hit position values seem to be problematic (the ones added by lion, higher values) -->
+               <!-- because it seemsit hides the projectiles sometimes depending on the camera angle... no clue how to solve it and still spread -->
+              <!-- <Filename>data/dlc11/graphics/vehicle/airships/airship_transport_big/airship_transport_big.cfg</Filename> -->
+              <!-- <Filename>data/graphics_serp/spread_target/spread_target.cfg</Filename> -->
+              <!-- <Filename>data/graphics_serp/spread_target/spread_target2.cfg</Filename> -->
+              <!-- <Filename>data/graphics_serp/spread_target/spread_target3.cfg</Filename> -->
+              <!-- <Filename>data/graphics_serp/spread_target/test.cfg</Filename> -->
+              <!-- <Filename>data/graphics_serp/spread_target/airship_transport_big_test.cfg</Filename> -->
+              
+              <Filename>data/graphics_serp/spread_target/airship_transport_big_test2.cfg</Filename>
+              
+              <!-- <Filename>data/graphics_serp/spread_target/airship_transport_big_test3.cfg</Filename> -->
+            </Item>
+          </Variations>
+        </Object>
+        <Walking>
+          <!-- <StartHeight>250</StartHeight>           -->
+          <StartHeight>200</StartHeight>          
+          <Acceleration>8</Acceleration>
+          <TurnDeceleration>0</TurnDeceleration>
+          <TurnMovement>0</TurnMovement>
+          <ForwardSpeed>15</ForwardSpeed>
+          <TurnAroundRadius>2</TurnAroundRadius>
+          <Deceleration>8</Deceleration>
+          <TurnRadius>2</TurnRadius>
+          <TurnSpeed>200</TurnSpeed>
+          <TurnSpeedInPlace>100</TurnSpeedInPlace>
+          <LeaningMaxAngle>0</LeaningMaxAngle>          
+        </Walking>
+        <Attackable>
+          <AttackableType>Airship</AttackableType>
+          <MaximumHitPoints>30000</MaximumHitPoints>
+        </Attackable>
+        <ItemContainer>
+          <SocketCount>0</SocketCount>
+          <SlotCount>0</SlotCount>
+          <CanStoreProducts>0</CanStoreProducts>
+        </ItemContainer>
+        <UpgradeList>
+          <DefaultBuff>1500004661</DefaultBuff>
+        </UpgradeList>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  <ModOp Type="AddNextSibling" GUID="2295">
+    
+    <!-- TODO: Effectivities zufügen, zb. gegen Holzschiffe, wobei gebäude in der regel mehr hitpoints als schiffe haben, weshalb man evlt eher den schaden gegen schiffe halbiert? damit beides ordentlich schaden bekommt? -->
+    <Asset>
+      <Template>ExplodingProjectile</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004646</GUID>
+          <Name>Fireball Projectile</Name>
+        </Standard>
+        <Projectile>
+          <ProjectileType>Arc</ProjectileType>
+          <!-- <ShotAngle>35</ShotAngle> -->
+          <!-- <ShotAngle>0</ShotAngle> -->
+          <ShotAngle>3</ShotAngle>
+          <ProjectileSpeed>20</ProjectileSpeed>
+          <!-- <StatusEffects> -->
+            <!-- <Item> -->
+              <!-- <StatusEffectChain> -->
+                <!-- <Item> -->
+                  <!-- <StatusEffect>1401</StatusEffect> -->
+                  <!-- <StatusDuration>15000</StatusDuration> -->
+                <!-- </Item> -->
+                <!-- <Item> -->
+                  <!-- <StatusEffect>1402</StatusEffect> -->
+                  <!-- <StatusDuration>120000</StatusDuration> -->
+                <!-- </Item> -->
+                <!-- <Item> -->
+                  <!-- <StatusEffect>1403</StatusEffect> -->
+                  <!-- <StatusDuration>900000</StatusDuration> -->
+                <!-- </Item> -->
+              <!-- </StatusEffectChain> -->
+              <!-- <StatusEffectExclusiveGroup>1410</StatusEffectExclusiveGroup> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <StatusEffectChain> -->
+                <!-- <Item> -->
+                  <!-- <StatusEffect>1407</StatusEffect> -->
+                  <!-- <StatusDuration>15000</StatusDuration> -->
+                <!-- </Item> -->
+                <!-- <Item> -->
+                  <!-- <StatusEffect>1408</StatusEffect> -->
+                  <!-- <StatusDuration>300000</StatusDuration> -->
+                <!-- </Item> -->
+                <!-- <Item> -->
+                  <!-- <StatusEffect>1409</StatusEffect> -->
+                  <!-- <StatusDuration>600000</StatusDuration> -->
+                <!-- </Item> -->
+              <!-- </StatusEffectChain> -->
+              <!-- <StatusEffectExclusiveGroup>1411</StatusEffectExclusiveGroup> -->
+            <!-- </Item> -->
+          <!-- </StatusEffects> -->
+          <ApplyStatusEffectsWithoutDamageCheck>1</ApplyStatusEffectsWithoutDamageCheck>
+        </Projectile>
+        <Mesh />
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/effects/military/projectiles/projectile_firebomb.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Text />
+        <SoundEmitter>
+          <ProjectileSounds>
+            <ProjectileLaunch>
+              <Item>
+                <Sound>200973</Sound>
+              </Item>
+            </ProjectileLaunch>
+            <ProjectileImpact>
+              <Item>
+                <Sound>200972</Sound>
+              </Item>
+            </ProjectileImpact>
+          </ProjectileSounds>
+        </SoundEmitter>
+        
+        <Exploder>
+          <InnerDamageRadius>1</InnerDamageRadius>
+          <InnerDamage>20</InnerDamage>
+          <OuterDamageRadius>4</OuterDamageRadius>
+          <MinimumDamage>10</MinimumDamage>
+          <DebrisForceY>1</DebrisForceY>
+          <DebrisForceX>1</DebrisForceX>
+          <DebrisForceZ>1</DebrisForceZ>
+          <DebrisCount>8</DebrisCount>
+        </Exploder>
+
+        <ProjectileIncident>
+          <CausedIncident>Fire</CausedIncident>
+          <CausedIncidentDuration>120000</CausedIncidentDuration>
+        </ProjectileIncident>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <BaseAssetGUID>1500004646</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004969</GUID>
+          <Name>Fireball from ground to sky Projectile (no debris, less radius)</Name>
+        </Standard>
+        <Exploder>
+          <OuterDamageRadius>1</OuterDamageRadius>
+          <DebrisForceY>0</DebrisForceY>
+          <DebrisForceX>0</DebrisForceX>
+          <DebrisForceZ>0</DebrisForceZ>
+          <DebrisCount>0</DebrisCount>
+        </Exploder>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>ExplodingProjectile</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004673</GUID>
+          <Name>Disable Vulcano (FromSky) Projectile</Name>
+        </Standard>
+        <Projectile>
+          <ProjectileType>Arc</ProjectileType>
+          <ShotAngle>0</ShotAngle>
+          <ProjectileSpeed>50</ProjectileSpeed>
+          <StatusEffects>
+            <Item>
+              <StatusEffectChain>
+                <Item>
+                  <StatusEffect>1500004671</StatusEffect>
+                  <StatusDuration>5000</StatusDuration>
+                </Item>
+              </StatusEffectChain>
+            </Item>
+          </StatusEffects>
+          <ApplyStatusEffectsWithoutDamageCheck>1</ApplyStatusEffectsWithoutDamageCheck>
+        </Projectile>
+        <Exploder>
+          <InnerDamageRadius>0</InnerDamageRadius>
+          <InnerDamage>0</InnerDamage>
+          <DebrisForceY>0</DebrisForceY>
+          <DebrisCount>0</DebrisCount>
+          <OuterDamageRadius>140</OuterDamageRadius>
+        </Exploder>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  
+  <!-- add new effect to Airship Water-Drop, to disable the active vulcan for some time -->
+  <!-- create paths if it does not exist yet -->
+  <ModOp Type="merge" GUID='1051' Path="/Values">
+    <Projectile>
+      <StatusEffects />
+      <ApplyStatusEffectsWithoutDamageCheck>1</ApplyStatusEffectsWithoutDamageCheck>
+    </Projectile>
+  </ModOp>
+  <!-- add new effect (with these 2 ModOps, it will be compatible to other mods also adding effects) -->
+  <ModOp Type="add" GUID='1051' Path="/Values/Projectile/StatusEffects">
+    <Item>
+      <StatusEffectChain>
+        <Item>
+          <StatusEffect>1500004672</StatusEffect>
+          <StatusDuration>20000</StatusDuration>
+          <!-- <StatusDuration>60000</StatusDuration> -->
+        </Item>
+      </StatusEffectChain>
+    </Item>
+    <Item>
+      <StatusEffectChain>
+        <Item>
+          <StatusEffect>1500004971</StatusEffect>
+          <StatusDuration>20000</StatusDuration>
+          <!-- <StatusDuration>60000</StatusDuration> -->
+        </Item>
+      </StatusEffectChain>
+    </Item>
+  </ModOp>
+
+  
+  
+
+</ModOps>

@@ -152,29 +152,24 @@
       </War>
     </ShipLimits>
   </ModOp>
-  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/SessionOverride">
-        <SessionOverride> <!-- Ac3s: the importance of each region to the AI, the higher the number the more ships they will keep in that region, hence it should be highest in Old World since that is where their main islands are, then New World since most important goods come from there. -->
-          <Item>
-            <SessionGUID>180023</SessionGUID> <!-- Old World (not Cape) --> <!-- Ac3s: was not set in vanilla -->
-            <Percentage>70</Percentage>
-          </Item>
-          <Item>
-            <SessionGUID>180025</SessionGUID> <!-- New World -->
-            <Percentage>50</Percentage>
-          </Item>
-          <Item>
-            <SessionGUID>110934</SessionGUID> <!-- Cape -->
-            <Percentage>50</Percentage>
-          </Item>
-          <Item>
-            <SessionGUID>180045</SessionGUID> <!-- Artic -->
-            <Percentage>25</Percentage>
-          </Item>
-          <Item>
-            <SessionGUID>112132</SessionGUID> <!-- Africa --> <!-- Ac3s: was not set in vanilla -->
-            <Percentage>20</Percentage>
-          </Item>
-        </SessionOverride>
+  <!-- thanks to the copy of MilitaryAI above, everyone has WarFleet/SessionOverride (even Mercier) -->
+   <!-- we can not really use Conditions here properly, because they don't work well with "or" paths (only checking if one of them is true, not the one we are currently checking) -->
+    <!-- but I think it will be no big problem if these entries are added multiple times.. at least I hope so :D (and the only mods I know which also add these are marked incompatible anyways) -->
+  <!-- sessions not mentioned in SessionOverride will have 100% of ShipLimits I assume -->
+  <ModOp Type="add" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/SessionOverride">
+    <Item>
+      <SessionGUID>112132</SessionGUID> <!-- Africa --> <!-- Ac3s: was not set in vanilla -->
+      <Percentage>20</Percentage>
+    </Item>
+  </ModOp>
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/SessionOverride/Item[SessionGUID='180025']/Percentage">
+    <Percentage>60</Percentage>
+  </ModOp>
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/SessionOverride/Item[SessionGUID='110934']/Percentage">
+    <Percentage>50</Percentage>
+  </ModOp>
+  <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169' or BaseAssetGUID='170']/Values/MilitaryAI/WarFleet/SessionOverride/Item[SessionGUID='180045']/Percentage">
+    <Percentage>25</Percentage>
   </ModOp>
   
   <!-- better BuyShares from Margarete, with TakeoverIslandProbability and MilitaryTakeoverProbability set to 95 (if not defined it is 100) -->
@@ -351,6 +346,52 @@
    <ModOp Type="replace" Path="//Asset[BaseAssetGUID='168' or BaseAssetGUID='169']/BaseAssetGUID">
     <BaseAssetGUID>170</BaseAssetGUID>
    </ModOp>
+   
+   
+  <!-- nerf the AIs positive AirshipDrop-Reactions (in vanilla you get +5 Reputation every single time you do a positive Drop with an airship over an AI island. -->
+   <!-- by increasing the cooldown from 30 seconds to 15 minutes (still OP, but we will also decrease the Rep gain below) -->
+  <ModOp Type="merge" GUID="167" Path="/Values/Interaction/DropReactionConfig">
+	  <DropReaction>
+      <!-- <Damage> -->
+        <!-- <Threshold>3</Threshold> -->
+        <!-- <ValueIncreaseFromAction>1</ValueIncreaseFromAction> -->
+        <!-- <ValueIncreasePerHitTarget>0.5</ValueIncreasePerHitTarget> -->
+        <!-- <TimeUntilActionIsForgotten>300000</TimeUntilActionIsForgotten> -->
+        <!-- <CoolDownAfterThresholdHasBeenReached>30000</CoolDownAfterThresholdHasBeenReached> -->
+      <!-- </Damage> -->
+      <PositiveEffect>
+        <!-- <Threshold>3</Threshold> -->
+        <!-- <ValueIncreaseFromAction>1</ValueIncreaseFromAction> -->
+        <!-- <ValueIncreasePerHitTarget>2</ValueIncreasePerHitTarget> -->
+        <!-- <TimeUntilActionIsForgotten>300000</TimeUntilActionIsForgotten> -->
+        <CoolDownAfterThresholdHasBeenReached>900000</CoolDownAfterThresholdHasBeenReached>
+      </PositiveEffect>
+      <!-- <NegativeEffect> -->
+        <!-- <Threshold>3</Threshold> -->
+        <!-- <ValueIncreaseFromAction>1</ValueIncreaseFromAction> -->
+        <!-- <ValueIncreasePerHitTarget>2</ValueIncreasePerHitTarget> -->
+        <!-- <TimeUntilActionIsForgotten>300000</TimeUntilActionIsForgotten> -->
+        <!-- <CoolDownAfterThresholdHasBeenReached>30000</CoolDownAfterThresholdHasBeenReached> -->
+      <!-- </NegativeEffect> -->
+      <IncidentResolver>
+        <!-- <Threshold>3</Threshold> -->
+        <!-- <ValueIncreaseFromAction>0.5</ValueIncreaseFromAction> -->
+        <!-- <ValueIncreasePerHitTarget>1</ValueIncreasePerHitTarget> -->
+        <!-- <TimeUntilActionIsForgotten>300000</TimeUntilActionIsForgotten> -->
+        <CoolDownAfterThresholdHasBeenReached>900000</CoolDownAfterThresholdHasBeenReached>
+      </IncidentResolver>
+    </DropReaction>
+  </ModOp>
+  <!-- reduce the positive Reputation gain, vanilla +5 -->
+  <!-- Care Packages -->
+  <ModOp Type="merge" GUID="119" Path="/Values/ParticipantMessages/MessageTriggers/AirshipDropPositiveEffectMessage/Reactions/Item[1]">
+    <SideEffectValue>3</SideEffectValue>
+  </ModOp>
+  <!-- Water Drops -->
+  <ModOp Type="merge" GUID="119" Path="/Values/ParticipantMessages/MessageTriggers/AirshipDropIncidentResolvedMessage/Reactions/Item[1]">
+    <SideEffectValue>2</SideEffectValue>
+  </ModOp>
+  
+   
 
 </ModOps>
-

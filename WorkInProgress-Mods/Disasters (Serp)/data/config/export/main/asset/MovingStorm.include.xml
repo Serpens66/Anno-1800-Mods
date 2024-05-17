@@ -1,0 +1,799 @@
+<ModOps>
+  
+  
+  <!-- TODO: -->
+  <!-- so aufbauen, dass andere Mods den sturm in beliebiger session starten können -->
+  <!-- also am Besten nach inem marker-object in session suchen lassen und in der/den sessions wo es mind. ein so nen marker gibt, -->
+   <!-- startet der Sturm und bewegt sich so lange es noch mind. so ein marker in derselben session gibt. -->
+  <!-- damit wir die stürme gezielt in ihrer jeweiligen session kontrollieren können, muss das am besten über eine Quest mit QuestSession laufen -->
+  <!-- evlt. bewegt sich der Sturm häufiger zum Marker objekt, aber nicht ständig, bw. vllt dafür nochmal nen eigenen marker machen -->
+  
+  
+  <!-- Trigger 1500004639 to start thunderstorm is currently disabled -->
+  
+   <!-- man könnte mit triger objectposition prüfen ob sturm in nähe von insel ist -->
+   <!-- wenn ja, dann additem was ihn langsamer macht, damit er realtiv zügig über wasser bewegt, aber auch land etwas langsamer ist. -->
+    <!-- ist aber komplizierter code für wenig nutzen.. -->
+  
+  <!-- TODO: -->
+   <!-- testen ob wir dummy building random at land spawnen können, als move marker -->
+    <!-- (schiffe, also ObjectDummyWithOwner geht nur auf wasser) -->
+  <ModOp Type="AddNextSibling" GUID="1054">
+    
+    <Asset>
+      <Template>ObjectDummyWithOwner</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004640</GUID>
+          <Name>MoveTo-Marker Water</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>BuildingDummy_WithOwner</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004649</GUID>
+          <Name>MoveTo-Marker Land</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004642</GUID>
+          <Name>AllowMove-Signal</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>WarAirShip</Template>
+      <!-- TODO: ObjectDummyWithOwner_Attacker verwdnen, aber vorher nochmal in WarAirShip gucken, was wir davon brauchen und das hier direkt ins Asset eintragen -->
+      <!-- <Template>ObjectDummyWithOwner_Attacker</Template> -->
+      <Values>
+        <Standard>
+          <GUID>1500004637</GUID>
+          <Name>Thunderstorm</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/ships/icon_airship_hunter.png</IconFilename>
+          <InfoDescription>1648</InfoDescription>
+        </Standard>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/dlc11/graphics/vehicle/airships/airship_agile_medium/airship_agile_medium_attack.cfg</Filename>
+              <!-- <Filename>data/dlc11/graphics/effects/clouds/moving_clouds01.cfg</Filename> -->
+              
+            </Item>
+          </Variations>
+        </Object>
+        <Mesh>
+          <LogoMode>CorporationLogoFromPlayer</LogoMode>
+        </Mesh>
+        <Selection>
+          <MultiSelectable>0</MultiSelectable>
+          <OnlySelectableForOwnerAndAllianceMembers>1</OnlySelectableForOwnerAndAllianceMembers>
+        </Selection>
+        <Walking>
+          <!-- StartHeight defines the height between object and ground at all times (unless landing). with normal zoomsettings the max heigt the player can see the object is roughly 100, while its already difficult starting at 75 and starting to get difficult at 40  -->
+          <StartHeight>25</StartHeight>
+          <ShortenSailsAfter>0</ShortenSailsAfter>
+          <Acceleration>50</Acceleration>
+          <Deceleration>50</Deceleration>
+          <TurnSpeed>145</TurnSpeed>
+          <TurnSpeedInPlace>95</TurnSpeedInPlace>
+          <LeaningMaxAngle>0</LeaningMaxAngle>
+          <ForwardSpeed>15</ForwardSpeed>
+          <!-- <ForwardSpeed>105</ForwardSpeed> -->
+          <WindMinSlowdownFactor>0.9</WindMinSlowdownFactor>
+          <WindSlowdownEffectOnTurningSpeed>1</WindSlowdownEffectOnTurningSpeed>
+          <WindMaxSpeedupFactor>1.7</WindMaxSpeedupFactor>
+          <CargoThreshold>0.1</CargoThreshold>
+          <CargoFullFactor>0.4</CargoFullFactor>
+          <MinSlowdownFactor>0.2</MinSlowdownFactor>
+          <SessionTransferSpeedFactor>0.9</SessionTransferSpeedFactor>
+        </Walking>
+        <Text />
+        <CommandQueue>
+          <MilitaryAirShipPoints>10</MilitaryAirShipPoints>
+          <MilitaryShipPoints>10</MilitaryShipPoints>
+          <TradeShipPoints>0</TradeShipPoints>
+          <AirShipPoints>0</AirShipPoints>
+          <InsecurityAttractiveness>-100</InsecurityAttractiveness>
+        </CommandQueue>
+        <Drifting>
+          <Length>7</Length>
+          <Width>3.5</Width>
+        </Drifting>
+        <Collector />
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+        </Attackable>
+        <MinimapToken>
+          <!-- TokenAsset is minimpa, while StrategicMapAsset is TradeRoute map -->
+          <TokenAsset>500492</TokenAsset>
+          <!-- <StrategicMapAsset>117300</StrategicMapAsset> -->
+          <StrategicMapAsset>1500004643</StrategicMapAsset>
+        </MinimapToken>
+        <SoundEmitter>
+          <VehicleSounds>
+            <MovementStart>
+              <Item>
+                <Sound>200992</Sound>
+              </Item>
+            </MovementStart>
+          </VehicleSounds>
+        </SoundEmitter>
+        <UpgradeList />
+        <QuestObject />
+        <ItemContainer>
+          <CanStoreProducts>0</CanStoreProducts>
+          <SlotCount>1</SlotCount>
+          <SocketAllocation>Warship;Ship</SocketAllocation>
+          <SocketScope>None</SocketScope>
+          <SocketScopeRadius>[NONE]</SocketScopeRadius>
+          <SocketScopeRadiusOverlapCategory>None</SocketScopeRadiusOverlapCategory>
+          <SocketCount>4</SocketCount>
+          <SpawnsFlotsam>0</SpawnsFlotsam>
+          <FlotsamNoRadius>1</FlotsamNoRadius>
+          <!-- pirate mode so it also attacks AI -->
+           <!-- only downside is when hovering it says "piratemode" .. -->
+           <!-- or we add a new participant, copied from General_Enemy, which is at war with also with AI..  -->
+          <InitSocketItems>
+            <Item>
+              <Item>1500001494</Item>
+            </Item>
+          </InitSocketItems>
+        </ItemContainer>
+        <Infolayer>
+          <AdditionalYOffset>-70</AdditionalYOffset>
+        </Infolayer>
+        <FeedbackController />
+        <Draggable />
+        <Cost />
+        <Craftable />
+        <TradeRouteVehicle />
+        <Locked />
+        <Nameable />
+        <MetaPersistent />
+        <ExpeditionAttribute />
+        <ShipMaintenance />
+        <Sellable />
+        <Stance>
+          <DefensiveReturnDistance>0</DefensiveReturnDistance>
+          <FleeDistance>0</FleeDistance>
+        </Stance>
+        <Rentable />
+        <WorldMapSound />
+        <Pausable />
+        <ShipIncident />
+        <SoundEmitterCommandBarks />
+        <ItemReplacer />
+        <Bombarder>
+          <Shafts>2</Shafts>
+        </Bombarder>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <BaseDamage>10</BaseDamage>
+          <!-- <BaseDamage>250</BaseDamage> -->
+          <ReloadTime>10</ReloadTime>
+          <AttackRange>15</AttackRange>
+          <LineOfSightRange>20</LineOfSightRange>
+          <!-- side shooting is important to make them shoot at multiple (2) targets at once -->
+          <ShootingTracking>Side</ShootingTracking>
+          <ProjectileAsset>1500004638</ProjectileAsset>
+          <TurretExplosionEffectAsset>2296</TurretExplosionEffectAsset>
+          <MuzzleEffectAssets>
+            <Item>
+              <MuzzleEffectAsset>2297</MuzzleEffectAsset>
+            </Item>
+          </MuzzleEffectAssets>
+          <FullVolleyTimeMin>1</FullVolleyTimeMin>
+          <FullVolleyTimeMax>2</FullVolleyTimeMax>
+          <!-- mit hohem AccuracyBase kann man dafür sorgen, dass oft daneben geschossen wird. Leider machen die schüsse danaben keinen schaden bei zufällig getroffenen objekten... -->
+          <AccuracyBase>3</AccuracyBase>
+          <AccuracyByDistance>
+            <Item />
+            <Item>
+              <AccuracyByDistancePair>
+                <EnemyDistanceRelToAttackRange>30</EnemyDistanceRelToAttackRange>
+                <CorrespondingAccuracy>60</CorrespondingAccuracy>
+              </AccuracyByDistancePair>
+            </Item>
+            <Item>
+              <AccuracyByDistancePair>
+                <EnemyDistanceRelToAttackRange>100</EnemyDistanceRelToAttackRange>
+              </AccuracyByDistancePair>
+            </Item>
+          </AccuracyByDistance>
+          <WeaponIcon>2188</WeaponIcon>
+        </Attacker>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- TODO: irgendwie ein Blitz Projektil machen... -->
+  <ModOp Type="AddNextSibling" GUID="2295">
+    <Asset>
+      <Template>Projectile</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004638</GUID>
+          <Name>Thunderstorm Projectile</Name>
+        </Standard>
+        <Projectile>
+          <ProjectileType>Arc</ProjectileType>
+          <ShotAngle>0</ShotAngle>
+          <ProjectileSpeed>40</ProjectileSpeed>
+          <!-- <SpawnImpactObject>1500004574</SpawnImpactObject> -->
+          <!-- <StatusEffects> -->
+            <!-- <Item> -->
+              <!-- <StatusEffectChain> -->
+                <!-- <Item> -->
+                  <!-- <StatusEffect>1500004573</StatusEffect> -->
+                  <!-- <StatusDuration>5000</StatusDuration> -->
+                <!-- </Item> -->
+                <!-- <Item> -->
+                  <!-- <StatusEffect>1500004599</StatusEffect> -->
+                  <!-- <StatusDuration>20000</StatusDuration> -->
+                <!-- </Item> -->
+                <!-- <Item> -->
+                  <!-- <StatusEffect>1500004598</StatusEffect> -->
+                  <!-- <StatusDuration>60000</StatusDuration> -->
+                <!-- </Item> -->
+              <!-- </StatusEffectChain> -->
+            <!-- </Item> -->
+          <!-- </StatusEffects> -->
+          <ApplyStatusEffectsWithoutDamageCheck>1</ApplyStatusEffectsWithoutDamageCheck>
+        </Projectile>
+        <Mesh />
+        <Object>
+          <Variations>
+            <Item>
+              <!-- <Filename>data/graphics/effects/military/projectiles/projectile_cannon_modern_01.cfg</Filename> -->
+              
+              <Filename>data/graphics/effects/military/projectiles/projectile_firebomb.cfg</Filename>
+              <!-- <Filename>data/graphics/effects/particles/special/fireworks/rocket_jump_resident_mode.cfg</Filename> -->
+              
+            </Item>
+          </Variations>
+        </Object>
+        <Text />
+        <SoundEmitter>
+          <ProjectileSounds>
+            <ProjectileLaunch>
+              <Item>
+                <Sound>200966</Sound>
+              </Item>
+            </ProjectileLaunch>
+            <ProjectileImpact>
+              <Item>
+                <Sound>200965</Sound>
+              </Item>
+            </ProjectileImpact>
+          </ProjectileSounds>
+        </SoundEmitter>
+        <ProjectileIncident>
+          <CausedIncident>Fire</CausedIncident>
+          <CausedIncidentDuration>120000</CausedIncidentDuration>
+        </ProjectileIncident>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  
+  <!-- TODO make a storm icon similar to icon_routemap_airship and icon_routemap_airship_outline -->
+  <ModOp GUID="117300" Type="AddNextSibling">
+    <Asset>
+      <Template>MinimapDot</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004643</GUID>
+          <Name>Storm Icon TradeRoute Map</Name>
+          <!-- <IconFilename>data/ui/2kimages/main/icons/icon_routemap_airship.png</IconFilename> -->
+          <IconFilename>data/ui/2kimages/main/icons/icon_threat_pirates.png</IconFilename>
+        </Standard>
+        <MinimapTokenSettings>
+          <Color>White</Color>
+          <Filter>Ships</Filter>
+          <Tooltip>1500004644</Tooltip>
+          <UsePlayerColor>0</UsePlayerColor>
+          <!-- <Outline>data/ui/2kimages/main/icons/icon_routemap_airship_outline.png</Outline> -->
+        </MinimapTokenSettings>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- traderoute-map tooltip -->
+  <ModOp GUID="117300" Type="AddNextSibling">
+    <Asset>
+      <Template>InfoTip</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004644</GUID>
+          <Name>StrategicViewStorm</Name>
+        </Standard>
+        <InfoTip />
+      </Values>
+    </Asset>
+  </ModOp>
+    
+    
+    
+  <ModOp GUID="153271" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004639</GUID>
+          <Name>Start Thunderstorm</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500001613</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteActionByChance</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteActionByChance>
+                    <ChanceValue>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <VariableValue>
+                          <FloatValue>100</FloatValue>
+                        </VariableValue>
+                      </Values>
+                    </ChanceValue>
+                    <ActionListChanceSuccess>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionSpawnObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionSpawnObjects>
+                                    <SpawnGUID>1500004637</SpawnGUID>
+                                    <Amount>1</Amount>
+                                    <Owner>General_Enemy</Owner>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <DistanceToBorder>Near</DistanceToBorder>
+                                    <DistanceToIsland>Far</DistanceToIsland>
+                                  </SpawnArea>
+                                  <SessionFilter>
+                                    <Sessions>
+                                      <Item>
+                                        <Session>180023</Session>
+                                      </Item>
+                                    </Sessions>
+                                  </SessionFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionSpawnObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionSpawnObjects>
+                                    <SpawnGUID>1500004642</SpawnGUID>
+                                    <Amount>1</Amount>
+                                    <Owner>Third_party_01_Queen</Owner>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <DistanceToBorder>Near</DistanceToBorder>
+                                    <DistanceToIsland>Far</DistanceToIsland>
+                                  </SpawnArea>
+                                  <SessionFilter>
+                                    <Sessions>
+                                      <Item>
+                                        <Session>180023</Session>
+                                      </Item>
+                                    </Sessions>
+                                  </SessionFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            
+                            <Item>
+                              <Action>
+                                <Template>ActionTriggerMinimapPing</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionTriggerMinimapPing>
+                                    <PingDuration>10000</PingDuration>
+                                    <PingObjectList>
+                                      <Item>
+                                        <Object>
+                                          <Template>ObjectFilter</Template>
+                                          <Values>
+                                            <ObjectFilter>
+                                              <ObjectGUID>1500004637</ObjectGUID>
+                                              <CheckParticipantID>1</CheckParticipantID>
+                                              <ObjectParticipantID>General_Enemy</ObjectParticipantID>
+                                              <ObjectSession>180023</ObjectSession>
+                                            </ObjectFilter>
+                                          </Values>
+                                        </Object>
+                                      </Item>
+                                    </PingObjectList>
+                                  </ActionTriggerMinimapPing>
+                                </Values>
+                              </Action>
+                            </Item>
+                            
+                            <!-- start the delete command here with a delay wich is the same like ConditionTimer on ResetTrigger here, -->
+                             <!-- but minus at least 60 seconds (depending on speed of storm), because we want it to leave the map first, which is aborted if it gets a move command at the same time -->
+                            <Item>
+                              <Action>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>590000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>                                            
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionDeleteObjects</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionDeleteObjects />
+                                                  <ObjectFilter>
+                                                    <ObjectGUID>1500004642</ObjectGUID>
+                                                    <CheckParticipantID>1</CheckParticipantID>
+                                                    <ObjectParticipantID>Third_party_01_Queen</ObjectParticipantID>
+                                                    <ObjectSession>180023</ObjectSession>
+                                                  </ObjectFilter>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionDeleteObjects</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionDeleteObjects>
+                                                    <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                                  </ActionDeleteObjects>
+                                                  <ObjectFilter>
+                                                    <ObjectGUID>1500004637</ObjectGUID>
+                                                    <CheckParticipantID>1</CheckParticipantID>
+                                                    <ObjectParticipantID>General_Enemy</ObjectParticipantID>
+                                                    <ObjectSession>180023</ObjectSession>
+                                                  </ObjectFilter>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </ActionListChanceSuccess>
+                    <ActionListChanceFailure />
+                  </ActionExecuteActionByChance>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>600000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <!-- <AutoRegisterTrigger>1</AutoRegisterTrigger> -->
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- moving thunderstorm should be don in the final stage of this mod in lua with objectfinder instead -->
+     <!-- because only this way we can surely move multiple one indedpentntly and also at coordintats, not only from one object to another  -->
+      <!-- and in xml we can not really move to random objects, except if we spawn a target object at random position and move to this, but lua is just better for this -->
+     <!-- ts.Selection.Object.Walking.SetDebugGoto(500,500) -->
+      <!-- ts.Selection.Object.Walking.IsMoving um zu testen ob am ziel angelangt -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004641</GUID>
+          <Name>Move Thunderstorm</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500001613</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <!-- only move while it is allowed (not allowed for ~30 seconds after we gave a "leave map command" to the current active one, because otherwise we would abort leaving the map) -->
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500004642</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <ComparisonOp>AtLeast</ComparisonOp>
+                          <CounterScope>Session</CounterScope>
+                          <CounterScopeContext>180023</CounterScopeContext>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+          
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteActionByChance</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteActionByChance>
+                    <ChanceValue>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <VariableValue>
+                          <FloatValue>80</FloatValue>
+                        </VariableValue>
+                      </Values>
+                    </ChanceValue>
+                    <!-- spawn random on the water -->
+                    <ActionListChanceSuccess>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionSpawnObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionSpawnObjects>
+                                    <SpawnGUID>1500004640</SpawnGUID>
+                                    <Amount>1</Amount>
+                                    <Owner>General_Enemy</Owner>
+                                  </ActionSpawnObjects>
+                                  <!-- everything except ForceContextPosition does not allow to spawn an Walking object at land, even airships ... -->
+                                  <SpawnArea>
+                                    <DistanceToBorder>Near;Mid;Far</DistanceToBorder>
+                                    <DistanceToIsland>Near;Mid;Far</DistanceToIsland>
+                                  </SpawnArea>
+                                  <SessionFilter>
+                                    <Sessions>
+                                      <Item>
+                                        <Session>180023</Session>
+                                      </Item>
+                                    </Sessions>
+                                  </SessionFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </ActionListChanceSuccess>
+                    <!-- near any building on land -->
+                    <ActionListChanceFailure>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionSpawnObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionSpawnObjects>
+                                    <SpawnGUID>1500004649</SpawnGUID>
+                                    <Amount>1</Amount>
+                                    <Owner>General_Enemy</Owner>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <!-- <SpawnContext>Object</SpawnContext> -->
+                                    <SpawnContext>ForceContextPosition</SpawnContext>
+                                    <DistanceToContext>15</DistanceToContext>
+                                    <MatcherGUID>1500004910</MatcherGUID>
+                                  </SpawnArea>
+                                  <SessionFilter>
+                                    <Sessions>
+                                      <Item>
+                                        <Session>180023</Session>
+                                      </Item>
+                                    </Sessions>
+                                  </SessionFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </ActionListChanceFailure>
+                  </ActionExecuteActionByChance>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionMoveObject</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500004637</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <ObjectParticipantID>General_Enemy</ObjectParticipantID>
+                    <ObjectSession>180023</ObjectSession>
+                  </ObjectFilter>
+                  <ObjectTargetFilter>
+                    <TargetGUID>1500004640</TargetGUID>
+                    <TargetObjectSession>180023</TargetObjectSession>
+                    <TargetCheckParticipantID>1</TargetCheckParticipantID>
+                    <TargetParticipantID>General_Enemy</TargetParticipantID>
+                  </ObjectTargetFilter>
+                  <ActionMoveObject>
+                    <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
+                    <SearchMode>Closest</SearchMode>
+                  </ActionMoveObject>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionMoveObject</Template>
+                <Values>
+                  <Action />
+                  <ObjectFilter>
+                    <ObjectGUID>1500004637</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <ObjectParticipantID>General_Enemy</ObjectParticipantID>
+                    <ObjectSession>180023</ObjectSession>
+                  </ObjectFilter>
+                  <ObjectTargetFilter>
+                    <TargetGUID>1500004649</TargetGUID>
+                    <TargetObjectSession>180023</TargetObjectSession>
+                    <TargetCheckParticipantID>1</TargetCheckParticipantID>
+                    <TargetParticipantID>General_Enemy</TargetParticipantID>
+                  </ObjectTargetFilter>
+                  <ActionMoveObject>
+                    <IgnoreEveryDistractionDuringMove>1</IgnoreEveryDistractionDuringMove>
+                    <SearchMode>Closest</SearchMode>
+                  </ActionMoveObject>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500004640</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>General_Enemy</ObjectParticipantID>
+                                    <ObjectSession>180023</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500004649</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>General_Enemy</ObjectParticipantID>
+                                    <ObjectSession>180023</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>40000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <!-- <AutoRegisterTrigger>1</AutoRegisterTrigger> -->
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  
+  
+
+</ModOps>

@@ -1,0 +1,78 @@
+<ModOps>
+  
+
+  
+  <!-- Serp GUIDs 1500004676 bis 1500004899 reserviert -->
+  <!-- aktuell bis einschl. 1500004740 verbraucht -->
+  <!-- wieder frei: 1500004687 -->
+  
+   <!-- Sichtbar machen der Insel Buffs jetzt über building das bei besiedelung spawned -->
+    <!-- Buffbuildings spawnen bei erstmaliger Besiedelung, sind unsichtbar und bleiben dauerhaft auf der Insel -->
+  
+  
+  <!-- (ursprünglicher Gedanke sie über Fruchtbarkeiten anzuzeigen, aber weder können wir im Laufenden Spiel Fruchtbarkeiten zufügen,  -->
+   <!-- noch können wir sie simpel abfragen (nur kompliziert über lua) und wegtauschen könnte man sie durch Research auch ... daher dies verworfen) -->
+   <!-- FALLS ich doch bock auf was kompliziertes in lua hab: Man kann doch Fruchtbarkeiten nachträglich zu inseln zufügen, denn  -->
+     <!-- Factory.ToggleCheatFertility() -->
+       <!-- sorgt nicht wie der Name vermuten lässt dafür, dass eine Fabrik keine fertility mehr braucht, -->
+       <!-- sondern fügt der Insel die nötige Fruchtbarkeit hinzu! -->
+      <!-- Dh. man kann doch in einem Laufenden Spiel neue Fruchtbarkeiten einer Insel zufügen! -->
+       <!-- Gebäude die die fertility brauchen und schon platziert waren müssen erneut platzier (oder bewegt) werden, damit es die Änderung erkennt -->
+       <!-- (noch MP testen) -->
+      <!-- Um eine beliebige fertility zuzufügen, müsste ich dann aber über xml eine dummy-factory auf der insel spawnen, -->
+       <!-- diese dann in lua finden und den Befehl ausführen, ist also schon noch einiges an Aufwand -->
+   <!-- Die Buffs würden aber dennoch über die Buffbuildings erzeugt und die Fertility wäre nur für die Anzeige da (anstelle des display-buildings) -->
+    <!-- (die buffbuildings können direkt NeededFertility haben was dann für lua genutzt werden kann) -->
+  <!-- Und auch über lua könnte man versuchen die Buffs schon vor der ersten Besiedelung zu verteilen: -->
+   <!-- wir können in xml weder gezielt auf bestimmten (unbesiedelten) inseln spawnen, noch prüfen wieviele obejkte auf diesen inseln sind. -->
+   <!-- Aber wir können auf random insel spawnen und in lua können wir, wenn Spieler in derselben Session ist, durch alle Inseln loopen -->
+    <!-- und die anzahl der Objekte mit einer GUID auf der Insel zählen. -->
+   <!-- Dh. es würde so aussehen: xml spawned auf random insel , lua prüft obs ne insel gibt wos zweimal ist, wenn ja dann mit lua neustes Objekt löschen (MP testen.. ObjectFinderSerp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(SpawnedObject_OID)..") Attackable AddDamagePercent(100,9)]")) -->
+    <!-- dann erneut random spawnen usw usf, bis wir in lua erkennen, dass jede insel der session das gewünschte objekt einmal hat. -->
+  <!-- Wird ziemlich sicher viel schwieriger als es klingt und sehr wahrscheinlich, dass es im MP Probleme gibt (mindestens dass alle spieler in selbe session gezwungen werden müssen) -->
+  <!-- Deswegen erst versuchen, wenn meine LuaHelpers fertig uns ausgereift sind -->
+  <!-- Und selbst dann könnte der ganze Rattenschwanz so groß sein, dass es sich für das resultat nicht lohnt -->
+  
+  <!-- Bzgl Optik: -->
+   <!-- Bei Feldern/animal Feldern könnte man theoretisch neu Grafiken für machen, die nach weniger/mehr aussehen und diese Skin evlt. per ActionChangeSkin aktivieren -->
+    <!-- aber extrem viel Arbeit, falls es überhaupt geht -->
+  
+  <!-- selten , grob einmal pro Session (nicht starterisland) eine insel haben -->
+   <!-- die sehr starken buff aber auch sehr straken debuff hat -->
+  <!-- ist nur die Frage wie wir die Starterinsel ausschließen.. geht nicht über PlayerCounter -->
+    <!-- aber geht über Spawn mit ForceContextPosition 102498 , dann spawned was auf dem dem öl und die insel die das gespawned hat, hat halt öl und kann -->
+     <!-- evlt ausgeschlossen werden (bzw. am Besten gefährliche Buffs immer zusammen mit dem Ölmarker spawnen und wenn dann ein ölmarker existiert, auf derselben Insel buffbuilding austauschen durch was harmloseres und marker löschen) -->
+    <!-- Wobei das mit dem KI code kompliziert wird... mal gucken...  -->
+  
+  <!-- Buff Ideen: -->
+  <!-- +- 25% on plant farms, on animal farms, on mines, on coast/water production, on oil/clay. (oder 1/10 additional output, skaliert mit items/traktoren/strom) -->
+  <!-- +- Attractivity -->
+  <!-- +- fire/explosion chance -->
+  <!-- forestry related stuff: lumberjack, charcoal, hunting -->
+  <!-- Und evlt nicht nur eigene Produkte extra, sondern auch passende andere Produkte -->
+  
+  
+  <!-- Sonstige Ideen basierend auf Anno 2205:  -->
+  <!-- https://docs.google.com/spreadsheets/d/1xeUW8iFsg-q6APzs8AP8dGNzPXzWYiLnM3bBjozteWk/edit#gid=0 -->
+  
+  
+  
+  <!-- give the Queen Third_party_01_Queen participant PlayerCounter property, so we can check for objects (tried with Neutral first, but for whatever reason did not get PlayerCounter to work, even with ProfileCounter) -->
+   <!-- volcano and buffbuildings will be owned by queen -->
+  <ModOp Type="merge" GUID='75' Path="/Values">
+    <ProfileCounter />
+  </ModOp>
+  
+  
+  <!-- ######################################################### -->
+   
+  <Include File="./BuffBuildings.include.xml" />
+  <Include File="./Human_SpawnTrigger.include.xml" />
+  <Include File="./AI_SpawnTrigger.include.xml" />
+  
+  <!-- ######################################################################################## -->
+
+  
+
+
+</ModOps>

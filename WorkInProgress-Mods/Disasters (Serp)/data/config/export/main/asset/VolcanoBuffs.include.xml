@@ -1,0 +1,452 @@
+<ModOps>
+  
+  <!-- noch evlt sinnvolle buffs: -->
+  <!-- AdditionalHeat wird in vanilla nicht verwendet, mal ausprobieren. -->
+   <!-- mindestens während vulkan aktiv ist kann das jedes ggebäude bekommen ,aber evlt auch bei inaktiv? -->
+  
+  <!-- man könnte auch ne neue fruchtbarkeit einführen, die nur der Vulkan in seiner Reichweite gewährt -->
+   <!-- mit neuer Produktinskette. diese kann dann lifestyleneed sein, -->
+    <!-- oder evlt auch zum Aufwerten von Militär oderso -->
+   <!-- muss einerseits so stark sein, dass sich das risiko lohnt, -->
+    <!-- andererseits so schwach, dass es im MP kein zu krasser unfairer Vorteil gegenüber anderen Spielern ist -->
+  
+  <ModOp Type="AddNextSibling" GUID="190093">
+    <!-- The FromSky helpers have Attackrange=0 at spawn, only after few seconds we will give them this Item to enable them -->
+    <!-- AttackRange=0 can still shoot, if the target is at exact same spot (or directly above), but the FromSky Airships nearly never shoot with Range=0, so its fine to have them disabled this way. -->
+     <!-- The FromGround still shoots, but we change the projectile from this one anyways instead of the range, to disable the FromTheSky objects -->
+    <Asset>
+      <Template>VehicleItem</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004652</GUID>
+          <Name>Give Attackrange (fromSky are disabled by 0 AttackRange when spawning)</Name>
+        </Standard>
+        <Item>
+          <Allocation>AirShip</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Legendary</Rarity>
+          <ItemType>Specialist</ItemType>
+          <TradePrice>2</TradePrice>
+          <OnlyEquippableOnce>1</OnlyEquippableOnce>
+          <TransferBlocked>1</TransferBlocked>
+          <Flotsam>1500001027</Flotsam>
+          <FlotsamTerrain>1500001189</FlotsamTerrain>
+        </Item>
+        
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+        
+        <AttackerUpgrade>
+          <AttackRangeUpgrade>
+            <Value>10</Value>
+          </AttackRangeUpgrade>
+        </AttackerUpgrade>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004661</GUID>
+          <Name>Invincible</Name>
+        </Standard>
+        <AttackableUpgrade>
+          <DamageReceiveFactor>
+            <Normal>
+              <Factor>0</Factor>
+            </Normal>
+            <Torpedo>
+              <Factor>0</Factor>
+            </Torpedo>
+            <Cannon>
+              <Factor>0</Factor>
+            </Cannon>
+            <BigBertha>
+              <Factor>0</Factor>
+            </BigBertha>
+          </DamageReceiveFactor>
+        </AttackableUpgrade>
+        <ItemEffect>
+          <AllowStacking>0</AllowStacking>
+          <!-- needs no EffectTargets, because we directly apply it as DefaultBuff -->
+        </ItemEffect>
+        
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004671</GUID>
+          <Name>Disable Attack FromSky (by reducing AttackRange to 0)</Name>
+        </Standard>
+        <AttackerUpgrade>
+          <AttackRangeUpgrade>
+            <Value>-10</Value>
+          </AttackRangeUpgrade>
+        </AttackerUpgrade>
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+        <ItemEffect>
+          <AllowStacking>0</AllowStacking>
+          <EffectTargets>
+            <Item>
+              <GUID>1500004645</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004672</GUID>
+          <Name>Use projectile that disables attacking FromSky</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/drop_goods/icon_dropgood_water.png</IconFilename>
+        </Standard>
+        <AttackerUpgrade>
+          <UseProjectile>1500004673</UseProjectile>
+          <AttackSpeedUpgrade>-60</AttackSpeedUpgrade>
+        </AttackerUpgrade>
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+        <ItemEffect>
+          <AllowStacking>0</AllowStacking>
+          <EffectTargets>
+            <Item>
+              <GUID>1500004651</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+    <!-- need a new GUID for the buff to be displayed at the volcano object, because game may freezes if you apply an AttackerUpgrade to an object without Attacker -->
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004971</GUID>
+          <Name>Use projectile that disables attacking FromSky</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/drop_goods/icon_dropgood_water.png</IconFilename>
+        </Standard>
+        <Text>
+          <TextOverride>1500004672</TextOverride>
+        </Text>
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+        <ItemEffect>
+          <AllowStacking>0</AllowStacking>
+          <EffectTargets>
+            <Item>
+              <GUID>1500004655</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+    
+    <!-- TODO: können wohl nur einen buff auf colcano wirken, weil DefaultBuff kein EffectContainer kann.. -->
+     <!-- daher in diesem Display buff alles allgemein beschreiben mit name und InfoDescription... -->
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005010</GUID>
+          <Name>Display-only: All Fertilites + mines + research - volcano</Name>
+          <IconFilename>data/graphics_serp/icons/icon_fertile_lands_and_minerals.png</IconFilename>
+          <InfoDescription>1500004665</InfoDescription>
+        </Standard>
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+        <ResidenceUpgrade>
+          <AdditionalResearch>1</AdditionalResearch>
+        </ResidenceUpgrade>
+        <FactoryUpgrade>
+          <AdditionalOutput />
+        </FactoryUpgrade>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500004655</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005014</GUID>
+          <Name>AdditionalResearch for scholars - volcano</Name>
+          <IconFilename>data/graphics_serp/icons/icon_research_volcano.png</IconFilename>
+          <InfoDescription>127425</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>127496</TextOverride>
+        </Text>
+        <ResidenceUpgrade>
+          <AdditionalResearch>1</AdditionalResearch>
+        </ResidenceUpgrade>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>114445</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004657</GUID>
+          <Name>Buff All Ores AdditionalOutput - volcano</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_mineral_desposits.png</IconFilename>
+          <InfoDescription>19935</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>11573</TextOverride>
+        </Text>
+        <FactoryUpgrade>
+          <AdditionalOutput>
+            <Item>
+              <ForceProductSameAsFactoryOutput>1</ForceProductSameAsFactoryOutput>
+              <AdditionalOutputCycle>25</AdditionalOutputCycle>
+              <Amount>1</Amount>
+            </Item>
+          </AdditionalOutput>
+        </FactoryUpgrade>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500004655</GUID>
+            </Item>
+            <Item>
+              <GUID>190786</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- Add all Ores from the ItemEffectTargetPool 7104 "Ores" as AdditionalOutput -->
+   <!-- (one could also add all FactoryOutputs from Slot Buildings, but this would leed to the same ores multiple times and I see no way to automatically prevent duplication) -->
+  <ModOp Type="add" Path="@1500004657/FactoryUpgrade/AdditionalOutput"
+    Content="@7104/ItemEffectTargetPool/EffectTargetGUIDs/Item/GUID/text()">
+    <Item>
+      <Product>
+        <ModOpContent />
+      </Product>
+      <AdditionalOutputCycle>40</AdditionalOutputCycle>
+      <Amount>1</Amount>
+    </Item>
+  </ModOp>
+  <!-- also add them to the display buff -->
+  <ModOp Type="add" Path="@1500005010/FactoryUpgrade/AdditionalOutput"
+    Content="@7104/ItemEffectTargetPool/EffectTargetGUIDs/Item/GUID/text()">
+    <Item>
+      <Product>
+        <ModOpContent />
+      </Product>
+      <AdditionalOutputCycle>40</AdditionalOutputCycle>
+      <Amount>1</Amount>
+    </Item>
+  </ModOp>
+  
+    
+  <ModOp Type="AddNextSibling" GUID='190093'>
+    <!-- TODO: evlt noch ein wenig die Buffs aufteilen, damit nicht alle diese Buffs bei allen Gebäuden stehen? -->
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004662</GUID>
+          <Name>negative Buff erupting volcano</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_1404.png</IconFilename>
+          <InfoDescription>802116</InfoDescription>
+        </Standard>
+        <FactoryUpgrade>
+          <ProductivityUpgrade>
+            <Value>-90</Value>
+            <Percental>1</Percental>
+          </ProductivityUpgrade>
+        </FactoryUpgrade>
+        <IncidentInfectableUpgrade>
+          <IncidentFireIncreaseUpgrade>
+            <Value>100</Value>
+            <Percental>1</Percental>
+          </IncidentFireIncreaseUpgrade>
+          <IncidentExplosionIncreaseUpgrade>
+            <Value>100</Value>
+            <Percental>1</Percental>
+          </IncidentExplosionIncreaseUpgrade>
+        </IncidentInfectableUpgrade>
+        <BuildingUpgrade>
+          <ResolverUnitCountUpgrade>
+            <Value>1</Value>
+          </ResolverUnitCountUpgrade>
+          <ResolverUnitDecreaseUpgrade>
+            <Value>50</Value>
+            <Percental>1</Percental>
+          </ResolverUnitDecreaseUpgrade>
+          <ResolverUnitMovementSpeedUpgrade>
+            <Value>15</Value>
+            <Percental>1</Percental>
+          </ResolverUnitMovementSpeedUpgrade>
+        </BuildingUpgrade>
+        <ResidenceUpgrade>
+          <AdditionalHeat>10</AdditionalHeat>
+          <AdditionalHappiness>-50</AdditionalHappiness>
+          <TaxModifierInPercent>-50</TaxModifierInPercent>
+          <WorkforceModifierInPercent>-50</WorkforceModifierInPercent>
+        </ResidenceUpgrade>
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500004655</GUID>
+            </Item>
+          
+            <Item>
+              <GUID>6000018</GUID>
+            </Item>
+            
+            <Item>
+              <GUID>190762</GUID>
+            </Item>
+            <!-- TODO: evlt den all residences pool 1500001211 aus Sabotage in shared mod packen und hier nutzen -->
+            <Item>
+              <GUID>112091</GUID>
+            </Item>
+            <Item>
+              <GUID>112652</GUID>
+            </Item>
+
+            <Item>
+              <GUID>190775</GUID>
+            </Item>
+            
+            <Item>
+              <GUID>368</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  <ModOp Type="AddNextSibling" GUID="269172">
+    <Asset>
+      <Template>EffectContainer</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004658</GUID>
+          <Name>Positive alltime Volcano Buffs, eg: all Fertilities and additional Ores</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_fertile_lands_1.png</IconFilename>
+        </Standard>
+        <EffectContainer>
+          <Effects>
+            <Item>
+              <Effect>1500004657</Effect>
+            </Item>
+            <Item>
+              <Effect>1500005014</Effect>
+            </Item>
+            <!-- All Fertilities , buffs added in shared_FertilityBuffs Mod -->
+            <Item>
+              <Effect>1500004973</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004974</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004975</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004976</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004977</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004978</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004979</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004980</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004981</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004982</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004983</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004984</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004985</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004986</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004987</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004988</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004989</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004990</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004991</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004992</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004993</Effect>
+            </Item>
+            <Item>
+              <Effect>1500004994</Effect>
+            </Item>
+          </Effects>
+        </EffectContainer>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+
+</ModOps>

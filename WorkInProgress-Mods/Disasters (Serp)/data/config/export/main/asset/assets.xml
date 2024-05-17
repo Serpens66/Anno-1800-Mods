@@ -1,0 +1,210 @@
+<ModOps>
+  
+  <!-- uses Serp GUIDs -->
+  <!-- 1500004637 bis 1500004675 und 1500004960 bis 1500005099 -->
+  <!-- bis einschl. 1500005016 verbrauccht -->
+  <!-- 1500004660 in shared_CopyPools_AP_Kontors -->
+  
+  <!-- wieder frei: 1500004647 und 1500004650 -->
+  
+  <!-- Auch das thunderstorm Movement am besten in eine Quest oderso packen, wo wir dann QuestArea usw verwenden können -->
+   <!-- ohne eine session hardcodenzu müssen (geht evlt auch in trigger), wo dann der Modder der den shared mod nutzt, nur StartQWuest mit InheritArea machen muss, -->
+    <!-- um System zu starten (läuft dann zb 30 minuten) -->
+  
+  <!-- Weitere Katastrophen: -->
+   <!-- - Dürre in Enbesa wodurch Irrigation durch Debuff stark reduziert wird (IrrigationUpgrade) und testen ob funzt: ActionMoveRiverLevel (aber vermutlich muss dafür die river nen label in inseldateien haben) -->
+    <!-- wobei das wohl ein paar haben, siehe vanilla mit <ObjectSession>112132</ObjectSession> -->
+  <!-- Evlt auch sowas wie -->
+   <!-- Kriminalität - reduziert Steuereinnahmen oderso? -->
+   <!-- Rattenplage - reduziert erträge von Farmen (in 1701 reduziert es wohl Warenbestände auf x% des maximalen lagers) -->
+   
+  
+  <!-- TODO -->
+  <!-- <CausedIncident>Fire</CausedIncident> zeigt keine duration an, illness schon. mal tooltip fixen (im tooltipbugsfixmods) -->
+  <!-- und mal gucken was eig das hier machen soll: AdditionalShipFireIncidentEffects -->
+  
+  <!-- Ideen: -->
+   <!-- an sich könnte man versuchen das mit dem scenario ecosystem nachzubilden, leider nur ohne schöne Anzeigen und ohne grafische Effekte dass es insel schlecht geht -.- -->
+    <!-- Wobeis vemrutlich besser investirte Zeit wäre anno reverse zu enginieeren, damit man ecosystem feature auch in sandbox aktivieren kann, genauso wie seasons... -->
+  
+  <!-- Aber man könnte halt auch Area-wide Debuffs basierend auf ConditionPlayercounter verteilen, -->
+   <!-- zb. x Müllobjekte auf Insel, oder Müll-Güter (die zb als AdditionalGood von Fabriken produziert werden) mal gucken wie der garbage mod funzt -->
+   <!-- oder WorkingConditions,.. an pollution einer insel kommt man offenbar leider nicht... -->
+    <!-- nur über Reactions IslandPollutionHigherThan könnte man was unlocken und dann eine kataspohe auslösen, aber eben nicht gezielt auf der insel.. -->
+  
+  
+  <!-- Idee wie wir ein Gebäude je einmal auf allen KI Inseln spawnen können: -->
+    <!-- KI führt Trigger ConditionMutualAreaInSubconditions aus ihrer sicht aus mit AllowQuestArea um in der richtigen Session zu sein. -->
+     <!-- spawned dann dadurch auf einer zufälligen insel der session da LimitToQuestArea ja für KI nicht funzt -->
+    <!-- wenn KI dann 2 Gebäude auf derselben Insel hat, löschen wir das Neuste davon und wiederholen den Vorgang, solange bis auf jeder Insel 1 ist. -->
+     <!-- Geht über: wir wir ein HilfsGUID! also wir wollen GUID 123 auf jeder Insel einmal haben. -->
+      <!-- Das erste mal spawnen wir diese direkt, gibt ja noch keine. -->
+      <!-- Danach spawnen wir GUID 124 und prüfen kann ob 123 und 124 aufderselben insel sind. Wenn ja, dann 124 löschen und erneut versuchen, -->
+       <!-- wenn nein, dann 123 an position 124 spawnen und 124 löschen. -->
+  
+  
+  <!-- das mit dem auf der karte bewengedem objekt was schaden macht ist schon ganz nett, -->
+   <!-- aber ein thunderstorm könnte man evlt stattdessen auch mit dem Wettersystem kombinieren, -->
+    <!-- da dann apocapylse wetter in session starten und die Blitze werden dann an zufälligen positionen in der session gespawned. -->
+     <!-- (problem dass ich mit Random" aktuell keine weg sehe direkt auf Insel zu spawnen... ansonsten halt MatcherGUID, was über zufälligen gebäude spawned) -->
+   <!-- Blitzobjekt ist dann unsichtbares luftschiff, was ein blitz projektil abschießt und nach 1-2 sekunden wieder entfernt wird -->
+  
+  <!-- keine ahnung wie man beim Wetter die Lichteffekte von Blitzen aktiviert.. angeblich passiert das bei FirstPerson Reward, aber nicht wenn ichs mit  -->
+   <!-- ts.Weather.ForcePreset(2, 1) oder ts.Weather.ForcePreset(4, 1) aktiviere... -->
+   <!-- mal testen es direkt über first person zu aktivieren und gucken wie ofts dann blitzt -->
+  
+  
+  <!-- So ein super häufigers ActionSpawnObjects wie für die Feuerbälle vom Himmel treibt die ObjectID extrem schnell extrem hoch,  -->
+   <!-- was nicht gut ist, da mein finder mod dadurch länger braucht UND die ObjectID limitiert ist, kann ein maximum erreichen.. -->
+   <!-- also optimalerweise noch ine anderen lösung dafür finden... nur welche? -->
+   <!-- Wobei, selbst bei 2 stück pro Sekunde erreicht man in 1000 stunden gerademal 7.2 Millionen und das wird ja nicht dauerhaft aktiv sein. -->
+  
+  
+  <!-- Wenn man ein Vulkan Objekt auf einer Insel hätte: -->
+  <!-- vulkan der direkt selbst schießt kann man denke ich technisch auch vergessen, da er immer nur aufselbe ziel schießen würde. -->
+ <!-- aber man könnte mit LimitToQuestArea random mit MatcherGUID über Gebäuden einer Insel zb für 1-2 sekunden ein unsihctbares Hilfsobjekt sehr hoch in der luft spawnen -->
+  <!-- welches dann feuerbälle nach unten schießt. Würde dann nur ine animation des Vulkan selbst fehlen, dass da feuerbälle in die luft geschossen werden, keine ahnung wie -->
+   <!-- .. wobei man auch unsichtbare victim luftschiffe hoch über den vulkan platzieren könnte, wodurch der einfach Feuerbälle hoch in die luft schießt, -->
+    <!-- die im nirvana was treffen, was der user aber nicht sehen kann, und dann kommen die anderen random feuerbälle über der insel runter -->
+  
+  <!-- für RandomMapObject evlt >Resource< template versuchen und in D:\CDesktopLink\Unterlagen\Mods\Anno 1800\Anno1800 RDA unpacked\dataAlle\data\eoy21 gucken, -->
+   <!-- vorallem den insel dateien, ob und wie das da platziert ist, zb <GUID>741</GUID> -->
+    <!-- mit NeedsFiniteResources/FiniteResourceSearchRadius könnte man dann sogar dafür sorgen, dass der Vulkan direkt als Quelle für seltene Waren genutzt werden kann -->
+    <!-- hm in den map/inseldateien find ich das nicht und auch in assets.xml wirds nirgends zugefügt.. keine ahnung wie das ins spiel kommt... -->
+   <!-- wenn man deren fineiteressource system nutzen will, müssen sie offenbar von map generiert werden und können nicht einfach gespawned werden, -->
+    <!-- weil sie beim spawn zb ActionSpawnObjects eine menge von 0/0 haben. Per lua kann man nur die aktuelle menge setzen, aber nicht das maximum -.- -->
+    <!-- und die refill mechanic die diese Objekte über permits FiniteResourceReplenishPermit haben können, füllt natürlichj auch nur bis zum maximum wieder auf -->
+   
+  
+  <!-- add the new item to the same pools like item 192172 -->
+  <!-- <ModOp Type="add" GUID="192717,113175,113178,112845" Path="/Values/RewardPool/ItemsPool"> -->
+    <!-- <Item> -->
+      <!-- <ItemLink>1500004505</ItemLink> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  <!-- <ModOp Type="add" GUID="130176" Path="/Values/AssetPool/AssetList"> -->
+    <!-- <Item> -->
+      <!-- <Asset>1500004505</Asset> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  
+  <!-- man könnte mit triger objectposition prüfen ob sturm in nähe von insel ist -->
+   <!-- wenn ja, dann additem was ihn langsamer macht, damit er realtiv zügig über wasser bewegt, aber auch land etwas langsamer ist. -->
+    <!-- ist aber komplizierter code für wenig nutzen.. -->
+  
+  
+  <!-- give the Queen Third_party_01_Queen participant PlayerCounter property, so we can check for objects (tried with Neutral first, but for whatever reason did not get PlayerCounter to work, even with ProfileCounter) -->
+   <!-- (1500004642 will be owned by it (Third_party_01_Queen), so they are not shown in shiplist-statistic menu of players and we can check with ConditionPlayerCounter) -->
+  <ModOp Type="merge" GUID='75' Path="/Values">
+    <ProfileCounter />
+  </ModOp>
+  
+  
+  <!-- use neutral icon for the message "building is under attack", it shows a ship icon in vanilla (501367), replace it with a war icon (crossed swords) -->
+   <!-- And the voice that says "Your harbor is under attack" is exchanged to "Your citiy is under attack" (game has no way to send different message for harbor/city, they are hardcoded, so city fits both cases best) -->
+   <!-- (you get this notification when the volcano hits your buildings. its hardcoded to send this message and it does not support more information about who attacks what...) -->
+  <ModOp Type="merge" GUID='501653' Path="/Values">
+    <Notification>
+      <NotificationType>
+        <Template>SideNotification</Template>
+        <Values>
+          <SideNotification>
+            <IconAsset>501449</IconAsset>
+          </SideNotification>
+          <NotificationSubtitle>
+            <Subtitle>265212</Subtitle>
+          </NotificationSubtitle>
+        </Values>
+      </NotificationType>
+    </Notification>
+  </ModOp>
+  
+  
+  
+  
+  <Include File="./MovingStorm.include.xml" />
+  <Include File="./Volcano.include.xml" />
+  <Include File="./VolcanoBuffs.include.xml" />
+  <Include File="./Volcano_TriggerQuests.include.xml" />
+  
+  
+  <ModOp GUID="141228" Type="addNextSibling">
+		<Asset>
+			<Template>NewspaperSpecialEditionArticle</Template>
+			<Values>
+				<Standard>
+					<GUID>1500004668</GUID>
+					<Name>Photo of Volcano NewsPaper</Name>
+				</Standard>
+				<NewspaperSpecialEditionArticle>
+					<SpecialEditionHeadline>1500004667</SpecialEditionHeadline>
+					<SpecialEditionSubline>802116</SpecialEditionSubline>
+          <!-- needs an image defined, otherwise it wont show, although we will use the taken photo as image.. -->
+          <SpecialEditionImage>141569</SpecialEditionImage>
+				</NewspaperSpecialEditionArticle>
+			</Values>
+		</Asset>
+  </ModOp>
+  
+  <!-- Targets to spawn the Volcano next to (must be assets that exist on all/most islands without settling them first) -->
+  <!-- it works fine this way, even if session is Enbesa, it does not fail to spawn (könnte ja sein, dass da Eisen selected wird, aber das passiert scheinbar nicht) -->
+  <ModOp GUID="700047" Type="AddNextSibling">
+    <Asset>
+      <Template>AssetPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005013</GUID>
+          <Name>AP - All mines slots. also arctic and waterslots from enbesa</Name>
+        </Standard>
+        <AssetPool>
+          <AssetList>
+            <Item>
+              <Asset>1010500</Asset>
+            </Item>
+            <Item>
+              <Asset>1010501</Asset>
+            </Item>
+            <Item>
+              <Asset>101061</Asset>
+            </Item>
+            <Item>
+              <Asset>1010503</Asset>
+            </Item>
+            <Item>
+              <Asset>1010504</Asset>
+            </Item>
+            <Item>
+              <Asset>1010505</Asset>
+            </Item>
+            <Item>
+              <Asset>1010507</Asset>
+            </Item>
+            
+            <Item>
+              <Asset>1372</Asset>
+            </Item>
+            <Item>
+              <Asset>1386</Asset>
+            </Item>
+            <Item>
+              <Asset>1387</Asset>
+            </Item>
+            
+            <Item>
+              <Asset>116038</Asset>
+            </Item>
+            
+            <Item>
+              <Asset>117741</Asset>
+            </Item>
+          </AssetList>
+        </AssetPool>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  
+  
+
+</ModOps>

@@ -1,0 +1,3586 @@
+<ModOps>
+  
+  
+  <!-- evlt könnte man auch die eruptionquest zufällig vorzeitig beenden, muss aber nicht -->
+  
+    
+    
+    <!-- schwierigkeit: -->
+     <!-- evlt ne DecisionQuest machen, wo man entscheiden kann wie häufig der Vulkan ausbrechen soll (unlocked dann die entsprecheden assets) -->
+     <!-- da man nur 7 optionen anzeigen kann, am ehesten dann zb 90, 70, 10 und 30 % rauslassen. -->
+    <!-- diese startet wenn mod erstmalig aktiv und kann irgendwie dann noch ingame erneut getriggert werden, nur wie? -->
+     <!-- über keybind und dann n trigger starten der mit ConditionObjectSelected prüft ob vulkan angeklickt ist -->
+      <!-- (wenn nicht, dann unarmen). wobei keybind dennoch doof ist, wenn anderer mod das schon hat.. -->
+    <!-- wobei so eine settings-quest es natürlich schwerer macht die chance auf gegebenheit anzupassen (zb Müll in der stadt odersowas) -->
+    <!-- oder ich mach für die dfficutly 3 weitere unlocks , wodurch gegebenheiten dann zwischen 0 und 30.. 30 und 60 oder 70 und 100 entscheiden -->
+     <!-- dürfen     -->
+    
+    
+  <!-- Known Issues (not fixable): -->
+   <!-- 1) If an island is lost while the Eruption-Quest is active, the Quest and therefore the Eruption of volcano is aborted. (and restarted again, so the timer starts from new)  -->
+    <!-- (this is because of the StarterObject-building on the island is for whatever reason removed in this case, although its Neutral and also OwnerChangeTarget does not help. -->
+     <!-- only way to solve this would be a Starter that does not belong to the island, like a ship, but the Starter is important to define the QuestArea and also QuestSession -->
+      <!-- with a ship both of these stay undefined unfortunately, which makes spawning all the helper objects around the volcano impossible (only possible if only 1 volcano wordwide exists)) -->
+      <!-- (we use a Quest for this, because I don't know another way to define a QuestArea. It does not work with PlayerCounter+Scope=Area, because this can only check islands owned by processing player, so espeically no unsettled islands) -->
+   <!-- 2) If an island was taken over/got the shares after a War, the forced CeaseFire of the island makes all buildings on the island not targetable by any attacks, even from Volcano (General_Enemy+PirateFalg) -->
+    <!-- No way to fix this besides disabling this forced CeaseFire, which of course is not an option.. -->
+  <!-- 3) Only one Eruption worldwide at the same time is possible, because CounterScope=Session can not define QuestSession and also not check if a session has several things in common (unlike CounterScope=Area) -->
+      <!-- (only workaround would be hardcoded Session GUIDs, but for now I want the volcano spawn in every session, even mod sessions) -->
+  
+
+  <!-- Falls MP Probleme macht: -->
+   <!-- sowohl vulkan spawnen, als auch Eruption Quest könnte man so gestallten: -->
+    <!-- Bist du Human0 , dann starte die Quest. -->
+     <!-- Bist du nicht Human0 sondern Human1, dann warte 2 sekunden, dann schau ob Eruption-Objekt gespawned wurde, wenn nicht, dann starte Quest usw. -->
+  
+  
+  
+  <!-- evlt. noch eine extra, quasi tutorial Quest machen, sobald spieler Water-drop und airhsips herstellen kann -->
+   <!-- die dem Spieler sagt, dass man den aktiven vulkan kurzeitig lahmlegen kann, wenn man wasser draufwirft -->
+    <!-- (ObjectGUID hier braucht Attacker, damit WinConditions es erkennt) -->
+    <!-- <Attackable> -->
+      <!-- <AttackableType>[NONE]</AttackableType> -->
+    <!-- </Attackable> -->
+   <!-- <Item> -->
+    <!-- <Objective> -->
+      <!-- <Template>AirdropObjective</Template> -->
+      <!-- <Values> -->
+        <!-- <ConditionQuestObjective> -->
+          <!-- <IsVisibleInQuestTracker>0</IsVisibleInQuestTracker> -->
+        <!-- </ConditionQuestObjective> -->
+        <!-- <ConditionQuestAirdrop> -->
+          <!-- <DropOnObject> -->
+            <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+            <!-- <Values> -->
+              <!-- <ObjectFilter> -->
+                <!-- <ObjectGUID>1500004656</ObjectGUID> -->
+                <!-- <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects> -->
+                <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                <!-- <ObjectParticipantID>Third_party_01_Queen</ObjectParticipantID> -->
+              <!-- </ObjectFilter> -->
+            <!-- </Values> -->
+          <!-- </DropOnObject> -->
+          <!-- <DropObjectRangeOp>Any</DropObjectRangeOp> -->
+          <!-- <DroppedProjectile>1051</DroppedProjectile> -->
+        <!-- </ConditionQuestAirdrop> -->
+      <!-- </Values> -->
+    <!-- </Objective> -->
+  <!-- </Item> -->
+  
+  
+  
+  <!-- ConditionPlayerCounter must be main condition from the Spawn-Action for the Spawn to work -->
+  <!-- we need this code structure with IsOptional because the session of the trigger will be the one where the trigger gets registered -->
+   <!-- and it wont check other sessions for whatever reason. Therefore we reset the trigger basically on every sessionenter and check if  -->
+    <!-- the volcano was already spawned in the current session or not -->
+    <!-- I only got CounterScopeUseActiveSession to work and spawning the volcano there with AllowParentConditionSession. -->
+     <!-- We can not get and use QuestSession with CounterScope=Session unfortunately -.- -->
+   
+   <!-- TODO: Check multiplayer if volcano spawns multiple times. Because we need this trgger to be executed for all humans, -->
+    <!-- in case another human than Human0 enters a session first -->
+  <ModOp Type="AddNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004665</GUID>
+          <Name>Spawn one Volcano per Session</Name>
+        </Standard>
+        <Trigger>
+          <!-- start after entering the first session after loading the game, otherwise code does not work if executed before -->
+           <!-- SessionEnter is also important before resetting the trigger, since we check activesession here -->
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionEvent>
+                <ConditionEvent>SessionEnter</ConditionEvent>
+                <ContextAssetInfolayer>0</ContextAssetInfolayer>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionUnlocked</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition /> -->
+                        <!-- <ConditionUnlocked> -->
+                          <!-- <UnlockNeeded>1500001613</UnlockNeeded> -->
+                        <!-- </ConditionUnlocked> -->
+                        <!-- <ConditionPropsNegatable /> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionActiveSession</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionActiveSession>
+                          <ActiveSession>180039</ActiveSession>
+                          <SessionBlacklist>1</SessionBlacklist>
+                        </ConditionActiveSession>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
+                                  <ConditionPlayerCounter>
+                                    <Context>1500004655</Context>
+                                    <CounterAmount>0</CounterAmount>
+                                    <ComparisonOp>AtMost</ComparisonOp>
+                                    <CounterScope>Session</CounterScope>
+                                    <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext>
+                                    <CounterScopeUseActiveSession>1</CounterScopeUseActiveSession>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionSpawnObjects</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionSpawnObjects>
+                                        <SpawnGUID>1500004655</SpawnGUID>
+                                        <Amount>1</Amount>
+                                        <Owner>Third_party_01_Queen</Owner>
+                                      </ActionSpawnObjects>
+                                      <SpawnArea>
+                                        <SpawnContext>Object</SpawnContext>
+                                        <ContextGUID>1500005013</ContextGUID>
+                                        
+                                        <!-- in theory spawning it on a mountain or even water very close to an island would be better, -->
+                                         <!-- because this would not block valuable space, especially on small islands. -->
+                                         <!-- But the problem is that QuestAre-stuff does not work then -->
+                                          <!-- (I think one can make it work without Area if we only have 1 eruption worldwide active at the same time) -->
+                                         <!-- AND also the BuffFactory, even with "Radius" does not work. -->
+                                          <!-- (EffectForwad funktioniert dabei auch nicht) -->
+                                          <!-- The buffs from the active vulcano could be done via projectile statuseffect. -->
+                                           <!-- but inactive ones... the inactive vulcano could also shoot invisible stuff... -->
+                                            <!-- but shooting these buffs could heavily lag on big games, so not really good choice.. -->
+                                            <!-- (one can also not simply shoot fpr the inactive-statuseffect once every hour or so to reduce lag, -->
+                                             <!-- because newly build buildings then would not be affected within that time, so it must be a renew every ~2 seconds, which is just by far too inefficent) -->
+                                           <!-- so having a volcano that is not at land that provides a nearby buff at all times is impossible -->
+                                        <!-- <SpawnAreaType>Mountain_02</SpawnAreaType> -->
+                                        
+                                        <DistanceToContext>20</DistanceToContext>
+                                        <MinObjectDistance>5</MinObjectDistance>
+                                        <MaxObjectDistance>10</MaxObjectDistance>
+                                      </SpawnArea>
+                                      <SessionFilter>
+                                        <AllowProcessingSession>0</AllowProcessingSession>
+                                        <AllowParentConditionSession>1</AllowParentConditionSession>
+                                        <AllowQuestSession>0</AllowQuestSession>
+                                        <AllowQuestArea>0</AllowQuestArea>
+                                      </SessionFilter>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                                <!-- some deco crater around volcano -->
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionSpawnObjects</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionSpawnObjects>
+                                        <SpawnGUID>1500004970</SpawnGUID>
+                                        <Amount>20</Amount>
+                                        <Owner>Neutral</Owner>
+                                      </ActionSpawnObjects>
+                                      <SpawnArea>
+                                        <SpawnContext>Object</SpawnContext>
+                                        <ContextGUID>1500004655</ContextGUID>
+                                        <DistanceToContext>18</DistanceToContext>
+                                        <MinObjectDistance>3</MinObjectDistance>
+                                        <MaxObjectDistance>10</MaxObjectDistance>
+                                        <SpreadObjects>1</SpreadObjects>
+                                      </SpawnArea>
+                                      <SessionFilter>
+                                        <AllowProcessingSession>0</AllowProcessingSession>
+                                        <AllowParentConditionSession>1</AllowParentConditionSession>
+                                        <AllowQuestSession>0</AllowQuestSession>
+                                        <AllowQuestArea>0</AllowQuestArea>
+                                      </SessionFilter>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionAlwaysTrue</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004675</GUID>
+          <Name>Show Volcano-Active Notification (Quest)</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500004656</Context>
+                <CounterAmount>1</CounterAmount>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionStartQuest</Template>
+                <Values>
+                  <Action />
+                  <ActionStartQuest>
+                    <Quest>1500004667</Quest>
+                  </ActionStartQuest>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500004656</Context>
+                      <CounterAmount>0</CounterAmount>
+                      <ComparisonOp>AtMost</ComparisonOp>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                      <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionEndQuest</Template>
+                      <Values>
+                        <Action />
+                        <ActionEndQuest>
+                          <Quest>1500004667</Quest>
+                          <AbortQuestExceptionally>1</AbortQuestExceptionally>
+                        </ActionEndQuest>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- we have to combine triggers with QuestPool, to be able to restart the quest if aborted (trigger) and make the StarterObject spawn in a random session (QuestPool) -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005012</GUID>
+          <Name>Do Unlock to make Questpool start Eruption Quest</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <Asset>1500004666</Asset>
+                      </Item>
+                    </UnlockAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004666</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Was forced to outsource the actions not contained in Trigger 1500005015/1500005016 from OnQuestActive of the eruption Quest, -->
+     <!-- because using ActionDelayedActions in there to delay the spawns was causing issues and crashes, in case the quest was automatically aborted by the game -->
+      <!-- (eg. when island owner changes), because the abort was not able to also abort these DelayedActions. -->
+       <!-- While with these Triggers now I can unregister them on OnQuestDiscarded in the Quest, to make sure they are not executed if the Quest is aborted -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005015</GUID>
+          <Name>Start Shooting from volcano ground into sky</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionTimer</Template>
+            <Values>
+              <Condition />
+              <ConditionTimer>
+                <TimeLimit>5000</TimeLimit>
+                <!-- <TimeLimit>30000</TimeLimit> -->
+              </ConditionTimer>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004670</SpawnGUID>
+                    <Amount>1</Amount>
+                    <Owner>Test_Doedel</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004651</SpawnGUID>
+                    <Amount>1</Amount>
+                    <Owner>General_Enemy</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005016</GUID>
+          <Name>Start Shooting from volcano sky to the ground</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionTimer</Template>
+            <Values>
+              <Condition />
+              <ConditionTimer>
+                <!-- 5 seconds longer than the previous trigger! -->
+                <TimeLimit>10000</TimeLimit>
+              </ConditionTimer>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddGoodsToItemContainer</Template>
+                <Values>
+                  <Action />
+                  <ActionAddGoodsToItemContainer>
+                    <Goods>
+                      <Item>
+                        <Good>1500004652</Good>
+                        <!-- Amount should be the exact amount of 1500004645 of this Quest. if less, some wont shoot, if more, they will spawn on ground to collect, although it should sink instantly -->
+                         <!-- Dont know why, but it still work with ObjectRestrictToQuestObjects although we are in a Trigger now and there is no option to oficialy inherit questobjects.. maybe this is done automatiaclly or via InheritArea? -->
+                         <!-- So its fine. But if it ever causes problems, I could replace this way to arm the sky-shooters with a projectile StatusEffect instead, shot at the from ground -->
+                        <Amount>58</Amount>
+                      </Item>
+                    </Goods>
+                    <ItemContainerObjects>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ObjectFilter>
+                          <ObjectGUID>1500004645</ObjectGUID>
+                          <CheckParticipantID>1</CheckParticipantID>
+                          <ObjectParticipantID>General_Enemy</ObjectParticipantID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                        </ObjectFilter>
+                      </Values>
+                    </ItemContainerObjects>
+                  </ActionAddGoodsToItemContainer>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <!-- nicht zu hohen radius, sonst verteilen sie sich zu stark auf großen inseln -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004659</SpawnGUID>
+                    <Amount>40</Amount>
+                    <Owner>Test_Doedel</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>Object</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <DistanceToContext>70</DistanceToContext>
+                    <MinObjectDistance>5</MinObjectDistance>
+                    <MaxObjectDistance>40</MaxObjectDistance>
+                    <SpreadObjects>1</SpreadObjects>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- und etwas weiter weg auch ein paar -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004659</SpawnGUID>
+                    <Amount>30</Amount>
+                    <Owner>Test_Doedel</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>Object</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <DistanceToContext>100</DistanceToContext>
+                    <MinObjectDistance>30</MinObjectDistance>
+                    <MaxObjectDistance>50</MaxObjectDistance>
+                    <SpreadObjects>1</SpreadObjects>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- dummy ships at water (must be without LimitToQuestArea, because this limits to buildable land area) -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004654</SpawnGUID>
+                    <Amount>60</Amount>
+                    <Owner>Test_Doedel</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>Object</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <DistanceToContext>100</DistanceToContext>
+                    <MinObjectDistance>5</MinObjectDistance>
+                    <MaxObjectDistance>50</MaxObjectDistance>
+                    <SpreadObjects>1</SpreadObjects>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <!-- using ActionStartQuest here does not work, because this will alawys spawn StarterObject in the current active session. It must be started via a QuestPool, to spawn it in random session. -->
+     <!-- therefore we do the unlocks for the pool in 1500005012 -->
+      <!-- (if we some day want a unique Skin of the volcano per Region, we can also use ActionStartQuest with QuestSession hardcoded (accepts Region) -->
+       <!-- instead of this QuestPool construct. Then it may be possible to make these volcanos (different GUIDs and Sessions) erupt indenpendently) -->
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004666</GUID>
+          <Name>Start EruptionQuest</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500001613</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionTimer</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                        <ConditionTimer>
+                          <TimeLimit>30000</TimeLimit>
+                          <!-- <TimeLimit>1800000</TimeLimit> -->
+                        </ConditionTimer>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <!-- 100% -->
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004664</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionRegisterTrigger</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionRegisterTrigger>
+                                        <TriggerAsset>1500005012</TriggerAsset>
+                                      </ActionRegisterTrigger>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <!-- 90% and so on in 10% steps (only one of these unlocks should be unlocked at a time to define the chance of eruption after Timer) -->
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004968</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>90</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005012</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                        <ActionListChanceFailure />
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004967</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>80</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005012</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                        <ActionListChanceFailure />
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004966</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>70</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005012</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                        <ActionListChanceFailure />
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004965</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>60</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005012</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                        <ActionListChanceFailure />
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004964</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>50</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005012</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                        <ActionListChanceFailure />
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004963</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>40</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005012</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                        <ActionListChanceFailure />
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004962</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>30</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005012</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                        <ActionListChanceFailure />
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004961</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>20</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005012</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                        <ActionListChanceFailure />
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500004960</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteActionByChance</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteActionByChance>
+                                        <ChanceValue>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <VariableValue>
+                                              <FloatValue>10</FloatValue>
+                                            </VariableValue>
+                                          </Values>
+                                        </ChanceValue>
+                                        <ActionListChanceSuccess>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005012</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionListChanceSuccess>
+                                        <ActionListChanceFailure />
+                                      </ActionExecuteActionByChance>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <!-- 0% chance if nothing of previous unlocks is unlocked -->
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionAlwaysTrue</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionAlwaysTrue />
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+    
+  
+  <ModOp Type="AddNextSibling" GUID="152264">
+
+    <!-- we can not make SideNotification with "JumpTo" functionality (all vanilla ones are hardcoded outside xml where to jump to -.-) -->
+     <!-- so only way to kind of mimic this, is instead to make a quest that shows our text and can jump to the volcano -->
+     <!-- it can be aborted, if you dont want to see it in your quests. -->
+     
+     <!-- iwie klappt das mit dem photo noch nicht.. -->
+      <!-- evlt nochmal mit A7_QuestPhotography testen -->
+       <!-- ja mit A7_QuestPhotography gehts halbwegs, es öffnet sich keine zeitung direkt nach erfolg und geht auch nicht ins archiv, -->
+        <!-- aber in der successmessage ist n button um die zeitung zu öffnen , dieser button geht aber nicht wenn ich dummyquest und sucess/SuppressMessage=0 mache... -->
+     
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <!-- <Template>A7_QuestPhotography</Template> -->
+      <Values>
+        <Standard>
+          <GUID>1500004667</GUID>
+          <Name>Notification Volcano Eruption (and make photo if you want)</Name>
+        </Standard>
+        <Quest>
+          <OnQuestActive>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <!-- TODO: hier dann narrator vulkan ist aktiv einfügen -->
+                  <!-- <Item> -->
+                    <!-- <Action> -->
+                      <!-- <Template>ActionPlaySound</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Action /> -->
+                        <!-- <ActionPlaySound> -->
+                          <!-- <Sound>233890</Sound> -->
+                        <!-- </ActionPlaySound> -->
+                      <!-- </Values> -->
+                    <!-- </Action> -->
+                  <!-- </Item> -->
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestActive>
+          <StoryText>802116</StoryText>
+          <IsAbortable>1</IsAbortable>
+          <QuestTimeLimit>0</QuestTimeLimit>
+          <QuestTrackerVisibility>Global</QuestTrackerVisibility>
+          <QuestBookBackground>data/graphics_serp/volcano/bg_quest_volcano.png</QuestBookBackground>
+          <HasStarterSpeechBubble>1</HasStarterSpeechBubble>
+          <StarterSpeechBubble>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionTutorialInteraction>
+                <HintText>802116</HintText>
+              </ConditionTutorialInteraction>
+            </Values>
+          </StarterSpeechBubble>
+          <OnPhotographySuccessNewspaperAction>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Action />
+              <ActionForceNewspaper>
+                <Articles>
+                  <Item>
+                    <Article>1500004668</Article>
+                  </Item>
+                </Articles>
+                <OpenNewspaperType>SpecialEdition</OpenNewspaperType>
+                <PamsyWelcomeRequiredAsset>142374</PamsyWelcomeRequiredAsset>
+                <OpenNewspaperUI>1</OpenNewspaperUI>
+              </ActionForceNewspaper>
+            </Values>
+          </OnPhotographySuccessNewspaperAction>
+          <QuestHints>
+            <Item>
+              <Text>17675</Text>
+            </Item>
+          </QuestHints>
+        </Quest>
+        <Objectives>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>PhotographyObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <QuestTrackerIcon>data/graphics_serp/icons/volcano_1404.png</QuestTrackerIcon>
+                  </ConditionQuestObjective>
+                  <ConditionQuestPhotography>
+                    <PhotographyObjectList>
+                      <Item>
+                        <Entry>
+                          <Template>ConditionObjectPrebuiltObject</Template>
+                          <Values>
+                            <ConditionObjectPrebuiltObject>
+                              <PrebuiltObject>1500004656</PrebuiltObject>
+                              <PrebuiltObjectCheckOwner>1</PrebuiltObjectCheckOwner>
+                              <PrebuiltObjectOwner>Third_party_01_Queen</PrebuiltObjectOwner>
+                            </ConditionObjectPrebuiltObject>
+                            <ConditionScanner />
+                            <ConditionObjectiveSignsAndFeedback />
+                          </Values>
+                        </Entry>
+                        <!-- <AppearInNewspaperArticle>1500004668</AppearInNewspaperArticle> -->
+                        <AppearInNewspaperArticle>114985</AppearInNewspaperArticle>
+                        <CircleAreaPercentage>1</CircleAreaPercentage>
+                        <ScreenBorderPercentage>100</ScreenBorderPercentage>
+                      </Item>
+                    </PhotographyObjectList>
+                  </ConditionQuestPhotography>
+                  <ConditionPropsExecutionPlaceSettings>
+                    <ExecutionPlaceConfirmOnReached>0</ExecutionPlaceConfirmOnReached>
+                  </ConditionPropsExecutionPlaceSettings>
+                </Values>
+              </Objective>
+            </Item>
+            
+          </WinConditions>
+        </Objectives>
+      </Values>
+    </Asset>
+    
+    <!-- ####################### -->
+    <!-- in OnQuestActive we will spawn many invisble helper objects to shoot/take the fireball projectiles. -->
+     <!-- We want to delay the shooting a bit: -->
+      <!-- 1) We want some seconds (~30 or so) without eruption, so the player gets notified and can take immediate actions, like moving ships -->
+      <!-- 2) Then we want the volcano spit fireballs in the air, but not yet raining from the air yet, to simulate that the fireballs would fall down after spit in the air. -->
+        <!-- therefore we will start the fireballs from the air only ~5 seconds after the fireballs from the ground were started (currently via ActionAddGoodsToItemContainer) -->
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004663</GUID>
+          <Name>Make volcano erupt</Name>
+        </Standard>
+        <Quest>
+          <OnQuestActive>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionSpawnObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionSpawnObjects>
+                          <SpawnGUID>1500004656</SpawnGUID>
+                          <Amount>1</Amount>
+                          <Owner>Third_party_01_Queen</Owner>
+                        </ActionSpawnObjects>
+                        <SpawnArea>
+                          <SpawnContext>ForceContextPosition</SpawnContext>
+                          <ContextGUID>1500004655</ContextGUID>
+                          <LimitToQuestArea>1</LimitToQuestArea>
+                        </SpawnArea>
+                        <SessionFilter>
+                          <AllowProcessingSession>0</AllowProcessingSession>
+                          <AllowParentConditionSession>0</AllowParentConditionSession>
+                          <AllowQuestSession>1</AllowQuestSession>
+                          <AllowQuestArea>1</AllowQuestArea>
+                        </SessionFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500005015</TriggerAsset>
+                          <InheritArea>1</InheritArea>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <!-- does not work properly to register 1500005016 from within 1500005015 (the area sems to not be inherited properly) -->
+                  <Item>
+                    <Action>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500005016</TriggerAsset>
+                          <InheritArea>1</InheritArea>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestActive>
+          
+          <OnQuestDiscarded>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <!-- properly abort all OnQuestActive related actions, by unregistering the triggers -->
+                  <Item>
+                    <Action>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500005015</TriggerAsset>
+                          <UnregisterTrigger>1</UnregisterTrigger>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500005016</TriggerAsset>
+                          <UnregisterTrigger>1</UnregisterTrigger>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <!-- restart this eruption Quest if it is internally aborted, most likely because the StarterObject failed to spawn -->
+                   <!-- (because this tries to spawn in random loaded session, but if that randomly chosen session has no volcano, the Quest fails) -->
+                  <!-- Sideeffect: Also restarted, if the player looses the volcano island... because the game aborts the Quest in this case too (for no real reason...) -->
+                  <!-- There are several different solutions: -->
+                  <!-- 1) just let the QuestPool restart the quest again and again until StarterObject spawned (by having his condition be fullfilled for ~2 seconds with 0 cooldown) -->
+                    <!-- this does not affect the Island-OWner_change Abort -->
+                  <!-- 2) if pool ondition is only true once, Register here Trigger 1500005012 to fullfill the pool condition again, to let the pool try again in a random session. This also affects ownerchange of islands. -->
+                  <!-- 3) if pool condiotin is only true once, start the same Quest directly again here instead the pool, inheriting the QuestArea. If the Quest failed to spawn StarterObject,  -->
+                  <!-- it has no QuestArea and therefore selects (the current session of Human0? no, seems still to be random, great) and if it has, it starts again on the same area -->
+                   <!-- choosing option 3) -->
+                  <Item>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>3000</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <!-- <Item> -->
+                                    <!-- <Action> -->
+                                      <!-- <Template>ActionRegisterTrigger</Template> -->
+                                      <!-- <Values> -->
+                                        <!-- <Action /> -->
+                                        <!-- <ActionRegisterTrigger> -->
+                                          <!-- <TriggerAsset>1500005012</TriggerAsset> -->
+                                        <!-- </ActionRegisterTrigger> -->
+                                      <!-- </Values> -->
+                                    <!-- </Action> -->
+                                  <!-- </Item> -->
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionStartQuest</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionStartQuest>
+                                          <Quest>1500004663</Quest>
+                                          <InheritQuestArea>1</InheritQuestArea>
+                                        </ActionStartQuest>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestDiscarded>
+          <!-- called when QuestTimeLimit ran out, so the Eruption ended normally. Then register the Trigger again that starts the Quest after a time again -->
+          <OnQuestFailed>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500004666</TriggerAsset>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestFailed>
+          <!-- OnQuestEnd is executed on any case, aborted, failed, success and so on -->
+          <OnQuestEnd>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionDeleteObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionDeleteObjects />
+                        <ObjectFilter>
+                          <ObjectGUID>1500004656</ObjectGUID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                          <CheckParticipantID>1</CheckParticipantID>
+                          <ObjectParticipantID>Third_party_01_Queen</ObjectParticipantID>
+                        </ObjectFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionDeleteObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionDeleteObjects />
+                        <ObjectFilter>
+                          <ObjectGUID>1500004659</ObjectGUID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                          <CheckParticipantID>1</CheckParticipantID>
+                          <ObjectParticipantID>Test_Doedel</ObjectParticipantID>
+                        </ObjectFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionDeleteObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionDeleteObjects />
+                        <ObjectFilter>
+                          <ObjectGUID>1500004654</ObjectGUID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                          <CheckParticipantID>1</CheckParticipantID>
+                          <ObjectParticipantID>Test_Doedel</ObjectParticipantID>
+                        </ObjectFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionDeleteObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionDeleteObjects />
+                        <ObjectFilter>
+                          <ObjectGUID>1500004651</ObjectGUID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                          <CheckParticipantID>1</CheckParticipantID>
+                          <ObjectParticipantID>General_Enemy</ObjectParticipantID>
+                        </ObjectFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionDeleteObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionDeleteObjects />
+                        <ObjectFilter>
+                          <ObjectGUID>1500004670</ObjectGUID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                          <CheckParticipantID>1</CheckParticipantID>
+                          <ObjectParticipantID>Test_Doedel</ObjectParticipantID>
+                        </ObjectFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestEnd>
+          
+          
+          <KeepCheckingPreconditionsWhenRunning>0</KeepCheckingPreconditionsWhenRunning>
+          <ResetPreconditionsAfterQuestWasTriggered>1</ResetPreconditionsAfterQuestWasTriggered>
+          <QuestTimeLimit>60000</QuestTimeLimit>
+          <!-- <QuestTimeLimit>30000</QuestTimeLimit> -->
+          <!-- <QuestTimeLimit>900000</QuestTimeLimit> -->
+          <!-- todo test (nach testen unsichtbar machen) -->
+          <QuestTrackerVisibility>Global</QuestTrackerVisibility>
+        </Quest>
+        <Objectives>
+          <WinConditions>
+
+            <!-- HitTargetAmount of 4 is maximum, higher amounts makes non of them spawn -->
+             <!-- they will move in exact circle (if enough WaypointAmount) around the spawnpoint. (with 3 WaypointAmount they will move in a triangle form) -->
+              <!-- so if we use SpreadObjects with MinObjectDistance/MaxObjectDistance, they will all spawn at different location and thus all having a different midpoint -->
+                <!-- Spreading them therefore helps to cover more area and not having them circle next to each other the very same path -->
+               <!-- For whatever reason the spawnpoint is always on water ... sometimes I have problems to make them spawn on water and sometimes to make them spawn on land.. strange.. -->
+             <!-- They refuse to spawn directly at the same location like a building (eg the ContextGUID) with SpawnContext=Object, so either use DistanceToContext=5 (for ~Kontor size) and/or SpreadObjects with MinObjectDistance/MaxObjectDistance to randomize the spawn position, so they can properly spawn. -->
+              <!-- With ForceContextPosition only 1 HitTarget will be spawned instead of up to 4, but its the only way to properly spawn them regardles if above water or land -->
+            <!-- The HitTarget Object needs ItemContainer (and ForwardSpeed), otherwise it wont move properly (even with ForwardSpeed >0) -->
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>10</WaypointAmount>
+                    <TargetPatrolRadius>15</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>15</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004674</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>6</WaypointAmount>
+                    <TargetPatrolRadius>15</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>20</WaypointAmount>
+                    <TargetPatrolRadius>25</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>20</WaypointAmount>
+                    <TargetPatrolRadius>25</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>25</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>30</WaypointAmount>
+                    <TargetPatrolRadius>35</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>30</WaypointAmount>
+                    <TargetPatrolRadius>35</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>30</WaypointAmount>
+                    <TargetPatrolRadius>35</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>35</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004674</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>30</WaypointAmount>
+                    <TargetPatrolRadius>35</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>40</WaypointAmount>
+                    <TargetPatrolRadius>45</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>40</WaypointAmount>
+                    <TargetPatrolRadius>45</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>40</WaypointAmount>
+                    <TargetPatrolRadius>45</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>40</WaypointAmount>
+                    <TargetPatrolRadius>45</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>45</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>50</WaypointAmount>
+                    <TargetPatrolRadius>55</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>50</WaypointAmount>
+                    <TargetPatrolRadius>55</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>50</WaypointAmount>
+                    <TargetPatrolRadius>55</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>50</WaypointAmount>
+                    <TargetPatrolRadius>55</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>50</WaypointAmount>
+                    <TargetPatrolRadius>55</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>55</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>55</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004674</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>50</WaypointAmount>
+                    <TargetPatrolRadius>55</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004674</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>50</WaypointAmount>
+                    <TargetPatrolRadius>55</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>60</WaypointAmount>
+                    <TargetPatrolRadius>65</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>60</WaypointAmount>
+                    <TargetPatrolRadius>65</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>60</WaypointAmount>
+                    <TargetPatrolRadius>65</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>60</WaypointAmount>
+                    <TargetPatrolRadius>65</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>60</WaypointAmount>
+                    <TargetPatrolRadius>65</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>60</WaypointAmount>
+                    <TargetPatrolRadius>65</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>65</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>65</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>65</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>65</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>65</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>65</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>65</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>65</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004674</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>65</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004674</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>65</WaypointAmount>
+                    <TargetPatrolRadius>75</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>75</WaypointAmount>
+                    <TargetPatrolRadius>85</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>75</WaypointAmount>
+                    <TargetPatrolRadius>85</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>75</WaypointAmount>
+                    <TargetPatrolRadius>85</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>75</WaypointAmount>
+                    <TargetPatrolRadius>85</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>75</WaypointAmount>
+                    <TargetPatrolRadius>85</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>75</WaypointAmount>
+                    <TargetPatrolRadius>85</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>75</WaypointAmount>
+                    <TargetPatrolRadius>85</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>75</WaypointAmount>
+                    <TargetPatrolRadius>85</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>85</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>85</WaypointAmount>
+                    <TargetPatrolRadius>100</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>85</WaypointAmount>
+                    <TargetPatrolRadius>100</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>85</WaypointAmount>
+                    <TargetPatrolRadius>100</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>85</WaypointAmount>
+                    <TargetPatrolRadius>100</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>85</WaypointAmount>
+                    <TargetPatrolRadius>100</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>3</WaypointAmount>
+                    <TargetPatrolRadius>100</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004674</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>85</WaypointAmount>
+                    <TargetPatrolRadius>100</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004674</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>85</WaypointAmount>
+                    <TargetPatrolRadius>100</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004674</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>85</WaypointAmount>
+                    <TargetPatrolRadius>100</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>100</WaypointAmount>
+                    <TargetPatrolRadius>120</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>100</WaypointAmount>
+                    <TargetPatrolRadius>120</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>100</WaypointAmount>
+                    <TargetPatrolRadius>120</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>100</WaypointAmount>
+                    <TargetPatrolRadius>120</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>100</WaypointAmount>
+                    <TargetPatrolRadius>140</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>100</WaypointAmount>
+                    <TargetPatrolRadius>140</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>HitMovingTargetObjective</Template>
+                <Values>
+                  <ConditionQuestHitMovingTarget>
+                    <HitTarget>1500004645</HitTarget>
+                    <HitTargetAmount>1</HitTargetAmount>
+                    <HitTargetSignsAndFeedback />
+                    <WaypointAmount>100</WaypointAmount>
+                    <TargetPatrolRadius>140</TargetPatrolRadius>
+                    <ItemRetrievalPlace />
+                  </ConditionQuestHitMovingTarget>
+                  <ConditionPropsSessionSettings />
+                  <ConditionQuestObjective />
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnAreaType />
+                  </SpawnArea>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <!-- 58 times 1500004645. When adding more of it, also increase the Amount of the Fireball-projectile-Item 1500004652 above ActionAddGoodsToItemContainer -->
+            
+          </WinConditions>
+          <WinConditionCompletionOrder>MutuallyExclusive</WinConditionCompletionOrder>
+        </Objectives>
+        <!-- Unfortunately the Anno devs never implemented a way to define a QuestSession via <CounterScope>Session</CounterScope> -->
+         <!-- and also nothing similar to ConditionMutualAreaInSubconditions for Sessions -->
+         <!-- it only works for <CounterScope>Area</CounterScope>, but this loops only through islands from processing player, while the volcano can be anywhere -->
+          <!-- (disabled vanilla Quest 152459 shows in its name that this was never implemented, it tries to start a quest in a session where both AIs have a lighthouse) -->
+         <!-- That means: -->
+         <!-- PreCondition checking global for the volcano is enough.  -->
+          <!-- It also means we can not check in which session a volcano is already active, so only one eruption worldwide is possible. -->
+          <!-- And it means the StarterObject will try to spawn in a random Session. -->
+           <!-- If that random session does not contain the ContextGUID to spawn next to, the Quest will simply automatically be aborted again (then we will restart in OnQuestDiscarded) -->
+        <PreConditionList>
+          
+          <Condition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition/>
+              <ConditionEvent>
+                <ConditionEvent>GUIDUnlocked</ConditionEvent>
+                <ContextAsset>1500004666</ContextAsset>
+                <ContextAssetInfolayer>0</ContextAssetInfolayer>
+              </ConditionEvent>
+              <ConditionPropsNegatable/>
+            </Values>
+          </Condition>
+          <SubConditions>
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500004655</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </Condition>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+          </SubConditions>
+        </PreConditionList>
+        <!-- using QuestOptional as alternative way to define a QuestArea, which also can be an AI/unsettled island (with ConditionPlayerCounter+Scope=Area we can only check our own islands) -->
+          <!-- if we spawn a marker at 1500004655 (the buff building), it randomly chooses an island where this building exists, not all of them at once -->
+          <!-- This chooses a random session (ONLY when started via a QuestPool, regardless of PreConditionList!) and tries to spawn the StarterObject there -->
+        <QuestOptional>
+          <HasStarterObject>Specific</HasStarterObject>
+          <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionStarterObject>
+                <OverwriteExistingQuestArea>1</OverwriteExistingQuestArea>
+                <StarterObjectObject>
+                  <Template>ConditionObjectSpawnedObject</Template>
+                  <Values>
+                    <ConditionObjectSpawnedObject>
+                      <ExecutionObject>1500004669</ExecutionObject>
+                      <SpawnTiming>OnQuestActivated</SpawnTiming>
+                      <!-- ObjectOwner is ignored here in StarterObject, it will always belong to Neutral! -->
+                      <ObjectDespawn>Despawn</ObjectDespawn>
+                      <ObjectSpawnArea>
+                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                        <Values>
+                          <SpawnArea>
+                            <SpawnContext>ForceContextPosition</SpawnContext>
+                            <ContextGUID>1500004655</ContextGUID>
+                          </SpawnArea>
+                        </Values>
+                      </ObjectSpawnArea>
+                    </ConditionObjectSpawnedObject>
+                    <ConditionScanner />
+                    <ConditionObjectiveSignsAndFeedback />
+                  </Values>
+                </StarterObjectObject>
+              </ConditionStarterObject>
+              <ConditionQuestObjective />
+              <ConditionPropsSessionSettings />
+            </Values>
+          </StarterObject>
+        </QuestOptional>
+        
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- seems we need the QuestPool to get a rnadom session somehow, because ActionStartQuest seems to always start the Quest in the current active session?! At least the StarterObject always spawns there, while its random with a QuestPool -->
+  <!-- instantly start Quest (up to 1 at the same time active) as soon as 1500004666 is unlocked -->
+    <!-- (put the 1500004666 unlock check in the Quest itself, because we need to use GUIDUnlocked Event, while only Quests Support ResetPreconditionsAfterQuestWasTriggered, which is needed for Events) -->
+  <ModOp Type="addNextSibling" GUID="150725">
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005011</GUID>
+          <Name>Volcano eruption - only Human0</Name>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <Item>
+              <Quest>1500004663</Quest>
+            </Item>
+          </Quests>
+          <PoolCooldown>0</PoolCooldown>
+          <QuestCooldown>0</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>1</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>1</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500001613</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+  </ModOp>
+
+    
+  <!-- If nothing from these is unlocked for Human0, the chance for eruption is 0% -->
+   <!-- only up to one of these UnlockableAsset should be unlocked at a time (for Human0!) to define the chance a eruption happens after ConditionTimer from the eruption-start-trigger -->
+   <!-- (group just to be able to hide code in code-editor) -->
+  <Group>
+    <ModOp Type="AddNextSibling" GUID="116915">
+      <Asset>
+        <Template>UnlockableAsset</Template>
+        <Values>
+          <Standard>
+            <GUID>1500004960</GUID>
+            <Name>Eruption Chance 10%</Name>
+          </Standard>
+          <Locked />
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>1500004960</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500004961</GUID>
+            <Name>Eruption Chance 20%</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>1500004960</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500004962</GUID>
+            <Name>Eruption Chance 30%</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>1500004960</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500004963</GUID>
+            <Name>Eruption Chance 40%</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <!-- 50% chance by default (unlocked at start) -->
+      <Asset>
+        <BaseAssetGUID>1500004960</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500004964</GUID>
+            <Name>Eruption Chance 50%</Name>
+          </Standard>
+          <Locked>
+            <!-- <DefaultLockedState>0</DefaultLockedState> -->
+          </Locked>
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>1500004960</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500004965</GUID>
+            <Name>Eruption Chance 60%</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>1500004960</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500004966</GUID>
+            <Name>Eruption Chance 70%</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>1500004960</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500004967</GUID>
+            <Name>Eruption Chance 80%</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>1500004960</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500004968</GUID>
+            <Name>Eruption Chance 90%</Name>
+          </Standard>
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>1500004960</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500004664</GUID>
+            <Name>Eruption Chance 100%</Name>
+          </Standard>
+          <!-- TODO for testing 100%, but when life use 50% instead -->
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+        </Values>
+      </Asset>
+      
+    </ModOp>
+  </Group>
+  
+  
+  
+  
+  
+  
+
+</ModOps>

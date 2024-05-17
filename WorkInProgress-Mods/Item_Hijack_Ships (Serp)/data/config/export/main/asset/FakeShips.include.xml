@@ -1,0 +1,1129 @@
+<ModOps>
+  
+  <!-- There is no proper ActionSpawnObject or ActionChangeParticipant in lua unfortunately, so we are forced to do this via xml. -->
+   <!-- but xml is unable to do these actions on specific targets, unless it has a Labe (can only be added by xml on spawn, nowhere else..) or a unique GUID. -->
+   <!-- So we are forced to change the GUID via lua first. But changing GUID can crash the game if the old and new properties do not match. -->
+    <!-- Therefore we need unique GUID Fakeships, luckily only needed for pirate ships, so we make a copy of each of them... -->
+    
+    <!-- um in  current session wo executing coop player gerade ist etwas zu spawnen, -->
+     <!-- MÜSSEN wir glaube ich lua StartQuest machen, damit Quest aufjedenfall in der richtigen session spawned. -->
+    <!-- (mit Trigger StartQuest UseCurrentSession ists immer die Session des Coop Leaders, was evlt nicht die richtige fürs kapern ist) -->
+    <!-- Oder wir bleiben einfach bei fester definition der Session old world/new world für piraten -->
+    
+
+	<ModOp Type="addNextSibling" GUID='102429'>
+		<Asset>
+			<BaseAssetGUID>102429</BaseAssetGUID>
+			<Values>
+				<Standard>
+					<GUID>1500004600</GUID>
+					<Name>Pirate Gunboat FakeShip</Name>
+				</Standard>
+        <Walking>
+          <ForwardSpeed>0</ForwardSpeed>
+        </Walking>
+			</Values>
+		</Asset>
+  </ModOp>
+  <ModOp Type="addNextSibling" GUID='102430'>
+		<Asset>
+			<BaseAssetGUID>102430</BaseAssetGUID>
+			<Values>
+				<Standard>
+					<GUID>1500004601</GUID>
+					<Name>Pirate Frigate FakeShip</Name>
+				</Standard>
+        <Walking>
+          <ForwardSpeed>0</ForwardSpeed>
+        </Walking>
+			</Values>
+		</Asset>
+  </ModOp>
+  <ModOp Type="addNextSibling" GUID='102431'>
+		<Asset>
+			<BaseAssetGUID>102431</BaseAssetGUID>
+			<Values>
+				<Standard>
+					<GUID>1500004602</GUID>
+					<Name>Pirate Liner FakeShip</Name>
+				</Standard>
+        <Walking>
+          <ForwardSpeed>0</ForwardSpeed>
+        </Walking>
+			</Values>
+		</Asset>
+  </ModOp>
+  <ModOp Type="addNextSibling" GUID='102432'>
+		<Asset>
+			<BaseAssetGUID>102432</BaseAssetGUID>
+			<Values>
+				<Standard>
+					<GUID>1500004603</GUID>
+					<Name>Pirate Monitor FakeShip</Name>
+				</Standard>
+        <Walking>
+          <ForwardSpeed>0</ForwardSpeed>
+        </Walking>
+			</Values>
+		</Asset>
+  </ModOp>
+  
+  <!-- add mod pirate ships ? -->
+   <!-- they need 2 copies, one for the unique spawnpoint and one for the player to keep (so player does not own the same GUID which the pirate does) -->
+    <!-- and then add them below to the pools and create triggers for them and add the GUIDs into lua code pirateships -->
+  <!-- <ModOp Type="addNextSibling" GUID='100437'> -->
+    <!-- <Asset> -->
+			<!-- <BaseAssetGUID>AirShip</BaseAssetGUID> -->
+			<!-- <Values> -->
+				<!-- <Standard> -->
+					<!-- <GUID>1500004604</GUID> -->
+					<!-- <Name>AirShip FakeShip</Name> -->
+				<!-- </Standard> -->
+        <!-- <Walking> -->
+          <!-- <ForwardSpeed>0</ForwardSpeed> -->
+        <!-- </Walking> -->
+			<!-- </Values> -->
+		<!-- </Asset> -->
+    <!-- <Asset> -->
+			<!-- <BaseAssetGUID>WarAirShip</BaseAssetGUID> -->
+			<!-- <Values> -->
+				<!-- <Standard> -->
+					<!-- <GUID>1500004605</GUID> -->
+					<!-- <Name>WarAirShip FakeShip</Name> -->
+				<!-- </Standard> -->
+        <!-- <Walking> -->
+          <!-- <ForwardSpeed>0</ForwardSpeed> -->
+        <!-- </Walking> -->
+			<!-- </Values> -->
+		<!-- </Asset> -->
+    <!-- <Asset> -->
+			<!-- <BaseAssetGUID>AirShip</BaseAssetGUID> -->
+			<!-- <Values> -->
+				<!-- <Standard> -->
+					<!-- <GUID>1500004606</GUID> -->
+					<!-- <Name>AirShipPermit FakeShip</Name> -->
+				<!-- </Standard> -->
+        <!-- <Walking> -->
+          <!-- <ForwardSpeed>0</ForwardSpeed> -->
+        <!-- </Walking> -->
+			<!-- </Values> -->
+		<!-- </Asset> -->
+    <!-- <Asset> -->
+			<!-- <BaseAssetGUID>WarAirShip</BaseAssetGUID> -->
+			<!-- <Values> -->
+				<!-- <Standard> -->
+					<!-- <GUID>1500004607</GUID> -->
+					<!-- <Name>WarAirShipPermit FakeShip</Name> -->
+				<!-- </Standard> -->
+        <!-- <Walking> -->
+          <!-- <ForwardSpeed>0</ForwardSpeed> -->
+        <!-- </Walking> -->
+			<!-- </Values> -->
+		<!-- </Asset> -->
+  <!-- </ModOp> -->
+
+    <!-- TODO schiffe hier zufügen und auch andere vanilla pools -->
+  <!-- fake ships zu den ItemEffectTargetPool zufügen, weil sonst eigener globaler buff bis zum Neuladen des spiels nicht aktiv ist nach changeguid -->
+  <!-- all ships 191454 (all player ships! in vanilla only the ones you can build) -->
+  <!-- 191458 all warships -->
+  <!-- 193986 military player units -->
+  <ModOp Type="add" GUID='191454,191458,193986' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs">
+    <Item>
+      <GUID>1500004600</GUID>
+    </Item>
+    <Item>
+      <GUID>1500004601</GUID>
+    </Item>
+    <Item>
+      <GUID>1500004602</GUID>
+    </Item>
+    <Item>
+      <GUID>1500004603</GUID>
+    </Item>
+    <!-- <Item> -->
+      <!-- <GUID>1500004604</GUID> -->
+    <!-- </Item> -->
+    <!-- <Item> -->
+      <!-- <GUID>1500004605</GUID> -->
+    <!-- </Item> -->
+    <!-- <Item> -->
+      <!-- <GUID>1500004606</GUID> -->
+    <!-- </Item> -->
+    <!-- <Item> -->
+      <!-- <GUID>1500004607</GUID> -->
+    <!-- </Item> -->
+  </ModOp>
+  <!-- 1398 flameable ships -->
+  <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs">
+    <Item>
+      <GUID>1500004600</GUID>
+    </Item>
+    <Item>
+      <GUID>1500004601</GUID>
+    </Item>
+    <Item>
+      <GUID>1500004602</GUID>
+    </Item>
+  </ModOp>
+  <!-- 1404 steal ships -->
+  <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs">
+    <Item>
+      <GUID>1500004603</GUID>
+    </Item>
+  </ModOp>
+
+  
+  
+  <!-- Trigger to spawn helper ships -->
+  <!-- ActionSpawnObjects is just horrible. no way to simply spawn in current active or provessing session, only hardcoded or with an Area it works. -->
+  <ModOp GUID="153271" Type="AddNextSibling">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004592</GUID>
+          <Name>Spawn Helper Pirate Gunboat - Old World</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004592</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004592</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004600</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004600</ContextGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <Sessions>
+                      <Item>
+                        <Session>180023</Session>
+                      </Item>
+                    </Sessions>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
+            <!-- TODO: desen delay wenns hilft dann bei allen anderen auch zufügen, auch anderen mods wo ich unlock in lua mache -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004592</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004593</GUID>
+          <Name>Spawn Helper Pirate Gunboat - New World</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004593</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004593</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004600</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004600</ContextGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <Sessions>
+                      <Item>
+                        <Session>180025</Session>
+                      </Item>
+                    </Sessions>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004593</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004586</GUID>
+          <Name>Spawn Helper Pirate Frigate - Old World</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004586</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004586</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004601</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004601</ContextGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <Sessions>
+                      <Item>
+                        <Session>180023</Session>
+                      </Item>
+                    </Sessions>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004586</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004587</GUID>
+          <Name>Spawn Helper Pirate Frigate - New World</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004587</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004587</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004601</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004601</ContextGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <Sessions>
+                      <Item>
+                        <Session>180025</Session>
+                      </Item>
+                    </Sessions>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004587</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004588</GUID>
+          <Name>Spawn Helper Pirate Liner - Old World</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004588</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004588</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004602</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004602</ContextGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <Sessions>
+                      <Item>
+                        <Session>180023</Session>
+                      </Item>
+                    </Sessions>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004588</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004589</GUID>
+          <Name>Spawn Helper Pirate Liner - New World</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004589</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004589</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004602</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004602</ContextGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <Sessions>
+                      <Item>
+                        <Session>180025</Session>
+                      </Item>
+                    </Sessions>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004589</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004590</GUID>
+          <Name>Spawn Helper Pirate Monitor - Old World</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004590</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004590</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004603</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004603</ContextGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <Sessions>
+                      <Item>
+                        <Session>180023</Session>
+                      </Item>
+                    </Sessions>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004590</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004591</GUID>
+          <Name>Spawn Helper Pirate Monitor - New World</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004591</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004591</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004603</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004603</ContextGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <Sessions>
+                      <Item>
+                        <Session>180025</Session>
+                      </Item>
+                    </Sessions>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004591</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+
+</ModOps>

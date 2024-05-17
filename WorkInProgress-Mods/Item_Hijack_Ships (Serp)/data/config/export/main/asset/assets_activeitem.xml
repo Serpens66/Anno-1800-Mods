@@ -1,0 +1,1626 @@
+<ModOps>
+    
+    
+     <!-- PROBLEM: -->
+      <!--bei spawnen des SpawnImpactObject beim Auto-Schießen eines schiffs:-->
+      <!--Objekt wird korrekt gepsawned und kann eigentlich auch von ConditionPlayerCounter erfasst werden, -->
+   <!-- ABER aus irgendeinem Grund kommt der Counter nicht hinterher, bzw. zählt einfach garnicht, wenn das Objekt zu schnell hintereinander gespeend wird durch -->
+    <!-- SpawnImpactObject ! -->
+    <!-- ja das zählen triggert iwie nicht oderso, wenn ich weniger <ShootingTracking>Front</ShootingTracking> nehme, dann zählt er (wobeis da auch merhre projektile aufeinmal sind?) -->
+     <!-- und dann zählt er direkt alle korrekt die er vorher nicht gezählt hat -->
+     <!-- Da das also ein Bug ist den wir nicht lösen können... doch wieder zurück zum Schuss Item... -->
+      <!-- und dann ists halt so, dass es ab und zu daneben geht. wenn wir den cooldown hoch genug machen, -->
+       <!-- dann wird der user dadurch schon ausreichend animiert vorher dafür zu sorgen, dass das schiff langsam ist -->
+      <!-- Fehlt nur der Debuff auf dem kaperndem schiff selbst.. dass es stehenbleibt können wir in lua durch regelmäßig stop aufrufe erzwingen -->
+       <!-- einen buff könnten wir da auch zufügen, aber nur wenn alle spieler schon zu diesem zeitpunkt in der richtigen session sind -.- -->
+    
+    <!-- Und jetzt wo wir ItemType=Specialist nutzen, ist die Nuke Variante eh die bessere -->
+    
+    
+    
+    
+    
+    
+  <!-- Serp GUIDs 1500004570 to 1500004619 reserved for this mod -->
+  <!-- ab 1500004600 sind die fakeschiffe -->
+  <!-- 1500004596 bis 1500004599 noch frei -->
+  
+  <!-- Note: -->
+    <!-- if the item to hijack is freely available and every human can use it anytime, it might cause a problem if more than one is executing it at exactly the same time -->
+     <!-- (within 0.5 seconds), because the lua script can only search for objects "being hijacked", but can not check by who. -->
+      <!-- So right now this is solved by simply executing everything in the shortest time possible, so at most given moment, there can only be a single ship being hijacked. -->
+    
+    <!-- man könnte das system auch in Sabotage Mod übertragen, -->
+     <!-- und dort dann ein Item pro Human machen, um dann eine einzigartige StatusEffect GUID zu haben, anhand derer man erkennen kann, wer wer hijacked. -->
+      <!-- (die items vom spy werden ja eh per trigger verteilt, da kann man dann auch checken wer welcher human ist) -->
+    <!-- abwehren kann man das kapern vom spy dann so wie alle anderen sabotage auf schiffe auch: -->
+     <!-- das item hat nen delay von x sekunden und du musst das schiff einfach nur innerhalb der zeit wegbewegen -->
+      <!-- (bei spy reicht es also wenn das schiff einfach nach ablauf der zeit den besitzer wechselt) -->
+  
+
+  <!-- Ideen für Kaper-Vorgang: -->
+  <!-- Item auf schiff aktivieren -> (kann jederzeit deaktiviert werden?) steht nur noch, geringe range, bekommt nur noch halben schaden, -->
+    <!-- schießt spezielle munition. Dieses projektil löst beim ziel statuseffect aus, zb einen mit 5 sec und einen mit 30 sec. -->
+     <!-- (bei beiden auch wenig range, halber schaden). beim ersten schießt schiff ein projektil zurück, was dafür sorgt, -->
+      <!-- dass das kapernde schiff auch marktiert ist und garnicht mehr schießen kann. und der 2te buff nach den 5 sek sorgt ebenfalls dafür dass man ganricht mehr schießen kann. -->
+       <!-- auf diese weise sind die beiden schiffe erstmal nur miteinander beschäftigt und nicht noch andere schiff. -->
+      <!-- und in lua könnte man nen x sek timer laufen lassen und danach prüfen welches der schiffe noch stärker ist. -->
+      <!-- Darein kann aktuelle hitpoint, damagepersec eingehen und wenn möglich noch diverse buffs -->
+    <!-- .. -->
+    <!-- zusätzlich dafür sorgen, dass item nur einmalig erhältlich ist, -->
+     <!-- auf diese weise könnten schiffe weiterschießen und wir können weitere SpawnImpactObject ignorieren, soalnge ein kapervorgang im gange ist. -->
+      <!-- wir kapern das zuerst getroffen schiff (im fall dass noch ein zweites angeschossen wird) -->
+     <!-- das Kapernde schiff können wir nicht wirklich sinnvoll identifizieren, solange wir nich auch den aktiven itembuff finden können, -->
+      <!-- denn das zu kapernde schiff könnte, wenns überhaupt schießen kann, ja auch andere schiffe in der nähe anschießen -->
+        <!-- wenn wirs identifizeiren können, dann naütrlich mehr vergleichen -->
+      <!-- ansonsten einfach zb auf hitpoints unter 50% oderso warten, aber mind. 1 minute warten. während der wartzeit immer mal wieder prüfen ob zu kaperndes schiff den statuseffekt noch hat oder versenkt wurde, wenn nicht dann fail. -->
+      <!-- Kaperndes schiff kann sich nicht bewegen durch itemaction und zu kaperndes durch statuseffekt. dieser hält nur ungefährt so lange wie die schussrate des kapernden schiffs ist. -->
+       <!-- schussrate von kaperndem schiff erhöht, damits bei aktivierung des items möglichst sofort auf das erste schiff in direkteer nähe schießen kann -->
+        <!-- itemaction kann jederzeit beendet werden,  cooldown um die 10 minuten. -->
+  
+  
+  <!-- Item bekommt man einmalig von Piraten nach erstem besiegen oder ersten Mal Allianz mit ihnen, -->
+   <!-- am besten durch Quest mit einfach item abholen -->
+  <!-- und damit kein anderer das Item von nem anderen Spieler einsammeln kann, -->
+   <!-- ein eigenes Flotsam für das item machen, -->
+    <!-- welches das hier hat: -->
+    <!-- <Collectable> -->
+      <!-- <CheckOwner>1</CheckOwner> -->
+    <!-- </Collectable> -->
+
+  <!-- TODO: -->
+    <!-- noch SideNotifications zufügen: -->
+    <!-- Subtitle -->
+    <!-- <Text> -->
+      <!-- <GUID>265425</GUID> -->
+      <!-- <Text>Kaperversuch fehlgeschlagen!</Text> -->
+    <!-- </Text> -->
+    <!-- <Text> -->
+      <!-- <GUID>265426</GUID> -->
+      <!-- <Text>Jemand versucht, Ihr Schiff zu kapern!</Text> -->
+    <!-- </Text> -->
+    <!-- <Text> -->
+      <!-- <GUID>265427</GUID> -->
+      <!-- <Text>Ein Feind hat Ihr Schiff gekapert!</Text> -->
+    <!-- </Text> -->
+    <!-- <Text> -->
+      <!-- <GUID>265428</GUID> -->
+      <!-- <Text>Ein Enterversuch wurde abgewehrt!</Text> -->
+    <!-- </Text> -->
+    <!-- <Text> -->
+      <!-- <GUID>265415</GUID> -->
+      <!-- <Text>Schiff erfolgreich gekapert!</Text> -->
+    <!-- </Text> -->
+  
+
+
+  
+  <!-- gegen ein Schuss-Item spricht vorallem, dass es nicht 100% sicher trifft, wodurch SpawnImpactObject dann evlt. völlig umsonst eine teure lua Suche startet -->
+   
+  
+  <!-- add the new item to the same (asset/reward)pools like item pirate flag item 192172 -->
+  <!-- <ModOp Type="add" GUID="192717,113175,113178,112845" Path="/Values/RewardPool/ItemsPool"> -->
+    <!-- <Item> -->
+      <!-- <ItemLink>1500004570</ItemLink> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  <!-- <ModOp Type="add" GUID="130176" Path="/Values/AssetPool/AssetList"> -->
+    <!-- <Item> -->
+      <!-- <Asset>1500004570</Asset> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  
+  <!-- Game Items am besten immer mit AddNextSibling bei GUID 112574 zufügen, -->
+   <!-- weil bei diesen auch die Group-GUIDs wichtig sein können. Manche group guids werden für quest rewards genommen, -->
+    <!-- so wirds im item-statistic menu zb angezeigt, dass man das item durch resident-quests bekommen kann, wenn ich meine items bei 192168 hinzugüge -->
+  
+  <!-- TODO für Itembeschreibung brauch ich vermutlich noch nen activebuff mit fakeprojektil -->
+  
+  <!-- Schiff-audios: (suche nach ShipHijacking) -->
+  <!-- <Name>AT_MurmurMale1_Gunboat_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurMale1_Gunboat_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurMale2_Frigate_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurMale3_OilTanker_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurMale4_Battlecruiser_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurMale5_Flagship_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurMale6_Monitor_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurFemale1_Schooner_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurFemale2_Clipper_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurFemale3_Collier_ShipHijacking01</Name> -->
+  <!-- <Name>AT_MurmurFemale4_Liner_ShipHijacking01</Name> -->
+  <!-- <Name>AT_DLC03_Airship_ShipHijacking_01</Name> -->
+  <!-- <Name>AT_DLC7_CaptainShip_ShipHijacking</Name> -->
+  <!-- ActivateActionSound unfortunately only accepts one AudioAsset, not an audiopool/textpool -.- -->
+   <!-- and we can not make the sound different per ship, so we have to decide for one of the options. I choose 237920 and 245270 for airships -->
+  <!-- TODO: InfoDescription noch durch eine description des items ersetzen -->
+  
+  <ModOp Type="AddNextSibling" GUID="112574">
+
+    <Asset>
+      <Template>ActiveItem</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004570</GUID>
+          <Name>Hijack Item</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_pirate_flag.png</IconFilename>
+          <InfoDescription>801680</InfoDescription>
+        </Standard>
+        <Item>
+          <Allocation>Warship</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Legendary</Rarity>
+          <HasAction>1</HasAction>
+          <TradePrice>700000</TradePrice>
+        </Item>
+        <ItemAction>
+          <!-- ActionCooldown needs to be higher than ActionDuration for the Trigger Reset-Timer to poperly work -->
+           <!-- am Besten nicht beendbar machen, weil sonst Beschuss enden könnte, bevor kapern zuende ist und vorallem man dann auch abhauen könnte nach einem schuss -->
+            <!-- und das kapern weitergeht -->
+          <ActionCooldown>12000</ActionCooldown>
+          <ActionDuration>10000</ActionDuration>
+          <ActiveBuff>1500004572</ActiveBuff>
+          <ActionDescription>20071</ActionDescription>
+          <CanEndItemAction>0</CanEndItemAction>
+          <StopMovementOnInteraction>1</StopMovementOnInteraction>
+          <ActivateActionSound>237920</ActivateActionSound>
+          <!-- <DeactivateActionSound></DeactivateActionSound> -->
+          <ActionCompletedEffect>
+            <EffectAsset>101063</EffectAsset>
+          </ActionCompletedEffect>
+        </ItemAction>
+        <ExpeditionAttribute />
+        <SpecialAction />
+        <Locked />
+        <CraftableItem />
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004570</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004579</GUID>
+          <Name>Hijack Item Airship</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_pirate_flag.png</IconFilename>
+          <InfoDescription>801680</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>1500004570</TextOverride>
+        </Text>
+        <ItemAction>
+          <ActivateActionSound>245270</ActivateActionSound>
+        </ItemAction>
+        <Item>
+          <Allocation>AirShip</Allocation>
+        </Item>
+        <VisualEffectWhenActive>
+          <EffectFile>data/graphics/effects/military/decals/ship_target_decal_01.cfg</EffectFile>
+        </VisualEffectWhenActive>
+      </Values>
+    </Asset>
+
+  </ModOp>
+  
+  <!-- TODO: -->
+   <!-- mit InfoLayerInfotip könnten wir theoretisch auch irgendeine Art Fortschritt anzeigen oder? -->
+    <!-- Also zumindest alles was in infotips geht... das beinhaltet leider keine eigene Berechnung, nur Werte die wir direkt abfragen können... -->
+   <!-- Aber wir können prüfen ob der Owner/GUID supported wird (hardcoden der GUIDs/IDs im infotip) -->
+    <!-- und dann eben zb. schreiben, "kann nicht gekapert werden!" usw (wobei man das auch als notification machen kann, wäre einfacher) -->
+    <!-- und man könnte evlt sogar einen Timer anzeigen lassen im infotip, -->
+     <!-- zur not indem wir ein fakeobjekt spawnen mit Object DelayedConstruction RemainingConstructionTime -->
+      <!-- oder testen: [ItemAssetData([RefGuid]) GlobalBuffCountdown &gt;&gt; time] -->
+       <!-- ob hier RefGuid tatsächlich die GUID des buffs meint und dann eben beim ersten SpawnImpactObject eine AddBuff Action machen mit 1 minuten laufzeit -->
+        <!-- der aber nichts effekted -->
+      <!-- oder noch besser: -->
+       <!-- [Selection Object ShipIncident RemainingDuration &gt;&gt; time] -->
+       <!-- einfach ein incident mit dem Projektil auslösen (mal gucken ob riot geht, wobei die Frage ist ob der sich bei jedem schuss erneuert? -->
+         <!-- vanilla nutzt sowas <Condition>[Selection Picked Collectable CanBeCollected]</Condition> -->
+          <!-- aber ich frag mich wieso Selection funzt, man hat es doch nicht zwangsweise selected, wenn man über infolayer hovered, oder ist dafür Picked da? -->
+         
+         <!-- Dabei evlt auch mal direkt den "In Brand" 192004 Buff tooltip und evlt dem Feuer! infolayer nen tooltip geben, -->
+           <!-- der tatsächlich RemainingDuration anzeigt <GUID>500307</GUID>  <Name>Fire - Active</Name> einfach nen infolayer tip geben, -->
+           <!-- der pfüft obs ShipIncident hat und dann das anzeigt, ansonsten halt weiterhin feuer, soferns für häsuer nicht definiert ist -->
+  
+  <!-- Piratenschiffe können keine ShipIncidents haben?  -->
+   <!-- evlt zufügen? -->
+  
+  <ModOp Type="AddNextSibling" GUID="501794">
+    <Asset>
+      <Template>InfoLayerIcon</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004576</GUID>
+          <Name>Hijack InfoLayer</Name>
+        </Standard>
+        <InfoLayerIcon>
+          <Config>data/graphics/ui/infolayer3d/busy_double_size.cfg</Config>
+          <PopupDelay>0</PopupDelay>
+          <!-- <InfoLayerInfotip>1500004574</InfoLayerInfotip> -->
+          <IsQuestInfolayer>0</IsQuestInfolayer>
+          <ShowInCreativeMode>1</ShowInCreativeMode>
+        </InfoLayerIcon>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp Type="AddNextSibling" GUID="112574">
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004572</GUID>
+          <Name>Hijacking Buff</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_mercier_flag.png</IconFilename>
+        </Standard>
+        <!-- todo fürs testen piratemode, aber final denke ich nicht -->
+        <VehicleUpgrade>
+          <ActivatePirateFlag>1</ActivatePirateFlag>
+          <ForwardSpeedUpgrade>
+            <Value>-10000</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+        </VehicleUpgrade>
+        <Buff>
+          <AddedInfolayer>1500004576</AddedInfolayer>
+        </Buff>
+        <AttackerUpgrade>
+          <AttackRangeUpgrade>
+            <Value>-80</Value>
+            <Percental>1</Percental>
+          </AttackRangeUpgrade>
+          <BaseDamageUpgrade>
+            <Value>-50</Value>
+            <Percental>1</Percental>
+          </BaseDamageUpgrade>
+          <UseProjectile>1500004571</UseProjectile>
+          <AddStatusEffects>
+            <Item />
+          </AddStatusEffects>
+          <LineOfSightRangeUpgrade>
+            <Value>-80</Value>
+            <Percental>1</Percental>
+          </LineOfSightRangeUpgrade>
+          <AttackSpeedUpgrade>100</AttackSpeedUpgrade>
+        </AttackerUpgrade>
+        <AttackableUpgrade>
+          <DamageReceiveFactor>
+            <Cannon>
+              <Factor>0.5</Factor>
+            </Cannon>
+            <Normal>
+              <Factor>0.5</Factor>
+            </Normal>
+            <Torpedo>
+              <Factor>0.5</Factor>
+            </Torpedo>
+            <BigBertha>
+              <Factor>0.5</Factor>
+            </BigBertha>
+          </DamageReceiveFactor>
+        </AttackableUpgrade>
+        <ProjectileUpgrade />
+        <TradeShipUpgrade />
+        <UpgradeList />
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1512</GUID>
+            </Item>
+            <Item>
+              <GUID>102492</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <DivingBellUpgrade />
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>VehicleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004573</GUID>
+          <Name>Gets Hijacked Buff</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/machine_items/icon_mercier_flag.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1512</GUID>
+            </Item>
+            <Item>
+              <GUID>102492</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>-1000</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+        </VehicleUpgrade>
+        <Buff>
+          <AddedInfolayer>1500004576</AddedInfolayer>
+        </Buff>
+        <!-- <AttackerUpgrade> -->
+          <!-- <UseProjectile>1500004571</UseProjectile> -->
+        <!-- </AttackerUpgrade> -->
+        <AttackableUpgrade>
+          <DamageReceiveFactor>
+            <Cannon>
+              <Factor>0.5</Factor>
+            </Cannon>
+            <Normal>
+              <Factor>0.5</Factor>
+            </Normal>
+            <Torpedo>
+              <Factor>0.5</Factor>
+            </Torpedo>
+            <BigBertha>
+              <Factor>0.5</Factor>
+            </BigBertha>
+          </DamageReceiveFactor>
+        </AttackableUpgrade>
+        <ProjectileUpgrade />
+        <TradeShipUpgrade />
+        <UpgradeList />
+        <DivingBellUpgrade />
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  <!-- PROBLEM: Objekt wird korrekt gepsawned und kann eigentlich auch von ConditionPlayerCounter erfasst werden, -->
+   <!-- ABER aus irgendeinem Grund kommt der Counter nicht hinterher, bzw. zählt einfach garnicht, wenn das Objekt zu schnell hintereinander gespeend wird durch -->
+    <!-- SpawnImpactObject ! -->
+    <!-- ja das zählen triggert iwie nicht oderso, wenn ich weniger <ShootingTracking>Front</ShootingTracking> nehme, dann zählt er (wobeis da auch merhre projektile aufeinmal sind?) -->
+     <!-- und dann zählt er direkt alle korrekt die er vorher nicht gezählt hat -->
+     <!-- Da das also ein Bug ist den wir nicht lösen können... doch wieder zurück zum Schuss Item... -->
+      <!-- und dann ists halt so, dass es ab und zu daneben geht. wenn wir den cooldown hoch genug machen, -->
+       <!-- dann wird der user dadurch schon ausreichend animiert vorher dafür zu sorgen, dass das schiff langsam ist -->
+      <!-- Fehlt nur der Debuff auf dem kaperndem schiff selbst.. dass es stehenbleibt können wir in lua durch regelmäßig stop aufrufe erzwingen -->
+       <!-- einen buff könnten wir da auch zufügen, aber nur wenn alle spieler schon zu diesem zeitpunkt in der richtigen session sind -.- -->
+       
+  <ModOp Type="addNextSibling" GUID='1654'>
+    <Asset>
+      <Template>ObjectDummyWithOwner</Template>
+			<Values>
+				<Standard>
+					<GUID>1500004574</GUID>
+          <Name>Is Hijacking Helper</Name>
+				</Standard>
+			</Values>
+		</Asset>
+  </ModOp>
+  
+  <ModOp Type="addNextSibling" GUID="102494">
+    
+    <!-- damit StatusEffect weitergegeben wird muss es als Item-Projektil leider Exploder haben -->
+     <!-- und ich glaube solche item-projektile sind auch nicht möglich, dass sie immer treffen? -->
+    <!-- alternativ könnte ich übern buff das projektil vom kapernden schiff ganz kurz austauschen lassen -->
+     <!-- aber da lässt sich nicht wirklich steuern, wieviele Schüsse in der Zeit abgegeben werden und es sollte optimalerweise nur EINER sein.. -->
+      <!-- aber dann würde es vermutlich immer treffen und ginge ohne exploder -->
+      <!-- (und wenn viele prjektile aufeinmal gespawned werden, kommt der trigger auch ans limit und resetted evlt nicht mehr) -->
+    
+    <!-- StatusDuration = 100 is too low, but 500 seems to be fine -->
+    <Asset>
+      <Template>Projectile</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004571</GUID>
+          <Name>Hijack-Projectile</Name>
+          <!-- Das IconFilename von hier wird dann bei "Effektdauer" in der Itembeschreibung verwendet, also nehmen wir das uhrensymbol -->
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_time.png</IconFilename>
+          <InfoDescription>801680</InfoDescription>
+        </Standard>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/effects/military/projectiles/projectile_fishing_net_01.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <SoundEmitter>
+          <ProjectileSounds>
+            <!-- <ProjectileLaunch> -->
+              <!-- <Item> -->
+                <!-- <Sound>239626</Sound> -->
+              <!-- </Item> -->
+            <!-- </ProjectileLaunch> -->
+            <!-- <ProjectileImpact> -->
+              <!-- <Item> -->
+                <!-- <Sound>239737</Sound> -->
+              <!-- </Item> -->
+            <!-- </ProjectileImpact> -->
+            <!-- <ProjectileVolley> -->
+              <!-- <Item> -->
+                <!-- <Sound>200971</Sound> -->
+              <!-- </Item> -->
+            <!-- </ProjectileVolley> -->
+            <ProjectileLaunch>
+              <Item>
+                <Sound>222229</Sound>
+              </Item>
+            </ProjectileLaunch>
+            <ProjectileImpact>
+              <Item>
+                <Sound>222229</Sound>
+              </Item>
+            </ProjectileImpact>
+            <ProjectileVolley>
+              <Item>
+                <Sound>222229</Sound>
+              </Item>
+            </ProjectileVolley>
+            
+          </ProjectileSounds>
+        </SoundEmitter>
+        <!-- StatusDuration ~15 seconds, because this is how long it roughly takes to search 10 million ObjectIDs in one session to find it on extremely big savegames.. -->
+        <!-- TODO: hier noch einen 2ten Effekt in der Chain machen "kürzlich gekapert" der einen Debuff gibt -->
+         <!-- dieser sollte durch den Beschuss des kapernden Schiffes ja erst auslösen, wennn hijacking vorbei ist. -->
+          <!-- (effectchain Bug war, dass beide buffs zeitgleich aktiv sein können, aber ich denke das wäre nicht so schlimm..) -->
+        <Projectile>
+          <ProjectileType>HomingStraight</ProjectileType>
+          <ShotHeight>1</ShotHeight>
+          <ShotAngle>45</ShotAngle>
+          <ProjectileSpeed>30</ProjectileSpeed> 
+          <SpawnImpactObject>1500004574</SpawnImpactObject>
+          <StatusEffects>
+            <Item>
+              <StatusEffectChain>
+                <Item>
+                  <StatusEffect>1500004573</StatusEffect>
+                  <StatusDuration>15000</StatusDuration>
+                </Item>
+              </StatusEffectChain>
+            </Item>
+          </StatusEffects>
+          <ApplyStatusEffectsWithoutDamageCheck>1</ApplyStatusEffectsWithoutDamageCheck>
+        </Projectile>
+        <!-- <ProjectileIncident /> -->
+        <ProjectileIncident>
+          <CausedIncident>Fire</CausedIncident>
+          <!-- <CausedIncident>Riot</CausedIncident> -->
+          <CausedIncidentBuff>192004</CausedIncidentBuff>
+          <CausedIncidentDuration>60000</CausedIncidentDuration>
+        </ProjectileIncident>
+        
+        <UpgradeList />
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  <!-- bin mir jetzt sihcer dass IncidentSounds nicht funktionieren bei schiffen, auch bei feuer von vanilla hör ich nichts -->
+    <!-- eventuelle kampfgeräusche sonst übers projetil machen? aber welche sounds gehen da? -->
+  <ModOp Type="merge" GUID='100437' Path="/Values">
+    <ShipIncident>
+      <InfectableByIncident>
+        <Riot>
+          <Infectable>1</Infectable>
+        </Riot>
+      </InfectableByIncident>
+    </ShipIncident>
+    <SoundEmitter>
+      <IncidentSounds>
+        <InfectedRiot>
+          <Item>
+            <Sound>222229</Sound>
+          </Item>
+        </InfectedRiot>
+      </IncidentSounds>
+    </SoundEmitter>
+  </ModOp>
+  
+    
+   
+  <ModOp GUID="130248" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004575</GUID>
+          <Name>Is Hijacking</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>1500004574</Context>
+                <CounterAmount>1</CounterAmount>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001613</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions> 
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/hijack_ship_human0.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionUnlocked</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition /> -->
+                        <!-- <ConditionUnlocked> -->
+                          <!-- <UnlockNeeded>1500001614</UnlockNeeded> -->
+                        <!-- </ConditionUnlocked> -->
+                        <!-- <ConditionPropsNegatable /> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions>  -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionExecuteScript</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionExecuteScript> -->
+                              <!-- <ScriptFileName>data/scripts_serp/check_shipstrength_harlow_human1.lua</ScriptFileName> -->
+                            <!-- </ActionExecuteScript> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionUnlocked</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition /> -->
+                        <!-- <ConditionUnlocked> -->
+                          <!-- <UnlockNeeded>1500001615</UnlockNeeded> -->
+                        <!-- </ConditionUnlocked> -->
+                        <!-- <ConditionPropsNegatable /> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions>  -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionExecuteScript</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionExecuteScript> -->
+                              <!-- <ScriptFileName>data/scripts_serp/check_shipstrength_harlow_human2.lua</ScriptFileName> -->
+                            <!-- </ActionExecuteScript> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionUnlocked</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition /> -->
+                        <!-- <ConditionUnlocked> -->
+                          <!-- <UnlockNeeded>1500001616</UnlockNeeded> -->
+                        <!-- </ConditionUnlocked> -->
+                        <!-- <ConditionPropsNegatable /> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions>  -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionExecuteScript</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionExecuteScript> -->
+                              <!-- <ScriptFileName>data/scripts_serp/check_shipstrength_harlow_human3.lua</ScriptFileName> -->
+                            <!-- </ActionExecuteScript> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+            
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <!-- reset the trigger with delay which is same as the ActionCooldown, because with an ActiveBuff-Item we will shoot the SpawnImpactObject multiple times -->
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>12000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Seperate Trigger for deleting SpawnImpactObject, because we will shoot it more often than we need to start the script. -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004595</GUID>
+          <Name>Delete Helper SpawnImpactObject</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>1500004574</Context>
+                <CounterAmount>1</CounterAmount>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <!-- delete it with a tiny delay, because lua script needs to find out which session it is first -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500004574</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                    <MaxObjectCount>3</MaxObjectCount>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <!-- narrator speach can either be AudioText in Subtitle or AudioAsset in NotificationAudioAsset. -->
+     <!-- but if it is AudioText both in Subtitle and NotificationText, the game refuses to show anything -.- -->
+      <!-- So we would need a new Text GUID for NotificationText to be able to use AudioText as subtitle, so we will use instead AudioText as Text and AudioAsset as sound -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004580</GUID>
+          <Name>Fail Notification</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_attack_mode.png</IconFilename>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004580</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004580</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>SideNotification</Template>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501449</IconAsset>
+                          <NotificationSideTitle>14326</NotificationSideTitle>
+                          <FilterType>Military</FilterType>
+                          <IsWarning>0</IsWarning>
+                          <HasJumpLocation>1</HasJumpLocation>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>265425</NotificationText>
+                          <NotificationAudioAsset>234101</NotificationAudioAsset>
+                          <DisplayTimeout>300000</DisplayTimeout>
+                          <NotificationPriority>200</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004580</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004580</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004581</GUID>
+          <Name>Success Notification</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004581</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004581</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>SideNotification</Template>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501449</IconAsset>
+                          <NotificationSideTitle>14326</NotificationSideTitle>
+                          <FilterType>Military</FilterType>
+                          <IsWarning>0</IsWarning>
+                          <HasJumpLocation>1</HasJumpLocation>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>265415</NotificationText>
+                          <NotificationAudioAsset>234109</NotificationAudioAsset>
+                          <DisplayTimeout>300000</DisplayTimeout>
+                          <NotificationPriority>200</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004581</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004580</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004582</GUID>
+          <Name>Fail - ships of this kind not hijackable - Notification</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004582</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004582</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>SideNotification</Template>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501449</IconAsset>
+                          <NotificationSideTitle>14326</NotificationSideTitle>
+                          <FilterType>Military</FilterType>
+                          <IsWarning>0</IsWarning>
+                          <HasJumpLocation>1</HasJumpLocation>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>265425</NotificationText>
+                          <NotificationAudioAsset>234101</NotificationAudioAsset>
+                          <DisplayTimeout>300000</DisplayTimeout>
+                          <NotificationPriority>200</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004582</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004580</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004583</GUID>
+          <Name>Fail - ships from this owner not hijackable - Notification</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004583</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004583</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>SideNotification</Template>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501449</IconAsset>
+                          <NotificationSideTitle>14326</NotificationSideTitle>
+                          <FilterType>Military</FilterType>
+                          <IsWarning>0</IsWarning>
+                          <HasJumpLocation>1</HasJumpLocation>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>265425</NotificationText>
+                          <NotificationAudioAsset>234101</NotificationAudioAsset>
+                          <DisplayTimeout>300000</DisplayTimeout>
+                          <NotificationPriority>200</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004583</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004580</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004584</GUID>
+          <Name>Your Ships was hijacked - Notification</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004584</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004584</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>SideNotification</Template>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501449</IconAsset>
+                          <NotificationSideTitle>14326</NotificationSideTitle>
+                          <FilterType>Military</FilterType>
+                          <IsWarning>1</IsWarning>
+                          <HasJumpLocation>1</HasJumpLocation>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>265427</NotificationText>
+                          <NotificationAudioAsset>234103</NotificationAudioAsset>
+                          <DisplayTimeout>300000</DisplayTimeout>
+                          <NotificationPriority>200</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004584</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004580</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004585</GUID>
+          <Name>Hijack prevented - Notification</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004585</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004585</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>SideNotification</Template>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501449</IconAsset>
+                          <NotificationSideTitle>14326</NotificationSideTitle>
+                          <FilterType>Military</FilterType>
+                          <IsWarning>0</IsWarning>
+                          <HasJumpLocation>1</HasJumpLocation>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>265428</NotificationText>
+                          <NotificationAudioAsset>234104</NotificationAudioAsset>
+                          <DisplayTimeout>300000</DisplayTimeout>
+                          <NotificationPriority>200</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004585</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004580</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004577</GUID>
+          <Name>Someone trying hijack your ship - Notification</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionEvent</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition/> -->
+              <!-- <ConditionEvent> -->
+                <!-- <ConditionEvent>GUIDUnlocked</ConditionEvent> -->
+                <!-- <ContextAsset>1500004577</ContextAsset> -->
+                <!-- <ContextAssetInfolayer>0</ContextAssetInfolayer> -->
+              <!-- </ConditionEvent> -->
+              <!-- <ConditionPropsNegatable/> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004577</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>SideNotification</Template>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501449</IconAsset>
+                          <NotificationSideTitle>14326</NotificationSideTitle>
+                          <FilterType>Military</FilterType>
+                          <IsWarning>1</IsWarning>
+                          <HasJumpLocation>1</HasJumpLocation>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>265426</NotificationText>
+                          <NotificationAudioAsset>234102</NotificationAudioAsset>
+                          <DisplayTimeout>300000</DisplayTimeout>
+                          <NotificationPriority>200</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004577</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    
+  </ModOp>
+    
+  
+  <ModOp Type="AddNextSibling" GUID="265425">
+    <!-- TODO: text zufügen der sagt not supported shiptype und playertype zufügen -->
+    <Asset>
+      <Template>AudioText</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004578</GUID>
+          <Name>AT_Narrator_Items_Warning_ItemActionHijackFailure_WrongOwner</Name>
+        </Standard>
+        <AudioText>
+          <AudioAsset>234101</AudioAsset>
+          <SpeechAudioType>Campaign</SpeechAudioType>
+        </AudioText>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>AudioText</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004594</GUID>
+          <Name>AT_Narrator_Items_Warning_ItemActionHijackFailure_WrongType</Name>
+        </Standard>
+        <AudioText>
+          <AudioAsset>234101</AudioAsset>
+          <SpeechAudioType>Campaign</SpeechAudioType>
+        </AudioText>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- <ModOp Type="AddNextSibling" GUID="700138"> -->
+    <!-- <Asset> -->
+      <!-- <Template>AssetPool</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500004579</GUID> -->
+          <!-- <Name>All Helper Ships</Name> -->
+        <!-- </Standard> -->
+        <!-- <AssetPool> -->
+          <!-- <AssetList> -->
+            <!-- <Item> -->
+              <!-- <Asset>1500004600</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Asset>1500004601</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Asset>1500004602</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Asset>1500004603</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Asset>1500004604</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Asset>1500004605</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Asset>1500004606</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <Asset>1500004607</Asset> -->
+            <!-- </Item> -->
+          <!-- </AssetList> -->
+        <!-- </AssetPool> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+  
+  <!-- bugfixes: -->
+  <!-- Add flagship to All Wooden-Hulled Ships 1398, so it is automatically also included in all ships for combat effects 1512 -->
+  <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+    Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='101121']">
+    <Item>
+      <GUID>101121</GUID>
+    </Item>
+  </ModOp>
+  
+  <!-- FlakMonitor to All Metal-Hulled Ships -->
+  <ModOp Type="add" GUID='1404' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+    Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='720']">
+    <Item>
+      <GUID>720</GUID>
+    </Item>
+  </ModOp>
+  
+  <!-- FlakMonitor and Fire Monitor to All PlayerShips -->
+  <ModOp Type="add" GUID='700151' Path="/Values/AssetPool/AssetList"
+    Condition="!~/Values/AssetPool/AssetList/Item[Asset='720']">
+    <Item>
+      <Asset>720</Asset>
+    </Item>
+  </ModOp>
+  <ModOp Type="add" GUID='700151' Path="/Values/AssetPool/AssetList"
+    Condition="!~/Values/AssetPool/AssetList/Item[Asset='968']">
+    <Item>
+      <Asset>968</Asset>
+    </Item>
+  </ModOp>
+  
+  <!-- Add Passage Airship (Trade) to All AirShips -->
+  <ModOp Type="add" GUID='102492' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+    Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='114166']">
+    <Item>
+      <GUID>114166</GUID>
+    </Item>
+  </ModOp>
+  
+  
+  <Include File="./FakeShips.include.xml" />
+  
+
+</ModOps>

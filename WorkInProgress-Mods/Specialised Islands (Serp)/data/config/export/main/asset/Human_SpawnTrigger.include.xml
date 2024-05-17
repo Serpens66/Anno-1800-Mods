@@ -1,0 +1,405 @@
+<ModOps>
+  
+  
+  <!-- Trigger/Quest Human -->
+  
+  
+  <ModOp Type="addNextSibling" GUID="150725">
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004677</GUID>
+          <Name>alwaystrue-QuestPool</Name>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <Item>
+              <Quest>1500004681</Quest>
+              <Weight>10</Weight>
+            </Item>
+            <Item>
+              <Quest>1500004736</Quest>
+              <Weight>10</Weight>
+            </Item>
+          </Quests>
+          <PoolCooldown>200</PoolCooldown>
+          <QuestCooldown>0</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>1</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>1</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+          <!-- <QuestLimit>3</QuestLimit> -->
+        </QuestPool>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  
+  <!-- only within Quests LimitToQuestArea works -->
+  <ModOp Type="AddNextSibling" GUID="152264">
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004681</GUID>
+          <Name>Spawn Display Building at Kontor</Name>
+        </Standard>
+        <Quest>
+          <OnQuestStart>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionSpawnObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionSpawnObjects>
+                          <SpawnGUID>1500004682</SpawnGUID>
+                          <Amount>1</Amount>
+                          <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                        </ActionSpawnObjects>
+                        <SpawnArea>
+                          <SpawnContext>ForceContextPosition</SpawnContext>
+                          <MatcherGUID>1500004905</MatcherGUID>
+                          <LimitToQuestArea>1</LimitToQuestArea>
+                        </SpawnArea>
+                        <SessionFilter>
+                          <AllowProcessingSession>0</AllowProcessingSession>
+                          <AllowParentConditionSession>0</AllowParentConditionSession>
+                          <AllowQuestSession>1</AllowQuestSession>
+                          <AllowQuestArea>1</AllowQuestArea>
+                        </SessionFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestStart>
+        </Quest>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionMutualAreaInSubconditions</Template>
+            <Values>
+              <Condition />
+              <ConditionMutualAreaInSubconditions />
+            </Values>
+          </Condition>
+          <SubConditions>
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>700000</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <ComparisonOp>AtLeast</ComparisonOp>
+                          <CounterScope>Area</CounterScope>
+                          <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </Condition>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500004682</Context>
+                          <CounterAmount>0</CounterAmount>
+                          <ComparisonOp>AtMost</ComparisonOp>
+                          <CounterScope>Area</CounterScope>
+                          <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </Condition>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+          </SubConditions>
+        </PreConditionList>
+      </Values>
+    </Asset>
+  
+    <!-- ##################################################################################################################################### -->
+
+  
+    <!-- BuffFactory -->
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004736</GUID>
+          <Name>Human spawn random BuffFactory at Kontor</Name>
+        </Standard>
+        <Quest>
+          <OnQuestStart>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionExecuteActionByChance</Template>
+                      <Values>
+                        <Action />
+                        <ActionExecuteActionByChance>
+                          <ChanceValue>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <VariableValue>
+                                <!-- <FloatValue>100</FloatValue> -->
+                                <FloatValue>5</FloatValue>
+                              </VariableValue>
+                            </Values>
+                          </ChanceValue>
+                          <ActionListChanceSuccess>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <!-- spawn powerful buffs (positive and negative) -->
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionSpawnObjects</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionSpawnObjects>
+                                          <SpawnGUID>1500004733</SpawnGUID>
+                                          <Amount>1</Amount>
+                                          <Owner>Third_party_01_Queen</Owner>
+                                          <!-- <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant> -->
+                                        </ActionSpawnObjects>
+                                        <SpawnArea>
+                                          <SpawnContext>ForceContextPosition</SpawnContext>
+                                          <MatcherGUID>1500004905</MatcherGUID>
+                                          <LimitToQuestArea>1</LimitToQuestArea>
+                                        </SpawnArea>
+                                        <SessionFilter>
+                                          <AllowProcessingSession>0</AllowProcessingSession>
+                                          <AllowParentConditionSession>0</AllowParentConditionSession>
+                                          <AllowQuestSession>1</AllowQuestSession>
+                                          <AllowQuestArea>1</AllowQuestArea>
+                                        </SessionFilter>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionSpawnObjects</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionSpawnObjects>
+                                          <SpawnGUID>1500004737</SpawnGUID>
+                                          <Amount>1</Amount>
+                                          <Owner>Third_party_01_Queen</Owner>
+                                          <!-- <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant> -->
+                                        </ActionSpawnObjects>
+                                        <SpawnArea>
+                                          <SpawnContext>ForceContextPosition</SpawnContext>
+                                          <MatcherGUID>1500004905</MatcherGUID>
+                                          <LimitToQuestArea>1</LimitToQuestArea>
+                                        </SpawnArea>
+                                        <SessionFilter>
+                                          <AllowProcessingSession>0</AllowProcessingSession>
+                                          <AllowParentConditionSession>0</AllowParentConditionSession>
+                                          <AllowQuestSession>1</AllowQuestSession>
+                                          <AllowQuestArea>1</AllowQuestArea>
+                                        </SessionFilter>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </ActionListChanceSuccess>
+                          <ActionListChanceFailure>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <!-- spawn common buffs (positive and negative) -->
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionSpawnObjects</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionSpawnObjects>
+                                          <SpawnGUID>1500004734</SpawnGUID>
+                                          <Amount>1</Amount>
+                                          <Owner>Third_party_01_Queen</Owner>
+                                          <!-- <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant> -->
+                                        </ActionSpawnObjects>
+                                        <SpawnArea>
+                                          <SpawnContext>ForceContextPosition</SpawnContext>
+                                          <MatcherGUID>1500004905</MatcherGUID>
+                                          <LimitToQuestArea>1</LimitToQuestArea>
+                                        </SpawnArea>
+                                        <SessionFilter>
+                                          <AllowProcessingSession>0</AllowProcessingSession>
+                                          <AllowParentConditionSession>0</AllowParentConditionSession>
+                                          <AllowQuestSession>1</AllowQuestSession>
+                                          <AllowQuestArea>1</AllowQuestArea>
+                                        </SessionFilter>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionSpawnObjects</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionSpawnObjects>
+                                          <SpawnGUID>1500004735</SpawnGUID>
+                                          <Amount>1</Amount>
+                                          <Owner>Third_party_01_Queen</Owner>
+                                          <!-- <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant> -->
+                                        </ActionSpawnObjects>
+                                        <SpawnArea>
+                                          <SpawnContext>ForceContextPosition</SpawnContext>
+                                          <MatcherGUID>1500004905</MatcherGUID>
+                                          <LimitToQuestArea>1</LimitToQuestArea>
+                                        </SpawnArea>
+                                        <SessionFilter>
+                                          <AllowProcessingSession>0</AllowProcessingSession>
+                                          <AllowParentConditionSession>0</AllowParentConditionSession>
+                                          <AllowQuestSession>1</AllowQuestSession>
+                                          <AllowQuestArea>1</AllowQuestArea>
+                                        </SessionFilter>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </ActionListChanceFailure>
+                        </ActionExecuteActionByChance>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestStart>
+        </Quest>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionMutualAreaInSubconditions</Template>
+            <Values>
+              <Condition />
+              <ConditionMutualAreaInSubconditions />
+            </Values>
+          </Condition>
+          <SubConditions>
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>700000</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <ComparisonOp>AtLeast</ComparisonOp>
+                          <CounterScope>Area</CounterScope>
+                          <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </Condition>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500004690</Context>
+                          <CounterAmount>0</CounterAmount>
+                          <ComparisonOp>AtMost</ComparisonOp>
+                          <CounterScope>Area</CounterScope>
+                          <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </Condition>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+            <!-- if my Disasters mod is active, make sure to not provide buffs to islands with volcano, because they have enough buffs already -->
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500004655</Context>
+                          <CounterAmount>0</CounterAmount>
+                          <ComparisonOp>AtMost</ComparisonOp>
+                          <CounterScope>Area</CounterScope>
+                          <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </Condition>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+          </SubConditions>
+        </PreConditionList>
+      </Values>
+    </Asset>
+  </ModOp>
+    
+    
+  
+  
+    
+
+</ModOps>
