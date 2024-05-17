@@ -24,9 +24,12 @@
       <!-- (we use a Quest for this, because I don't know another way to define a QuestArea. It does not work with PlayerCounter+Scope=Area, because this can only check islands owned by processing player, so espeically no unsettled islands) -->
    <!-- 2) If an island was taken over/got the shares after a War, the forced CeaseFire of the island makes all buildings on the island not targetable by any attacks, even from Volcano (General_Enemy+PirateFalg) -->
     <!-- No way to fix this besides disabling this forced CeaseFire, which of course is not an option.. -->
-  <!-- 3) Only one Eruption worldwide at the same time is possible, because CounterScope=Session can not define QuestSession and also not check if a session has several things in common (unlike CounterScope=Area) -->
+   <!-- 3) Only one Eruption worldwide at the same time is possible, because CounterScope=Session can not define QuestSession and also not check if a session has several things in common (unlike CounterScope=Area) -->
       <!-- (only workaround would be hardcoded Session GUIDs, but for now I want the volcano spawn in every session, even mod sessions) -->
-  
+   <!-- 4) if you play coop multiplayer: -->
+     <!-- the volcano can only spawn in a session where a coop-leader (first slot in coop team) is currently active. -->
+      <!-- that means if no coop-leader is anymore participating in the game, the volcano will only spawn in the session where he was the last. -->
+
 
   <!-- Falls MP Probleme macht: -->
    <!-- sowohl vulkan spawnen, als auch Eruption Quest könnte man so gestallten: -->
@@ -75,9 +78,11 @@
     <!-- the volcano was already spawned in the current session or not -->
     <!-- I only got CounterScopeUseActiveSession to work and spawning the volcano there with AllowParentConditionSession. -->
      <!-- We can not get and use QuestSession with CounterScope=Session unfortunately -.- -->
+      <!-- (CounterScopeUseActiveSession only checks the session from a coop-leader in MP!!) -->
    
    <!-- TODO: Check multiplayer if volcano spawns multiple times. Because we need this trgger to be executed for all humans, -->
     <!-- in case another human than Human0 enters a session first -->
+    
   <ModOp Type="AddNextSibling" GUID="130248">
     <Asset>
       <Template>Trigger</Template>
@@ -190,11 +195,13 @@
                                             <!-- (one can also not simply shoot fpr the inactive-statuseffect once every hour or so to reduce lag, -->
                                              <!-- because newly build buildings then would not be affected within that time, so it must be a renew every ~2 seconds, which is just by far too inefficent) -->
                                            <!-- so having a volcano that is not at land that provides a nearby buff at all times is impossible -->
+                                         <!-- (if we would succeed to spawn it in harborarea, the buff and everything would work, -->
+                                          <!-- but none of the SpawnAreaType with water can make sure it does (only"Water" can at all ,but also spawns outside of harborarea)) -->
                                         <!-- <SpawnAreaType>Mountain_02</SpawnAreaType> -->
                                         
                                         <DistanceToContext>20</DistanceToContext>
-                                        <MinObjectDistance>5</MinObjectDistance>
-                                        <MaxObjectDistance>10</MaxObjectDistance>
+                                        <MinObjectDistance>7</MinObjectDistance>
+                                        <MaxObjectDistance>12</MaxObjectDistance>
                                       </SpawnArea>
                                       <SessionFilter>
                                         <AllowProcessingSession>0</AllowProcessingSession>
@@ -406,232 +413,6 @@
                       </Values>
                     </DelayedActions>
                   </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-        </Trigger>
-        <TriggerSetup>
-          <AutoRegisterTrigger>0</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-        </TriggerSetup>
-      </Values>
-    </Asset>
-    
-    <!-- Was forced to outsource the actions not contained in Trigger 1500005015/1500005016 from OnQuestActive of the eruption Quest, -->
-     <!-- because using ActionDelayedActions in there to delay the spawns was causing issues and crashes, in case the quest was automatically aborted by the game -->
-      <!-- (eg. when island owner changes), because the abort was not able to also abort these DelayedActions. -->
-       <!-- While with these Triggers now I can unregister them on OnQuestDiscarded in the Quest, to make sure they are not executed if the Quest is aborted -->
-    <Asset>
-      <Template>Trigger</Template>
-      <Values>
-        <Standard>
-          <GUID>1500005015</GUID>
-          <Name>Start Shooting from volcano ground into sky</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionTimer</Template>
-            <Values>
-              <Condition />
-              <ConditionTimer>
-                <TimeLimit>5000</TimeLimit>
-                <!-- <TimeLimit>30000</TimeLimit> -->
-              </ConditionTimer>
-            </Values>
-          </TriggerCondition>
-          <TriggerActions>
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004670</SpawnGUID>
-                    <Amount>1</Amount>
-                    <Owner>Test_Doedel</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <SpawnContext>ForceContextPosition</SpawnContext>
-                    <ContextGUID>1500004655</ContextGUID>
-                    <LimitToQuestArea>1</LimitToQuestArea>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <AllowProcessingSession>0</AllowProcessingSession>
-                    <AllowParentConditionSession>0</AllowParentConditionSession>
-                    <AllowQuestSession>1</AllowQuestSession>
-                    <AllowQuestArea>1</AllowQuestArea>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-            
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004651</SpawnGUID>
-                    <Amount>1</Amount>
-                    <Owner>General_Enemy</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <SpawnContext>ForceContextPosition</SpawnContext>
-                    <ContextGUID>1500004655</ContextGUID>
-                    <LimitToQuestArea>1</LimitToQuestArea>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <AllowProcessingSession>0</AllowProcessingSession>
-                    <AllowParentConditionSession>0</AllowParentConditionSession>
-                    <AllowQuestSession>1</AllowQuestSession>
-                    <AllowQuestArea>1</AllowQuestArea>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-        </Trigger>
-        <TriggerSetup>
-          <AutoRegisterTrigger>0</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-        </TriggerSetup>
-      </Values>
-    </Asset>
-    
-    <Asset>
-      <Template>Trigger</Template>
-      <Values>
-        <Standard>
-          <GUID>1500005016</GUID>
-          <Name>Start Shooting from volcano sky to the ground</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionTimer</Template>
-            <Values>
-              <Condition />
-              <ConditionTimer>
-                <!-- 5 seconds longer than the previous trigger! -->
-                <TimeLimit>10000</TimeLimit>
-              </ConditionTimer>
-            </Values>
-          </TriggerCondition>
-          <TriggerActions>
-            <Item>
-              <TriggerAction>
-                <Template>ActionAddGoodsToItemContainer</Template>
-                <Values>
-                  <Action />
-                  <ActionAddGoodsToItemContainer>
-                    <Goods>
-                      <Item>
-                        <Good>1500004652</Good>
-                        <!-- Amount should be the exact amount of 1500004645 of this Quest. if less, some wont shoot, if more, they will spawn on ground to collect, although it should sink instantly -->
-                         <!-- Dont know why, but it still work with ObjectRestrictToQuestObjects although we are in a Trigger now and there is no option to oficialy inherit questobjects.. maybe this is done automatiaclly or via InheritArea? -->
-                         <!-- So its fine. But if it ever causes problems, I could replace this way to arm the sky-shooters with a projectile StatusEffect instead, shot at the from ground -->
-                        <Amount>58</Amount>
-                      </Item>
-                    </Goods>
-                    <ItemContainerObjects>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ObjectFilter>
-                          <ObjectGUID>1500004645</ObjectGUID>
-                          <CheckParticipantID>1</CheckParticipantID>
-                          <ObjectParticipantID>General_Enemy</ObjectParticipantID>
-                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                        </ObjectFilter>
-                      </Values>
-                    </ItemContainerObjects>
-                  </ActionAddGoodsToItemContainer>
-                </Values>
-              </TriggerAction>
-            </Item>
-            
-            <!-- nicht zu hohen radius, sonst verteilen sie sich zu stark auf großen inseln -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004659</SpawnGUID>
-                    <Amount>40</Amount>
-                    <Owner>Test_Doedel</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <SpawnContext>Object</SpawnContext>
-                    <ContextGUID>1500004655</ContextGUID>
-                    <LimitToQuestArea>1</LimitToQuestArea>
-                    <DistanceToContext>70</DistanceToContext>
-                    <MinObjectDistance>5</MinObjectDistance>
-                    <MaxObjectDistance>40</MaxObjectDistance>
-                    <SpreadObjects>1</SpreadObjects>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <AllowProcessingSession>0</AllowProcessingSession>
-                    <AllowParentConditionSession>0</AllowParentConditionSession>
-                    <AllowQuestSession>1</AllowQuestSession>
-                    <AllowQuestArea>1</AllowQuestArea>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- und etwas weiter weg auch ein paar -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004659</SpawnGUID>
-                    <Amount>30</Amount>
-                    <Owner>Test_Doedel</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <SpawnContext>Object</SpawnContext>
-                    <ContextGUID>1500004655</ContextGUID>
-                    <LimitToQuestArea>1</LimitToQuestArea>
-                    <DistanceToContext>100</DistanceToContext>
-                    <MinObjectDistance>30</MinObjectDistance>
-                    <MaxObjectDistance>50</MaxObjectDistance>
-                    <SpreadObjects>1</SpreadObjects>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <AllowProcessingSession>0</AllowProcessingSession>
-                    <AllowParentConditionSession>0</AllowParentConditionSession>
-                    <AllowQuestSession>1</AllowQuestSession>
-                    <AllowQuestArea>1</AllowQuestArea>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- dummy ships at water (must be without LimitToQuestArea, because this limits to buildable land area) -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004654</SpawnGUID>
-                    <Amount>60</Amount>
-                    <Owner>Test_Doedel</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <SpawnContext>Object</SpawnContext>
-                    <ContextGUID>1500004655</ContextGUID>
-                    <DistanceToContext>100</DistanceToContext>
-                    <MinObjectDistance>5</MinObjectDistance>
-                    <MaxObjectDistance>50</MaxObjectDistance>
-                    <SpreadObjects>1</SpreadObjects>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <AllowProcessingSession>0</AllowProcessingSession>
-                    <AllowParentConditionSession>0</AllowParentConditionSession>
-                    <AllowQuestSession>1</AllowQuestSession>
-                    <AllowQuestArea>1</AllowQuestArea>
-                  </SessionFilter>
                 </Values>
               </TriggerAction>
             </Item>
@@ -1293,6 +1074,235 @@
         </TriggerSetup>
       </Values>
     </Asset>
+    
+    
+    
+    <!-- Was forced to outsource the actions not contained in Trigger 1500005015/1500005016 from OnQuestActive of the eruption Quest, -->
+     <!-- because using ActionDelayedActions in there to delay the spawns was causing issues and crashes, in case the quest was automatically aborted by the game -->
+      <!-- (eg. when island owner changes), because the abort was not able to also abort these DelayedActions. -->
+       <!-- While with these Triggers now I can unregister them on OnQuestDiscarded in the Quest, to make sure they are not executed if the Quest is aborted -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005015</GUID>
+          <Name>Start Shooting from volcano ground into sky</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionTimer</Template>
+            <Values>
+              <Condition />
+              <ConditionTimer>
+                <TimeLimit>5000</TimeLimit>
+                <!-- <TimeLimit>30000</TimeLimit> -->
+              </ConditionTimer>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004670</SpawnGUID>
+                    <Amount>1</Amount>
+                    <Owner>Test_Doedel</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004651</SpawnGUID>
+                    <Amount>1</Amount>
+                    <Owner>General_Enemy</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005016</GUID>
+          <Name>Start Shooting from volcano sky to the ground</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionTimer</Template>
+            <Values>
+              <Condition />
+              <ConditionTimer>
+                <!-- 5 seconds longer than the previous trigger! -->
+                <TimeLimit>10000</TimeLimit>
+              </ConditionTimer>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddGoodsToItemContainer</Template>
+                <Values>
+                  <Action />
+                  <ActionAddGoodsToItemContainer>
+                    <Goods>
+                      <Item>
+                        <Good>1500004652</Good>
+                        <!-- Amount should be the exact amount of 1500004645 of this Quest. if less, some wont shoot, if more, they will spawn on ground to collect, although it should sink instantly -->
+                         <!-- Dont know why, but it still work with ObjectRestrictToQuestObjects although we are in a Trigger now and there is no option to oficialy inherit questobjects.. maybe this is done automatiaclly or via InheritArea? -->
+                         <!-- So its fine. But if it ever causes problems, I could replace this way to arm the sky-shooters with a projectile StatusEffect instead, shot at the from ground -->
+                        <Amount>58</Amount>
+                      </Item>
+                    </Goods>
+                    <ItemContainerObjects>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ObjectFilter>
+                          <ObjectGUID>1500004645</ObjectGUID>
+                          <CheckParticipantID>1</CheckParticipantID>
+                          <ObjectParticipantID>General_Enemy</ObjectParticipantID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                        </ObjectFilter>
+                      </Values>
+                    </ItemContainerObjects>
+                  </ActionAddGoodsToItemContainer>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <!-- nicht zu hohen radius, sonst verteilen sie sich zu stark auf großen inseln -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004659</SpawnGUID>
+                    <Amount>40</Amount>
+                    <Owner>Test_Doedel</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>Object</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <DistanceToContext>70</DistanceToContext>
+                    <MinObjectDistance>5</MinObjectDistance>
+                    <MaxObjectDistance>40</MaxObjectDistance>
+                    <SpreadObjects>1</SpreadObjects>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- und etwas weiter weg auch ein paar -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004659</SpawnGUID>
+                    <Amount>30</Amount>
+                    <Owner>Test_Doedel</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>Object</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <DistanceToContext>100</DistanceToContext>
+                    <MinObjectDistance>30</MinObjectDistance>
+                    <MaxObjectDistance>50</MaxObjectDistance>
+                    <SpreadObjects>1</SpreadObjects>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- dummy ships at water (must be without LimitToQuestArea, because this limits to buildable land area) -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500004654</SpawnGUID>
+                    <Amount>60</Amount>
+                    <Owner>Test_Doedel</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>Object</SpawnContext>
+                    <ContextGUID>1500004655</ContextGUID>
+                    <DistanceToContext>100</DistanceToContext>
+                    <MinObjectDistance>5</MinObjectDistance>
+                    <MaxObjectDistance>50</MaxObjectDistance>
+                    <SpreadObjects>1</SpreadObjects>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
     
   </ModOp>
   
