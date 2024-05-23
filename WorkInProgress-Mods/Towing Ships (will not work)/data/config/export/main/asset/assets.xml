@@ -1,0 +1,602 @@
+<ModOps>
+  
+  <!-- Serp GUIDs 1500004670 to 1500004675 -->
+   <!-- (achtung, da es nicht funzt, wurden die GUIDS nun im Disasters Mod verwendet) -->
+  
+  <!-- ist zu buggy und zu limitiert.. -->
+   <!-- best case ist es nur auf festen schiffen zu machen.. aber auch das ist alles andere als toll -->
+  
+  
+  
+  <!-- unklar wie ich dann wieder entkoppel.. mt rechtsklick enditemaction crashed das spiel -->
+   <!-- vermutlich klappts mit 2 items, eins zum an eins zum abkoppeln.. ja klappt, aber das ist ja auch doof.. -->
+   <!-- Mit AutoTargets klappts nicht, Target muss Action=Item haben und Item muss Action=DRAG haben. -->
+    <!-- doch das item  deaktiviert sich nicht von selbst, bzw. wenns durch duration deaktiviert wird, wirds entkoppelt, weshalb ich das item nicht einfach nochmal -->
+     <!-- zum dekoppeln nutzen kann.. -->
+   <!-- -> keine option gefunden es mit nur einem Item zu schaffen und 2 items die man beide sockeln muss ist mist. -->
+     <!-- außer es man hat ein schiff was diese immer gesockelt hat, also speziell dafür gedacht ist. (oder man gibt jedem schiff 2 zusätzliche sockel... aber das wäre auch recht inkompatibel zu anderen mods)    -->
+  
+  
+  <!-- ActionAddGoodsToItemContainer fügt item nur einmal zu, also nur einem schiff, während Delete es bei allen entfernt... -->
+   <!-- im areabuff mod funktioniert es, weil wir die action quasi für jede insel einmal ausführen, bis jede eins hat. -->
+  <!-- Hier für jedes schiff, was es noch nicht hat es auszuführen klappt glaub ich nicht wirklich, weil wir das nicht prüfen können.. -->
+   <!-- könnten höchstens OnlyEquippableOnce versuchen und dann einfach 100 mal item adden, -->
+    <!-- sodass es sich auf alle verteilen muss, wobei sie dann keinen slot haben dürfen? -->
+  
+  <ModOp Type="AddNextSibling" GUID="112574">
+    
+     <!-- CanEndItemAction = 1 crasht wenn mans abbricht soalnge noch verbunden, aber mit ActionDuration wirds automaitsch abgekoppelt wenn zeit um ist -->
+      <!-- auch detach item crasht, wenn man es beendet, während seil gespannt ist -.- -->
+    
+    <Asset>
+      <Template>ActiveItem</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004670</GUID>
+          <Name>Item Drag Ship Attach</Name>
+          <IconFilename>data/graphics_serp/icons/icon_rope_shiptow.png</IconFilename>
+          <InfoDescription>6417</InfoDescription>
+        </Standard>
+        <ItemAction>
+          <ItemAction>DRAG</ItemAction>
+          <ActionTarget>1500004673</ActionTarget>
+          <ActionScope>Target</ActionScope>
+          <!-- <ActionDistance>5000</ActionDistance> -->
+          <ActionCooldown>0</ActionCooldown>
+          <ActionDuration>0</ActionDuration>
+          <CanEndItemAction>1</CanEndItemAction>
+          <StopMovementOnInteraction>0</StopMovementOnInteraction>
+        </ItemAction>
+        <Item>
+          <Allocation>Ship</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Epic</Rarity>
+          <HasAction>1</HasAction>
+          <TradePrice>1</TradePrice>
+          <TransferBlocked>1</TransferBlocked>
+          <Flotsam>1500001027</Flotsam>
+          <FlotsamTerrain>1500001189</FlotsamTerrain>
+          <OnlyEquippableOnce>1</OnlyEquippableOnce>
+        </Item>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    
+    
+  </ModOp>
+  <!-- 2001893 attach und 2001894 detach -->
+  
+  <!-- aus irgendeinem Grund klappt <ConditionEvent>ObjectAttached</ConditionEvent> nicht -->
+   <!-- aber <ConditionEvent>ObjectDropped</ConditionEvent> klappt... (sobald detached) -->
+   <!-- <ConditionEvent>DragOperationInProgress</ConditionEvent> feuert einmal sobald man das item (egal ob attach oder detach) anklickt und daher zielen kann. -->
+    
+  <!-- adding an amount of <Amount>1000</Amount>, it will be divided through all tugboats (if we only add 1, only one boat will get it) -->
+  <!-- this manes the tugboats should have no cargo slot, otherwise this will also be filled -->
+  <ModOp GUID="153271" Type="AddNextSibling">
+    <!-- <Asset> -->
+      <!-- <Template>Trigger</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500004672</GUID> -->
+          <!-- <Name>On Drag/Drop Ship</Name> -->
+        <!-- </Standard> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionAlwaysTrue</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionAlwaysTrue /> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <!-- <TriggerActions> -->
+            <!-- <Item> -->
+              <!-- <TriggerAction> -->
+                <!-- <Template>ActionDeleteItem</Template> -->
+                <!-- <Values> -->
+                  <!-- <Action /> -->
+                  <!-- <ActionDeleteItem> -->
+                    <!-- <ItemGUID>1500004670</ItemGUID> -->
+                  <!-- </ActionDeleteItem> -->
+                <!-- </Values> -->
+              <!-- </TriggerAction> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <TriggerAction> -->
+                <!-- <Template>ActionAddGoodsToItemContainer</Template> -->
+                <!-- <Values> -->
+                  <!-- <Action /> -->
+                  <!-- <ActionAddGoodsToItemContainer> -->
+                    <!-- <Goods> -->
+                      <!-- <Item> -->
+                        <!-- <Good>1500004670</Good> -->
+                        <!-- <Amount>100</Amount> -->
+                      <!-- </Item> -->
+                    <!-- </Goods> -->
+                    <!-- <ItemContainerObjects> -->
+                      <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                      <!-- <Values> -->
+                        <!-- <ObjectFilter> -->
+                          <!-- <ObjectGUID>1500004671</ObjectGUID> -->
+                        <!-- </ObjectFilter> -->
+                      <!-- </Values> -->
+                    <!-- </ItemContainerObjects> -->
+                  <!-- </ActionAddGoodsToItemContainer> -->
+                <!-- </Values> -->
+              <!-- </TriggerAction> -->
+            <!-- </Item> -->
+          <!-- </TriggerActions> -->
+        <!-- </Trigger> -->
+        <!-- <TriggerSetup> -->
+          <!-- <AutoRegisterTrigger>0</AutoRegisterTrigger> -->
+          <!-- <UsedBySecondParties>0</UsedBySecondParties> -->
+        <!-- </TriggerSetup> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004672</GUID>
+          <Name>On Drag/Drop Ship</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004672</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDeleteItem</Template>
+                <Values>
+                  <Action />
+                  <ActionDeleteItem>
+                    <ItemGUID>1500004670</ItemGUID>
+                  </ActionDeleteItem>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddGoodsToItemContainer</Template>
+                <Values>
+                  <Action />
+                  <ActionAddGoodsToItemContainer>
+                    <Goods>
+                      <Item>
+                        <Good>1500004670</Good>
+                        <Amount>1000</Amount>
+                      </Item>
+                      <Item>
+                        <Good>1500004670</Good>
+                        <Amount>1</Amount>
+                      </Item>
+                    </Goods>
+                    <ItemContainerObjects>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ObjectFilter>
+                          <ObjectGUID>1500004671</ObjectGUID>
+                        </ObjectFilter>
+                      </Values>
+                    </ItemContainerObjects>
+                  </ActionAddGoodsToItemContainer>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddGoodsToItemContainer</Template>
+                <Values>
+                  <Action />
+                  <ActionAddGoodsToItemContainer>
+                    <Goods>
+                      <Item>
+                        <Good>1500004670</Good>
+                        <Amount>1000</Amount>
+                      </Item>
+                      <Item>
+                        <Good>1500004670</Good>
+                        <Amount>1</Amount>
+                      </Item>
+                    </Goods>
+                    <ItemContainerObjects>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ObjectFilter>
+                          <ObjectGUID>1500004671</ObjectGUID>
+                        </ObjectFilter>
+                      </Values>
+                    </ItemContainerObjects>
+                  </ActionAddGoodsToItemContainer>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionAddGoodsToItemContainer</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionAddGoodsToItemContainer>
+                                    <Goods>
+                                      <Item>
+                                        <Good>1500004670</Good>
+                                        <Amount>1000</Amount>
+                                      </Item>
+                                      <Item>
+                                        <Good>1500004670</Good>
+                                        <Amount>1</Amount>
+                                      </Item>
+                                    </Goods>
+                                    <ItemContainerObjects>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500004671</ObjectGUID>
+                                        </ObjectFilter>
+                                      </Values>
+                                    </ItemContainerObjects>
+                                  </ActionAddGoodsToItemContainer>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004672</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>2000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+  </ModOp>
+  
+  
+  <ModOp Type="AddNextSibling" GUID="2001894">
+    <Asset>
+      <Template>Target</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004673</GUID>
+          <Name>Draggable Attach/Detach</Name>
+        </Standard>
+        <Target>
+          <ActionID>ITEM</ActionID>
+          <Matches>
+            <SelectionMatch1>
+              <Flags>OwnedByPlayer;CheckProperty</Flags>
+              <Property>Collector</Property>
+            </SelectionMatch1>
+            <TargetMatch1>
+              <Flags>OrNextMatch;OwnedByPlayer;CheckProperty;NotSelf;IsDroppableDraggable;IsDraggedBySelection</Flags>           
+              <Property>Draggable</Property>
+            </TargetMatch1>
+            <TargetMatch2>
+              <Flags>OwnedByPlayer;CheckProperty;NotSelf;IsDraggableBySelection;NotActionBlocked</Flags>
+              <Property>Draggable</Property>
+            </TargetMatch2>
+          </Matches>
+          <MouseCursorTarget>2001866</MouseCursorTarget>
+          <MouseCursorDisable>2001207</MouseCursorDisable>
+          <MouseCursorMode>2001038</MouseCursorMode>
+        </Target>
+        <Text />
+      </Values>
+    </Asset>
+    
+    
+  </ModOp>
+  
+
+  
+  
+  <!-- <ModOp Type="merge" GUID='2001894' Path="/Values/Target"> -->
+    <!-- <ActionID>ITEM</ActionID> -->
+  <!-- </ModOp> -->
+  
+  
+  
+  <!-- damit direkt mit klick machbar ist, kann mans hier zufügen, -->
+   <!-- wobei drag iwie nichts macht und detach nur n rotes decal  spawned und sonst nichts macht... -->
+    <!-- und außerdem würde dann follow nicht mehr funzen, weil nur das erste was gefunden wird gemacht wird -->
+  <!-- <ModOp Type="AddPrevSibling" GUID='2001270' Path="/Values/GlobalConfig/AutoTargets/Item[1]"> -->
+    <!-- <Item> -->
+      <!-- <GUID>2001893</GUID> -->
+    <!-- </Item> -->
+    <!-- <Item> -->
+      <!-- <GUID>2001894</GUID> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  
+   <!-- allein ActionID ändert den cursor schon?! -->
+  <!-- <ModOp Type="merge" GUID='2001893' Path="/Values/Target"> -->
+    <!-- <ActionID>DRAG</ActionID> -->
+    <!-- <MouseCursorTarget>2001866</MouseCursorTarget> -->
+  <!-- </ModOp> -->
+  
+  
+  
+  
+  <!-- keine ahnung was solche InteractionFeedback dinger machen. gibt noch einige andere, aber keine davon werden iwo erwähnt, außer drag -->
+  <!-- InteractionTargetInfolayer zufügen? InteractionTextOnWay testen? InteractionEffect 1000219 ist confetti ?! mal durch 101958 ersetzen und gucken was passiert (vllt ists ja das seil?) -->
+    <!-- infolayer hat aufjedenfall auswirkung, wobei das auch von DraggableDropInfoLayer kommen könnte,  -->
+   
+   <!-- ok, InteractionTargetInfolayer zuzufügen hat was geändert. diese infolayer werden offenbar verwendet, wenn das schiff gerade dabei ist das abschleppen einzurichten, -->
+    <!-- während DraggableDropInfoLayer dann beim abschlpeen selbst angezeigt wird (hat aktuell kein icon, zeigt nur text on hover) -->
+   
+   
+   <!-- der TowDebuff 6000032 wird in properties.xml erwähnt mit <UpgradeWhenDraggingShip>6000032</UpgradeWhenDraggingShip> -->
+  
+  <!-- <Asset> -->
+              <!-- <Template>InteractionFeedback</Template> -->
+              <!-- <Values> -->
+                <!-- <Standard> -->
+                  <!-- <GUID>2001897</GUID> -->
+                  <!-- <Name>DragObjectAttachedFeedback</Name> -->
+                <!-- </Standard> -->
+                <!-- <InteractionFeedback> -->
+                  <!-- <InteractionCursor>2001866</InteractionCursor> -->
+                  <!-- <InteractionEffect>1000219</InteractionEffect> -->
+                  <!-- <InteractionTime>3000</InteractionTime> -->
+                  <!-- <InteractionInfolayer>2001837</InteractionInfolayer> -->
+                <!-- </InteractionFeedback> -->
+                <!-- <Text> -->
+                  <!-- <LocaText> -->
+                    <!-- <English> -->
+                      <!-- <Text>Attaching object</Text> -->
+                      <!-- <Status>Exported</Status> -->
+                    <!-- </English> -->
+                  <!-- </LocaText> -->
+                  <!-- <LineID>4269</LineID> -->
+                <!-- </Text> -->
+              <!-- </Values> -->
+            <!-- </Asset> -->
+            <!-- <Asset> -->
+              <!-- <Template>InteractionFeedback</Template> -->
+              <!-- <Values> -->
+                <!-- <Standard> -->
+                  <!-- <GUID>2001898</GUID> -->
+                  <!-- <Name>DragObjectDetachedFeedback</Name> -->
+                <!-- </Standard> -->
+                <!-- <InteractionFeedback> -->
+                  <!-- <InteractionCursor>2001879</InteractionCursor> -->
+                  <!-- <InteractionEffect>1000219</InteractionEffect> -->
+                  <!-- <InteractionTime>3000</InteractionTime> -->
+                  <!-- <InteractionInfolayer>2001837</InteractionInfolayer> -->
+                <!-- </InteractionFeedback> -->
+                <!-- <Text> -->
+                  <!-- <LocaText> -->
+                    <!-- <English> -->
+                      <!-- <Text>Detaching object</Text> -->
+                      <!-- <Status>Exported</Status> -->
+                    <!-- </English> -->
+                  <!-- </LocaText> -->
+                  <!-- <LineID>4270</LineID> -->
+                <!-- </Text> -->
+              <!-- </Values> -->
+            <!-- </Asset> -->
+  
+  <!-- wird beim schiffen template verwendet: -->
+  <!-- <DraggableFeedbackOnDrag>2001897</DraggableFeedbackOnDrag> -->
+            <!-- <DraggableFeedbackOnDrop>2001898</DraggableFeedbackOnDrop> -->
+            <!-- <DraggableDropInfoLayer>2001942</DraggableDropInfoLayer> -->
+  
+  <!-- InteractionOnScreenText seh ich nicht, ist aber auch egal -->
+  <!-- InteractionEffect konnte ich keinen seehn -->
+  <ModOp Type="merge" GUID='2001897,2001898' Path="/Values/InteractionFeedback">
+    <InteractionTime>5000</InteractionTime>
+    <InteractionTargetInfolayer>2001837</InteractionTargetInfolayer>
+    <!-- <InteractionEffect>101958</InteractionEffect> -->
+    <!-- <InteractionOnScreenText>501481</InteractionOnScreenText> -->
+    <!-- <InteractionTextOnWay>2001386</InteractionTextOnWay> -->
+    <!-- <InteractionTextWaitingForMenu>2001895</InteractionTextWaitingForMenu> -->
+  </ModOp>
+  
+  <!-- luftschiffe können andere schiffe durch inseln durchziehen... -->
+  <!-- also falls das alles iwie klappt, dann vllt luftschiffen MaxDragShips=0 geben? -->
+   <!-- wobei luftschiffe ja schon andere luftschiffe ziehen können sollen.. -->
+    <!-- falls weitehrin über item sonst ein eigenes item für luftschiffe machen, wo ich dann noch property Bombarder mit Target prüfe -->
+  
+   <!-- GetsCarriedByFlyers hat keinen sichtabren einfluss auf irgendwas (luftschiff geht auch nicht runter) -->
+  <!-- <ModOp Type="merge" GUID='101121' Path="/Values"> -->
+    <!-- <Draggable> -->
+      <!-- <GetsCarriedByFlyers>1</GetsCarriedByFlyers> -->
+    <!-- </Draggable> -->
+    <!-- <Collector> -->
+      <!-- <MaxDragShips>3</MaxDragShips> -->
+    <!-- </Collector> -->
+  <!-- </ModOp> -->
+
+  <ModOp Type="add" GUID='2002450' Path="/Values/DifficultySettings/StartShips/*/Ships">
+    <Item>
+      <Ship>1054</Ship>
+    </Item>
+    <Item>
+      <Ship>1500004671</Ship>
+    </Item>
+    <Item>
+      <Ship>1500004671</Ship>
+    </Item>
+    <Item>
+      <Ship>1500004671</Ship>
+    </Item>
+  </ModOp>
+  
+  <ModOp Type="merge" GUID='6000032' Path="/Values">
+    <VehicleUpgrade>
+      <ForwardSpeedUpgrade>
+        <Value>-25</Value>
+        <Percental>1</Percental>
+      </ForwardSpeedUpgrade>
+    </VehicleUpgrade>
+    <!-- <AttackerUpgrade> -->
+      <!-- <AttackRangeUpgrade> -->
+        <!-- <Value>-50</Value> -->
+        <!-- <Percental>1</Percental> -->
+      <!-- </AttackRangeUpgrade> -->
+      <!-- <BaseDamageUpgrade> -->
+        <!-- <Value>-40</Value> -->
+        <!-- <Percental>1</Percental> -->
+      <!-- </BaseDamageUpgrade> -->
+      <!-- <LineOfSightRangeUpgrade> -->
+        <!-- <Value>-50</Value> -->
+        <!-- <Percental>1</Percental> -->
+      <!-- </LineOfSightRangeUpgrade> -->
+      <!-- <AttackSpeedUpgrade>-50</AttackSpeedUpgrade> -->
+    <!-- </AttackerUpgrade> -->
+  </ModOp>
+  
+  
+  <ModOp Type="AddNextSibling" GUID="1010062">
+    <Asset>
+      <BaseAssetGUID>1010062</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004671</GUID>
+          <Name>Tugboat</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/ships/icon_ship_collier.png</IconFilename>
+          <InfoDescription>1089</InfoDescription>
+        </Standard>
+        <Object>
+          <Variations>
+            <Item>
+              <!-- <Filename>data/graphics/vehicle/collier/collier.cfg</Filename> -->
+              <Filename>data/graphics/vehicle/huge_steam_ship/huge_steam_ship.cfg</Filename>
+            </Item>
+          </Variations>
+          <Skins>
+            <DefaultSkinName>0</DefaultSkinName>
+            <DefaultSkinCategoryName>0</DefaultSkinCategoryName>
+            <SkinList />
+          </Skins>
+        </Object>
+        <ItemContainer>
+          <SocketAllocation>Ship;SteamShip;Tradeship</SocketAllocation>
+          <!-- no cargo slot, because we need to delete and add the tow-item everytime, which would otherwise also fill the slot -->
+          <SlotCount>0</SlotCount>
+          <SocketCount>2</SocketCount>
+          <InitSocketItems>
+            <Item>
+              <Item>1500004670</Item>
+            </Item>
+          </InitSocketItems>
+        </ItemContainer>
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <!-- evlt noch in allen targets wie "follow/defend/patrol" noch zufügen, dass man nicht dragged sein darf, ja (AutoTargets) -->
+   <!-- testen ob IsDroppableDraggable hilft -->
+  <!-- <ModOp Type="add" GUID='501735,2001781' Path="/Values/Target"> -->
+  <!-- make it more compatible, not replace everything, just add AndNotNextMatch to SelectionMatch2 and add SelectionMatch3 -->
+  
+  <!-- <ModOp Type="merge" GUID='501735' Path="/Values/Target"> -->
+    <!-- <Matches> -->
+        <!-- <SelectionMatch1> -->
+          <!-- <Flags>AndNextMatch;OwnedByPlayer;CheckProperty</Flags> -->
+          <!-- <Property>Attacker</Property> -->
+        <!-- </SelectionMatch1> -->
+        <!-- <SelectionMatch2> -->
+          <!-- <Flags>AndNotNextMatch;CheckProperty</Flags> -->
+          <!-- <Property>Walking</Property> -->
+        <!-- </SelectionMatch2> -->
+        <!-- <SelectionMatch3> -->
+          <!-- <Flags>IsDroppableDraggable</Flags> -->
+        <!-- </SelectionMatch3> -->
+      <!-- </Matches> -->
+  <!-- </ModOp> -->
+   <!-- IsDroppableDraggable prüft offenbar ob man gerade gezogen wird, oder auch zieht, dh auch für das ziehende schiff würde ich so actions verbieten -->
+  <!-- ActionBlocked prüfen hilft wohl nicht -->
+  
+  <!-- bei sessionwechsel wird automatisch abgekoppelt, problem: die action die item  wieder zufügt klappt dann wohl nicht, nur delete, wodurch item weg ist. -->
+   <!-- ist evlt auch ein problem allgemein bei sessionwechsel der tugboats, weil deleteitem sie wohl erwischt, aber additem während der reise nicht geht? -->
+  <!-- evlt tugboat kein vehicle GUI geben? -->
+
+
+</ModOps>
