@@ -8,6 +8,8 @@
 -- end
 -- and then you can use eg. ObjectFinderSerp.GetCurrentSessionObjectsFromLocaleByProperty(367)
 
+-- TODO:
+ -- testen ob code auch fut funktioniert, wenn wir nicht in alter welt 180023 starten (sollte, aber testen)
 
 -- before starting an expensive search for a specific GUID, you might want to check with ProfileCounter in lua (see below for example) or PlayerCounter in xml
  -- if the player owns an object with that GUID 
@@ -83,6 +85,13 @@ local function deepcopy(orig, copies)
   return copy
 end
 
+local function table_len(t)
+  local c = 0
+  for k,v in pairs(t) do
+    c = c + 1
+  end
+  return c
+end
 
 
 -- useful info:
@@ -145,6 +154,10 @@ end
 
  -- und evlt mit OncePerSession Hilfsmod einmal für jedes sessionenter die KontorIDs zu Spielbeginn abfragen und im cache speichern
 
+-- TODO:
+ -- evlt direkt in eine find funktion einbinden, dass sie nen trigger startet, der ein einzigartiges objekt spawned
+  -- und dann solange gelooped wird, bis die GUID des einzigartigen objekt gefunden wurde, weil dann sicher ist, dass es maximal bis da ging zum zieptunkt des spawnens
+
 -- PROBLEM/Vorteil?:
  -- coop/multiplayer:
   -- Die Spieler können in untersch. Sessions sein und dadurch auch untersch. infos im Cache gespeichert haben,
@@ -190,40 +203,35 @@ local function FindHelperOIDs(onlysavehelper)
           return {addthis=true,done=done,next_AreaID=false,next_SessionID=false} -- important to return addthis and done, to stop the expensive search
         end
       end
-      local function mySessionFilterOldWorld(SessionID,CheckingSessionGuid) -- first search in old world, because it is most likely to be here
-        if CheckingSessionGuid==180023 then
-          return true
+      
+      local loadedSessions = ObjectFinderSerp.GetLoadedSessions()
+      local HelperSession
+      for lSessionID,lSessionGUID in pairs(loadedSessions) do
+        if ts.Participants.GetParticipant(HelperOwner).ProfileCounter.Stats.GetCounter(0,0,next(HelperGUIDs),1,lSessionGUID)>0 then
+          HelperSession = lSessionGUID
+          break
         end
       end
-      local function mySessionFilterNotOldWorld(SessionID,CheckingSessionGuid)
-        if CheckingSessionGuid~=180023 then
+      local function mySessionFilter(SessionID,CheckingSessionGuid)
+        if CheckingSessionGuid==HelperSession then
           return true
         end
       end
       system.start(function()
+        
         local results = {}
-        if ts.Participants.GetParticipant(HelperOwner).ProfileCounter.Stats.GetCounter(0,0,next(HelperGUIDs),1,180023)>0 then -- if it is in old world
-          results = ObjectFinderSerp.GetAnyObjectsFromAnyone({ObjectFilter=myObjectFilter,SessionFilter=mySessionFilterOldWorld,FromSessionID=1,ToSessionID=nil,
-            FromIslandID=0,ToIslandID=0,FromAreaIndex=0,ToAreaIndex=0,FromObjectID=nil,ToObjectID=10000,withyield=false,nosave=true})
-          if next(results)==nil then -- then search up to 1m ObjectIDs, should be enough even on very big savegames
-            results = ObjectFinderSerp.GetAnyObjectsFromAnyone({ObjectFilter=myObjectFilter,SessionFilter=mySessionFilterOldWorld,FromSessionID=1,ToSessionID=nil,
-              FromIslandID=0,ToIslandID=0,FromAreaIndex=0,ToAreaIndex=0,FromObjectID=10000,ToObjectID=1000000,withyield=true,nosave=true})
-          end
-          if next(results)==nil then -- then search up to 10m ObjectIDs, should be enough for biggest savegame in the world ?!
-            results = ObjectFinderSerp.GetAnyObjectsFromAnyone({ObjectFilter=myObjectFilter,SessionFilter=mySessionFilterOldWorld,FromSessionID=1,ToSessionID=nil,
-              FromIslandID=0,ToIslandID=0,FromAreaIndex=0,ToAreaIndex=0,FromObjectID=1000000,ToObjectID=10000000,withyield=true,nosave=true})
-          end
+        results = ObjectFinderSerp.GetAnyObjectsFromAnyone({ObjectFilter=myObjectFilter,SessionFilter=mySessionFilter,FromSessionID=1,ToSessionID=nil,
+          FromIslandID=0,ToIslandID=0,FromAreaIndex=0,ToAreaIndex=0,FromObjectID=nil,ToObjectID=10000,withyield=false,nosave=true})
+        if table_len(results)~=table_len(HelperGUIDs) then -- then search up to 1m ObjectIDs, should be enough even on very big savegames
+          results = ObjectFinderSerp.GetAnyObjectsFromAnyone({ObjectFilter=myObjectFilter,SessionFilter=mySessionFilter,FromSessionID=1,ToSessionID=nil,
+            FromIslandID=0,ToIslandID=0,FromAreaIndex=0,ToAreaIndex=0,FromObjectID=10000,ToObjectID=1000000,withyield=true,nosave=true})
         end
-        if next(results)==nil then -- then search again in the other sessions
-          results = ObjectFinderSerp.GetAnyObjectsFromAnyone({ObjectFilter=myObjectFilter,SessionFilter=mySessionFilterNotOldWorld,FromSessionID=1,ToSessionID=nil,
-            FromIslandID=0,ToIslandID=0,FromAreaIndex=0,ToAreaIndex=0,FromObjectID=nil,ToObjectID=10000,withyield=false,nosave=true})
-          if next(results)==nil then -- then search up to 1m ObjectIDs, should be enough even on very big savegames
-            results = ObjectFinderSerp.GetAnyObjectsFromAnyone({ObjectFilter=myObjectFilter,SessionFilter=mySessionFilterNotOldWorld,FromSessionID=1,ToSessionID=nil,
-              FromIslandID=0,ToIslandID=0,FromAreaIndex=0,ToAreaIndex=0,FromObjectID=10000,ToObjectID=1000000,withyield=true,nosave=true})
-          end
+        if table_len(results)~=table_len(HelperGUIDs) then -- then search up to 10m ObjectIDs, should be enough for biggest savegame in the world ?!
+          results = ObjectFinderSerp.GetAnyObjectsFromAnyone({ObjectFilter=myObjectFilter,SessionFilter=mySessionFilter,FromSessionID=1,ToSessionID=nil,
+            FromIslandID=0,ToIslandID=0,FromAreaIndex=0,ToAreaIndex=0,FromObjectID=1000000,ToObjectID=10000000,withyield=true,nosave=true})
         end
-        if next(results)==nil then
-          print("Did not find helper objects")
+        if table_len(results)~=table_len(HelperGUIDs) then
+          print("ATTENTION: Did not find objectfinder helper objects in session",HelperSession)
         else
           SaveLuaStuff_Serp.Helper_OID = FoundObject_OID
           for Found_OID,info in pairs(results) do 
@@ -262,6 +270,8 @@ end
 
  -- ts_embed_string should be eg: "[MetaObjects SessionGameObject("..tostring(OID)..") Area CityName]"
  -- so always inlucding "[MetaObjects SessionGameObject("..tostring(OID)..") ...]" and your wanted command for the OID you enter
+-- TODO: name evlt noch ändern der fkt , zb. DoTextEmbed oderso und dazu dann eine tatsäcliche DoForSessionGameObject funktion machen,
+ -- der man dann direkt nur OID und "Area CityName" übergibt
  local function DoForSessionGameObject(ts_embed_string,doreturnstring)
   if doreturnstring then -- we want to get what the textembed returns, but game.TextSourceManager.setDebugTextSource does not return anything. I only know a workarkund to get it, by setting and reading out the name of a namable helper object
     local helper_OID = ObjectFinderSerp.ObjectFinderCacheSerp["Nameable_Helper_OIDs"]["EmbedHelper"]
@@ -277,6 +287,24 @@ end
     game.TextSourceManager.setDebugTextSource(ts_embed_string)
   end
 end
+
+-- INFO:
+-- with game.TextSourceManager.setDebugTextSource(string) we can also execute commands for too high OIDs if they keep them a string when getting it from userdata:getName() (higher than the max allowed integer in lua -.- which is true for all "EditorFlag" objects, so placed on the islands directly)
+-- (ts.GetGameObject(OID) akzeptiert keinen string, deswegen der Weg über debug)
+-- session.getObjectByID(OID) um an userdata zu kommen akzeptiert auch einen string
+-- aber wir können unsere OIDtableToOID usw funktionen nicht nutzen, weil die alles in Zahlen umwandelt.
+ -- und selbst wenn wir da EditorFlag einbauen, würden wir anstatt 9308976176787619987 : 9.3089761767876e+18 returned bekommen, was wir jetzt nicht mehr 
+  -- nachträglich in einen string umwandeln können, ohne dass wir Zeichen verloren haben...
+-- Sollte gehen mit:
+-- console.startScript("data/scripts_serp/bint.lua")
+-- local bint = bint_Library051(256)
+-- local x = bint(1)
+-- x = x << 128
+-- print(x) -- outputs: 340282366920938463463374607431768211456
+-- print(tostring(x) == '340282366920938463463374607431768211456')
+
+
+
 
 -- helpers to access "Vector" return values you find in textsourcelist.json, which are not accessable in lua directly -.-
 -- we can only access AreaFromID from the current active session of the local player
@@ -344,6 +372,8 @@ local function GetCoopPeersAtMarker(UIState,RefOid)
         end
       end
     end
+  else
+    return nil
   end
   return peerints
 end
@@ -500,10 +530,13 @@ end
 -- Ships (walkables) always have AreaIndex and IslandID of 0
 -- ObjectID is in increasing number for every newly created object. It starts from 1 for every Areatable-combination (so for each session for each IslandID and each AreaIndex it starts from 1) 
 -- Objects leaving the session and then come back, will get a new ObjectID (it seems the old one is abandoned)
+-- ts.GetGameObject and other functions expect the integer OID, not the table
 local function OIDtableToOID(OIDtable)
-  local AreaID, ObjectID
+  local AreaID, ObjectID,EditorFlag,EditorChunkID
   if type(OIDtable)=="table" then 
     ObjectID = OIDtable["ObjectID"]
+    EditorFlag = OIDtable["EditorFlag"] or 0
+    EditorChunkID = OIDtable["EditorChunkID"] or 0
     if type(OIDtable["AreaID"])=="table" then
       AreaID = AreatableToAreaID(OIDtable["AreaID"])
     elseif type(OIDtable["AreaID"])=="number" then
@@ -511,10 +544,18 @@ local function OIDtableToOID(OIDtable)
     end
   end
   if type(ObjectID)=="number" and type(AreaID)=="number" then
-    return ((AreaID << 32) + (ObjectID))
+    return ((AreaID << 32) + (ObjectID) + (EditorFlag << 63) + (EditorChunkID << 50))
   end
 end
 
+-- TODO:  noch berechnen wie hier die Editordinge rauskommen , keine ahnuhn wie
+-- Dannach überlegen wie wir das hier umändern, ob wir immer mit bint rechnen und immer string/bint returnen
+ -- oder nur wennse zu groß sind? ts.GetGameObject kann nicht mit string arbeiten, weshalb man da dann zu DoForSessionGameObject greifen muss
+ -- -> immer number returnen, außer wenn Editorkram übergeben wird, dann string
+  -- und die aufrufende Fkt muss dann selbst prüfen was sie zurückbekommen hat?
+-- und mal testweise dann durch alle editorobjecte loopen und rausfinden warum deren ObjectID so hoch ist,
+ -- zb der Kontor von den thirdparties ist eben oft nicht 1. sind dann die objecte auf der insel alle höher oder gibts auch niedrigere
+  -- (dann für editor objekte eben nicht die KontorObjectID als startpunkt für suche nehmen)
 local function OIDToOIDtable(OID)
   if type(OID)=="number" then
     local AreaID = ((OID) >> 32)
@@ -591,7 +632,10 @@ local function IsLoadedSessionByID(SessionID)
     OID = OIDtableToOID({ObjectID=ObjectID,AreaID=AreaID})
     local GUID = ts.GetGameObject(OID).GUID
     if GUID==34 then
-      return ts.GetGameObject(OID).SessionGuid
+      SessionGuid = ts.GetGameObject(OID).SessionGuid
+      if SessionGuid~=1500004631 then -- is my empty fake session. worldmap 180039 has not Neutral participant I think
+        return SessionGuid
+      end
     end
   end
 end
@@ -619,6 +663,8 @@ end
      -- (bei islandsettle von KI klappt das natürlich nicht unbedingt)
    -- und dann könnte man bei GetAnyObjectsFromAnyone dann allgemein nur Areas prüfen, die bekannt sind...
     -- (bzw. dieses "nur islands prüfen die bekannt sind" könnte man evlt noch als Argument übergeben?)
+      -- IslandSettled wird auch bei Übernahme einer Insel getriggert. Übernahme einer Insel geht auch, wenn Spieler gerade in anderer Session ist..
+     
      
      -- Und als Tipp zufügen, dass man next_AreaID returnen soll, wenns der falsche Participant ist
   
@@ -629,8 +675,8 @@ end
 
 -- Does not work for objects with EditorFlag, which are mostly objects at the map from beginning, like Pirate/Archibald harbor/objects. (because their OID is higher than lua can handle eg archibald harbor 9223413826886612345)
 -- see also my comments below for GetAnyObjectsFromAnyone
-function GetCurrentSessionObjectsFromAnyone(args)
-  local ObjectFilter,FromSessionID,ToSessionID,FromIslandID,ToIslandID,FromAreaIndex,ToAreaIndex,FromObjectID,ToObjectID,withyield,nosave = args["ObjectFilter"],args["FromSessionID"],args["ToSessionID"],args["FromIslandID"],args["ToIslandID"],args["FromAreaIndex"],args["ToAreaIndex"],args["FromObjectID"],args["ToObjectID"],args["withyield"],args["nosave"]
+function GetCurrentSessionObjectsFromAnyone(myargs)
+  local ObjectFilter,FromSessionID,ToSessionID,FromIslandID,ToIslandID,FromAreaIndex,ToAreaIndex,FromObjectID,ToObjectID,withyield,nosave = myargs["ObjectFilter"],myargs["FromSessionID"],myargs["ToSessionID"],myargs["FromIslandID"],myargs["ToIslandID"],myargs["FromAreaIndex"],myargs["ToAreaIndex"],myargs["FromObjectID"],myargs["ToObjectID"],myargs["withyield"],myargs["nosave"]
   local Objects = {}
   local AreaID,OID,CheckingSessionGuid
   local filterresult,AreaOwnerName,Kontor_OIDtable,Kontor_OID,objectcount,HighestObjectID,LowestObjectID,GUID,SessionGuid,ParticipantID,userdata,sessionisloaded,CheckingSessionGuid
@@ -798,8 +844,8 @@ end
   -- Or change FromObjectID/ToObjectID to match the expected currently used ObjectIDs-range. Eg. spawn a new object for local player and get his ObjectID somehow (eg with GetCurrentSessionObjectsFromLocaleByProperty) to find out the current highest ObjectID used (within the spawned AreaID!) 
 -- see "my_ObjectFilter" below for examples how to use it
 -- set withyield to true and start the function within a coroutine to yield on every new areaand every 10k objects, to prevent game-blocking on big searches (search takes longer then, but does not block. so use this if time does not matter much)
-function GetAnyObjectsFromAnyone(args)
-  local ObjectFilter,SessionFilter,FromSessionID,ToSessionID,FromIslandID,ToIslandID,FromAreaIndex,ToAreaIndex,FromObjectID,ToObjectID,withyield,nosave = args["ObjectFilter"],args["SessionFilter"],args["FromSessionID"],args["ToSessionID"],args["FromIslandID"],args["ToIslandID"],args["FromAreaIndex"],args["ToAreaIndex"],args["FromObjectID"],args["ToObjectID"],args["withyield"],args["nosave"]
+function GetAnyObjectsFromAnyone(myargs)
+  local ObjectFilter,SessionFilter,FromSessionID,ToSessionID,FromIslandID,ToIslandID,FromAreaIndex,ToAreaIndex,FromObjectID,ToObjectID,withyield,nosave = myargs["ObjectFilter"],myargs["SessionFilter"],myargs["FromSessionID"],myargs["ToSessionID"],myargs["FromIslandID"],myargs["ToIslandID"],myargs["FromAreaIndex"],myargs["ToAreaIndex"],myargs["FromObjectID"],myargs["ToObjectID"],myargs["withyield"],myargs["nosave"]
   local Objects = {}
   local AreaID,OID,SessionIsCurrent,CheckingSessionGuid
   local filterresult,AreaOwnerName,Kontor_OIDtable,Kontor_OID,objectcount,HighestObjectID,LowestObjectID,GUID,SessionGuid,ParticipantID,userdata,sessionisloaded,CheckingSessionGuid,CurrentSessionObjects
@@ -819,10 +865,10 @@ function GetAnyObjectsFromAnyone(args)
       if ObjectFinderSerp.ObjectFinderCacheSerp["ObIDs"][SessionID]==nil then
         ObjectFinderSerp.ObjectFinderCacheSerp["ObIDs"][SessionID] = {}
       end
-      session_ok = type(SessionFilter)=="function" and SessionFilter(SessionID,CheckingSessionGuid) or true
+      local session_ok = type(SessionFilter)=="function" and SessionFilter(SessionID,CheckingSessionGuid) or true
       if session_ok then -- not really needed if we find objects and reach the ObjectFilter call (then use next_SessionID), but eg. if we want to only check Areas then we wont find Neutral object and reach ObjectFilter quite late. So use SessionFilter to sort out unwanted session early to save performance
         if SessionIsCurrent then
-          sessionargs = deepcopy(args)
+          local sessionargs = deepcopy(myargs)
           sessionargs["FromSessionID"] = SessionID
           sessionargs["ToSessionID"] = SessionID
           CurrentSessionObjects = GetCurrentSessionObjectsFromAnyone(sessionargs)
@@ -834,6 +880,8 @@ function GetAnyObjectsFromAnyone(args)
             -- entweder ändern was fkt returned..
              -- oder uns bei Anwendung außerhalb vom ObjectFilter merken, dass wir einmal schon bei "done=true" waren und das dann bei folgenden
               -- Aufrufen immer wieder returnen
+              -- Lösung: einfach einen weiteren paramter in GetCurrentSessionObjectsFromAnyone zufügen sowas wie "returne bitte done" den ich nur hier setze,
+               -- und dadurch dann hier auch done returned bekomme und umsetzen kann (bzw einfach das ganze filterresult)
         else
           for IslandID=FromIslandID,ToIslandID do
             for AreaIndex=FromAreaIndex,ToAreaIndex do
@@ -995,12 +1043,29 @@ end
 -- ts.Area.GetAreaFromID(AreaID).CityName will be an empty string for invalid Areas, eg the IslandID=0 water area.
  -- Of course you can still find ships in that AreaID, but no city/buildings
 
--- simply example ObjectFilter
+-- simple example ObjectFilter
 local function my_ObjectFilter(OID,GUID,userdata,SessionGuid,ParticipantID,AreaID,SessionID,IslandID,AreaIndex,ObjectID)
   if GUID==100438 and ParticipantID==1 and ts.GetGameObject(OID).Nameable.Name=="Hans" then
     return {addthis=true,done=true} -- add it and stop searching, everything found wanted to find
   end
-end 
+end
+-- good filter for searching Area for a specific building
+-- we differentiate between object-owner and area-owner because in theory mods can add objects to islands not owned by the area-owner.
+local function myObjectFilter(OID,GUID,userdata,SessionGuid,ParticipantID,AreaID,SessionID,IslandID,AreaIndex,ObjectID)
+  local AreaOwner = ObjectFinderSerp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Area Owner]",true) -- using DoForSessionGameObject, because Area is not known if local player is not in the same session
+  local Area_onwedbyus = AreaOwner==ts.Participants.GetGetCurrentParticipantID()
+  local object_ownedbyus = ParticipantID==ts.Participants.GetGetCurrentParticipantID() 
+  if GUID==1500004632 and Area_onwedbyus and object_ownedbyus then
+    return {addthis=true,done=true,next_AreaID=false,next_SessionID=false} -- important to return addthis and done, to stop the expensive search
+  else
+    if not Area_onwedbyus then
+      return {addthis=false,done=false,next_AreaID=true,next_SessionID=false}
+    elseif ts.Participants.GetParticipant(ParticipantID).ProfileCounter.Stats.GetCounter(0,0,1500004632,0,AreaID)==0 then -- check if this area even has the searched building
+      return {addthis=false,done=false,next_AreaID=true,next_SessionID=false}
+    end
+  end
+end
+
 -- complex example To find objects with ParticipantID=0 , GUID=100438 and Names Hans/Franz. in total 2 objects to be found in Old world session 180023
 -- you can of course also count yourself in a variable defined outside of my_ObjectFilter in your script how many you already found and if it is enough.
 local function my_ObjectFilter(OID,GUID,userdata,SessionGuid,ParticipantID,AreaID,SessionID,IslandID,AreaIndex,ObjectID)
@@ -1167,7 +1232,9 @@ end
 local function AffectedByStatusEffect(OID,StatusEffectGUID) -- eg StatusEffect dealt by projectiles. this way you can easily filter for objects hit with your custom projectile
   return ts.GetGameObject(OID).Attackable.GetIsPartOfActiveStatusEffectChain(StatusEffectGUID) -- unfortunately does not work with buffs provided in a different way
 end
-
+-- for Productivity Buffs fro Factory/Monument see GetVectorGuidsFromSessionObject
+-- And you can check ItemContainer for "GetItemAlreadyEquipped" to check if a ship/guildhouse has an item euqipped
+-- I fear checking other buffs is not possible in lua...
 
 -- ###################################################################################################
 -- ###################################################################################################

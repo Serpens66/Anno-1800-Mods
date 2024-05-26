@@ -4,6 +4,9 @@
   
   <!-- UnlockableAsset ist vanilla template, gibts also schon -->
   
+  <!-- An Object that should be used in Quests AirdropObjective needs Attackable property -->
+   <!-- (same for being affected by StatusEffects from such a drop/projectiles) -->
+  
   <ModOp Type="addNextSibling" Template="AirShip">
     <Template>
       <Name>ObjectDummyWithoutOwner</Name>
@@ -55,6 +58,9 @@
     
     <!-- damit objekt nen owner haben kann muss es entweder Building+Selection sein, oder Selection+ShipMaintenance+Walking haben -->
     <!-- (ConditionPlayerCounter erkennt es auch ohne Walking, aber ObjectFilter zb. bei ActionDeleteObjects offenbar nicht)  -->
+     <!-- Achtung: objekte werden in StatistikMenü Shiplist angezeigt =/ keine Ahnung wie man das verhindern könnte.. -->
+      <!-- höchtens vllt so machen, dass man statt Human0 ein objekt für Neutral spawnt sodass man dennoch mit arbeiten -->
+       <!-- kann, aber sie durch fremden owner nicht in menü angezeigt werden (oder eben sehr schnell wieder entfernen/zerstören) -->
     <Template>
       <Name>ObjectDummyWithOwner</Name>
       <Properties>
@@ -207,7 +213,7 @@
       </Properties>
     </Template>
     
-    
+  
     <Template>
       <Name>BuildingDummy_WithoutOwner</Name>
       <Properties>
@@ -216,6 +222,9 @@
         <Building>
           <AssociatedRegions>Moderate;Colony01;Africa;Arctic</AssociatedRegions>
           <TerrainType>Terrain</TerrainType>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+          <Destructable>0</Destructable>
+          <Movable>0</Movable>
         </Building>
       </Properties>
     </Template>
@@ -229,10 +238,176 @@
         <Building>
           <AssociatedRegions>Moderate;Colony01;Africa;Arctic</AssociatedRegions>
           <TerrainType>Terrain</TerrainType>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+          <Destructable>0</Destructable>
+          <Movable>0</Movable>
         </Building>
         <Selection>
           <GUIType>Generic</GUIType>
+          <MultiSelectable>0</MultiSelectable>
+          <Selectable>0</Selectable>
+          <DestructSelectable>0</DestructSelectable>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
         </Selection>
+      </Properties>
+    </Template>
+    
+    
+    <!-- BasicAttackType=Seamine, so meant to be used with my shared mod "AttackEverything", but of course you can change the BasicAttackType in your mod -->
+    <Template>
+      <Name>BuildingDummy_WithOwner_Attacker</Name>
+      <Properties>
+        <Standard />
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/buildings/special/harbor_04/harbor_04.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Building>
+          <AssociatedRegions>Moderate;Colony01;Africa;Arctic</AssociatedRegions>
+          <TerrainType>Terrain</TerrainType>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+          <Destructable>0</Destructable>
+          <Movable>0</Movable>
+        </Building>
+        <Selection>
+          <GUIType>Generic</GUIType>
+          <MultiSelectable>0</MultiSelectable>
+          <Selectable>0</Selectable>
+          <DestructSelectable>0</DestructSelectable>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+        </Selection>
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+        </Attackable>
+        <Attacker>
+          <BasicAttackType>Seamine</BasicAttackType>
+          <ShootingTracking>TurretFixed</ShootingTracking>
+          <TargetAngleVariation>360</TargetAngleVariation>
+          <LineOfSightRange>1</LineOfSightRange>
+          <AttackRange>1</AttackRange>
+          <BaseDamage>1</BaseDamage>
+          <ReloadTime>1</ReloadTime>
+          <Turrets>
+            <Item>
+              <TurnSpan>360</TurnSpan>
+              <TurretCfg>data/graphics/buildings/special/harbor_04/harbor_04_turret.cfg</TurretCfg>
+            </Item>
+          </Turrets>
+          <ProjectileAsset>1500001439</ProjectileAsset>
+          <TurretExplosionEffectAsset>0</TurretExplosionEffectAsset>
+          <MuzzleEffectAssets />
+          <AccuracyByDistance />
+        </Attacker>
+        <ItemContainer>
+          <SocketAllocation>Warship;Ship;AirShip</SocketAllocation>
+          <SocketCount>1</SocketCount>
+          <SlotCount>0</SlotCount>
+          <CanStoreProducts>0</CanStoreProducts>
+          <SpawnsFlotsam>0</SpawnsFlotsam>
+          <InitSocketItems>
+            <Item>
+              <Item>1500001494</Item>
+            </Item>
+          </InitSocketItems>
+        </ItemContainer>
+        <CommandQueue>
+          <IsDestructable>0</IsDestructable>
+          <IsPlayerControllableVehicle>0</IsPlayerControllableVehicle>
+          <InsecurityAttractiveness>0</InsecurityAttractiveness>
+          <MilitaryShipPoints>0</MilitaryShipPoints>
+          <TradeShipPoints>0</TradeShipPoints>
+          <AirShipPoints>0</AirShipPoints>
+        </CommandQueue>
+        <UpgradeList />
+      </Properties>
+    </Template>
+    
+    
+    <Template>
+      <Name>BuildingDummy_WithOwner_Victim</Name>
+      <Properties>
+        <Standard />
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/buildings/special/harbor_04/harbor_04.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Building>
+          <AssociatedRegions>Moderate;Colony01;Africa;Arctic</AssociatedRegions>
+          <TerrainType>Terrain</TerrainType>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+          <Destructable>0</Destructable>
+          <Movable>0</Movable>
+        </Building>
+        <Selection>
+          <GUIType>Generic</GUIType>
+          <MultiSelectable>0</MultiSelectable>
+          <Selectable>0</Selectable>
+          <DestructSelectable>0</DestructSelectable>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+        </Selection>
+        <Attackable>
+          <AttackableType>IslandBuilding</AttackableType>
+          <MaximumHitPoints>1</MaximumHitPoints>
+        </Attackable>
+        <UpgradeList />
+        <CommandQueue>
+          <IsDestructable>0</IsDestructable>
+          <IsPlayerControllableVehicle>0</IsPlayerControllableVehicle>
+          <InsecurityAttractiveness>0</InsecurityAttractiveness>
+          <MilitaryShipPoints>0</MilitaryShipPoints>
+          <TradeShipPoints>0</TradeShipPoints>
+          <AirShipPoints>0</AirShipPoints>
+        </CommandQueue>
+      </Properties>
+    </Template>
+    
+    
+     <!-- BuffFactory needs the following to work:  -->
+      <!--  LogisticNode (sonst crash) -->
+      <!-- Pauseable: otherwise BaseBuff does not work -->
+      <!-- FactoryBase: Otherwise ProductionBuffs does not work (can be empty to produce wiht no input just the buff) -->
+     <!-- optional: UpgradeList wenn auf es selbst buffs wirken sollen. -->
+     <!-- Hint: The BuffFactory must be moved/rebuild to update the buffs, if you want to add/remove buff assets in a running game -->
+     <!-- Alterantive to make a building forward a buff areawide: UpgradeList+DefaultBuff, where you add a EffectForward that forwards your buff (so 2 buff assets needed), this does not require more properties for the building -->
+    <Template>
+      <Name>BuffFactoryDummy_WithOwner</Name>
+      <Properties>
+        <Standard />
+        <Object />
+        <Building>
+          <AssociatedRegions>Moderate;Colony01;Africa;Arctic</AssociatedRegions>
+          <TerrainType>Terrain</TerrainType>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+          <Destructable>0</Destructable>
+          <Movable>0</Movable>
+        </Building>
+        <Selection>
+          <GUIType>Generic</GUIType>
+          <MultiSelectable>0</MultiSelectable>
+          <Selectable>0</Selectable>
+          <DestructSelectable>0</DestructSelectable>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+        </Selection>
+        
+        <BuffFactory />
+        <LogisticNode>
+          <TransporterCountMax>0</TransporterCountMax>
+          <HideTransportersBeforeTheyMove>1</HideTransportersBeforeTheyMove>
+          <NeedsTransporterQueue>0</NeedsTransporterQueue>
+        </LogisticNode>
+        <FactoryBase />
+        <Pausable />
+        
       </Properties>
     </Template>
     
@@ -310,6 +485,92 @@
       </Properties>
     </Template>
     
+    <!-- Building Shipyard without StreetActivation, IncidentInfectable, Electrifiable, Industrializable, LogisticNode, Maintenance, Cost, AmbientMoodProvider -->
+     <!-- Pausable is required for it to work -->
+    <Template>
+      <Name>Min_Shipyard_Serp</Name>
+      <Properties>
+        <Standard />
+        <Building>
+          <TerrainType>Coast</TerrainType>
+        </Building>
+        <Blocking />
+        <Mesh />
+        <Object />
+        <Constructable />
+        <Selection>
+          <GUIType>Shipyard</GUIType>
+          <OnSelection>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList />
+            </Values>
+          </OnSelection>
+        </Selection>
+        <Text />
+        <Shipyard />
+        <Locked />
+        <Infolayer />
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+          <HasRuinState>1</HasRuinState>
+          <RuinSmokeParticles>
+            <Item>
+              <SmokeParticleFilePath>data/graphics/effects/military/explosions/damage_smoke_01.cfg</SmokeParticleFilePath>
+            </Item>
+          </RuinSmokeParticles>
+          <RuinSmokeParticlesMin>1</RuinSmokeParticlesMin>
+          <RuinSmokeParticlesMax>3</RuinSmokeParticlesMax>
+          <RuinSmokeParticleRectBorderPercent>0.2</RuinSmokeParticleRectBorderPercent>
+          <ExplosionEffects>
+            <Item />
+          </ExplosionEffects>
+          <SelfHealPerHealTick>300</SelfHealPerHealTick>
+        </Attackable>
+        <SoundEmitter>
+          <DestroySounds>
+            <Item>
+              <Sound>9818756</Sound>
+            </Item>
+          </DestroySounds>
+          <ConstructionSounds>
+            <BuildFailed>
+              <Item>
+                <Sound>9818387</Sound>
+              </Item>
+            </BuildFailed>
+            <BuildMoveStart>
+              <Item>
+                <Sound>9818755</Sound>
+              </Item>
+            </BuildMoveStart>
+            <BuildMoveSuccess>
+              <Item>
+                <Sound>203995</Sound>
+              </Item>
+            </BuildMoveSuccess>
+            <BuildMoveEnd>
+              <Item>
+                <Sound>200141</Sound>
+              </Item>
+            </BuildMoveEnd>
+          </ConstructionSounds>
+          <IncidentSounds>
+            <ExplosionOneShots>
+              <Item>
+                <Sound>203849</Sound>
+              </Item>
+            </ExplosionOneShots>
+          </IncidentSounds>
+        </SoundEmitter>
+        <FeedbackController>
+          <NightBehavior>HideNone</NightBehavior>
+        </FeedbackController>
+        <UpgradeList />
+        <QuestObject />
+        <Pausable />
+      </Properties>
+    </Template>
     
     
     
@@ -322,14 +583,16 @@
     <!-- for whatever reason: -->
      <!-- Attacker needs also UpgradeList, otherwise game will crash. -->
      <!-- Attackable also needs Bombarder, otherwise the airship wont be attacked. Most likely only true for airhsips, since normal ships dont have this. -->
+       <!-- IMPORTANT!!: BasicAttackType=HunterAirship only auto-shoots at objects with the Bombarder property. While Seamine (and maybe also others) won't auto shoot at objects with the Bombarder property. -->
+        <!-- so depending on the BasicAttackType of the Attacker, the Victim needs or should not have the Bombarder property! -->
+        <!-- This is true regardless of what is written in MilitaryFeature/CanAttackTable, so most likely hardcoded outside of xml ... -->
     <!-- Both require CommandQueue to work (otherwise no attack) -->
-    <!-- pirate mode only works with attacker, so the victim can not have pirate mode -->
+    <!-- pirate mode only works with attacker property, so the victim can not have pirate mode -->
     <!-- also needs Object/Variations (graphic), but will still be invisible since we dont add Mesh (and even if we would there is InitialVisibility option in it) -->
     <!-- graphic von dlc11 geht auch wenn man den dlc nicht besitzt -->
     <!-- For the Attacker to destroy the victim it seems there is no DiscoverRadius needed. But for reactions to work the participants must have discovreed each other -->
     
-    
-    <!-- TODO: Testen ob dieses victim/Attacker system auch bei verdeckten Karten klappt, wenn die Helper Objekte <DiscoverRadius>50</DiscoverRadius> haben! -->
+    <!-- with Bombarder property, so auto-attackable by BasicAttackType=HunterAirship -->
     <Template>
       <Name>ObjectDummyWithOwner_Victim</Name>
       <Properties>
@@ -442,8 +705,7 @@
           <CurveSegmentDensity>High</CurveSegmentDensity>
         </Walking>
         <Attackable>
-          <AttackableType>Airship</AttackableType>
-          <MaximumHitPoints>20000</MaximumHitPoints>
+          <AttackableType>[NONE]</AttackableType>
         </Attackable>
         <Attacker>
           <BasicAttackType>HunterAirship</BasicAttackType>
@@ -465,10 +727,11 @@
           <AccuracyByDistance />
         </Attacker>
         <ItemContainer>
-          <SocketAllocation>Ship;AirShip</SocketAllocation>
+          <SocketAllocation>Warship;Ship;AirShip</SocketAllocation>
           <SocketCount>1</SocketCount>
           <SlotCount>0</SlotCount>
           <CanStoreProducts>0</CanStoreProducts>
+          <SpawnsFlotsam>0</SpawnsFlotsam>
           <InitSocketItems>
             <Item>
               <Item>1500001494</Item>
@@ -487,6 +750,131 @@
       </Properties>
     </Template>
     
+    <!-- without bombarder, eg. to be attacked by BasicAttackType=Seamine with my shared mod AttackEverything enabled (the rest is the same like ObjectDummyWithOwner_Victim) -->
+    <Template>
+      <Name>ObjectDummyWithOwner_Victim_without_Bombarder</Name>
+      <Properties>
+        <Standard />
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/dlc11/graphics/vehicle/airships/airship_agile_small/airship_agile_small.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Selection>
+          <GUIType>Vehicle</GUIType>
+          <MultiSelectable>0</MultiSelectable>
+          <Selectable>0</Selectable>
+          <DestructSelectable>0</DestructSelectable>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+        </Selection>
+        <ShipMaintenance>
+          <Maintenance>0</Maintenance>
+          <DisableShipDestructionTracking>1</DisableShipDestructionTracking>
+          <DisableEscort>1</DisableEscort>
+        </ShipMaintenance>
+        <Walking>
+          <SpecialMovementType>AirConstantHeight</SpecialMovementType>
+          <StartHeight>8</StartHeight>
+          <DiscoverRadius>0</DiscoverRadius>
+          <ReservationLength>9</ReservationLength>
+          <ReservationWidth>5</ReservationWidth>
+          <PathPlannerLayer>Air</PathPlannerLayer>
+          <ExpensiveDirSmoothing>0</ExpensiveDirSmoothing>
+          <TurnAroundRadius>4</TurnAroundRadius>
+          <Acceleration>2</Acceleration>
+          <Deceleration>4</Deceleration>
+          <TurnRadius>4</TurnRadius>
+          <TurnSpeed>75</TurnSpeed>
+          <TurnDeceleration>0</TurnDeceleration>
+          <TurnMovement>0</TurnMovement>
+          <LeaningMaxAngle>-35</LeaningMaxAngle>
+          <ForwardSpeed>0</ForwardSpeed>
+          <WindMinSlowdownFactor>0.75</WindMinSlowdownFactor>
+          <WindSlowdownEffectOnTurningSpeed>0.18</WindSlowdownEffectOnTurningSpeed>
+          <WindMaxSpeedupFactor>1.4</WindMaxSpeedupFactor>
+          <WindSpeedupEffectOnTurningSpeed>0.85</WindSpeedupEffectOnTurningSpeed>
+          <CurveSegmentDensity>High</CurveSegmentDensity>
+        </Walking>
+        <Attackable>
+          <AttackableType>Airship</AttackableType>
+          <MaximumHitPoints>1</MaximumHitPoints>
+        </Attackable>
+        <UpgradeList />
+        <CommandQueue>
+          <IsDestructable>0</IsDestructable>
+          <IsPlayerControllableVehicle>0</IsPlayerControllableVehicle>
+          <InsecurityAttractiveness>0</InsecurityAttractiveness>
+          <MilitaryShipPoints>0</MilitaryShipPoints>
+          <TradeShipPoints>0</TradeShipPoints>
+          <AirShipPoints>0</AirShipPoints>
+        </CommandQueue>
+      </Properties>
+    </Template>
+    
+    
+    <Template>
+      <Name>ObjectDummyWithOwner_Victim_WaterShip</Name>
+      <Properties>
+        <Standard />
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/vehicle/schooner/schooner.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Selection>
+          <GUIType>Vehicle</GUIType>
+          <MultiSelectable>0</MultiSelectable>
+          <Selectable>0</Selectable>
+          <DestructSelectable>0</DestructSelectable>
+          <InteractionDistance>0</InteractionDistance>
+          <AllowedDragType>[NONE]</AllowedDragType>
+        </Selection>
+        <ShipMaintenance>
+          <Maintenance>0</Maintenance>
+          <DisableShipDestructionTracking>1</DisableShipDestructionTracking>
+          <DisableEscort>1</DisableEscort>
+        </ShipMaintenance>
+        <Walking>
+          <DiscoverRadius>0</DiscoverRadius>
+          <ReservationLength>9</ReservationLength>
+          <ReservationWidth>5</ReservationWidth>
+          <PathPlannerLayer>Water</PathPlannerLayer>
+          <ExpensiveDirSmoothing>0</ExpensiveDirSmoothing>
+          <TurnAroundRadius>4</TurnAroundRadius>
+          <Acceleration>2</Acceleration>
+          <Deceleration>4</Deceleration>
+          <TurnRadius>4</TurnRadius>
+          <TurnSpeed>75</TurnSpeed>
+          <TurnDeceleration>0</TurnDeceleration>
+          <TurnMovement>0</TurnMovement>
+          <LeaningMaxAngle>-35</LeaningMaxAngle>
+          <ForwardSpeed>0</ForwardSpeed>
+          <WindMinSlowdownFactor>0.75</WindMinSlowdownFactor>
+          <WindSlowdownEffectOnTurningSpeed>0.18</WindSlowdownEffectOnTurningSpeed>
+          <WindMaxSpeedupFactor>1.4</WindMaxSpeedupFactor>
+          <WindSpeedupEffectOnTurningSpeed>0.85</WindSpeedupEffectOnTurningSpeed>
+          <CurveSegmentDensity>High</CurveSegmentDensity>
+        </Walking>
+        <Attackable>
+          <AttackableType>Ship</AttackableType>
+          <MaximumHitPoints>1</MaximumHitPoints>
+        </Attackable>
+        <UpgradeList />
+        <CommandQueue>
+          <IsDestructable>0</IsDestructable>
+          <IsPlayerControllableVehicle>0</IsPlayerControllableVehicle>
+          <InsecurityAttractiveness>0</InsecurityAttractiveness>
+          <MilitaryShipPoints>0</MilitaryShipPoints>
+          <TradeShipPoints>0</TradeShipPoints>
+          <AirShipPoints>0</AirShipPoints>
+        </CommandQueue>
+      </Properties>
+    </Template>
     
     
   </ModOp>
@@ -495,8 +883,13 @@
   <ModOp Type="addNextSibling" Template="A7_QuestStatusQuo">
     <!-- A Quest to execute actions/queststuff in the background because triggers are too limited -->
     <!-- I think Questgiver must be someone present in the session? Or only worldwide? For Old World I often use GUID=86=Bauern and New World GUID=186=Journaleros -->
-    <!-- Use ActionEndQuest to end/win (WinQuest=1 or 0) the quest after starting it with ActionStartQuest -->
+     <!-- But better use Queen 75 now, because she exists in every session (neutral also exist everywhere, but can not give quests) -->
+    <!-- Start it with ActionStartQuest and I think it autosolves automatically already, although not sure why vanilla Quests with FakeQuestObjective do not autosolve.. -->
+      <!-- in case it does not autosolve use ActionEndQuest to end/win (WinQuest=1 or 0) the quest (eg also directly in OnQuestStart) -->
+        <!-- .. I think ConditionQuestFakeObjective is instanly solved if one does not add QuestTrackerEntries to it. And it never solves itself if you add these entries -->
     <!-- You also may use it to give reputation and other rewards with notification -->
+    <!-- Better do your actions in OnQuestStart, not in OnQuestEnd because: -->
+      <!-- ActionSpawnObjects mit AllowProcessingSession funktioniert NICHT in OnQuestEnd !! also zb OnQuestStart nutzen! -->
     <Template>
       <Name>A7_QuestDummyQuest</Name>
       <Properties>
@@ -555,7 +948,8 @@
           <OnQuestSucceeded />
           <OnQuestEnd />
           <OnPhotographySuccessNewspaperAction />
-          <QuestGiver>86</QuestGiver>
+          <QuestGiver>75</QuestGiver>
+          <HasExclusiveQuestGiver>0</HasExclusiveQuestGiver>
           <DescriptionText>3965</DescriptionText>
           <QuestActivation>QuestStart</QuestActivation>
           <QuestCategory>RandomQuest</QuestCategory>
@@ -577,7 +971,7 @@
           <ConfirmOnReached>0</ConfirmOnReached>
           <QuestBookBackground>data/ui/2kimages/main/assets16/questbackground/bg_quest_construction_sustain.png</QuestBookBackground>
           <ReputationQuestFail>
-              <ReputationFailList />
+            <ReputationFailList />
           </ReputationQuestFail>
           <QuestHints />
           <HasStarterSpeechBubble>0</HasStarterSpeechBubble>
@@ -588,13 +982,13 @@
           <CanBeActiveForMultipleParticipants>1</CanBeActiveForMultipleParticipants>
         </Quest>
         <PreConditionList>
+          <!-- AlwaysFalse to not have it automatically started by Pools (use ActionStartQuest instead) or replace this PreCondition -->
+           <!-- When overwrting this in your asset MAKE SURE to set a template for the Condition ! Not BaseAssetAutoCreate, because then the AlwaysFalse template here will persist! -->
           <Condition>
-            <Template>ConditionAlwaysTrue</Template>
+            <Template>ConditionAlwaysFalse</Template>
             <Values>
-              <Condition>
-                <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionAlwaysTrue />
+              <Condition />
+              <ConditionAlwaysFalse />
             </Values>
           </Condition>
         </PreConditionList>

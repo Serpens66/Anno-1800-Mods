@@ -1,0 +1,2449 @@
+<ModOps>
+  
+  <!-- GUIDs 1500005030 to 1500005099 -->
+   <!-- 1500005034 bis 1500005035 aktuell wieder frei -->
+  
+  <!-- DecisionQuests are horrible and also cause problems in multiplayer (workaround exists, but they still suck) -->
+   <!-- so we use a shipyard building only for the settings -->
+  
+  <!-- TODO: -->
+   <!-- noch iwie die aktuelle Einstellung hervorheben, evtl. durch locked aber unhide? -->
+    <!-- ne, weil durch lock ja schon durchgeschaltet wird. -->
+    <!-- evlt dann doch buildpermit  machen und diejenigen die aktuell gewählt sind, -->
+     <!-- da hat man keinen buildpermit für? -->
+      
+      
+    <!-- TODO: -->
+     <!-- logik einbauen, wenn ich vorher "disabled" hatte und dann eine der anderen einstellungen mache, -->
+      <!-- zb. Duration, (dann wird disabled wieder frei), aber frequency hat dann nichts gewählt, -->
+       <!-- also sollte ich wiei erkennen, wenn eine kategorie nichts gewählt hat, dass dann medium als standard genommen wird. -->
+     <!-- Am besten dazu einfach eigenen Trigger machen, der prüft, wenn in einer Kategorie nichts locked ist, dann medium locken? -->
+  
+  
+  
+  <!-- neuer Ansatz fürs syncen: -->
+   <!-- (weil aktueller ansatz mit PlayerCounter CheckedParticipant unfassbar viel code ist und die unlock-bedingugen im spiel anzeigt) -->
+   <!-- mit ActionExecuteScript wird ein lua script für alle humans ausgeführt, dadurch wird ein lock/addamount darin aufjedefnalls synced. -->
+    <!-- Problem: es gibt in lua kein unhide, weshalb wir dadurch die gewählte settings nicht anzeigen lassen können -.- -->
+   <!-- Alternativ doch mit Baukosten anzeigen lassen? Wenns metaressource ist, dann wird diese auch automatisch verbraucht (und nicht wieder zurückgegeben, wie buildpermit bei delete) -->
+    <!-- und in lua kann mann dann einen wert auf 0 setzen durch AddAmount(GetAmount()*-1) und genauso auf 1. -->
+    <!-- das sollte also funktionieren... -->
+    <!-- Probleme: -->
+     <!-- - wir brauchen eine weitere gUID pro Setting für die metaprodukte (kanns auch einmal mit buildpermit testen, aber ich fürchte da gibts race conditions, weil er das ja selbst wieder gutschreibt bei delete) -->
+     <!-- - zu Spiel Beginn wären alle Ressourcen auf 0, wobei eine Menge von 0 hier ja bedeutet, dass es gewählt wurde... -->
+      <!-- Alternativ sagen wir dass -1 gewählt heißt (und 1 offen). Dann wäre zumindest nicht alles aktiv, sondern alles aus an settings. -->
+       <!-- aber wir können halt nicht wie bei den locks sicherstellen, dass direkt zu beginn ein default wert eingestellt ist -->
+    <!-- Abfragen können sollte man das dann mit PlayerCounter GoodsInStock denke ich. -->
+  
+  <!-- ODER: -->
+   <!-- weiterhin mit lock arbeiten, -->
+    <!-- und mit lua script: in lua dann einfach nur regsitertrigger machen, und in diesem trigger wird dadurch dann für jeden Spieler -->
+     <!-- die locks und unhide gemacht -->
+    <!-- Vorteil: wir könnten weiterhin locks verwenden, ohne doffe anzeige und zuverlässiger als mit baukosten. -->
+    <!-- Nachteil: wir brauchen für jede setting eine lua datei und einen eigenen Trigger. -->
+       <!-- theoretisch reicht auch ein einziges lua skript, wenn wir darin prüfen können welches der settingsobjekte -->
+        <!-- gebaut wurde (ProfileCounter) bevor es deleted wird. wir können aber wohl keinen assetpool durchloopen -->
+         <!-- muessen so eine liste der setting guids und dazugehörigen trigger guids also hardcoden in der lua datei -->
+       <!-- das würde den code komplizierter machen und nur den vorteil von weniger lua dateien haben, was nicht so wirklich wichtig ist.. -->
+  
+   <!-- Theoretisch könnte man fürs unhiden auch nen eigenen trigger machen, -->
+    <!-- denn an sich wollen wir ja immer alles was gelocked wird, direkt unhiden (nichts soll locked+unsichtbar sein) -->
+   <!-- also machen wir nen trigger der bei jedem even GUIDLocked prüft und dann direkt nen unhide ausführt. -->
+    <!-- wenn wir das dann sogar mit den pools zum laufen kriegen, kann das lock/unlock mit lua gemacht werden -->
+  <!-- man kann unhide sogar städnig bei jeder aktion aufrufen, da es niemals schadet -->
+  <!-- <Item> -->
+    <!-- <TriggerAction> -->
+      <!-- <Template>ActionUnlockAsset</Template> -->
+      <!-- <Values> -->
+        <!-- <Action /> -->
+        <!-- <ActionUnlockAsset> -->
+          <!-- <UnhideAssets> -->
+            <!-- <Item> -->
+              <!-- <Asset>1500005206</Asset> -->
+            <!-- </Item> -->
+          <!-- </UnhideAssets> -->
+        <!-- </ActionUnlockAsset> -->
+      <!-- </Values> -->
+    <!-- </TriggerAction> -->
+  <!-- </Item> -->
+  
+  
+  <!-- Use an IconFilename that kind of represents your mod here, so users esily know to which mod a button belongs -->
+  <ModOp GUID="114166" Type="addNextSibling">
+
+    <Asset>
+      <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005030</GUID>
+          <Name>ModSettings-Starter-Button - Disasters Mod</Name>
+          <IconFilename>data/graphics_serp/icons/icon_disasters_difficulties.png</IconFilename>
+          <InfoDescription>1500005031</InfoDescription>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500005200</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+        
+        <!-- <BuildPermit> -->
+          <!-- <VisibleWithoutPermits>1</VisibleWithoutPermits> -->
+        <!-- </BuildPermit> -->
+        
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005030</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005036</GUID>
+          <Name>SettingOption: Volcano frequency seldom</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_frequency_seldom.png</IconFilename>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005036</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005037</GUID>
+          <Name>SettingOption: Volcano frequency normal</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_frequency_medium.png</IconFilename>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>1</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005036</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005038</GUID>
+          <Name>SettingOption: Volcano frequency often</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_frequency_often.png</IconFilename>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005036</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005039</GUID>
+          <Name>SettingOption: Volcano duration short</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_duration_easy.png</IconFilename>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005036</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005040</GUID>
+          <Name>SettingOption: Volcano duration normal</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_duration_medium.png</IconFilename>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>1</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005036</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005041</GUID>
+          <Name>SettingOption: Volcano duration long</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_duration_hard.png</IconFilename>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005036</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005042</GUID>
+          <Name>SettingOption: Volcano Disabled eruption</Name>
+          <IconFilename>data/graphics_serp/icons/volcano_eruption_disabled.png</IconFilename>
+        </Standard>
+      </Values>
+    </Asset>
+  
+  </ModOp>
+  
+  
+  <!-- Mod-Settings-Opener -->
+  <ModOp Type="add" GUID="1500005203" Path="/Values/PlayerCounterContextPool/Contexts">
+    <Item>
+      <Asset>1500005030</Asset>
+    </Item>
+  </ModOp>
+  <!-- Mod-Settings-Details -->
+  <ModOp Type="add" GUID="1500005204" Path="/Values/PlayerCounterContextPool/Contexts">
+    <Item>
+      <Asset>1500005036</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005037</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005038</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005039</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005040</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005041</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005042</Asset>
+    </Item>
+  </ModOp>
+  
+  <!-- AssetPool, used in shared mod to delete these button-ships as soon as they are finished -->
+   <!-- Add all your ObjectDummyWithOwner_BuildInShipyard assets here -->
+  <ModOp Type="add" GUID="1500005206" Path="/Values/AssetPool/AssetList">
+    <Item>
+      <Asset>1500005030</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005036</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005037</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005038</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005039</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005040</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005041</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005042</Asset>
+    </Item>
+  </ModOp>
+  <!-- Here only add your Mod-Settings-Opener -->
+  <ModOp Type="add" GUID="1500005209" Path="/Values/ShipyardUpgrade/AddAssemblyOptions">
+    <Item>
+      <NewOption>1500005030</NewOption>
+    </Item>
+  </ModOp>
+  
+  
+  <ModOp Type="AddNextSibling" GUID="190093">
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005031</GUID>
+          <Name>Show All Mod-Settings-Details</Name>
+        </Standard>
+        <ShipyardUpgrade>
+          <AddAssemblyOptions>
+            <Item>
+              <NewOption>1500005036</NewOption>
+            </Item>
+            <Item>
+              <NewOption>1500005037</NewOption>
+            </Item>
+            <Item>
+              <NewOption>1500005038</NewOption>
+            </Item>
+            <Item>
+              <NewOption>1500005039</NewOption>
+            </Item>
+            <Item>
+              <NewOption>1500005040</NewOption>
+            </Item>
+            <Item>
+              <NewOption>1500005041</NewOption>
+            </Item>
+            <Item>
+              <NewOption>1500005042</NewOption>
+            </Item>
+          </AddAssemblyOptions>
+        </ShipyardUpgrade>
+        <CultureUpgrade>
+          <HideBuff>1</HideBuff>
+        </CultureUpgrade>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500005200</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <!-- #################################### -->
+  <!-- Trigger -->
+  <ModOp Type="add" GUID="1500005201" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger[TriggerCondition/Values/ConditionEvent/ContextAsset='1500005202']/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionBuff</Template>
+        <Values>
+          <Action />
+          <ActionBuff>
+            <BuffAsset>1500005031</BuffAsset>
+            <AddBuff>0</AddBuff>
+            <BuffProcessingParticipant>1</BuffProcessingParticipant>
+          </ActionBuff>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  <!-- add your Subtrigger to the DecisionQuest-Start-Trigger -->
+  <!-- For DecisionObjective we need one Quest per Human participant, because decisions taken by one human are also chosen for others otherwise (MP incompatible) -->
+    <!-- Only if each human has its own DecisionQuest-GUID, it works in MP (also dont use AutoShowDecisionScreen!) -->
+    <!-- Therefore we use UnlockNeeded 1500001613 to 1500001616 to check which human it is (using my shared mod WhichPlayerCondition) -->
+  
+  <!--  diesen Teil doch in eigenen Trigger packen, damit ein Fehler eines mods nicht alle anderen mods schrottet. -->
+   <!-- und außerdem wollen wir hier dann PlayerCounter verwenden um alle humans zu prüfen, -->
+    <!-- wobei bei playercounter dann ein reset sinnvoll wäre, nachdem alles deleted wurde -->
+  
+  <!-- important: lock the chosen asset before unlocking others (because of the default-setting trigger, that chooses default if non is locked) -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005032</GUID>
+          <Name>Lock/Unlock Settings and and Sync them for all humans</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500005030</Context>
+                          <CounterAmount>1</CounterAmount>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionAddResource</Template>
+                          <Values>
+                            <Action />
+                            <ActionAddResource>
+                              <Resource>1010017</Resource>
+                              <ResourceAmount>1011</ResourceAmount>
+                            </ActionAddResource>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500005031</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionAlwaysTrue</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                        <ConditionAlwaysTrue />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005036</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005036</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005036</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005036</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionLockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionLockAsset>
+                              <LockAssets>
+                                <Item>
+                                  <Asset>1500005036</Asset>
+                                </Item>
+                              </LockAssets>
+                            </ActionLockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnhideAssets>
+                                <Item>
+                                  <Asset>1500005036</Asset>
+                                </Item>
+                              </UnhideAssets>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500005037</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005038</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005042</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionAlwaysTrue</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                        <ConditionAlwaysTrue />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005037</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005037</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005037</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005037</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionLockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionLockAsset>
+                              <LockAssets>
+                                <Item>
+                                  <Asset>1500005037</Asset>
+                                </Item>
+                              </LockAssets>
+                            </ActionLockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnhideAssets>
+                                <Item>
+                                  <Asset>1500005037</Asset>
+                                </Item>
+                              </UnhideAssets>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500005036</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005038</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005042</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionAlwaysTrue</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                        <ConditionAlwaysTrue />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005038</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005038</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005038</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005038</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionLockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionLockAsset>
+                              <LockAssets>
+                                <Item>
+                                  <Asset>1500005038</Asset>
+                                </Item>
+                              </LockAssets>
+                            </ActionLockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnhideAssets>
+                                <Item>
+                                  <Asset>1500005038</Asset>
+                                </Item>
+                              </UnhideAssets>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500005036</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005037</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005042</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionAlwaysTrue</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                        <ConditionAlwaysTrue />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005039</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005039</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005039</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005039</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionLockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionLockAsset>
+                              <LockAssets>
+                                <Item>
+                                  <Asset>1500005039</Asset>
+                                </Item>
+                              </LockAssets>
+                            </ActionLockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnhideAssets>
+                                <Item>
+                                  <Asset>1500005039</Asset>
+                                </Item>
+                              </UnhideAssets>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500005040</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005041</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005042</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionAlwaysTrue</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                        <ConditionAlwaysTrue />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005040</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005040</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005040</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005040</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionLockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionLockAsset>
+                              <LockAssets>
+                                <Item>
+                                  <Asset>1500005040</Asset>
+                                </Item>
+                              </LockAssets>
+                            </ActionLockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnhideAssets>
+                                <Item>
+                                  <Asset>1500005040</Asset>
+                                </Item>
+                              </UnhideAssets>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500005039</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005041</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005042</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionAlwaysTrue</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                        <ConditionAlwaysTrue />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005041</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005041</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005041</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005041</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionLockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionLockAsset>
+                              <LockAssets>
+                                <Item>
+                                  <Asset>1500005041</Asset>
+                                </Item>
+                              </LockAssets>
+                            </ActionLockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnhideAssets>
+                                <Item>
+                                  <Asset>1500005041</Asset>
+                                </Item>
+                              </UnhideAssets>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500005039</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005040</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005042</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionAlwaysTrue</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                        <ConditionAlwaysTrue />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005042</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005042</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005042</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <Context>1500005042</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionLockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionLockAsset>
+                              <LockAssets>
+                                <Item>
+                                  <Asset>1500005042</Asset>
+                                </Item>
+                              </LockAssets>
+                            </ActionLockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnhideAssets>
+                                <Item>
+                                  <Asset>1500005042</Asset>
+                                </Item>
+                              </UnhideAssets>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500005036</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005037</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005038</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005039</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005040</Asset>
+                                </Item>
+                                <Item>
+                                  <Asset>1500005041</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionAlwaysTrue</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+                <SubTriggers>
+                  <!-- check Human1 ist immer UNWAHR wenn Human1 nie Teil des spiels war, egal was geprüft wird! -->
+                   <!-- ConditionIsParticipantInGame prüft nur ob jemand beim Start Spiel war und auch nur StartSession (180023) -->
+                    <!-- aber zum prüfen für human reicht das -->
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionAlwaysTrue</Template>
+                            <Values>
+                              <Condition>
+                                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                              </Condition>
+                              <ConditionAlwaysTrue />
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human0</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable>
+                                          <NegateCondition>1</NegateCondition>
+                                        </ConditionPropsNegatable>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human0</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable />
+                                      </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers>
+                                      <Item>
+                                        <SubTrigger>
+                                          <Template>AutoCreateTrigger</Template>
+                                          <Values>
+                                            <Trigger>
+                                              <TriggerCondition>
+                                                <Template>ConditionPlayerCounter</Template>
+                                                <Values>
+                                                  <Condition />
+                                                  <ConditionPlayerCounter>
+                                                    <Context>1500005203</Context>
+                                                    <CounterAmount>0</CounterAmount>
+                                                    <ComparisonOp>AtMost</ComparisonOp>
+                                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                                  </ConditionPlayerCounter>
+                                                </Values>
+                                              </TriggerCondition>
+                                            </Trigger>
+                                          </Values>
+                                        </SubTrigger>
+                                      </Item>
+                                    </SubTriggers>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionAlwaysTrue</Template>
+                            <Values>
+                              <Condition>
+                                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                              </Condition>
+                              <ConditionAlwaysTrue />
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human1</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable>
+                                          <NegateCondition>1</NegateCondition>
+                                        </ConditionPropsNegatable>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human1</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable />
+                                      </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers>
+                                      <Item>
+                                        <SubTrigger>
+                                          <Template>AutoCreateTrigger</Template>
+                                          <Values>
+                                            <Trigger>
+                                              <TriggerCondition>
+                                                <Template>ConditionPlayerCounter</Template>
+                                                <Values>
+                                                  <Condition />
+                                                  <ConditionPlayerCounter>
+                                                    <Context>1500005203</Context>
+                                                    <CounterAmount>0</CounterAmount>
+                                                    <ComparisonOp>AtMost</ComparisonOp>
+                                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                                  </ConditionPlayerCounter>
+                                                </Values>
+                                              </TriggerCondition>
+                                            </Trigger>
+                                          </Values>
+                                        </SubTrigger>
+                                      </Item>
+                                    </SubTriggers>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionAlwaysTrue</Template>
+                            <Values>
+                              <Condition>
+                                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                              </Condition>
+                              <ConditionAlwaysTrue />
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human2</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable>
+                                          <NegateCondition>1</NegateCondition>
+                                        </ConditionPropsNegatable>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human2</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable />
+                                      </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers>
+                                      <Item>
+                                        <SubTrigger>
+                                          <Template>AutoCreateTrigger</Template>
+                                          <Values>
+                                            <Trigger>
+                                              <TriggerCondition>
+                                                <Template>ConditionPlayerCounter</Template>
+                                                <Values>
+                                                  <Condition />
+                                                  <ConditionPlayerCounter>
+                                                    <Context>1500005203</Context>
+                                                    <CounterAmount>0</CounterAmount>
+                                                    <ComparisonOp>AtMost</ComparisonOp>
+                                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                                  </ConditionPlayerCounter>
+                                                </Values>
+                                              </TriggerCondition>
+                                            </Trigger>
+                                          </Values>
+                                        </SubTrigger>
+                                      </Item>
+                                    </SubTriggers>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionAlwaysTrue</Template>
+                            <Values>
+                              <Condition>
+                                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                              </Condition>
+                              <ConditionAlwaysTrue />
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human3</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable>
+                                          <NegateCondition>1</NegateCondition>
+                                        </ConditionPropsNegatable>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human3</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable />
+                                      </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers>
+                                      <Item>
+                                        <SubTrigger>
+                                          <Template>AutoCreateTrigger</Template>
+                                          <Values>
+                                            <Trigger>
+                                              <TriggerCondition>
+                                                <Template>ConditionPlayerCounter</Template>
+                                                <Values>
+                                                  <Condition />
+                                                  <ConditionPlayerCounter>
+                                                    <Context>1500005203</Context>
+                                                    <CounterAmount>0</CounterAmount>
+                                                    <ComparisonOp>AtMost</ComparisonOp>
+                                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                                  </ConditionPlayerCounter>
+                                                </Values>
+                                              </TriggerCondition>
+                                            </Trigger>
+                                          </Values>
+                                        </SubTrigger>
+                                      </Item>
+                                    </SubTriggers>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionAlwaysTrue</Template>
+                            <Values>
+                              <Condition>
+                                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                              </Condition>
+                              <ConditionAlwaysTrue />
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human0</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable>
+                                          <NegateCondition>1</NegateCondition>
+                                        </ConditionPropsNegatable>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human0</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable />
+                                      </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers>
+                                      <Item>
+                                        <SubTrigger>
+                                          <Template>AutoCreateTrigger</Template>
+                                          <Values>
+                                            <Trigger>
+                                              <TriggerCondition>
+                                                <Template>ConditionPlayerCounter</Template>
+                                                <Values>
+                                                  <Condition />
+                                                  <ConditionPlayerCounter>
+                                                    <Context>1500005204</Context>
+                                                    <CounterAmount>0</CounterAmount>
+                                                    <ComparisonOp>AtMost</ComparisonOp>
+                                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                                  </ConditionPlayerCounter>
+                                                </Values>
+                                              </TriggerCondition>
+                                            </Trigger>
+                                          </Values>
+                                        </SubTrigger>
+                                      </Item>
+                                    </SubTriggers>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionAlwaysTrue</Template>
+                            <Values>
+                              <Condition>
+                                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                              </Condition>
+                              <ConditionAlwaysTrue />
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human1</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable>
+                                          <NegateCondition>1</NegateCondition>
+                                        </ConditionPropsNegatable>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human1</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable />
+                                      </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers>
+                                      <Item>
+                                        <SubTrigger>
+                                          <Template>AutoCreateTrigger</Template>
+                                          <Values>
+                                            <Trigger>
+                                              <TriggerCondition>
+                                                <Template>ConditionPlayerCounter</Template>
+                                                <Values>
+                                                  <Condition />
+                                                  <ConditionPlayerCounter>
+                                                    <Context>1500005204</Context>
+                                                    <CounterAmount>0</CounterAmount>
+                                                    <ComparisonOp>AtMost</ComparisonOp>
+                                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                                  </ConditionPlayerCounter>
+                                                </Values>
+                                              </TriggerCondition>
+                                            </Trigger>
+                                          </Values>
+                                        </SubTrigger>
+                                      </Item>
+                                    </SubTriggers>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionAlwaysTrue</Template>
+                            <Values>
+                              <Condition>
+                                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                              </Condition>
+                              <ConditionAlwaysTrue />
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human2</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable>
+                                          <NegateCondition>1</NegateCondition>
+                                        </ConditionPropsNegatable>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human2</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable />
+                                      </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers>
+                                      <Item>
+                                        <SubTrigger>
+                                          <Template>AutoCreateTrigger</Template>
+                                          <Values>
+                                            <Trigger>
+                                              <TriggerCondition>
+                                                <Template>ConditionPlayerCounter</Template>
+                                                <Values>
+                                                  <Condition />
+                                                  <ConditionPlayerCounter>
+                                                    <Context>1500005204</Context>
+                                                    <CounterAmount>0</CounterAmount>
+                                                    <ComparisonOp>AtMost</ComparisonOp>
+                                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                                  </ConditionPlayerCounter>
+                                                </Values>
+                                              </TriggerCondition>
+                                            </Trigger>
+                                          </Values>
+                                        </SubTrigger>
+                                      </Item>
+                                    </SubTriggers>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionAlwaysTrue</Template>
+                            <Values>
+                              <Condition>
+                                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                              </Condition>
+                              <ConditionAlwaysTrue />
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human3</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable>
+                                          <NegateCondition>1</NegateCondition>
+                                        </ConditionPropsNegatable>
+                                      </Values>
+                                    </TriggerCondition>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionIsParticipantInGame</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionIsParticipantInGame>
+                                          <InGameParticipant>Human3</InGameParticipant>
+                                        </ConditionIsParticipantInGame>
+                                        <ConditionPropsNegatable />
+                                      </Values>
+                                    </TriggerCondition>
+                                    <SubTriggers>
+                                      <Item>
+                                        <SubTrigger>
+                                          <Template>AutoCreateTrigger</Template>
+                                          <Values>
+                                            <Trigger>
+                                              <TriggerCondition>
+                                                <Template>ConditionPlayerCounter</Template>
+                                                <Values>
+                                                  <Condition />
+                                                  <ConditionPlayerCounter>
+                                                    <Context>1500005204</Context>
+                                                    <CounterAmount>0</CounterAmount>
+                                                    <ComparisonOp>AtMost</ComparisonOp>
+                                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                                  </ConditionPlayerCounter>
+                                                </Values>
+                                              </TriggerCondition>
+                                            </Trigger>
+                                          </Values>
+                                        </SubTrigger>
+                                      </Item>
+                                    </SubTriggers>
+                                  </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005033</GUID>
+          <Name>Choose-Default-Settings</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionAlwaysTrue</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionAlwaysTrue />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <!-- to make sure all of the following conditions are true at the same time, they each must have their own SubTriggers -->
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500005036</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <SubTriggers>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500005037</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <SubTriggers>
+                                          <Item>
+                                            <SubTrigger>
+                                              <Template>AutoCreateTrigger</Template>
+                                              <Values>
+                                                <Trigger>
+                                                  <TriggerCondition>
+                                                    <Template>ConditionUnlocked</Template>
+                                                    <Values>
+                                                      <Condition />
+                                                      <ConditionUnlocked>
+                                                        <UnlockNeeded>1500005038</UnlockNeeded>
+                                                      </ConditionUnlocked>
+                                                      <ConditionPropsNegatable />
+                                                    </Values>
+                                                  </TriggerCondition>
+                                                  <SubTriggers>
+                                                    <Item>
+                                                      <SubTrigger>
+                                                        <Template>AutoCreateTrigger</Template>
+                                                        <Values>
+                                                          <Trigger>
+                                                            <TriggerCondition>
+                                                              <Template>ConditionUnlocked</Template>
+                                                              <Values>
+                                                                <Condition />
+                                                                <ConditionUnlocked>
+                                                                  <UnlockNeeded>1500005042</UnlockNeeded>
+                                                                </ConditionUnlocked>
+                                                                <ConditionPropsNegatable />
+                                                              </Values>
+                                                            </TriggerCondition>
+                                                            <TriggerActions>
+                                                              <Item>
+                                                                <TriggerAction>
+                                                                  <Template>ActionLockAsset</Template>
+                                                                  <Values>
+                                                                    <Action />
+                                                                    <ActionLockAsset>
+                                                                      <LockAssets>
+                                                                        <Item>
+                                                                          <Asset>1500005037</Asset>
+                                                                        </Item>
+                                                                      </LockAssets>
+                                                                    </ActionLockAsset>
+                                                                  </Values>
+                                                                </TriggerAction>
+                                                              </Item>
+                                                              <Item>
+                                                                <TriggerAction>
+                                                                  <Template>ActionUnlockAsset</Template>
+                                                                  <Values>
+                                                                    <Action />
+                                                                    <ActionUnlockAsset>
+                                                                      <UnhideAssets>
+                                                                        <Item>
+                                                                          <Asset>1500005037</Asset>
+                                                                        </Item>
+                                                                      </UnhideAssets>
+                                                                    </ActionUnlockAsset>
+                                                                  </Values>
+                                                                </TriggerAction>
+                                                              </Item>
+                                                            </TriggerActions>
+                                                         </Trigger>
+                                                        </Values>
+                                                      </SubTrigger>
+                                                    </Item>
+                                                  </SubTriggers>
+                                               </Trigger>
+                                              </Values>
+                                            </SubTrigger>
+                                          </Item>
+                                        </SubTriggers>
+                                     </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                              </SubTriggers>
+                           </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionAlwaysTrue</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionAlwaysTrue />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <!-- to make sure all of the following conditions are true at the same time, they each must have their own SubTriggers -->
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1500005039</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <SubTriggers>
+                                <Item>
+                                  <SubTrigger>
+                                    <Template>AutoCreateTrigger</Template>
+                                    <Values>
+                                      <Trigger>
+                                        <TriggerCondition>
+                                          <Template>ConditionUnlocked</Template>
+                                          <Values>
+                                            <Condition />
+                                            <ConditionUnlocked>
+                                              <UnlockNeeded>1500005040</UnlockNeeded>
+                                            </ConditionUnlocked>
+                                            <ConditionPropsNegatable />
+                                          </Values>
+                                        </TriggerCondition>
+                                        <SubTriggers>
+                                          <Item>
+                                            <SubTrigger>
+                                              <Template>AutoCreateTrigger</Template>
+                                              <Values>
+                                                <Trigger>
+                                                  <TriggerCondition>
+                                                    <Template>ConditionUnlocked</Template>
+                                                    <Values>
+                                                      <Condition />
+                                                      <ConditionUnlocked>
+                                                        <UnlockNeeded>1500005041</UnlockNeeded>
+                                                      </ConditionUnlocked>
+                                                      <ConditionPropsNegatable />
+                                                    </Values>
+                                                  </TriggerCondition>
+                                                  <SubTriggers>
+                                                    <Item>
+                                                      <SubTrigger>
+                                                        <Template>AutoCreateTrigger</Template>
+                                                        <Values>
+                                                          <Trigger>
+                                                            <TriggerCondition>
+                                                              <Template>ConditionUnlocked</Template>
+                                                              <Values>
+                                                                <Condition />
+                                                                <ConditionUnlocked>
+                                                                  <UnlockNeeded>1500005042</UnlockNeeded>
+                                                                </ConditionUnlocked>
+                                                                <ConditionPropsNegatable />
+                                                              </Values>
+                                                            </TriggerCondition>
+                                                            <TriggerActions>
+                                                              <Item>
+                                                                <TriggerAction>
+                                                                  <Template>ActionLockAsset</Template>
+                                                                  <Values>
+                                                                    <Action />
+                                                                    <ActionLockAsset>
+                                                                      <LockAssets>
+                                                                        <Item>
+                                                                          <Asset>1500005040</Asset>
+                                                                        </Item>
+                                                                      </LockAssets>
+                                                                    </ActionLockAsset>
+                                                                  </Values>
+                                                                </TriggerAction>
+                                                              </Item>
+                                                              <Item>
+                                                                <TriggerAction>
+                                                                  <Template>ActionUnlockAsset</Template>
+                                                                  <Values>
+                                                                    <Action />
+                                                                    <ActionUnlockAsset>
+                                                                      <UnhideAssets>
+                                                                        <Item>
+                                                                          <Asset>1500005040</Asset>
+                                                                        </Item>
+                                                                      </UnhideAssets>
+                                                                    </ActionUnlockAsset>
+                                                                  </Values>
+                                                                </TriggerAction>
+                                                              </Item>
+                                                            </TriggerActions>
+                                                         </Trigger>
+                                                        </Values>
+                                                      </SubTrigger>
+                                                    </Item>
+                                                  </SubTriggers>
+                                               </Trigger>
+                                              </Values>
+                                            </SubTrigger>
+                                          </Item>
+                                        </SubTriggers>
+                                     </Trigger>
+                                    </Values>
+                                  </SubTrigger>
+                                </Item>
+                              </SubTriggers>
+                           </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionAlwaysTrue</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    
+  </ModOp>
+  
+  
+  
+
+</ModOps>

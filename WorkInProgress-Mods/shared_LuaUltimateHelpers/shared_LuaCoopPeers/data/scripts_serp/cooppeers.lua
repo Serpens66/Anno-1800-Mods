@@ -35,6 +35,8 @@ if CoopCount_Serp==nil then
   console.startScript("data/scripts_coophelper_serp/coopcount.lua")
 end
 
+-- TODO: hier mit neuem Wissen und PeersInfo überarbeiten und die CoopCount funktionen hierein übertragen
+
 -- call this function within a coroutine, eg. system.start(function()...end) code
  -- if CoopPeers_Serp.ImFirstActiveCoopPeer is still nil. to wait for it to be initialized before continuing
 local function GetWait_ImFirstActiveCoopPeer()
@@ -93,5 +95,6 @@ CoopPeers_Serp = CoopPeers_Serp or {
   GetWait_ImFirstActiveCoopPeer = GetWait_ImFirstActiveCoopPeer,
   GetWait_ImFirstCoopPeerInSession = GetWait_ImFirstCoopPeerInSession,
   PeerInt = nil, -- to get username use: ts.Online.GetUsername(CoopPeers_Serp.PeerInt)
-  ImFirstActiveCoopPeer = nil
+  ImFirstActiveCoopPeer = nil,
+  PeersInfo = {ActivePeers={},InactivePeers={},NeverActivePeers={}},
 }

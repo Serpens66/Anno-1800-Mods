@@ -1,11 +1,67 @@
 <ModOps>
   
-  <!-- Serp GUIDs 1500004620 to 1500004629 (1500004629 noch frei) -->
+  <!-- Serp GUIDs 1500004620 to 1500004629 -->
 
   <!-- Mix of savestuff and objectfinder xml, since they both have similar code, saves GUIDs -->
 
-  <!-- TODO: hier auch noch 4 nameables zufügen, die fürs teilen von infos zwischen den 4 humans genutzt werden können -->
-   <!-- (1500004621 bis 1500004624) -->
+  
+  
+  <!-- You can add your own nameable helpers to Trigger 1500004628 -->
+     <!-- as Subtrigger eg (only replac the GUID 1500004625 in exmaple, nothing more): -->
+     <!-- <Item> -->
+        <!-- <SubTrigger> -->
+          <!-- <Template>AutoCreateTrigger</Template> -->
+          <!-- <Values> -->
+            <!-- <Trigger> -->
+              <!-- <TriggerCondition> -->
+                <!-- <Template>ConditionPlayerCounter</Template> -->
+                <!-- <Values> -->
+                  <!-- <Condition> -->
+                    <!-- <IsOptional>1</IsOptional> -->
+                  <!-- </Condition> -->
+                  <!-- <ConditionPlayerCounter> -->
+                    <!-- <Context>1500004625</Context> -->
+                    <!-- <CounterAmount>0</CounterAmount> -->
+                    <!-- <ComparisonOp>AtMost</ComparisonOp> -->
+                    <!-- <CheckSpecificParticipant>Third_party_01_Queen</CheckSpecificParticipant> -->
+                    <!-- <CheckedParticipant>Third_party_01_Queen</CheckedParticipant> -->
+                  <!-- </ConditionPlayerCounter> -->
+                <!-- </Values> -->
+              <!-- </TriggerCondition> -->
+              <!-- <TriggerActions> -->
+                <!-- <Item> -->
+                  <!-- <TriggerAction> -->
+                    <!-- <Template>ActionSpawnObjects</Template> -->
+                    <!-- <Values> -->
+                      <!-- <Action /> -->
+                      <!-- <ActionSpawnObjects> -->
+                        <!-- <SpawnGUID>1500004625</SpawnGUID> -->
+                        <!-- <Amount>1</Amount> -->
+                        <!-- <Owner>Third_party_01_Queen</Owner> -->
+                      <!-- </ActionSpawnObjects> -->
+                      <!-- <SpawnArea> -->
+                        <!-- <DistanceToBorder>Near</DistanceToBorder> -->
+                        <!-- <DistanceToIsland>Far</DistanceToIsland> -->
+                      <!-- </SpawnArea> -->
+                      <!-- <SessionFilter> -->
+                        <!-- <Sessions> -->
+                          <!-- <Item> -->
+                            <!-- <Session>180023</Session> -->
+                          <!-- </Item> -->
+                        <!-- </Sessions> -->
+                      <!-- </SessionFilter> -->
+                    <!-- </Values> -->
+                  <!-- </TriggerAction> -->
+                <!-- </Item> -->
+              <!-- </TriggerActions> -->
+            <!-- </Trigger> -->
+          <!-- </Values> -->
+        <!-- </SubTrigger> -->
+      <!-- </Item> -->
+   <!-- And your own help-quest that spawns your nameable helper as subtrigger to trigger 1500004626 -->
+  
+  
+  <!-- ####################################################################################### -->
  
  <!-- Zum Laden es wäre einfacher das helper schiff in jeder session zu haben, weil man dann über geProperty gehen kann, egal in welcher sessinon das schiff ist. -->
   <!-- aber das spawnen in jeder session einmalig ist der komplizierte Teil, besonders in Multiplayer da UseCurrentSession nur in session von coopleader spawnen kann -->
@@ -130,6 +186,50 @@
     <!-- it does not matter for us which session though -->
    <!-- we have to check SessionEnter first, because with alwaystrue the trigger fires before we are in the session, which makes the Spawn AllowProcessingSession fail.. -->
   <ModOp GUID="153271" Type="AddNextSibling">
+    
+    <!-- first time register on sessionenter, so the other trigger can use alwaystrue, while still only ever triggering after session was finally entered -->
+     <!-- (will reset on SessionEnter which allows other mods to add their nameables into the trigger, since on reset possibly new code is used) -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004629</GUID>
+          <Name>First Register on SessionEnter</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>SessionEnter</ConditionEvent>
+                <ContextAssetInfolayer>0</ContextAssetInfolayer>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004628</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
     <!-- first try to spawn in old world session. knowing the session makes searching for this helper object faster -->
     <!-- should be enough to spawn it only for Human0 (unlock 1500001613) -->
      <!-- and is enough to only check ConditionPlayerCounter for 1500004625, not the other helpers, because if one fails, all will fail -->
@@ -142,14 +242,10 @@
         </Standard>
         <Trigger>
           <TriggerCondition>
-            <Template>ConditionEvent</Template>
+            <Template>ConditionAlwaysTrue</Template>
             <Values>
               <Condition />
-              <ConditionEvent>
-                <ConditionEvent>SessionEnter</ConditionEvent>
-                <ContextAssetInfolayer>0</ContextAssetInfolayer>
-              </ConditionEvent>
-              <ConditionPropsNegatable />
+              <ConditionAlwaysTrue />
             </Values>
           </TriggerCondition>
           <SubTriggers>
@@ -177,14 +273,195 @@
                               <TriggerCondition>
                                 <Template>ConditionPlayerCounter</Template>
                                 <Values>
-                                  <Condition />
+                                  <Condition>
+                                    <IsOptional>1</IsOptional>
+                                  </Condition>
                                   <ConditionPlayerCounter>
                                     <Context>1500004625</Context>
                                     <CounterAmount>0</CounterAmount>
                                     <ComparisonOp>AtMost</ComparisonOp>
+                                    <CheckSpecificParticipant>Third_party_01_Queen</CheckSpecificParticipant>
+                                    <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
                                   </ConditionPlayerCounter>
                                 </Values>
                               </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionSpawnObjects</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionSpawnObjects>
+                                        <SpawnGUID>1500004625</SpawnGUID>
+                                        <Amount>1</Amount>
+                                        <Owner>Third_party_01_Queen</Owner>
+                                      </ActionSpawnObjects>
+                                      <SpawnArea>
+                                        <DistanceToBorder>Near</DistanceToBorder>
+                                        <DistanceToIsland>Far</DistanceToIsland>
+                                      </SpawnArea>
+                                      <SessionFilter>
+                                        <Sessions>
+                                          <Item>
+                                            <Session>180023</Session>
+                                          </Item>
+                                        </Sessions>
+                                      </SessionFilter>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionSpawnObjects</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionSpawnObjects>
+                                        <SpawnGUID>1500004620</SpawnGUID>
+                                        <Amount>1</Amount>
+                                        <Owner>Third_party_01_Queen</Owner>
+                                      </ActionSpawnObjects>
+                                      <SpawnArea>
+                                        <DistanceToBorder>Near</DistanceToBorder>
+                                        <DistanceToIsland>Far</DistanceToIsland>
+                                      </SpawnArea>
+                                      <SessionFilter>
+                                        <Sessions>
+                                          <Item>
+                                            <Session>180023</Session>
+                                          </Item>
+                                        </Sessions>
+                                      </SessionFilter>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionSpawnObjects</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionSpawnObjects>
+                                        <SpawnGUID>1500004621</SpawnGUID>
+                                        <Amount>1</Amount>
+                                        <Owner>Third_party_01_Queen</Owner>
+                                      </ActionSpawnObjects>
+                                      <SpawnArea>
+                                        <DistanceToBorder>Near</DistanceToBorder>
+                                        <DistanceToIsland>Far</DistanceToIsland>
+                                      </SpawnArea>
+                                      <SessionFilter>
+                                        <Sessions>
+                                          <Item>
+                                            <Session>180023</Session>
+                                          </Item>
+                                        </Sessions>
+                                      </SessionFilter>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionSpawnObjects</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionSpawnObjects>
+                                        <SpawnGUID>1500004622</SpawnGUID>
+                                        <Amount>1</Amount>
+                                        <Owner>Third_party_01_Queen</Owner>
+                                      </ActionSpawnObjects>
+                                      <SpawnArea>
+                                        <DistanceToBorder>Near</DistanceToBorder>
+                                        <DistanceToIsland>Far</DistanceToIsland>
+                                      </SpawnArea>
+                                      <SessionFilter>
+                                        <Sessions>
+                                          <Item>
+                                            <Session>180023</Session>
+                                          </Item>
+                                        </Sessions>
+                                      </SessionFilter>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionSpawnObjects</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionSpawnObjects>
+                                        <SpawnGUID>1500004623</SpawnGUID>
+                                        <Amount>1</Amount>
+                                        <Owner>Third_party_01_Queen</Owner>
+                                      </ActionSpawnObjects>
+                                      <SpawnArea>
+                                        <DistanceToBorder>Near</DistanceToBorder>
+                                        <DistanceToIsland>Far</DistanceToIsland>
+                                      </SpawnArea>
+                                      <SessionFilter>
+                                        <Sessions>
+                                          <Item>
+                                            <Session>180023</Session>
+                                          </Item>
+                                        </Sessions>
+                                      </SessionFilter>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionSpawnObjects</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionSpawnObjects>
+                                        <SpawnGUID>1500004624</SpawnGUID>
+                                        <Amount>1</Amount>
+                                        <Owner>Third_party_01_Queen</Owner>
+                                      </ActionSpawnObjects>
+                                      <SpawnArea>
+                                        <DistanceToBorder>Near</DistanceToBorder>
+                                        <DistanceToIsland>Far</DistanceToIsland>
+                                      </SpawnArea>
+                                      <SessionFilter>
+                                        <Sessions>
+                                          <Item>
+                                            <Session>180023</Session>
+                                          </Item>
+                                        </Sessions>
+                                      </SessionFilter>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionDelayedActions</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionDelayedActions>
+                                        <ExecutionDelay>1200</ExecutionDelay>
+                                        <DelayedActions>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionExecuteScript</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionExecuteScript>
+                                                        <ScriptFileName>data/scripts_serp/objectfinder/save_helper_oid.lua</ScriptFileName>
+                                                      </ActionExecuteScript>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </DelayedActions>
+                                      </ActionDelayedActions>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
                             </Trigger>
                           </Values>
                         </SubTrigger>
@@ -196,181 +473,6 @@
             </Item>
           </SubTriggers>
           <TriggerActions>
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004625</SpawnGUID>
-                    <Amount>1</Amount>
-                    <Owner>Third_party_01_Queen</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <DistanceToBorder>Near</DistanceToBorder>
-                    <DistanceToIsland>Far</DistanceToIsland>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <Sessions>
-                      <Item>
-                        <Session>180023</Session>
-                      </Item>
-                    </Sessions>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004620</SpawnGUID>
-                    <Amount>1</Amount>
-                    <Owner>Third_party_01_Queen</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <DistanceToBorder>Near</DistanceToBorder>
-                    <DistanceToIsland>Far</DistanceToIsland>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <Sessions>
-                      <Item>
-                        <Session>180023</Session>
-                      </Item>
-                    </Sessions>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004621</SpawnGUID>
-                    <Amount>1</Amount>
-                    <Owner>Third_party_01_Queen</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <DistanceToBorder>Near</DistanceToBorder>
-                    <DistanceToIsland>Far</DistanceToIsland>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <Sessions>
-                      <Item>
-                        <Session>180023</Session>
-                      </Item>
-                    </Sessions>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004622</SpawnGUID>
-                    <Amount>1</Amount>
-                    <Owner>Third_party_01_Queen</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <DistanceToBorder>Near</DistanceToBorder>
-                    <DistanceToIsland>Far</DistanceToIsland>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <Sessions>
-                      <Item>
-                        <Session>180023</Session>
-                      </Item>
-                    </Sessions>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004623</SpawnGUID>
-                    <Amount>1</Amount>
-                    <Owner>Third_party_01_Queen</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <DistanceToBorder>Near</DistanceToBorder>
-                    <DistanceToIsland>Far</DistanceToIsland>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <Sessions>
-                      <Item>
-                        <Session>180023</Session>
-                      </Item>
-                    </Sessions>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionSpawnObjects</Template>
-                <Values>
-                  <Action />
-                  <ActionSpawnObjects>
-                    <SpawnGUID>1500004624</SpawnGUID>
-                    <Amount>1</Amount>
-                    <Owner>Third_party_01_Queen</Owner>
-                  </ActionSpawnObjects>
-                  <SpawnArea>
-                    <DistanceToBorder>Near</DistanceToBorder>
-                    <DistanceToIsland>Far</DistanceToIsland>
-                  </SpawnArea>
-                  <SessionFilter>
-                    <Sessions>
-                      <Item>
-                        <Session>180023</Session>
-                      </Item>
-                    </Sessions>
-                  </SessionFilter>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>1200</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionExecuteScript</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionExecuteScript>
-                                    <ScriptFileName>data/scripts_serp/objectfinder/save_helper_oid.lua</ScriptFileName>
-                                  </ActionExecuteScript>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
             <Item>
               <TriggerAction>
                 <Template>ActionDelayedActions</Template>
@@ -403,9 +505,27 @@
               </TriggerAction>
             </Item>
           </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionEvent</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionEvent>
+                      <ConditionEvent>SessionEnter</ConditionEvent>
+                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                    </ConditionEvent>
+                    <ConditionPropsNegatable />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
         <TriggerSetup>
-          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
           <UsedBySecondParties>0</UsedBySecondParties>
         </TriggerSetup>
       </Values>
@@ -422,68 +542,52 @@
         </Standard>
         <Trigger>
           <TriggerCondition>
-            <Template>ConditionPlayerCounter</Template>
+            <Template>ConditionAlwaysTrue</Template>
             <Values>
               <Condition />
-              <ConditionPlayerCounter>
-                <Context>1500004625</Context>
-                <CounterAmount>0</CounterAmount>
-                <ComparisonOp>AtMost</ComparisonOp>
-              </ConditionPlayerCounter>
+              <ConditionAlwaysTrue />
             </Values>
           </TriggerCondition>
-          <TriggerActions>
+          <SubTriggers>
             <Item>
-              <TriggerAction>
-                <Template>ActionStartQuest</Template>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
                 <Values>
-                  <Action />
-                  <ActionStartQuest>
-                    <Quest>1500004627</Quest>
-                    <UseCurrentSession>1</UseCurrentSession>
-                  </ActionStartQuest>
+                  <Trigger>
+                    <TriggerCondition>
+                    <Template>ConditionPlayerCounter</Template>
+                    <Values>
+                      <Condition>
+                        <IsOptional>1</IsOptional>
+                      </Condition>
+                      <ConditionPlayerCounter>
+                        <Context>1500004625</Context>
+                        <CounterAmount>0</CounterAmount>
+                        <ComparisonOp>AtMost</ComparisonOp>
+                      </ConditionPlayerCounter>
+                      <CheckSpecificParticipant>Third_party_01_Queen</CheckSpecificParticipant>
+                      <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
+                    </Values>
+                  </TriggerCondition>
+                  <TriggerActions>
+                    <Item>
+                      <TriggerAction>
+                        <Template>ActionStartQuest</Template>
+                        <Values>
+                          <Action />
+                          <ActionStartQuest>
+                            <Quest>1500004627</Quest>
+                            <UseCurrentSession>1</UseCurrentSession>
+                          </ActionStartQuest>
+                        </Values>
+                      </TriggerAction>
+                    </Item>
+                  </TriggerActions>
+                  </Trigger>
                 </Values>
-              </TriggerAction>
+              </SubTrigger>
             </Item>
-          </TriggerActions>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerCondition>
-                  <Template>ConditionTimer</Template>
-                  <Values>
-                    <Condition />
-                    <ConditionTimer>
-                      <TimeLimit>30000</TimeLimit>
-                    </ConditionTimer>
-                  </Values>
-                </TriggerCondition>
-                <SubTriggers>
-                  <Item>
-                    <SubTrigger>
-                      <Template>AutoCreateTrigger</Template>
-                      <Values>
-                        <Trigger>
-                          <TriggerCondition>
-                            <Template>ConditionPlayerCounter</Template>
-                            <Values>
-                              <Condition />
-                              <ConditionPlayerCounter>
-                                <Context>1500004625</Context>
-                                <CounterAmount>0</CounterAmount>
-                                <ComparisonOp>AtMost</ComparisonOp>
-                              </ConditionPlayerCounter>
-                            </Values>
-                          </TriggerCondition>
-                        </Trigger>
-                      </Values>
-                    </SubTrigger>
-                  </Item>
-                </SubTriggers>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
+          </SubTriggers>
         </Trigger>
         <TriggerSetup>
           <AutoRegisterTrigger>0</AutoRegisterTrigger>

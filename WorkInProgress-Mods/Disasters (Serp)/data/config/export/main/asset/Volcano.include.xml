@@ -15,7 +15,27 @@
     <!-- (und rausfinden, ob man die Debriss Objekte da auch definieren kann, die default Dinger sehen scheiße aus, vermutlich wird "data\graphics\effects\debris\debris01.cfg" oderso in den cfg dateien vorkommen) -->
   
   
+  <!-- Projektil vom vulkan: -->
+   <!-- aktuelle feuerbälle, gemixt mit ~15% sehr großen feuersteinen, deren explosion dann so aussieht wie die vom mortar auf wasser (projectile_mortar_01) -->
   
+  <!-- Info: -->
+  <!-- projectile explosion on land fix: -->
+   <!-- in the cfg and ifo file is <SequenceID>2410</SequenceID> and <Sequence> <Id>2410</Id> for misswater -->
+    <!-- found in GlobalBalancing GUID 2001270 SequenceIDs. 2411 is missland -->
+    <!-- while all prjectiles with Exploder property seems to always "miss", at least at land -->
+   <!-- ParticleID and Condition are not globally defined, but it seems per model , but not really sure yet how to find out -->
+  <!-- man kann aufjedenfall aus derselben cfg Teile von 2400 kopieren und ein 2411 draus machen, damits dieeslbe aniation auf land gibt. -->
+   <!-- nur feuerball  hat in vanilla auch kein watersplash, den müsste man von woanders noch reinkopieren, aber da hat man das rpoblem von partcielid -->
+  <!-- Water Splash: -->
+    <!-- das Prjojektil führt durch Exploder nur noch misswater und missland Animationen aus, aber treffen/zielen tut es immernoch -->
+     <!-- die hitmetal usw. targets von den Gebäuden. Das hat zur Folge wenn man einen Water-Splash auf Wasser haben will, dass man diesen auch -->
+      <!-- bekommt, wenn ein hohes Hafengebäude getroffen wird, dann spielst es auch die splash animation in der luft ab .. -->
+    <!-- Deshalb wohl kein splash nehmen... -->
+  
+  
+    <!-- rausfinden ob und wie einschlagende projektile tiere verschrecken können... -->
+     <!-- ich glaub beste option is SpawnImpactObject, welches in Blocking+DeletePropsRadius hat (um bäume zu entfernen und evlt selbst brennende bäume animation hat) -->
+      <!-- und SuppressDangerToAnimals=0, damit tiere vor weglaufen -->
   
   <ModOp Type="AddNextSibling" GUID='132370'>
     
@@ -49,6 +69,7 @@
           <!-- <MeshPlacement>IgnoreTerrain</MeshPlacement> -->
         </Mesh>
         
+        <MetaPersistent />
         <Blocking />
         <UpgradeList>
           <!-- DefaultBuff does not accept a EffectContainer... -->
@@ -271,7 +292,7 @@
           <AttackRange>0</AttackRange>
           <!-- <AttackRange>12</AttackRange> -->
           <!-- <BaseDamage>50</BaseDamage> -->
-          <BaseDamage>10</BaseDamage>
+          <BaseDamage>20</BaseDamage>
           <ReloadTime>50</ReloadTime>
           <ProjectileAsset>1500004646</ProjectileAsset>
           <!-- <ProjectileAsset>1500001439</ProjectileAsset> -->
@@ -279,10 +300,10 @@
           <MuzzleEffectAssets />
           <AccuracyByDistance />
           <!-- <AccuracyBase>10</AccuracyBase> -->
-          <AccuracyBase>0</AccuracyBase>
+          <!-- <AccuracyBase>0</AccuracyBase> -->
           <AccuracySpeedDecay>3</AccuracySpeedDecay>
           <AccuracyIncreaseOverDistance>100</AccuracyIncreaseOverDistance>
-          <!-- <AccuracyBase>100</AccuracyBase> -->
+          <AccuracyBase>100</AccuracyBase>
         </Attacker>
       </Values>
     </Asset>
@@ -460,6 +481,7 @@
   <ModOp Type="AddNextSibling" GUID="2295">
     
     <!-- TODO: Effectivities zufügen, zb. gegen Holzschiffe, wobei gebäude in der regel mehr hitpoints als schiffe haben, weshalb man evlt eher den schaden gegen schiffe halbiert? damit beides ordentlich schaden bekommt? -->
+    <!-- using an ExplodingProjectile also solves the problem shots always damaging the target, although the target already moved miles away -->
     <Asset>
       <Template>ExplodingProjectile</Template>
       <Values>
@@ -515,7 +537,14 @@
         <Object>
           <Variations>
             <Item>
-              <Filename>data/graphics/effects/military/projectiles/projectile_firebomb.cfg</Filename>
+              <!-- <Filename>data/graphics/effects/military/projectiles/projectile_firebomb.cfg</Filename> -->
+              <!-- <Filename>data/graphics/effects/military/projectiles/projectile_rocket_01.cfg</Filename> -->
+              <!-- <Filename>data/graphics/effects/military/projectiles/projectile_mortar_01.cfg</Filename> -->
+              <!-- <Filename>data/graphics/effects/military/projectiles/projectile_bomb_01.cfg</Filename> -->
+              <!-- <Filename>data/graphics/effects/military/projectiles/projectile_cannon_area_very_large_01.cfg</Filename> -->
+              <!-- <Filename>data/graphics_serp/volcano/projectiles/projectile_firebomb.cfg</Filename> -->
+              <!-- <Filename>data/graphics_serp/volcano/projectiles/ac3s/projectile_firebomb_small.cfg</Filename> -->
+              <Filename>data/graphics_serp/volcano/projectiles/ac3s/projectile_firebomb_medium.cfg</Filename>
             </Item>
           </Variations>
         </Object>
@@ -536,7 +565,7 @@
         </SoundEmitter>
         
         <Exploder>
-          <InnerDamageRadius>1</InnerDamageRadius>
+          <InnerDamageRadius>4</InnerDamageRadius>
           <InnerDamage>20</InnerDamage>
           <OuterDamageRadius>4</OuterDamageRadius>
           <MinimumDamage>10</MinimumDamage>
@@ -546,10 +575,10 @@
           <DebrisCount>8</DebrisCount>
         </Exploder>
 
-        <ProjectileIncident>
-          <CausedIncident>Fire</CausedIncident>
-          <CausedIncidentDuration>120000</CausedIncidentDuration>
-        </ProjectileIncident>
+        <!-- <ProjectileIncident> -->
+          <!-- <CausedIncident>Fire</CausedIncident> -->
+          <!-- <CausedIncidentDuration>120000</CausedIncidentDuration> -->
+        <!-- </ProjectileIncident> -->
       </Values>
     </Asset>
     
