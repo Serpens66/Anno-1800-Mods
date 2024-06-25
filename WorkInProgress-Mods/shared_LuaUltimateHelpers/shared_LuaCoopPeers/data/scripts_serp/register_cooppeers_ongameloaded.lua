@@ -181,9 +181,7 @@ end
 -- 0) mit GetEverCoopCount() gucken ob mehr als 1ter slot "jemals aktiv" war. Wenn nur slot1 aktiv war, dann ists schon erledigt, wir sind und waren immer der einzige coop.
 -- 1) ObjectFinderSerp.GetLoadedSessions(1,6)
 -- 2) wenns nur eine ist, dann dennoch nochmal alle in diese session befehlen (könnten worldmap sein) und dann mit selectNextObject und Marker stuff machen
--- 3) wemm alle in derselben session sind, dann genause marker select machen
- -- - falls dann laut marker alle jemals aktiven coops aktiv sind, ist alles erledigt.
- -- falls nicht ... gehts nicht weiter, weil ein session switch ja nicht geht... dann popup-abfrage
+-- 3)  falls laut marker alle jemals aktiven coops aktiv sind, ist alles erledigt.
 -- 4) wenn angeblich welche in anderer session sind, dann alle sessionswitch in die erste session. Dann den Marker check mit Selection.
  -- und wenn nicht alle aktiv sind, dann checken wer angeblich nicht in korrekter session ist und ob das alle inaktiven sind,
   -- wenn nicht, dann nochmal sessionwitch in die 2te session und gucken wer sich nicht bewegt hat.
@@ -213,6 +211,8 @@ end
 -- PopUp PlayerLeft
 -- lua script ausführen, welches ~15 sekunden in lua wartet (15 sek damits nichts macht, wenn spieler eh spiel beenden wollen und in lua, dmait nicht gespeichert wird)
  -- und dann erneut versucht rauszufinden, welcher coop peer jetzt inaktiv geworden ist, (wer man selbst ist weiß man ja noch)
+-- alternativ noch besser eine antwort vom PopUp forcieren ts.Popup.ClosePopup(0/1) um das spiel zu beenden,
+ -- damit neu geladen werden muss
 
 
 local function AtLeastOnePeerAtSession(searchSession)

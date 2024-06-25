@@ -1,0 +1,770 @@
+<ModOps>
+
+  <!-- Serp GUIDs: 1500005221 bis einsch. 1500005499 reserviert -->
+  <!-- verbraucht bis einschl. 1500005295 (1500005296 bis 1500005299 noch frei) -->
+   <!-- nutze 1500005300 bis 1500005350 frei für GiftShips, danach kann für allgemeines weiter verwendet werden -->
+  
+  <!-- TODO TEST: -->
+  <!-- es kann im MP passieren, dass Whichplayer  -->
+<!-- ts.Unlock.GetIsUnlocked(1500001613) -->
+<!-- nicht wahr für human0 ist ?!! -->
+<!-- nochmal testen ob ich das reproduzieren kann.. -->
+ <!-- wenn ja evlt SessionEnter als condiiton nehmen? -->
+  <!-- vllt wenn man bei spielstart zu lange/kurz im ladebildschirm wartet? -->
+ <!-- NE, das passiert teilweise wenn man das erste Autosave läd!! -->
+  <!-- Da funktioniert dann auch PlayerInGame Check für KIs nicht! -->
+ <!-- WICHTIG! -->
+  <!-- das noch iwie gefixt bekommen... -->
+  
+  
+  <!-- Evlt nochmal umstrukturieren!? -->
+   <!-- Keine Buffs für die Anzeige verwenden, sondern einfach nur Lock/Unlock/unhide -->
+    <!-- Wobei Lock dann eben dafür sorgt, dass es nicht angezeigt wird. -->
+     <!-- und als Marker welche KI gewählt wurde, könnte man noch ein FeatureUnlock jeweils machen (kann man die Buff GUIDs direkt für wiederverwenden), welches -->
+      <!-- prüft wann Asset gebaut wurde, bzw. wann Back button gedrückt wurde. -->
+    <!-- Dadurch wäre der code deutlich weniger kompliziert und kürzer. Vorteil wäre auch, dass reihenfolge basierend auf AssemblyOptions fix ist und wir nicht mit delays arbeiten müssen -->
+     <!-- die Buffs hatte ich nur aus dem DifficultyMod übernommen, da sind sie notwendig, weil ich mit locked+unhide zeigen will, was gerade aktiv ist, -->
+       <!-- während das hier nicht notwendig ist. -->
+  <!-- WOBEI: wir wollen ja auch zb. JoinWar locken, um zu zeigen, dass es da ist, aber nicht gewählt werden kann, soalnge man nicht in allianz ist -->
+   <!-- Also erstmal nachdenken, ob das so auch noch ohne das Buff-System funktionieren würde!! -->
+  
+  
+  <!-- TODO: -->
+   <!-- testen ob zufügen einer Action nur in neuem Spiel funzt ?! -->
+    <!-- sah beim Testen so aus... -->
+  
+  
+  <!-- TODO: -->
+    <!-- basierend auf diesen shared mod vllt auch Optionen zufügen wie: -->
+      <!-- Bente fragen, ob Sie Krieg gegen Quing/Priaten erklären will. -->
+    <!-- am Besten würde man das dann via script auswerten, wer wen wie sehr mag und je nach unterschied ja/nein, bzw mit Geldforderung machen (geldforderung vllt über Quest? oder wie?) -->
+    <!-- Aber solange lua nicht im MP coop geht, wäre vermutlich eine Reaction die automatsch die Reputations vergleich (mit dummy schiffen die sich gegenseitig versenken) -->
+     <!-- am sinnvollsten (auch chance dass bündnis zu human aufgelöst wird, wenn Kis auch verbündet mit 50% chance oderso) -->
+   <!-- Daher besser erstmal simpler gestalten: -->
+    <!-- - nur wenn man in alliance mit jemanden ist, kann man verlangen, dass dieser allen den Krieg erklärt, mit denen man selbst im Krieg ist. -->
+     <!-- am einfachsten ohne rep vergleich -->
+     
+     <!-- Quest anfordern könnte man auch machen,  -->
+      <!-- indem man per lua ts.Quests.CheatEndPoolCooldownNet macht... -->
+       <!-- aber weiß nicht ob das so gut ist, wenn man dadurch häufiger Quests bekommen kann.. -->
+      <!-- falls es klappt, dann am besten Kosten haben, die man durch Quests erledigen wieder einbekommt (zb honro) -->
+       <!-- sodass man immer eine quest anfordern kann und erst wenn diese erledigtist, die nächste anfordern kann, -->
+        <!-- bzw. wenn man sie abbricht und nicht erledigt halt einen verlust hat -->
+  
+  <!-- wenn viel zeit evlt sogar noch mehr Diplomatie zufügen, im Sinne von: -->
+   <!-- KI fragt nicht mehr random nach Waffenstillstand/frieden, sondern nur zb nach verlieren einer Insel, oder  -->
+    <!-- wenn militaryshipscore zu niedrig gegenüber dem spieler ist (dennoch mit cooldown oderso) -->
+    <!-- und sie bietet für waffenstillstand/Frieden dann Belohnung an, am besten in Form von Quest -->
+     <!-- (wenns angenommen wird dann Frieden+Nichtangriffspakt oderso) -->
+     
+  <!-- und man könnte Spy und Diplo als einen Mod releasen, weils thematisch zusammenpasst (und mit difficultysetting kann man KI Spies ausschalten) -->
+   <!-- Problem wäre nur, dass für spy noch sehr viel grafikarbeit noetig ist, die ich nicht machen kann.. -->
+  
+  <!-- evlt doch noch ne andere gebäudegrafik nehmen, eines was zu jedem fortschritt passt? -->
+  
+  <!-- Eventuell Honor in Diplomatische Gunst (oder kürzer) umbenennen und dies dann eine Ressource für Diplomatische Aktionen machen? -->
+   
+
+  
+  <!-- im AI Shipyard sind auch ein paar interessante characternotifications, die man nutzen könnte, damit die KI bei ihrer auwahl evlt auch was sagt usw -->
+  
+  <!-- nachdem rest fertig, dann text_english usw machen -->
+  
+  <!-- trivia: -->
+   <!-- - First I tried to add more diplo options to the Diplo Menu itself (by anabling unsued buttons), but they cause desync in multiplayer. -->
+   <!-- - then I tried to achieve it with help of a Decision Quest, but also they suck in muliplayer and are a beast to maintain, the more options/paths you have. -->
+  <!-- So now it will be down via a shipyard-like building (without building sth, but its the same UI), where you can choose the AI and action. -->
+  
+  
+  
+  <!-- TODO: -->
+   <!-- noch iwie kenntlich machen, welche KI aktuell ausgewählt ist (nachdem wir eine gewählt haben und dann zu den Actions wechseln) -->
+    <!-- Am besten evlt indem wir Name/Category des Gebäudes ändern, aber weiß nicht ob das möglich ist.. evlt mit nameable und lua? -->
+    <!-- Oder den gelockten AI button weiterhin anzeigen... evlt daneben dann Back und daneben n platzhalter button, den man zur formatierung nutzen kann (sind ja immer 3 in einer reihe) -->
+     <!-- (wobei ein weiteres anzeigen zu sehr vielen einzelnen Buffs führt die nötig wären...) -->
+  
+  <!-- der großteil ist aktuell vom difficultysettings mod kopiert -->
+  
+  
+  <!-- TODO: -->
+   <!-- noch Humans zufügen, mit Text: -->
+    <!-- [AssetData(8884) Text]:  [Participants GetParticipantName(0)] &lt;img height='48' width='48' src="[AssetData([Participants Participant(0) Profile AvatarPortrait]) Icon]"/&gt; -->
+    <!-- Das Icon der Option lässt sich leider nicht automatisch korrekt anpassen -->
+  
+  <ModOp Type="addNextSibling" GUID="153189">
+    <Asset>
+      <Template>Min_Shipyard_Serp</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005221</GUID>
+          <Name>Embassy</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/campaign/icon_court_of_justice.png</IconFilename>
+          <InfoDescription>1500005250</InfoDescription>
+        </Standard>
+        <Selection>
+          <!-- <ParticipantMessageArcheType>Arctic_Resident_tier01</ParticipantMessageArcheType> -->
+          <!-- <GUIType>Vehicle</GUIType> -->
+          <!-- <ParticipantMessageArcheType>Africa_Resident_tier03</ParticipantMessageArcheType> -->
+        </Selection>
+        <Building>
+          <BuildModeRandomRotation>180</BuildModeRandomRotation>
+          <AssociatedRegions>Moderate</AssociatedRegions>
+          <TerrainType>Terrain</TerrainType>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+          <BuildingCategoryName>14539</BuildingCategoryName>
+          <BuildModeStartVariation>0</BuildModeStartVariation>
+          <AllowChangeVariation>1</AllowChangeVariation>
+        </Building>
+        <Object>
+          <Variations>
+            <Item>
+							<Filename>data/graphics_serp/modbuildings/embassy/embassy_04.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Shipyard>
+          <AssemblyOptions />
+        </Shipyard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+          <MoralePower>0</MoralePower>
+        </Attackable>
+        <SoundEmitter>
+          <ActiveSounds>
+            <Item>
+              <Sound>200896</Sound>
+            </Item>
+          </ActiveSounds>
+          <IncidentSounds>
+            <InfectedFire>
+              <Item>
+                <Sound>214659</Sound>
+              </Item>
+            </InfectedFire>
+          </IncidentSounds>
+          <BuildingRuined>
+            <Item>
+              <Sound>203848</Sound>
+            </Item>
+          </BuildingRuined>
+          <BuildingRepaired>
+            <Item>
+              <Sound>203866</Sound>
+            </Item>
+          </BuildingRepaired>
+        </SoundEmitter>
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <!-- scholar buildmenu -->
+  <ModOp Type="add" GUID="502107" Path="/Values/ConstructionCategory/BuildingList">
+    <Item>
+      <Building>1500005221</Building>
+    </Item>
+  </ModOp>
+  <!-- culture buildmenu -->
+  <ModOp Type="add" GUID="500116" Path="/Values/ConstructionCategory/BuildingList">
+    <Item>
+      <Building>1500005221</Building>
+    </Item>
+  </ModOp>
+  <!-- adding EffectTargets to this asset, because this way my shared mod shared_ShipyardForBuffsTooltip will hide all the ship-details you normally see in a shipyard and instead displays the InfoDescription (and Buff-effects, if there are any) -->
+  <ModOp GUID="114166" Type="addNextSibling">
+    
+    <Asset>
+      <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005222</GUID>
+          <Name>Back-To-AI-Selection-Button</Name>
+          <IconFilename>data/graphics_serp/icon_arrow_left2_brown.png</IconFilename>
+          <InfoDescription>20089</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>16815</TextOverride>
+        </Text>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500005221</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005295</GUID>
+          <Name>Placeholder</Name>
+          <IconFilename>data/graphics_serp/icon_empty.png</IconFilename>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500005221</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005223</GUID>
+          <Name>Select: Bente Jorgensen</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_01.png</IconFilename>
+          <InfoDescription>14465</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>47</TextOverride>
+        </Text>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500005221</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005224</GUID>
+          <Name>Select: Quing</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_02.png</IconFilename>
+          <InfoDescription>14466</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>79</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005225</GUID>
+          <Name>Select: Wibblesock</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_03.png</IconFilename>
+          <InfoDescription>14467</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>80</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005226</GUID>
+          <Name>Select: Smith</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_04.png</IconFilename>
+          <InfoDescription>14468</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>81</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005227</GUID>
+          <Name>Select: OMara</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_05.png</IconFilename>
+          <InfoDescription>14469</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>82</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005228</GUID>
+          <Name>Select: Gasparov</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_06.png</IconFilename>
+          <InfoDescription>14471</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>83</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005229</GUID>
+          <Name>Select: Malching</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_07.png</IconFilename>
+          <InfoDescription>14470</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>11</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005230</GUID>
+          <Name>Select: Gravez</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_08.png</IconFilename>
+          <InfoDescription>14472</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>48</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005231</GUID>
+          <Name>Select: Silva</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_09.png</IconFilename>
+          <InfoDescription>14473</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>84</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005232</GUID>
+          <Name>Select: Hunt</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/enemy_02.png</IconFilename>
+          <InfoDescription>14474</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>79</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005233</GUID>
+          <Name>Select: Mercier</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/ai_11.png</IconFilename>
+          <InfoDescription>104465</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>220</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005234</GUID>
+          <Name>Select: Harlow</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_03.png</IconFilename>
+          <InfoDescription>14476</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>73</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005235</GUID>
+          <Name>Select: LaFortune</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_04.png</IconFilename>
+          <InfoDescription>14475</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>76</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005236</GUID>
+          <Name>Select: Blake</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_02.png</IconFilename>
+          <InfoDescription>20097</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>45</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005237</GUID>
+          <Name>Select: Sarmento</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_05.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>29</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005238</GUID>
+          <Name>Select: Nate</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_06.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>77</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005239</GUID>
+          <Name>Select: Bleakworth</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_07.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>46</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005240</GUID>
+          <Name>Select: Kahina</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_08.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>78</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005241</GUID>
+          <Name>Select: Ketema</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_13.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>119051</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005242</GUID>
+          <Name>Select: Inuit</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/inuit_trader.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>237</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005243</GUID>
+          <Name>Select: Queen</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_01.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>75</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005244</GUID>
+          <Name>Select: Human0</Name>
+          <IconFilename>data/graphics_serp/icon_population_level_1_brown.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>0</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005245</GUID>
+          <Name>Select: Human1</Name>
+          <IconFilename>data/graphics_serp/icon_population_level_2_brown.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>0</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005246</GUID>
+          <Name>Select: Human2</Name>
+          <IconFilename>data/graphics_serp/icon_population_level_3_brown.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>0</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500005223</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005247</GUID>
+          <Name>Select: Human3</Name>
+          <IconFilename>data/graphics_serp/icon_population_level_4_brown.png</IconFilename>
+          <InfoDescription>XXXXXXXXXX</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>0</TextOverride>
+        </Text>
+      </Values>
+    </Asset>
+    
+    <!-- 1500005248 to 1500005249 free for more Diplo Targets, if needed -->
+
+  <!-- TODO: InfoDescription -->
+
+  <!-- TODO: evlt Texte zusammenpacken (gibt oft 2 für einen Charakter, einen allgemeinen und einen für diplo) in einen Text für infodescription? -->
+  <!-- <Text> -->
+    <!-- <GUID>14458</GUID> -->
+    <!-- <Text>La Fortune mag ein Pirat sein, aber er ist ein vernünftiger Mann. Versuchen Sie, mit ihm zu verhandeln und Sie werden überrascht sein.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14459</GUID> -->
+    <!-- <Text>Es mag schwierig sein, mit Piraten zu verkehren, aber es könnte vorteilhaft sein, Ihren Ruf bei ihnen zu pflegen. Harlow könnte dadurch bereitwilliger Handelsrechte abtreten oder sogar Frieden schließen, falls sie Sie mag.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14460</GUID> -->
+    <!-- <Text>Sir Archibald Blake ist der Repräsentant der Königin. In seinem Hafen bietet er immer interessante Items und Waren zum Kauf an.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14461</GUID> -->
+    <!-- <Text>Isabel Sarmento ist die mutige Anführerin der Bewegung in der Neuen Welt. In ihrem Hafen können Sie viele interessante Items und Waren finden.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14462</GUID> -->
+    <!-- <Text>Der Alte Nate ist ein verabscheuungswürdiger Aasgeier, aber seine schlechten Angewohnheiten haben ihm zu einem Sortiment an bemerkenswerten Items verholfen, die er zum Verkauf anbietet. Obgleich ich gehört habe, dass er seine Geschäfte nur in einer dubiosen ausländischen Währung abwickelt ...</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14463</GUID> -->
+    <!-- <Text>Eli Bleakworth rühmt sich damit, das Gefängnis mit eiserner Faust zu leiten. Verschiedenste nützliche Leute scheinen in seinen Zellen zu landen. Zahlen Sie ihre Kaution und sie werden sich Ihnen gerne anschließen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14464</GUID> -->
+    <!-- <Text>Madame Kahina kennt jede Route zu exotischen Waren und Items. In ihrem Geschäft finden Sie nahezu alles, was Sie sich vorstellen können, und das zu einem vernünftigen Preis ...</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14465</GUID> -->
+    <!-- <Text>Bente Jorgensen ist eine liebenswürdige junge Dame mit einem Faible für die Erkundung der Welt. Genau wie Sie hat Bente gerade ihr eigenes Unternehmen gegründet. Sie wird mehr als glücklich darüber sein, mit Ihnen Handel treiben und sich mit Ihnen austauschen zu können.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14466</GUID> -->
+    <!-- <Text>Prinzessin Qing leitet die Niederlassung ihrer Familie in diesen Gefilden mit so ruhiger Hand wie möglich. Sie wird erfreut sein, mit Ihnen in Kontakt treten zu können, doch hüten Sie sich in Ihrem eigenen Interesse vor kulturellen Missverständnissen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14467</GUID> -->
+    <!-- <Text>Willie Wibblesock hat sein Unternehmen erst kürzlich aus heiterem Himmel gegründet. Es schadet nicht, mit ihm zu reden.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14468</GUID> -->
+    <!-- <Text>George Smith scheint in allen Bereichen des Lebens erfahren zu sein. Auch wenn er mürrisch wirkt, wird er sich gerne mit Ihnen abgeben, solange Ihr Handeln von ähnlicher Prinzipientreue zeugt.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14469</GUID> -->
+    <!-- <Text>Beryl O'Mara hat sich aus eigener Kraft hochgearbeitet, auch wenn ihre Methoden alles andere als konventionell sind. Sie ist eine rücksichtslose Rivalin, aber wenn Sie mit ihr zu tun haben, stellen Sie möglicherweise fest, dass es ihr nicht an Herz mangelt.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14470</GUID> -->
+    <!-- <Text>Carl Leonard von Malching ist besessen davon, seinem Namen Gehör zu verschaffen und aus unerfindlichen Gründen scheint er damit Erfolg zu haben. Lassen Sie sich bei Verhandlungen nicht von seinem Gehabe beeinflussen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14471</GUID> -->
+    <!-- <Text>Artur Gasparov hält sich für den größten Architekten des Jahrhunderts. Behalten sie das im Hinterkopf, wenn Sie ein Geschäft mit ihm abschließen wollen, denn das ist alles, was ihn interessiert.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14472</GUID> -->
+    <!-- <Text>Alonso Graves ist der gefährlichste, unberechenbarste Mensch diesseits des Ozeans ... Seien Sie sehr vorsichtig in seiner Nähe.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14473</GUID> -->
+    <!-- <Text>Admiral Vicente Silva dient einem verfeindeten Reich und hat nur die Eroberung der Alten Welt im Sinn. Diplomatie ist nicht seine starke Seite, aber er hat ein paar Schwachpunkte, die man zu seinem Vorteil nutzen kann.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14474</GUID> -->
+    <!-- <Text>Lady Margaret Hunt ist eines der einflussreichsten Mitglieder des Königlichen Rats. Seien Sie äußerst vorsichtig und lassen Sie sich nicht von ihr ausnutzen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14475</GUID> -->
+    <!-- <Text>La Fortune hat sich der Piraterie verschrieben, um zu überleben. Passen Sie auf, dass ihm keines Ihrer Schiffe in die Hände fällt. Nichtsdestotrotz könnte er zustimmen, die Waffen niederzulegen und mit Ihnen Geschäfte zu machen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14476</GUID> -->
+    <!-- <Text>Hüten Sie sich vor Anne Harlow. Sie ist nicht daran interessiert, ihr Inselreich zu vergrößern, aber ihre Piratenschiffe haben es auf unsere Händler abgesehen, es sei denn, wir zahlen eine Gebühr ... Vielleicht können Sie ja Handel mit ihr treiben, wenn Sie sich gut mit ihr stellen.</Text> -->
+  <!-- </Text> -->
+
+
+  <!-- <Text> -->
+    <!-- <GUID>14364</GUID> -->
+    <!-- <Text>Bente ist die junge Erbin der Jorgensen-​Stiftung, eines philanthropischen Projekts ihres verstorbenen Vaters. Sie ist ein überaus freundliches Wesen, das sich um jeden in ihrer Umgebung kümmert. &lt;br/&gt;Als unerschrockene Reisende glaubt sie, dass die Welt existiert, damit sich alle daran erfreuen und sie erkunden können. Daher ist sie mit nahezu jedem befreundet.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14365</GUID> -->
+    <!-- <Text>Prinzessin Qing ist eine junge, unsichere Gesandte des Kaiserlichen Ostens. &lt;br/&gt;Sie bemüht sich, die unterschiedlichen diplomatischen Wünsche von Kaiser und Kaiserin hier an einem neuen und unbekannten Ort umzusetzen. Trost findet sie, indem sie wehmütige Gedichte über die Natur der Heimat schreibt.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14366</GUID> -->
+    <!-- <Text>Hinter dem kühnen Rauschen von Willies Zaubererumhang verbirgt sich eine verletzliche Maus auf der verzweifelten Suche nach der Zuneigung, die ihm seine verstorbene Mutter entgegengebracht hat. &lt;br/&gt;Aber vor allem ist er von Angst erfüllt, Angst vor einer unaussprechlichen, grauenhaften Vergeltung -​ denn Willie scheint sein großes Vermögen verdächtig plötzlich erlangt zu haben!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14367</GUID> -->
+    <!-- <Text>Vor langer Zeit war George Smith ein Sklave. &lt;br/&gt;Eine Explosion in der Mine nahm ihm den Vater und ließ ihn ertauben. Als er die Freiheit erlangte, ergriff George die Gelegenheit und machte etwas aus seinem Leben. Er scheint nun alles erreicht zu haben. Doch lassen Sie sich davon nicht täuschen, noch ist er nicht fertig.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14368</GUID> -->
+    <!-- <Text>Beryl O'Mara war einst eine gute Seele -​ damals, als sie glaubte, ihr Gatte, ein bescheidener Ladenbesitzer, würde der Schuldhaft entrinnen. Doch das tat er nicht. &lt;br/&gt;Jahre später führt sie eine Straßenbande mithilfe ihrer zahllosen Augen und Ohren an. Sie wird Sie zum Tee einladen, doch machen Sie es sich nicht zu bequem, denn unter der Blümchentischdecke verbirgt sie eine abgesägte Flinte!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14369</GUID> -->
+    <!-- <Text>Artur Gasparov ist frankophil und ein selbsternannter Visionär, der nach architektonischer Perfektion strebt. &lt;br/&gt;Gasparov löst sich höchstens von seinem Spiegelbild, um mit den wichtigsten Kritikern zu plaudern, dabei hat er wenig Geduld mit anderen und schon gar kein Mitgefühl. Wie sagte er einst? „Jede große Stadt wird von ihren Bewohnern verschandelt.“</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14370</GUID> -->
+    <!-- <Text>Carl ist ein widerlicher kapitalistischer Geldsack, der seinen Eltern vorwirft, dass sie den einstmals großen Namen von Malching verblassen ließen. &lt;br/&gt;Er ist stets verzweifelt bemüht, sich mit dem Adel gut zu stellen, und natürlich Gold anzuhäufen. Seine Philosophie lautet: „Geld ist gleich Ruf, also immer her damit!“</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14371</GUID> -->
+    <!-- <Text>Alonso Graves ist ein gestörter Mensch. Der Krieg hat die Seele dieses ehemaligen Empire-​Soldaten für immer versehrt. &lt;br/&gt;Die Verachtung und Menschenfeindlichkeit in seinem Inneren können nur durch das Blut seiner einstigen Herren zeitweilig zum Schweigen gebracht werden. Selbst hält er sich inzwischen für einen Gott, der danach strebt, so viele wie möglich von den Fesseln der menschlichen Existenz zu „befreien“.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14372</GUID> -->
+    <!-- <Text>Admiral Vincente Silva ist ein erfahrener, berechnender und humorloser Eroberer. Seine adlige Erziehung und die Ausbildung an den erlesensten Militärakademien haben ihn auf ein Leben voller Macht vorbereitet. &lt;br/&gt;Als eiserner Traditionalist ist es seine Überzeugung, dass das zerfallende Reich von La Corona, in dessen Dienst er steht, gegen eine Welt in Aufruhr bestehen wird.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14373</GUID> -->
+    <!-- <Text>Lady Margaret Hunts Einfluss sollte nicht unterschätzt werden. Als Mitglied des Königlichen Rates genießt sie allseitiges Vertrauen und sucht nur selten Mitgefühl für das, was zweifelsohne ein schwieriges Leben war. &lt;br/&gt;Schließlich ist sie eine geborene Harlow, ein Name, der gleichbedeutend mit Verrat ist ... doch all dies wurde schon vor langer Zeit begraben.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14374</GUID> -->
+    <!-- <Text>Anne Harlow ist die rachsüchtige Anführerin einer gottverlassenen Bande -​ und der letzte Jubelschrei der Piraterie. Geboren wurde sie als Adlige und musste miterleben, wie ihr Vater wegen Widerspruchs gegen den König gehängt wurde. &lt;br/&gt;Im Exil hat sich Annes Verlangen, die Krone und die soziale Ordnung zu zerstören, durch die Ankunft einer neuen, verwundbaren Königin nur noch gesteigert.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>14375</GUID> -->
+    <!-- <Text>Jean la Fortune ist einem Leben in Sklaverei entkommen und wurde zum Anführer einer neu gegründeten Nation auf einer Insel, die sein Volk „High Mountain“ nennt. &lt;br/&gt;Aber sein Volk kann nicht darauf hoffen, zu wachsen, solange das Empire seine Unabhängigkeit nicht anerkennt. Mit nur wenigen Verbündeten scheint Jean nichts anderes übrig zu bleiben, als zu kämpfen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>18113</GUID> -->
+    <!-- <Text>Isabel Sarmento ist die leidenschaftliche Anführerin einer Rebellion in der Neuen Welt, die als „Die Bewegung“ bekannt ist und sich für die Unabhängigkeit von den Imperien der Alten Welt einsetzt. &lt;br/&gt;Sie hat ihren Bruder in diesem Kampf verloren, doch das scheint sie in ihrer Entschlossenheit nur bestärkt zu haben. Ihr ist bewusst, dass ihre Leute clever vorgehen müssen, wenn sie gemeinsam eine nachhaltige Zukunft aufbauen wollen.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>18114</GUID> -->
+    <!-- <Text>Eli Bleakworth ist ein zutiefst verbitterter Diener der Krone mit dem Auftrag, das Wormways-​Gefängnis, eine verkommene und isolierte Einrichtung, zu leiten. &lt;br/&gt;Es verschafft ihm große Genugtuung, Bestrafungen auszuteilen. Er ist streng und unnachgiebig und glaubt, der Abschaum bekomme nur das, was er auch verdient. Sein grenzenloses Misstrauen wird sicherlich dafür sorgen, dass er auch Sie genau im Auge behält!</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>18115</GUID> -->
+    <!-- <Text>Es fühlt sich wie ein echtes Privileg an, Kahinas Emporium mit ihren wahrlich luxuriösen Auslagen auch nur zu durchstöbern. &lt;br/&gt;Für Kahina hingegen ist das ganze Geschäft recht eintönig. Es ist lediglich ein Kompromiss, den sie für ihren Komfort und ihre Sicherheit eingegangen ist und der ihr im Vergleich zu ihrem früheren waghalsigen Leben voller Intrigen und mit hohem Ansehen wahnsinnig langweilig erscheint.</Text> -->
+  <!-- </Text> -->
+  <!-- <Text> -->
+    <!-- <GUID>20097</GUID> -->
+    <!-- <Text>Sir Archibald Blake ist der treue Berater Ihrer Majestät der Königin. Mit seiner optimistischen, taktvollen und dennoch oft unbeholfenen Art will der gute alte Archie lediglich, dass alle gut miteinander auskommen. &lt;br/&gt;Seine jahrelange regelmäßige Teilnahme an diplomatischen Banketts hat ihn zu einem Experten in Sachen Smalltalk gemacht, was bei Unachtsamen schnell den Eindruck erwecken kann, er sei nicht so weise wie er es tatsächlich ist.</Text> -->
+  <!-- </Text> -->
+
+
+
+  </ModOp>
+  
+  
+  <!-- ignore these dummy asset for FunFactsCounter -->
+  <ModOp Type="add" GUID="140560" Path="/Values/PlayerCounterConfig/CounterConfig/FunFactsCounter/Item[not(PlayerCounter) or PlayerCounter='ObjectDestroyed' or PlayerCounter='ObjectLost']/FilterResults/IgnoreContexts">
+    <Item>
+      <Asset>1500005222</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005251</Asset>
+    </Item>
+  </ModOp>
+  
+
+  
+  
+  <Include File="/data/config/export/main/asset/Triggers.include.xml" />
+  <Include File="/data/config/export/main/asset/Pools.include.xml" />
+  <Include File="/data/config/export/main/asset/Buffs.include.xml" />
+  <!-- add a few diplo actions already -->
+  <Include File="/data/config/export/main/asset/DiploActions/JoinWar.include.xml" />
+  <Include File="/data/config/export/main/asset/DiploActions/RequestQuest.include.xml" />
+  <Include File="/data/config/export/main/asset/DiploActions/GiftShip.include.xml" />
+  
+
+  
+  
+  
+  
+
+</ModOps>

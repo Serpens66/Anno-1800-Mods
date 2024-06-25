@@ -6,10 +6,6 @@
   
 
 
-  <!-- TODO: -->
-   <!-- MP Test: ConditionPlayerCounter Human1 ist immer unwahr wenn human1 nie im spiel war. -->
-    <!-- ist es das auch, wenn human1 im spiel war, aber jetzt nicht mehr (vermutlich kanns da wahr sein) -->
-
   
   <!-- example how to use: -->
    <!-- disasters mod -->
@@ -31,7 +27,7 @@
     <!-- 2) Using a Buff with AddAssemblyOptions -->
     <!-- We will use the 2) one here, because locking will be used instead to 1) mark a setting as currently chosen and 2) other mods can check the chosen setting by checking what is locked (locked means chosen) -->
     <!-- (Beware, the lock of ObjectDummyWithOwner_BuildInShipyard-Assets are only changed for the player who did the setting, not for all! -->
-     <!-- for general settings that should affect everyone you need to add a new unlockableasset and change its lock state for all if one player changes settings) -->
+     <!-- for general settings that should affect everyone you need to add a new unlockableasset and change its lock state for all if one player changes settings, see my disaster mods for example) -->
 
   <!-- VisibleWhenLocked unfortunately does not work for ships/buildings, just portraits/skins... -->
 
@@ -405,6 +401,50 @@
                     </ConditionPlayerCounter>
                   </Values>
                 </TriggerCondition>
+                <SubTriggers>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionPlayerCounter</Template>
+                            <Values>
+                              <Condition />
+                              <ConditionPlayerCounter>
+                                <Context>1500005202</Context>
+                                <CounterAmount>0</CounterAmount>
+                                <ComparisonOp>AtMost</ComparisonOp>
+                              </ConditionPlayerCounter>
+                            </Values>
+                          </TriggerCondition>
+                          <SubTriggers>
+                            <Item>
+                              <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                  <Trigger>
+                                    <TriggerCondition>
+                                      <Template>ConditionPlayerCounter</Template>
+                                      <Values>
+                                        <Condition />
+                                        <ConditionPlayerCounter>
+                                          <Context>1500005203</Context>
+                                          <CounterAmount>0</CounterAmount>
+                                          <ComparisonOp>AtMost</ComparisonOp>
+                                        </ConditionPlayerCounter>
+                                      </Values>
+                                    </TriggerCondition>
+                                 </Trigger>
+                                </Values>
+                              </SubTrigger>
+                            </Item>
+                          </SubTriggers>
+                       </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
               </Trigger>
             </Values>
           </ResetTrigger>
@@ -506,6 +546,15 @@
     </Asset>
   </ModOp>
   
+  <!-- ignore these dummy asset for FunFactsCounter -->
+  <ModOp Type="add" GUID="140560" Path="/Values/PlayerCounterConfig/CounterConfig/FunFactsCounter/Item[not(PlayerCounter) or PlayerCounter='ObjectDestroyed' or PlayerCounter='ObjectLost']/FilterResults/IgnoreContexts">
+    <Item>
+      <Asset>1500005203</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005204</Asset>
+    </Item>
+  </ModOp>
 
   <ModOp Type="AddNextSibling" GUID="190093">
     <Asset>

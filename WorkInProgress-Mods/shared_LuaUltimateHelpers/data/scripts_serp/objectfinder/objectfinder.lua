@@ -15,6 +15,13 @@
  -- if the player owns an object with that GUID 
 
 
+-- TODO:
+ -- testen ob bzgl des yield Problems (dass alle spieler gleich lange warten, bis alle peers fertig sind)
+ -- Also eine metaressource pro Participant einführen und mit ProfileCounter warten, bis bei allen spielern
+  -- die korrekte Menge angezeigt wird (bei Coop beachten, dass mehr als 1 gutgeschrieben wird)
+ -- und dabei dann schauen, ob dadurch alle exakt gleich lang gewartet haben-
+
+
 
 print("objectfinder.lua called")
   
@@ -272,6 +279,17 @@ end
  -- so always inlucding "[MetaObjects SessionGameObject("..tostring(OID)..") ...]" and your wanted command for the OID you enter
 -- TODO: name evlt noch ändern der fkt , zb. DoTextEmbed oderso und dazu dann eine tatsäcliche DoForSessionGameObject funktion machen,
  -- der man dann direkt nur OID und "Area CityName" übergibt
+ 
+ -- TODO:
+  -- geht auch ohne Helper_OID-schiff ! Einfach ts.Participants.GetParticipant(PID).Profile.CompanyName / SetCompanyName
+   -- nutzen !
+   -- Wobei für diesen loklen Zweck evlt auch:
+    -- ts.GameSetup.SetSetSettingsName("abc")
+    -- print(ts.GameSetup.GetSettingsName)
+    -- nutzbar ist? Ändert den eingetragenen Text beim Spiel-Erstell-Screen fürs laden von settings, aber speichert/ld nichts
+  -- TODO: testen ob ein ändern des settingsname im netzwerk an andere spieler übertragen wird. Vermutlich nicht
+   -- und wird vermutlich auch nicht im spiel sondern global gespeichert und nach Spielneustart ists wieder weg
+ 
  local function DoForSessionGameObject(ts_embed_string,doreturnstring)
   if doreturnstring then -- we want to get what the textembed returns, but game.TextSourceManager.setDebugTextSource does not return anything. I only know a workarkund to get it, by setting and reading out the name of a namable helper object
     local helper_OID = ObjectFinderSerp.ObjectFinderCacheSerp["Nameable_Helper_OIDs"]["EmbedHelper"]

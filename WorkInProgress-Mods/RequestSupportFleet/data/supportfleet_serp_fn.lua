@@ -23,7 +23,7 @@
  -- ja funktioniert an sich, zumindest wenn Spiel nicht neu gestartet wird. wenn doch dann funzt es nicht.
  -- also eher unter 10 sekunden machen, wenn mehr delay gewünscht, dann in trigger
 
--- ich denke es ist besser den Code für spawnsupportfleet doch rein in Trigger zu packen (itemspawn über initslot/socket),
+-- ich denke es ist besser den Code für spawnsupportfleet doch rein in Trigger zu packen (itemspawn über riesigen ActionExecuteByChance Trigger),
  -- lua ist vorallem im MP zu unberechenbar, auch desync usw...
 
 
@@ -35,6 +35,10 @@
   -- (oder falls ich dummy schiffe spawne, kann mans auch daran erkennen)
   -- damit andere mods zb Quests darauf basierend einbauen können, dass man schiffe schenken soll (zb PirateDemand Mod)
   
+-- beim schenken über lua skript auch ein event einbauen, also eine globale tabelle mit funktionen
+ -- die andere mods darein packen können, welche dann beim schenken aufgerufen werden und alle bekannten infos
+  -- übergeben werden. Dann können diese mods oder andere erkennen, wenn ein schiff verschenkt wurde
+   -- und das zb. für Questziele zählen
 
 -- für coop compatibility könnte man die mengen und chancen mit der anzahl der coop spieler die aktiv sind verrehcnen,
  -- sodass gesamtzahl/chance ungefähr aufs selbe rauskommt, egal ob script 1 oder 4 mal ausgeführt wird.
@@ -281,6 +285,8 @@ local function FinishSpawnSupportFleet(SessionGUID,Human_ID,AI_ID)
             -- if this does not help, we could also use a chance to credit an item and try to balance the chance based on coop players
             -- if nothing helps, können wir auch pro KI helper-schiffkopien machen, welche initslot mit rewardpool nutzen
             -- system.waitForGameTimeDelta(1000) -- wait ? does not help I guess
+            
+            -- SetCheatItemInSlot macht DESYNC! wenns nicht alle zeitgleich machen..
             
             -- GameObject.ItemContainer.SetCheatItemInSlot(weighted_random_choice(ShipItems[AI_ID]),1)
             GameObject = ts.Objects.GetObject(OID) -- GameObject must be renewed as usual.., so dont use the one in Ships

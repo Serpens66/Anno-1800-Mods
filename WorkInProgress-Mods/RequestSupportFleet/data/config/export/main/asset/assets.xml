@@ -1,5 +1,10 @@
 <ModOps>
 
+
+   <!-- Serp GUIDs: 1500001290 bis 1500001399 und 1500003870 bis einschließlich 1500004199 freigehalten -->
+   <!-- 1500001245 bis 1500001289 wurde glaub ich für decisions verwendet, die wir jetzt nicht mehr nutzen. stattdessen nehmen wir embassy building, welches neue guids nutzt -->
+    <!-- glaube ab 1500003920 ist noch bis 1500004199 alles frei? -->
+
   <!-- TODO: -->
    <!-- wird in coop jeder lua code mehrach ausgeführt?! ja.. -->
 
@@ -28,6 +33,11 @@
   <!-- Danach solls einen cooldown bei dieser KI geben, am besten auf alle Flottenanfragen... können wir vermutlich nicht vernünftig anzeigen, -->
    <!-- evlt als unlock condition in tooltip reinpacken, dass zb 60min seit letzter Anfrage vergangen sein müssen und in der Zeit sind die anfragen gelocked. -->
    
+   <!-- vllt doch noch decisionquest am ende der reihe packen. Also man wählt in gebäude dann zb Bente und dann SupportFleet -->
+    <!-- und erst dann kommt decisionquest mit den supportfleet optionen. -->
+     <!-- würde halt besser aussehen mit dem portrait der KI usw. -->
+      <!-- man müsste es nur sinnvoll für MP hinbekommen, dass decision sich am besten von selbst für richtigen spieler öffnet, vllt gibts da n lua befehl für? -->
+  
 
   <!-- TODO: -->
    <!-- auch mal in den evlt_inter Mod Gameplay_AI_Shipyard_-_Diplomacy -->
@@ -37,28 +47,14 @@
 
 
 
-  <!-- Serp GUIDs: 1500001290 bis 1500001399 und 1500003870 bis einschließlich 1500004199 freigehalten -->
 
     <!-- wenn von KI angefordert können sie direkt bei deren Werft spawnen und bei neutral trader bei denen denke ich -->
     <!-- allerdings eben mit verzögerung, damit man das nicht abusen kann -->
     
     <!-- bei traderights kann es ne chance auf ablehnung geben -->
     
-     <!-- Hilfsflotte: -->
-    
-    <!-- <GUID>10151</GUID> -->
-      <!-- <Text>[AssetData([NotificationContext CharacterGUID]) Text] stimmt zu, eine Hilfsflotte zu schicken.</Text> -->
-      <!-- AT_3rdParty02_GenericConfirmation -->
-      <!-- oder bei KI: PlayerInvokesAlliance , auch wenns ab und zu ein wenig übertrieben ist -->
-      <!-- man könnte evlt. auch die optionen anbieten von der KI hilfsflotte zu fordern, die ist dann bisschen größer als von 3rd, geht aber nur -->
-       <!-- wenn sie dich mag (allianz als bedingung ist denke ich zuviel? oder wir machen ne noch bessere option bei allianz) -->
-       <!-- und jede KI könnte eine eigene konstellation an schiffen senden, wobei man aufpassen muss, dass es nicht wieder zuviele optionen werden.. -->
-    
-    <!-- Königin aduio: -->
-    <!-- AT_3rdParty01  AT_3rdParty01_Generic Confirmation1 --> 
-    <!-- party_01 -->
-    
-       <!-- pirate: AT_3rd_party_03_Generic Confirmation1  -->
+
+
 
 
   <!-- ohne allianz nur kleine Flotte anfordern möglich -->
@@ -79,6 +75,7 @@
   <!-- - wo zum Fick kommt SupportFleetNotification_Base usw her?! Die Quelle dafür brauch ich auch! -->
    <!-- man kann selbst ein NotificationLabel in der Notification angeben! -->
   <!-- - 14710021 und paar weitere gibts nicht im original, ist evlt eine guid aus Taubes mods -->
+   <!-- NotificationRemoved funzt aber eh nicht im MP -->
 
   <!-- Anpassungen: -->
   <!-- SpawnShips: -->
@@ -120,6 +117,24 @@
   <!-- (mit action zufügen, um keine eigene guid draus amcehn zu müssen) -->
  
  
+ <!-- TODO: -->
+  <!-- für verschenken von Schiffen an KI: -->
+   <!-- hier dann eine notification starten mit ThirdpartyNotificationButtons  -->
+    <!-- mit der Frage ob man das aktuell angewählte schiff verschenken will. -->
+     <!-- und sobald man auf "ok" drückt, wird das skript dazu ausgeführt (nur für den ders drückt) -->
+   <!-- das löst das Problem im Coop, dass mehrere dinge selected sein können -->
+ <!-- ACHNE, man kann damit ja nur textsource ausführen, keine lua skripte.. und das schenken desynced wenn nicht alles es ausführen... -->
+ <!-- Löst das Coop Problem zwar nicht, aber ist dennoch denke ich sinnvoll, dass dann über so ne notification zu machen. -->
+    <!-- Wobei das mit dem Keybind dann evlt doch besser ist, weil das vermutlich die "Lösung" für Coop sein wird -->
+ 
+ <!-- Schenken so machen:  -->
+  <!-- es gibt n action button in shipyard/decision, aber wenn man den drückt bekommt man stattdessen ein ActionTriggerTextBook/ActionTriggerTextPopUp -->
+   <!-- in dem dann erklärt wird, wie man es nutzt, nämlich schiff anwählen und Keybind drücken, dann wirds an den aktuell im shipyard gewählten -->
+    <!-- spieler verschenkt. Darunter dann noch Multiplayer Warning, dass sessionwechsel erzwungen wird. -->
+ <!-- .. -->
+  <!-- um nicht abhängig von den lua-helpern zu sein, könnte man bei erzwungenen sessionwechsel auch einfach ~2 sekunden warten und  -->
+   <!-- dann einfach code ausführen, ohne zu prüfen ob alle spieler in derselben Session sind (da wir die inaktiven ja nicht kennen) -->
+ 
  <!-- für neutrale händler evlt stattdessen die zahl der schiffe die sie verkaufen erhöhen -->
   <!-- oder einfach die Trade1 und War1 option (also wenige schiffe) und ein klein wenig teurer als bei KI -->
  
@@ -129,7 +144,9 @@
     <!-- <GUID>10153</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] bittet Sie, eine Hilfsflotte zu schicken.</Text> -->
     <!-- <GUID>10149</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] bittet Sie, eine Hilfsflotte zu schicken.</Text> -->
     <!-- und wenns faile dann bündnis auflösen -->
-    <!-- schwierig wirds nur das als wincondition zu tracken ... -->
+    <!-- schwierig wirds nur das als wincondition zu tracken (schiffe schenken)... -->
+      <!-- vermutlich also fakeziel und zb über lua zählen oderso -->
+    
     
     <!-- <GUID>10151</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] stimmt zu, eine Hilfsflotte zu schicken.</Text> -->
     <!-- <GUID>10152</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] lehnt es ab, eine Hilfsflotte zu schicken.</Text> -->
@@ -137,7 +154,21 @@
     <!-- <GUID>10155</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] lehnt es ab, eine Hilfsflotte zu schicken.</Text> -->
  
     <!-- <GUID>4040</GUID> <Text>Um militärische Verstärkung ersuchen</Text> -->
- 
+    
+          <!-- AT_3rdParty02_GenericConfirmation -->
+      <!-- oder bei KI: PlayerInvokesAlliance , auch wenns ab und zu ein wenig übertrieben ist -->
+      <!-- man könnte evlt. auch die optionen anbieten von der KI hilfsflotte zu fordern, die ist dann bisschen größer als von 3rd, geht aber nur -->
+       <!-- wenn sie dich mag (allianz als bedingung ist denke ich zuviel? oder wir machen ne noch bessere option bei allianz) -->
+       <!-- und jede KI könnte eine eigene konstellation an schiffen senden, wobei man aufpassen muss, dass es nicht wieder zuviele optionen werden.. -->
+    <!-- Königin aduio: -->
+    <!-- AT_3rdParty01  AT_3rdParty01_Generic Confirmation1 --> 
+    <!-- party_01 -->
+       <!-- pirate: AT_3rd_party_03_Generic Confirmation1  -->
+    
+  <!-- wenn ich Erfolgschance in lua berechne, -->
+   <!-- könnte ich die chance von [Participants SupportFleetSuccess(25)] nehmen und anzeigen? -->
+   <!-- wobei ich diese nicht beeinflussen kann und vorallem nicht reduzieren nach einer anfrage, von der doch lassen.. -->
+  
   
   <!-- Wahl zwischen klein/große Handels/Kriegsflotte und Spezialflotte -->
   <!-- erstere sind bei jder KI gleich (zumindest jeder der gleichen Stufe) -->
@@ -145,6 +176,11 @@
  
   <!-- muss kein AssetPool sein, können wir auch in PlayerCounter umwandeln, falls nötig , hauptsache es funzt in ObjectFilter -->
   <!-- TODO: pool vervollständigen -->
+  
+  <!-- TODO: -->
+    <!-- um random item den schiffen mitzugeben, kann ich auch InitSlotItems mit ReardPool nutzen (drauf achten, dass kein EmptyRewardPool verlinkt ist, weil das unsichtbares items spawned) -->
+    <!-- wäre dann zwar nicht KI-spezifisch, aber besser als garnichts, denn nichts anderes funktioniert leider problemlos -->
+  
   <ModOp Type="AddNextSibling" GUID="700047">
     <Asset>
       <Template>AssetPool</Template>
@@ -211,5 +247,7 @@
   <Include File="/data/config/export/main/asset/ProgressUnlock.include.xml" />
   <Include File="/data/config/export/main/asset/Decisions.include.xml" />
   <Include File="/data/config/export/main/asset/Triggers.include.xml" />
+  <Include File="/data/config/export/main/asset/DiploButtonStuff.include.xml" />
+  
 
 </ModOps>

@@ -3,6 +3,41 @@
   
   <!-- Trigger/Quest Human -->
   
+  <!-- TODO:   -->
+  <!-- ActionSpawnObject mit AssetPool zum spawnen wählt ein zufälliges Asset aus, aber verursacht Desync im MP !!! -->
+   <!-- (ist eigentlich eine geniale Option gewesen, dass es auch für KI zufällig funzt...) -->
+  
+  <!-- daher ist die einzige sinnvolle andere Lösung für Humans es über QuestPool zu machen  -->
+   <!-- und dabei eine Quest pro zu spawnendem Asset zu haben, die dann zufällig gewählt wird... -->
+  <!-- und für KI, die keine Quests kann, hab ich dann noch keine sinvolle Lösung... -->
+  
+  <!-- mögliche lösung: -->
+   <!-- via lua oder Qeusts oder trigger eine zufällige ressource/zufällige Menge gutschreiben, zur Not Human0 -->
+    <!-- und dies dann via PlayerCounter aus Sicht der KI prüfen? gucken in welcher konstellation das klappen könnte.. -->
+  
+  <!-- mit PlayerCounter GoodsInStock kann ich auch metaressourcen abfragen -->
+  <!-- ActionAddResource hatte nicht mit  AssetPool geklappt, aber ActionAddGoodsToItemContainer klappt mit pool, aber ich fürchte -->
+   <!-- es nimmt dann immer das erste (oder optional alle) aus dem Pool, nicht zufällig. -->
+   
+   <!-- dann bliebe nur noch lua/Quest und dem human0 gutgeschreiben -->
+   <!-- per Quest über QuestReward, was aus einer Liste von rewards zufällig wählt. -->
+    <!-- oder eine zufällige menge in form eines resourcepools -->
+    
+    
+  <!-- ALTERNATIV: -->
+   <!-- ein Trigger mit ActionExecuteActionByChance, mit einer Anzahl an Optionen die durch 2fache wurzel teilbar ist, -->
+    <!-- also 2,4,8,16 usw. Dann -->
+    <!-- Also zb 8 Optionen, alle mit chance 50%: -->
+                                  <!-- true -> 1 -->
+                      <!-- true -> 1-2 -->
+                                  <!-- false -> 2 -->
+     <!-- True -> 1 bis 4 -->
+                                 <!-- true -> 3 -->
+                      <!-- false -> 3-4 -->
+                                  <!-- false -> 4 -->
+     <!-- und denselben Ast bei false mit 5 bis 8 -->
+    <!-- Die Chance dass eine einzlne Option gewählt wird, ist das Produkt der Chance aller Wege, also hier für alle 0.5*0.5*05 = 0.125 (also 1/8) -->
+      <!-- Zumindest also bei dieser Anzahl an Optionen und wenn alles gleich wahrsceinlich sein soll, wäre das so gut umsetzbar. -->
   
   <ModOp Type="addNextSibling" GUID="150725">
     <Asset>
@@ -37,7 +72,8 @@
           <DefaultLockedState>0</DefaultLockedState>
         </Locked>
       </Values>
-    </Asset>
+    </Asset>   
+    
   </ModOp>
   
   
@@ -175,7 +211,8 @@
                             <Values>
                               <VariableValue>
                                 <!-- <FloatValue>100</FloatValue> -->
-                                <FloatValue>5</FloatValue>
+                                <!-- <FloatValue>5</FloatValue> -->
+                                <FloatValue>0</FloatValue>
                               </VariableValue>
                             </Values>
                           </ChanceValue>
@@ -252,6 +289,7 @@
                                         <Action />
                                         <ActionSpawnObjects>
                                           <SpawnGUID>1500004734</SpawnGUID>
+                                          <!-- <SpawnGUID>1500004693</SpawnGUID> -->
                                           <Amount>1</Amount>
                                           <Owner>Third_party_01_Queen</Owner>
                                           <!-- <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant> -->
@@ -277,6 +315,7 @@
                                         <Action />
                                         <ActionSpawnObjects>
                                           <SpawnGUID>1500004735</SpawnGUID>
+                                          <!-- <SpawnGUID>1500004715</SpawnGUID> -->
                                           <Amount>1</Amount>
                                           <Owner>Third_party_01_Queen</Owner>
                                           <!-- <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant> -->
