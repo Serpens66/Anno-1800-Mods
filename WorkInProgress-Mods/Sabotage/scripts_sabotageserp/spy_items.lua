@@ -4,6 +4,7 @@
  -- also am besten skript 1 sek danach aufrufen um items zu verteilen
  
  -- doch besser mit Trigger in xml machen, da gibts weder die MP/coop probleme von lua, noch das problem, dass wir nur auf objekte der aktiven Session zugreifen können.
+-- (items ercheaten macht auch desync im MP)
  -- Der einzige Haken bei xml ist halt, dass wir eine condition für jede ressource und eine condition für jede menge die gepürft werden soll
   -- machen müssen, also "hast du 1 ressource, dann fürge 1 item zu. Hast du 2 ressourcen, dann fürge 2 items zu" usw.
   -- Aber die Anzahl kann durchaus auf 3 pro Item oderso limitiert sein, dann ufert das ohnehin nicht aus.
