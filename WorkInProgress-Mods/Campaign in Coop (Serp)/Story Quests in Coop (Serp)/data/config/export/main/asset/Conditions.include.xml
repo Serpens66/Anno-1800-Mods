@@ -3,6 +3,17 @@
   <!-- general code to replace all ConditionIsMultiplayer. might be incompatible to mods relying on it for their triggers, -->
    <!-- so they should load after this mod if this is a problem. -->
    <!-- See assets.xml include to enable compatible code instead -->
+   
+   
+   <!-- Instead of using <UnlockNeeded>1500003812</UnlockNeeded> ("is multiplayer" == "is not single human slot") -->
+    <!-- we will use ConditionAlwaysFalse now, to see if this prevents the bug from SP+MP Expedition starting both, although 1500003812 is locked -->
+    <!-- <TriggerCondition> -->
+      <!-- <Template>ConditionAlwaysFalse</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition /> -->
+        <!-- <ConditionAlwaysFalse /> -->
+      <!-- </Values> -->
+    <!-- </TriggerCondition> -->
   
   <!-- replace "not multiplayer" with "is single human slot" -->
   <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsMultiplayer and ConditionPropsNegatable/NegateCondition='1']]">
@@ -19,14 +30,21 @@
   </ModOp>
   <!-- replace "is multiplayer" with "is not single human slot" (must also replace these, otherwise both "is multiplayer" and "is single human slot" will be true, leading to double the quests or so) -->
   <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+    <!-- <TriggerCondition> -->
+      <!-- <Template>ConditionUnlocked</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition /> -->
+        <!-- <ConditionUnlocked> -->
+          <!-- <UnlockNeeded>1500003812</UnlockNeeded> -->
+        <!-- </ConditionUnlocked> -->
+        <!-- <ConditionPropsNegatable /> -->
+      <!-- </Values> -->
+    <!-- </TriggerCondition> -->
     <TriggerCondition>
-      <Template>ConditionUnlocked</Template>
+      <Template>ConditionAlwaysFalse</Template>
       <Values>
         <Condition />
-        <ConditionUnlocked>
-          <UnlockNeeded>1500003812</UnlockNeeded>
-        </ConditionUnlocked>
-        <ConditionPropsNegatable />
+        <ConditionAlwaysFalse />
       </Values>
     </TriggerCondition>
   </ModOp>
@@ -84,14 +102,21 @@
   </ModOp>
   <!-- Multiplayer == Not IsSingleHumanSlot -->
   <ModOp Type="replace" Path="//Condition[Values[ConditionIsMultiplayer and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
+    <!-- <Condition> -->
+      <!-- <Template>ConditionUnlocked</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition /> -->
+        <!-- <ConditionUnlocked> -->
+          <!-- <UnlockNeeded>1500003812</UnlockNeeded> -->
+        <!-- </ConditionUnlocked> -->
+        <!-- <ConditionPropsNegatable /> -->
+      <!-- </Values> -->
+    <!-- </Condition> -->
     <Condition>
-      <Template>ConditionUnlocked</Template>
+      <Template>ConditionAlwaysFalse</Template>
       <Values>
         <Condition />
-        <ConditionUnlocked>
-          <UnlockNeeded>1500003812</UnlockNeeded>
-        </ConditionUnlocked>
-        <ConditionPropsNegatable />
+        <ConditionAlwaysFalse />
       </Values>
     </Condition>
   </ModOp>

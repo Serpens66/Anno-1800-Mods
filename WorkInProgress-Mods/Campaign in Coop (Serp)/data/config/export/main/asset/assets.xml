@@ -15,16 +15,39 @@
   <!-- TODO im finale 151422 rausfinden was ActionEnableTicks macht (evlt auch in testmod mal ausführen) um zu wissen ob das wichtig und obs MP kompatibel ist -->
     <!-- sehe im singleplayer mit ActionEnableTicks keinen unterschied... keine ahnung was das macht.. -->
     
+    
+    <!-- TODO: -->
+      <!-- es gibt n popup CampaignReadLetter <GUID>10567</GUID>      <Text>Möchten Sie das versiegelte Dokument wirklich öffnen?</Text> -->
+      <!-- das startet danach ein <PopupText>10521</PopupText> und beendet die Quest  <Quest>150621</Quest> -->
+      <!-- testen ob das probleme im MP verursacht, wenn ja evlt durch decisionquest versuchen zu ersetzen, -->
+       <!-- wobei aktuell unklar ist, wann/wie/wo überhaupt "CampaignReadLetter" Popup geöffnet wird. -->
   
-
+  <!-- TODO: -->
+  <!-- - Angeblich gibts direkt nach erstmaligen Laden der Kampagne nen desync? gucken ob ich das reproduzieren kann. -->
+  <!-- - Die ActionLoseGame wenn man Kampagneninsel verliert: da noch condition zupacken, dass man die letzte Quest der Kampagne -->
+    <!-- noch nicht abgeschlossen haben darf (not Reached), sodass Loose nicht mehr ausgelöst wird, wenn man die Story der Kampagne abgeschlossen hat und dann -->
+     <!-- erst eine der inseln verliert. -->
   
   <!-- TODO -->
   <!-- bei Quest 150900 funktioniert der spawn in vanilla wohl nicht zuverlässig, auch wenn ich nicht sehe warum , spawnt in der nähe von player_kontor_colony was der spieler durch die mapfile haben sollte -->
-    <!-- evlt gucken ob man ein fallback einbauen kann, also einen trigger der prüft ob objecte erfolgreich gespawned wurden und wenn nicht, dann nochmal mit forcecontextposition und einem residence matcher oderso -->
+    <!-- evlt gucken ob man ein fallback einbauen kann, also einen trigger der prüft ob objecte erfolgreich gespawned wurden und wenn nicht, dann nochmal mit forcecontextposition und einem residence matcher oderso (oder einfach nur winquest und fertig) -->
     <!-- bzw. alternativ bei allen solcher Quests die menge der objekte die spawned verdoppeln, aber die anzahl die gefunden werden muss gleich halten -->
       <!-- indem wir AdditionalAmount auf Amount setzen (bzw amount draufaddieren, falls es den wert schon gibt) -->
     <!-- bei der quest mal testen, wopran es liegen könnte, ob die vllt im wasser spawnen würden und deshalb nicht alle spawnen oderso -->
-  
+   
+   <!-- TODO: -->
+    <!-- Quest nach Werft bauen, sollte eigentlich eine Zeitung anzeigen (evtl. mit Foto), aber diese wurde wohl nicht für den Host angezeigt, -->
+     <!-- nachdem client n foto gemacht hat. Vermutlich reicht ein "opennewspaper automatically" (OpenNewspaperUI) in der Quest oderso..  -->
+      <!-- denn bei random quests im MP klappt das eig auch, dass es für jeden coop spieler geöffnet wird nach foto -->
+    <!-- das Zeitungsarchiv, bzw der Zeitungsbutton erscheint vom Spiel her selbst erst bei der ersten Zeitung die man zensieren kann, -->
+     <!-- dh. wenn man vorher zeitungsquests hat, dann kann man die darin nicht nachschlagen. finde auch keinen Weg diesen Button vorher zu aktivieren -->
+      <!-- das newspaperunlock hat damit nicht direkt was zu tun, sondern aktiviert nur dass allgemein zensierbare artikel kommen können -->
+       <!-- aber erst sobald einer erscheint, gibts den button.. in SideNotificationsArchive schints auch kein an/aus zu geben.. -->
+   
+   <!-- TODO: -->
+    <!-- nochmal Tutorial Quests probieren und falls aktivierbar, evlt einfach die WinConditions ersetzen durch Fake = Instant Win ? -->
+     <!-- wäre deshalb wichtig, weil manche von Ihnen auch Belohnungen geben, die die User evlt haben wollen. -->
+      <!-- Oder wir verteilen die Belohnungen außerhalb davon iwie... -->
   
   <!-- bei Quest 151438 Pay No Ransom muss man wohl ein Item auf Isabels Luechtturm ziehen? und wenn man es stattdessen auf den Hafen zieht, -->
    <!-- dann ist quest nicht gelöst und man kommt da nicht mehr so leicht ran? -->
@@ -276,7 +299,15 @@
   <!-- ############################################################################################ -->
   
   
-
+  <!-- Instead of using <UnlockNeeded>1500003812</UnlockNeeded> ("not ConditionIsCampaign" == "is not single human slot") -->
+    <!-- we will use ConditionAlwaysFalse now, to see if this prevents the bug from SP+MP Expedition starting both, although 1500003812 is locked -->
+    <!-- <TriggerCondition> -->
+      <!-- <Template>ConditionAlwaysFalse</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition /> -->
+        <!-- <ConditionAlwaysFalse /> -->
+      <!-- </Values> -->
+    <!-- </TriggerCondition> -->
   
   <!-- replace "is ConditionIsCampaign" with "is single human slot" -->
   <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsCampaign and (ConditionPropsNegatable[not(NegateCondition)] or ConditionPropsNegatable/NegateCondition='0')]]">
@@ -293,14 +324,21 @@
   </ModOp>
   <!-- replace "not ConditionIsCampaign" with "is not single human slot" (must also replace these, otherwise both "is ConditionIsCampaign" and "is single human slot" will be true, leading to double the quests or so) -->
   <ModOp Type="replace" Path="//TriggerCondition[Values[ConditionIsCampaign and ConditionPropsNegatable/NegateCondition='1']]">
+    <!-- <TriggerCondition> -->
+      <!-- <Template>ConditionUnlocked</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition /> -->
+        <!-- <ConditionUnlocked> -->
+          <!-- <UnlockNeeded>1500003812</UnlockNeeded> -->
+        <!-- </ConditionUnlocked> -->
+        <!-- <ConditionPropsNegatable /> -->
+      <!-- </Values> -->
+    <!-- </TriggerCondition> -->
     <TriggerCondition>
-      <Template>ConditionUnlocked</Template>
+      <Template>ConditionAlwaysFalse</Template>
       <Values>
         <Condition />
-        <ConditionUnlocked>
-          <UnlockNeeded>1500003812</UnlockNeeded>
-        </ConditionUnlocked>
-        <ConditionPropsNegatable />
+        <ConditionAlwaysFalse />
       </Values>
     </TriggerCondition>
   </ModOp>
@@ -326,14 +364,21 @@
   </ModOp>
   <!-- Not ConditionIsCampaign == Not IsSingleHumanSlot -->
   <ModOp Type="replace" Path="//Condition[Values[ConditionIsCampaign and ConditionPropsNegatable/NegateCondition='1']]">
+    <!-- <Condition> -->
+      <!-- <Template>ConditionUnlocked</Template> -->
+      <!-- <Values> -->
+        <!-- <Condition /> -->
+        <!-- <ConditionUnlocked> -->
+          <!-- <UnlockNeeded>1500003812</UnlockNeeded> -->
+        <!-- </ConditionUnlocked> -->
+        <!-- <ConditionPropsNegatable /> -->
+      <!-- </Values> -->
+    <!-- </Condition> -->
     <Condition>
-      <Template>ConditionUnlocked</Template>
+      <Template>ConditionAlwaysFalse</Template>
       <Values>
         <Condition />
-        <ConditionUnlocked>
-          <UnlockNeeded>1500003812</UnlockNeeded>
-        </ConditionUnlocked>
-        <ConditionPropsNegatable />
+        <ConditionAlwaysFalse />
       </Values>
     </Condition>
   </ModOp>
@@ -452,97 +497,182 @@
     <!-- </IslandsToHold> -->
   <!-- </CampaignCondition> -->
   <!-- put this into a trigger to replicate -->
+   <!-- did not get ConditionEvent IslandUnsettled together with 160002/PlayerStartIsland to work -->
+   <!-- so we will use ConditionPlayerCounter to check if player owns a kontor on that island -->
   <ModOp Type="addNextSibling" GUID="130248">
     <Asset>
       <Template>Trigger</Template>
       <Values>
         <Standard>
           <GUID>1500004380</GUID>
-          <Name>LooseIslandLooseGame</Name>
+          <Name>LooseIslandLooseGame1</Name>
         </Standard>
         <Trigger>
           <TriggerCondition>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Template>ConditionPlayerCounter</Template>
             <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionAlwaysTrue />
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>700000</Context>
+                <CounterAmount>1</CounterAmount>
+                <CounterScope>Area</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CounterScopeContext>160002</CounterScopeContext>
+              </ConditionPlayerCounter>
             </Values>
           </TriggerCondition>
-          <SubTriggers>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionEvent</Template>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>700000</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CounterScope>Area</CounterScope>
+                      <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                      <CounterScopeContext>160002</CounterScopeContext>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions> 
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLoseGame</Template>
                       <Values>
-                        <Condition />
-                        <ConditionEvent>
-                          <ConditionEvent>IslandUnsettled</ConditionEvent>
-                          <ContextAsset>PlayerStartIsland</ContextAsset>
-                        </ConditionEvent>
-                        <ConditionPropsNegatable />
+                        <Action />
+                        <ActionLoseGame />
                       </Values>
-                    </TriggerCondition>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionEvent</Template>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004382</GUID>
+          <Name>LooseIslandLooseGame2</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>700000</Context>
+                <CounterAmount>1</CounterAmount>
+                <CounterScope>Area</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CounterScopeContext>160005</CounterScopeContext>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>700000</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CounterScope>Area</CounterScope>
+                      <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                      <CounterScopeContext>160005</CounterScopeContext>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions> 
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLoseGame</Template>
                       <Values>
-                        <Condition />
-                        <ConditionEvent>
-                          <ConditionEvent>IslandUnsettled</ConditionEvent>
-                          <ContextAsset>Campaign_SA_PlayerStartIsland</ContextAsset>
-                        </ConditionEvent>
-                        <ConditionPropsNegatable />
+                        <Action />
+                        <ActionLoseGame />
                       </Values>
-                    </TriggerCondition>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionEvent</Template>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004383</GUID>
+          <Name>LooseIslandLooseGame3</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>700000</Context>
+                <CounterAmount>1</CounterAmount>
+                <CounterScope>Area</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CounterScopeContext>160006</CounterScopeContext>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>700000</Context>
+                      <CounterAmount>1</CounterAmount>
+                      <ComparisonOp>LessThan</ComparisonOp>
+                      <CounterScope>Area</CounterScope>
+                      <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                      <CounterScopeContext>160006</CounterScopeContext>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions> 
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionLoseGame</Template>
                       <Values>
-                        <Condition />
-                        <ConditionEvent>
-                          <ConditionEvent>IslandUnsettled</ConditionEvent>
-                          <ContextAsset>Campaign_SA_ColonialistIsland</ContextAsset>
-                        </ConditionEvent>
-                        <ConditionPropsNegatable />
+                        <Action />
+                        <ActionLoseGame />
                       </Values>
-                    </TriggerCondition>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-          </SubTriggers>
-          <TriggerActions> 
-            <Item>
-              <TriggerAction>
-                <Template>ActionLoseGame</Template>
-                <Values>
-                  <Action />
-                  <ActionLoseGame />
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
         <TriggerSetup>
           <AutoRegisterTrigger>1</AutoRegisterTrigger>
@@ -552,6 +682,10 @@
     </Asset>
   </ModOp>
   
+  
+  
+  <!-- TODO: -->
+   <!-- game crashed zurzeit, wenn man die Movie von startsession in die alte welt skipped. -->
   
   
   
