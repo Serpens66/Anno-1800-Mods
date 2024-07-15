@@ -78,6 +78,17 @@ end
 -- Am besten eine SP/MP Unterscheidung machen, bei SP immer durch 1000 teilen, weils da kein coopcount problem gibt
 
 
+-- evlt. auch doch mit GiftSmallSize und SendSmallGift kombinieren? (testen wie es im MP reagiert, wenns desync macht, dann ists keine opition)
+ -- Problem hierbei ist halt, dass GiftSmallSize sich ändert und evlt. eben kein Teiler der Geldsumme ist,
+  -- um die es geht, also nicht genau genug ist.
+-- Aber bei AddAmount haben wir das problem der maximalmenge, wodurchs auch wieder ungenau wird.
+-- Wenn man nun also versucht es trotz maxmenge möglich genau zu halten und wir zb. sagen 100k kann man damit genau genug übertragen,
+ -- dann könnte man für Summen über 100k dann in nem loop SendSmallGift verwenden, solange bis Restbetrag unter 100k ist
+-- Auf diese Weise wirds dann denke ich genauer sein, als wenn wir nur eine der beiden Methoden nehmen
+
+
+
+
 -- TODO:
  -- nach erfoglreichen giften evlt noch n trigger registern der n lua skript für alle startet welches reputation verteilt,
   -- einen von dreien (1 bis 3 Reputation).. oder wir machen einfach stumpf immer 1 reputation pro gift hier,
