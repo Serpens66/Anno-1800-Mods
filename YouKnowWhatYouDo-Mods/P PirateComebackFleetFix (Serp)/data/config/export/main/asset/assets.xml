@@ -9,14 +9,10 @@
     <!-- (some vanilla quests are using ships from this pool, which is just stupid from them, but luckily always with General_Enemy as owner, so does not conflict with this mod) -->
     
     
-    
+    <!-- todo: wenn hafen unverwndbar, in vanilla quests gucken obs da quest gibt mit hafen zerstören, -->
+     <!-- und ob die dann auch lsen, wenn pirate defeated ist und ob das ok so ist. (DestroyObjective sollte lösen, PlayerCounter nicht) -->
 
-      <!-- Minor Problem: -->
-       <!-- die zurückgerufene Warfleet zählt nicht mehr intern zur warfleet, weshalb das spiel intern eine neue warfleet spawned (sofern Kontor ohne komplett Zerstörung repariert wird und von der warfleet mindestens ein schiff fehlt, wird eine komplette neue warlfeet gespawned) -->
-       <!-- ich könnte die warfleet stattdessen die map verlassen lassen und direkt instant ne neue warfleet mit derselben Menge spawnen, aber das sieht auch komisch aus. -->
-       <!-- stattdessen belassen wir es dabei und die warfleet die bei zerstörung des Kontors dan umgewandelt wird, wird vermutlich eh nicht so groß sein, weshalbs nicht schlimm ist, -->
-        <!-- wenn bei reparieren dann zusätzlich eine neue warfleet spawned. -->
-        
+
     <!-- ############### -->
     
     
@@ -294,168 +290,228 @@
       </Values>
     </Asset>
     
+    <!-- outcommented because it disturbs attacks. so while it is the only workaround to make comebackfleet roaming around again, it is too invasive. -->
     <!-- every ~30 minutes: -->
     <!-- change again owner back and forth to restart pirates SquadLogic for ships not part of the WarFleet (eg comebackfleet and the warfleet that turned neutral on harbor destroy) -->
     <!-- Changing the owner back and forth causes no harm for the ships and also not the current warfleet, beside that they will stand still for a second before getting their new command. -->
      <!-- (it also does not abort an active defend/attack command) -->
-    <Asset>
-      <Template>Trigger</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001129</GUID>
-          <Name>Make non-warfleet ships again follow SquadLogic (roaming around)</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition />
-              <ConditionUnlocked>
-                <UnlockNeeded>1500001613</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <SubTriggers>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionUnlocked</Template>
-                      <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
-                        <ConditionUnlocked>
-                          <UnlockNeeded>1500001145</UnlockNeeded>
-                        </ConditionUnlocked>
-                        <ConditionPropsNegatable />
-                      </Values>
-                    </TriggerCondition>
-                    <TriggerActions> 
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionChangeParticipant</Template>
-                          <Values>
-                            <Action />
-                            <ActionChangeParticipant>
-                              <NewParticipantID>Neutral</NewParticipantID>
-                            </ActionChangeParticipant>
-                            <ObjectFilter>
-                              <ObjectGUID>700138</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID>
-                              <ObjectSession>180023</ObjectSession>
-                            </ObjectFilter>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionChangeParticipant</Template>
-                          <Values>
-                            <Action />
-                            <ActionChangeParticipant>
-                              <NewParticipantID>Third_party_03_Pirate_Harlow</NewParticipantID>
-                            </ActionChangeParticipant>
-                            <ObjectFilter>
-                              <ObjectGUID>700138</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <ObjectParticipantID>Neutral</ObjectParticipantID>
-                              <ObjectSession>180023</ObjectSession>
-                            </ObjectFilter>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionUnlocked</Template>
-                      <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
-                        <ConditionUnlocked>
-                          <UnlockNeeded>1500001146</UnlockNeeded>
-                        </ConditionUnlocked>
-                        <ConditionPropsNegatable />
-                      </Values>
-                    </TriggerCondition>
-                    <TriggerActions> 
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionChangeParticipant</Template>
-                          <Values>
-                            <Action />
-                            <ActionChangeParticipant>
-                              <NewParticipantID>Neutral</NewParticipantID>
-                            </ActionChangeParticipant>
-                            <ObjectFilter>
-                              <ObjectGUID>700138</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <ObjectParticipantID>Third_party_04_Pirate_LaFortune</ObjectParticipantID>
-                              <ObjectSession>180025</ObjectSession>
-                            </ObjectFilter>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionChangeParticipant</Template>
-                          <Values>
-                            <Action />
-                            <ActionChangeParticipant>
-                              <NewParticipantID>Third_party_04_Pirate_LaFortune</NewParticipantID>
-                            </ActionChangeParticipant>
-                            <ObjectFilter>
-                              <ObjectGUID>700138</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <ObjectParticipantID>Neutral</ObjectParticipantID>
-                              <ObjectSession>180025</ObjectSession>
-                            </ObjectFilter>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-          </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerCondition>
-                  <Template>ConditionTimer</Template>
-                  <Values>
-                    <Condition />
-                    <ConditionTimer>
-                      <TimeLimit>1800000</TimeLimit>
-                    </ConditionTimer>
-                  </Values>
-                </TriggerCondition>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
-        </Trigger>
-        <TriggerSetup>
-          <AutoRegisterTrigger>1</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-        </TriggerSetup>
-      </Values>
-    </Asset>   
+    <!-- <Asset> -->
+      <!-- <Template>Trigger</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001129</GUID> -->
+          <!-- <Name>Make non-warfleet ships again follow SquadLogic (roaming around)</Name> -->
+        <!-- </Standard> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionUnlocked</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionUnlocked> -->
+                <!-- <UnlockNeeded>1500001613</UnlockNeeded> -->
+              <!-- </ConditionUnlocked> -->
+              <!-- <ConditionPropsNegatable /> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+          <!-- <SubTriggers> -->
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionUnlocked</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition> -->
+                          <!-- <IsOptional>1</IsOptional> -->
+                        <!-- </Condition> -->
+                        <!-- <ConditionUnlocked> -->
+                          <!-- <UnlockNeeded>1500001145</UnlockNeeded> -->
+                        <!-- </ConditionUnlocked> -->
+                        <!-- <ConditionPropsNegatable /> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions>  -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionChangeParticipant</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionChangeParticipant> -->
+                              <!-- <NewParticipantID>Neutral</NewParticipantID> -->
+                            <!-- </ActionChangeParticipant> -->
+                            <!-- <ObjectFilter> -->
+                              <!-- <ObjectGUID>700138</ObjectGUID> -->
+                              <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                              <!-- <ObjectParticipantID>Third_party_03_Pirate_Harlow</ObjectParticipantID> -->
+                              <!-- <ObjectSession>180023</ObjectSession> -->
+                            <!-- </ObjectFilter> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionChangeParticipant</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionChangeParticipant> -->
+                              <!-- <NewParticipantID>Third_party_03_Pirate_Harlow</NewParticipantID> -->
+                            <!-- </ActionChangeParticipant> -->
+                            <!-- <ObjectFilter> -->
+                              <!-- <ObjectGUID>700138</ObjectGUID> -->
+                              <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                              <!-- <ObjectParticipantID>Neutral</ObjectParticipantID> -->
+                              <!-- <ObjectSession>180023</ObjectSession> -->
+                            <!-- </ObjectFilter> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionUnlocked</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition> -->
+                          <!-- <IsOptional>1</IsOptional> -->
+                        <!-- </Condition> -->
+                        <!-- <ConditionUnlocked> -->
+                          <!-- <UnlockNeeded>1500001146</UnlockNeeded> -->
+                        <!-- </ConditionUnlocked> -->
+                        <!-- <ConditionPropsNegatable /> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                    <!-- <TriggerActions>  -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionChangeParticipant</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionChangeParticipant> -->
+                              <!-- <NewParticipantID>Neutral</NewParticipantID> -->
+                            <!-- </ActionChangeParticipant> -->
+                            <!-- <ObjectFilter> -->
+                              <!-- <ObjectGUID>700138</ObjectGUID> -->
+                              <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                              <!-- <ObjectParticipantID>Third_party_04_Pirate_LaFortune</ObjectParticipantID> -->
+                              <!-- <ObjectSession>180025</ObjectSession> -->
+                            <!-- </ObjectFilter> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                      <!-- <Item> -->
+                        <!-- <TriggerAction> -->
+                          <!-- <Template>ActionChangeParticipant</Template> -->
+                          <!-- <Values> -->
+                            <!-- <Action /> -->
+                            <!-- <ActionChangeParticipant> -->
+                              <!-- <NewParticipantID>Third_party_04_Pirate_LaFortune</NewParticipantID> -->
+                            <!-- </ActionChangeParticipant> -->
+                            <!-- <ObjectFilter> -->
+                              <!-- <ObjectGUID>700138</ObjectGUID> -->
+                              <!-- <CheckParticipantID>1</CheckParticipantID> -->
+                              <!-- <ObjectParticipantID>Neutral</ObjectParticipantID> -->
+                              <!-- <ObjectSession>180025</ObjectSession> -->
+                            <!-- </ObjectFilter> -->
+                          <!-- </Values> -->
+                        <!-- </TriggerAction> -->
+                      <!-- </Item> -->
+                    <!-- </TriggerActions> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+          <!-- </SubTriggers> -->
+          <!-- <ResetTrigger> -->
+            <!-- <Template>AutoCreateTrigger</Template> -->
+            <!-- <Values> -->
+              <!-- <Trigger> -->
+                <!-- <TriggerCondition> -->
+                  <!-- <Template>ConditionTimer</Template> -->
+                  <!-- <Values> -->
+                    <!-- <Condition /> -->
+                    <!-- <ConditionTimer> -->
+                      <!-- <TimeLimit>1800000</TimeLimit> -->
+                    <!-- </ConditionTimer> -->
+                  <!-- </Values> -->
+                <!-- </TriggerCondition> -->
+              <!-- </Trigger> -->
+            <!-- </Values> -->
+          <!-- </ResetTrigger> -->
+        <!-- </Trigger> -->
+        <!-- <TriggerSetup> -->
+          <!-- <AutoRegisterTrigger>1</AutoRegisterTrigger> -->
+          <!-- <UsedBySecondParties>0</UsedBySecondParties> -->
+        <!-- </TriggerSetup> -->
+      <!-- </Values> -->
+    <!-- </Asset>    -->
+    
   </ModOp>
+    
+    
+    <!-- ######################################## -->
+  
+  <!-- instead of working around with triggers for warfleet on harbor destroy (1500001117 and 1500001127), we might make the harbor invincible and lower the morale of it -->
+   <!-- this means the player has to destroy the canons to defeat pirates (which will then also destroy harbor automatically) -->
+    <!-- And most importanly: it means the harbor gets destroyed the same time the prate is defeated, so it is no problem anymore that the game removes the warfleet at that time -->
+  
+    <ModOp Type="merge" GUID='100681' Path="/Values">
+      <Attackable>
+        <MoralePower>100</MoralePower>
+        <AttackableType>[NONE]</AttackableType>
+      </Attackable>
+    </ModOp>
+    <ModOp Type="merge" GUID='100682' Path="/Values">
+      <Attackable>
+        <MoralePower>150</MoralePower>
+        <AttackableType>[NONE]</AttackableType>
+      </Attackable>
+    </ModOp>
+    
+    <!-- give the big bertha a damage reduction buff and selfheal of 30 instead of 5 (harbor has 300) to compensate for the fewer hitpoints you must destroy now that the harbor is missing. -->
+    <ModOp Type="merge" GUID='102450' Path="/Values">
+        <UpgradeList>
+          <DefaultBuff>1500001128</DefaultBuff>
+        </UpgradeList>
+        <Attackable>
+        <SelfHealPerHealTick>30</SelfHealPerHealTick>
+      </Attackable>
+    </ModOp> 
+    
+    <ModOp Type="addNextSibling" GUID="192176">
+      <Asset>
+        <Template>HarbourOfficeBuff</Template>
+        <Values>
+          <Standard>
+            <GUID>1500001128</GUID>
+            <Name>30% Less Damage from everything</Name>
+          </Standard>
+          <AttackableUpgrade>
+            <DamageReceiveFactor>
+              <Cannon>
+                <Factor>0.7</Factor>
+              </Cannon>
+              <Normal>
+                <Factor>0.7</Factor>
+              </Normal>
+              <Torpedo>
+                <Factor>0.7</Factor>
+              </Torpedo>
+              <BigBertha>
+                <Factor>0.7</Factor>
+              </BigBertha>
+            </DamageReceiveFactor>
+          </AttackableUpgrade>
+        </Values>
+      </Asset>
+    </ModOp>
     
 
     <!-- ######################################################## -->
@@ -468,7 +524,7 @@
     <Include File="/data/config/export/main/asset/DeclareWar.include.xml" />
     
     <!-- Triggers to make warfleet not leave map only on harbor destroy -->
-    <Include File="/data/config/export/main/asset/WarFleet.include.xml" />
+    <!-- <Include File="/data/config/export/main/asset/WarFleet.include.xml" /> -->
     
     
 

@@ -400,7 +400,7 @@ end
 -- ###########################################
 
 -- eg to share in lua with other humans: info what the human has unlocked (since in lua we can only check what we ourself have unlocked, but not what others have -.-)
--- invalid signs in strings (to save it into nameable): " \ , [ ] and () if both used
+-- invalid signs in strings (to save it into nameable): " \ , [ ] and () if both used. and better do not use - because it might hurt gsub?
   
 -- WICHTIGE INFO zu Nameable:
 
@@ -421,6 +421,7 @@ end
  -- womit es nicht für die allgemeine Verwendung von Jedem genutzt werden kann, zumindest nicht mit derselben HelperOID.
  -- ich werde es hier also erstmal exklusiv für savestuff verwenden um lokale Infos zwischen den Spielern abzugleichen
   -- und dann eine Kombination aus allen Infos abzuspeichern
+
 
 -- DONT USE THIS Get_Nameable_Helper_OID in your mod! (because this HelperOID is limited and usd for important things you should not block!)
 local function Get_Nameable_Helper_OID()

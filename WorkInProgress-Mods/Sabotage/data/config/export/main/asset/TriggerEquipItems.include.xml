@@ -18,6 +18,7 @@
   <!-- Geht halbwegs auch mit lua, aber da gibts diverse andere Probleme (MP/Coop sorgen für mehrfache ausführung und session. ist immer nur die aktuelle session des spielers) -->
     <!-- deswegen ist mit Triggern schon sinnvoller, auch wenn wir jede Menge einzeln prüfen müssen. Daher ist die maximlae Anzahl pro Item am besten limitiert, zb. auf 3 -->
   
+  
   <!-- Die "Ressource Item" kann man zb bekommen indem man sie für "Ressource Buy Item Ressources" kauft, zb. in einem shipyard ähnlichem gebäude -->
     <!-- also bei Bau eines objekts darin dann gutschreiben der ressource -->
   <!-- Und "Ressource Buy Item Ressources" könnte man zb. für das Platzieren von Spionageposten oderso auf fremden Inseln bekommen (die der inselbesitzer zb mit polizei zerstören kann) -->
@@ -42,6 +43,27 @@
         <!-- wobei wir am besten einfach ChangeGUID machen, statt spawnen+remove. Das sollte funktionieren. -->
       <!-- TODO... ConditionItemUsed funzt leider nicht für schuss-items... -->
       <!-- bleibt also nur der Weg jedem item-projektil ein eigenes SpawnOnImpact zu geben.. -->
+  
+
+  
+  <!-- TODO  -->
+  <!-- ALTERNATIVE Idee der Limitierung: -->
+   <!-- Items wieder endlos oft und in Init des spies reinpacken (oder weiter per trigger item spawnen, wenn man sie freischalten können soll). -->
+   <!-- Bei jedem mal wo so ein "Recently sabotage Helper" 1500001716 dazu kommt, fügen wir eine Meta Ressource hinzu (weil 1500001716 ja auch wieder entfernt wird über zeit mit dieser res ein euer counter) -->
+    <!-- die menge dieser res kann nicht negativ werden und der spy kann zb bei seiner Basis dann diesen wert wieder auf 0 reduzieren. -->
+     <!-- Sobald der Wert durch Sabotage zb mind. 10 erreicht, machen wir ein ActionDeleteItems direkt und auch ein ActionDeleteItems  -->
+      <!-- in dem trigger der erkennt dass ein spy/spy ship gespawned wurde. -->
+   <!-- Auf diese Weise kann man nur x mal sabotieren, bevor man keine sabo-items mehr hat und sie auf irgendeine Weise wieder auffüllen muss. -->
+    <!-- zb. könnte man auf eigener Inselbasis diese meta-res um -100 verringern, sodass es immer wieder komplette menge aufgefüllt wird. -->
+     <!-- und in basis auf fremder Insel könnte man nur -1 machen, sodass auffüllen zwar geht, aber länger dauert (auffüllvorgang kann auch zeit dauern) -->
+     
+    <!-- Diese maxmenge kann man auch direkt an die anzahl der Basen auf fremden inseln koppeln? -->
+    <!-- ohne basis kann man immer nur 1 mal sabotieren und jede stehende basis gibt +1 dazu, bis zu einer max menge von 10 -->
+      <!-- (dazu braucht es trigger der die menge der res mit der menge der basen abgleicht, ist etwas viel code, aber wenn wirs auf 10 limitieren sollte es ok sein) -->
+     
+     <!-- und dafür sorgen, dass man basen nur auf KI inseln bauen kann, also abreißen, wenn auf anderer insel gebaut oder targetting anpassen -->
+     
+     <!-- (wie sorge ich nochmal dafür, dass Basis nur nutzbar ist während Spy in der nähe ist? zb durch spy der buff mit item auf building macht, damit dies schneller das gewüscnhte produziert) -->
   
   
   
@@ -201,7 +223,7 @@
       <Values>
         <Standard>
           <GUID>1500002179</GUID>
-          <Name>Buy Sabotage Items</Name>
+          <Name>Shop Sabotage Items</Name>
           <IconFilename>data/ui/2kimages/main/3dicons/city_institution/icon_police.png</IconFilename>
           <InfoDescription>1500001503</InfoDescription>
         </Standard>

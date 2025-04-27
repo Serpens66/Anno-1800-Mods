@@ -1,35 +1,46 @@
-This mod fixes:
+Most major change you need to be aware:
+Pirate harbors are invincible now!
+ Destroy all guns instead from pirate to defeat the pirates!
 
-- Warfleet of pirates get neutral and leaves map when pirate harbor is destroyed, even if the pirate itself is not defeated yet and can rebuild harbor if not completely defeated in time.
--> fixed by commanding on harbor destroy all neutral pirate ships to move back to pirate harbor and change owner to pirate again, if pirate is not defeated yet.
-  Unfortunately this way the warfleet is no longer recognized as warfleet from pirate (but still properly used), so if the pirate repairs his kontor without being defeated, he will spawn a new warfleet over time, resulting in more ships then intended. There is no good way to solve this, but I also think it is ok, since the leftover warfleet will most likely be quite small anyways.
+...
 
-- Comeback Fleet does not count to the WarFleet count of pirates (so pirates will have the comeback fleet plus the warfleet amount after resettle -> more than intended)
--> fixed by commanding one of the resettle ships every 45 minutes to leave map (without changing to neutral) as long as pirate is not defeated. But since you (Ac3s) likes the extreme, this trigger is not active if Combat Overhaul-Pirates mod is active.
+This mod "fixes" (impossible to fix, just adding workarounds):
 
-- Warfleet does not spawn again after comeback if you defeated pirate while he had full warfleet. It does start spawn again after you destroyed at least one comebackfleet ship after rebuild.
--> also fixed by the previous fix which removes a comebackfleet ship every 45 minutes (starting 15 minutes after rebuild)
-
-- Comeback Fleet does not change to neutral and not leaving the map, after pirate island is destroyed again.
--> fixed by changing owner of all pirate ships from pirate to neutral and tell them to leave map, as soon as pirate is defeated.
-
-- comebackfleet regulary aborts the default pirates SquadLogic (roaming around) and stand still doing nothing, eg whenever there is a attack/defend Command (which is when island building gets attacked or a fixed time intervall for attacks).
-  It seems the game devs only implemented this for the internally spawned WarFleet, while ships spawned differently or ships that left the warfleet (which happens on harbor destroy for the current warfleet) only activate this "roaming around" once after the owner of the ships was changed to Pirate.
-  -> fixed by: Every 30 minutes this fixmod will change the owner of all pirate ships for a milisecond to neutral and then back to pirate, to make sure all ships are doing their job (will make the ships stop moving 1 second, but then they will continue doing what they did before).
+-  If you save and load a savegame, while the Quest to destroy the comeback fleet is active, this quest will end and a new comeback fleet will arrive after "ComebackAfterKontorDestruction"-time, resulting in 2 or more comeback fleets.
+-> fixed by removing the current comebackfleet when loading such a savegame. You still have to wait for the next, but at least there won't be 2 or more comebackfleets at once anymore. (this comeback-stuff is mostly outside of xml, so there is no proper way to simply start the Quest again on loading without the need to wait for the next fleet, that is why I chose this solution)
 
 - If the Comeback Fleet arrives while you are not at war with pirates (eg. AI destroyed them or you used pirate flag item), then the ships will simply stand next to the harbor doing nothing. You have to save+load the game, declare war and wait for the next fleet to bypass this.
 -> fixed by making pirates declare war on every human they not already have war with while they are defeated. I removed my complicated code that was ment to restore previous relation as soon as comebackfleet arrives, because I agree, that it is fine to get this kind of punishment for not helping the pirates to not be defeated.
 Pirates do not declare war to AIs with this fix, because I do not wanted to mess with AI personalities (may be stupid if Ais that would never be at war with pirates, suddenly are at war with them)
 
+- Comeback Fleet does not change to neutral and not leaving the map, after pirate island is destroyed again.
+-> fixed by changing owner of all pirate ships from pirate to neutral and tell them to leave map, as soon as pirate is defeated.
+
+- In multiplayer the players 2 to 4 will now also start with peace towards the new world pirate La Fortune, just like player 1
+
+- Warfleet of pirates get neutral and leaves map when pirate harbor is destroyed, even if the pirate itself is not defeated yet and can rebuild harbor if not completely defeated in time.
+-> COULD be "fixed" by commanding on harbor destroy all neutral pirate ships to move back to pirate harbor and change owner to pirate again, if pirate is not defeated yet.
+   BUT unfortunately this way the warfleet is no longer recognized as warfleet from pirate, so if the pirate repairs his kontor without being defeated, he will spawn a new warfleet over time, resulting in more ships then intended. In addition these ships will act the same like comebackfleet, so only attack/defend, but no roaming around.
+  So instead: we made the pirate harbor invincible. Destroy all pirate guns instead to defeat the pirate. This makes sure the harbor gets destroyed at the same time automatically the pirate is defeated, so it is no problem anymore that the game removes the warfleet on harbor destroy.
+
+- Comeback Fleet does not count to the WarFleet count of pirates (so pirates will have the comeback fleet plus the warfleet amount after resettle -> more than intended)
+-> fixed by commanding one of the resettle ships every 45 minutes to leave map (without changing to neutral) as long as pirate is not defeated. But  (Ac3s) likes the extreme, this trigger is not active if Combat Overhaul-Pirates mod is active.
+
+- Warfleet does not spawn again after comeback if you defeated pirate while he had full warfleet. It does start spawn again after you destroyed at least one comebackfleet ship after rebuild.
+-> also fixed by the previous fix which removes a comebackfleet ship every 45 minutes (starting 15 minutes after rebuild)
+
+- comebackfleet regulary aborts the default pirates SquadLogic (roaming around) and stand still doing nothing, eg whenever there is a attack/defend Command (which is when island building gets attacked or a fixed time intervall for attacks).
+  It seems the game devs only implemented this for the internally spawned WarFleet, while ships spawned differently or ships that left the warfleet (which happens on harbor destroy for the current warfleet) only activate this "roaming around" once after the owner of the ships was changed to Pirate.
+  -> COULD be "fixed" by: Every 30 minutes this fixmod will change the owner of all pirate ships for a milisecond to neutral and then back to pirate, to make sure all ships are doing their job (will make the ships stop moving 1 second, but then they will continue doing what they did before).
+  BUT this also disrupts active attacks from the ships, so we decided against it. Instead it is ok if comebackfleet is just for attacking/defending, not for roaming around.
+
 -  Comeback Fleet on their way to pirates harbor is owned by "General_Enemy" and therefore also shooting (drive by) at players the pirate is not at war with. 
 -> "fixed" automatically by the fix of 3). Now pirates will be at war with all humans when comebaclfleet arrives, so it is no problem that ships are owned by General_enemy and shooting at everyone. (ok they will still shoot at AIs they are at peace, but I don't think this is that important)
-
--  If you save and load a savegame, while the Quest to destroy the comeback fleet is active, this quest will end and a new comeback fleet will arrive after "ComebackAfterKontorDestruction"-time, resulting in 2 or more comeback fleets.
--> fixed by removing the current comebackfleet when loading such a savegame. You still have to wait for the next, but at least there won't be 2 or more comebackfleets at once anymore. (this comeback-stuff is mostly outside of xml, so there is no proper way to simply start the Quest again on loading without the need to wait for the next fleet, that is why I chose this solution)
 
 - Although the comebackfleet as "UseDangerLayer=1" defined, they still simply drive through island denfense and get shot. 
 -> not fixed. See no proper way to fix this, beside making the ComebackFleet Neutral until it reaches the harbor, but I don't think this would be a good solution.
  Combat Overhaul spawns the comebackfleet in multiple smaller fleets with different spawnpoints to reduce the chance all ships drive towards a defense. But this also increases the chance that some ships will drive towards defense. I will keep this untouched.
+
 
 ...
 
