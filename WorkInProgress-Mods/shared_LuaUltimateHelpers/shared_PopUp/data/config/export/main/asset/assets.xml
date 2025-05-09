@@ -1,0 +1,290 @@
+<ModOps>
+  
+  <!-- uses Serp GUIDs 1500005505 to 1500005509  -->
+  <!-- And CompanyName from these Participants (they exist in every vanilla game in every session): -->
+  <!-- Scenario3_Challenger1  GUID: 100132 , PID: 118  -->
+   <!-- Scenario3_Challenger2  GUID: 100938 , PID: 119  -->
+  
+  <!-- ############################################################################################# -->
+  
+  <!--  usage example see my mods:  -->
+  <!--  shared_IncompatibleModsPopUp (starting version 1.022) and shared_MP_Lua_Popup -->
+  
+  <!-- in modinfo from your mods you must load after mine -->
+  <!-- "LoadAfterIds": ["shared_PopUp_Serp"], -->
+  
+  <!-- Your assets.xml requires 2 things: -->
+  
+  <!-- 1) A FeatureUnlock per PopUp you want to show (so usually one). Use 1500005505 as BaseAssetGUID, so simply copy paste -->
+   <!-- the following and exchange YOURGUID with you own GUID this FeatureUnlock should have (also use YOURGUID in lua as Unlock) -->
+  <!-- <ModOp Type="addNextSibling" GUID="1500005505"> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500005505</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>YOURGUID</GUID> -->
+          <!-- <Name>Display Shared PopUp</Name> -->
+        <!-- </Standard> -->
+        <!-- <Trigger> -->
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionUnlocked</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionUnlocked> -->
+                <!-- <UnlockNeeded>YOURGUID</UnlockNeeded> -->
+              <!-- </ConditionUnlocked> -->
+              <!-- <ConditionPropsNegatable /> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
+        <!-- </Trigger> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  <!-- </ModOp> -->
+  
+  <!-- 2) adding your lua script to 1500004636 like this so it is started after loading a game (copy paste this and only change the path to your lua file) -->
+   <!-- Also adding ActionRegisterTrigger for your trigger here (because of buggy game.. see below for info about ActionTriggerPopup) -->
+  <!-- <ModOp Type="add" GUID="1500004636" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions"> -->
+    <!-- <Item> -->
+      <!-- <TriggerAction> -->
+        <!-- <Template>ActionRegisterTrigger</Template> -->
+        <!-- <Values> -->
+          <!-- <Action /> -->
+          <!-- <ActionRegisterTrigger> -->
+            <!-- <TriggerAsset>YOURGUID</TriggerAsset> -->
+          <!-- </ActionRegisterTrigger> -->
+        <!-- </Values> -->
+      <!-- </TriggerAction> -->
+    <!-- </Item> -->
+    <!-- <Item> -->
+      <!-- <TriggerAction> -->
+        <!-- <Template>ActionExecuteScript</Template> -->
+        <!-- <Values> -->
+          <!-- <Action /> -->
+          <!-- <ActionExecuteScript> -->
+            <!-- <ScriptFileName>data/scripts_serp/mp_popup.lua</ScriptFileName> -->
+          <!-- </ActionExecuteScript> -->
+        <!-- </Values> -->
+      <!-- </TriggerAction> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  
+  
+  <!-- ############################################################################################# -->
+  <!-- ############################################################################################# -->
+  
+  <!-- Text Einschränkungen: -->
+   <!-- - In Namen dürfen viele Zeichen nicht verwendet werden. -->
+    <!-- Das heißt auch in dem Text des Popups kann dann letzlich keine Formatierung/AssetData/Text embeds genutzt werden. -->
+     <!-- Auch kein Komma "," darf im Text verwendet werden! Aber Punkt/Ausrufezeichen usw sind erlaubt. Aber keine Klammern und kein = -->
+      <!-- wobei fett-Formatierung doch klappt &lt;b&gt;FETT&lt;/b&gt; -->
+    <!-- Da die Buttons selbst noch eingeschränkter sind (und im Laufe des Spiels Beschriftung nicht geändert werden kann),  -->
+     <!-- werden sie nur mit 1.  2. und 3. beschriftet.  Schreibe daher unten an deinen Body eine Beschreibung hin was  -->
+     <!-- die Buttons jeweils bedeuten. -->  
+   
+    
+
+  <!-- ############################################################################################# -->
+  <!-- ############################################################################################# -->
+  <!-- ############################################################################################# -->
+
+  
+  
+  <!-- replace one vanilla popup only relevant for console, which does not support mods anyways (can not add new ones since it requeires an ENUM) -->
+    <!-- (unfortunately MainText also does not accept an InfoTip instead of direct text for better formatting .. text is automatically aligend to the middle..) -->
+  <!-- I dont add "ShortcutIdentifier" (which makes the PopUp respond to eg Enter/ESC keyboard), because we want the user to take a choice and not by accident -->
+   <!-- close the PopUp by hitting ESC or so. -->
+  <ModOp Type="replace" GUID='500115' Path="/Values/GenericPopup/Popups/ResetConsoleOptionsConfirmation">
+    <ResetConsoleOptionsConfirmation>
+      <HeaderText>1500005505</HeaderText>
+      <MainText>1500005506</MainText>
+      <Buttons>
+        <Item>
+          <Text>1500005507</Text>
+          <Actions>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList />
+            </Values>
+          </Actions>
+          <Command>pcall(g_shared_PopUp_Serp.ButtonHit,1)</Command>
+          <GamepadAction>SystemPopupAcceptHold</GamepadAction>
+        </Item>
+        <Item>
+          <Text>1500005508</Text>
+          <Actions>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList />
+            </Values>
+          </Actions>
+          <Command>pcall(g_shared_PopUp_Serp.ButtonHit,2)</Command>
+          <GamepadAction>SystemPopupAcceptAltHold</GamepadAction>
+        </Item>
+        <Item>
+          <Text>1500005509</Text>
+          <Actions>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList />
+            </Values>
+          </Actions>
+          <Command>pcall(g_shared_PopUp_Serp.ButtonHit,3)</Command>
+          <GamepadAction>SystemPopupDecline</GamepadAction>
+        </Item>
+      </Buttons>
+      <IsModal>1</IsModal>
+    </ResetConsoleOptionsConfirmation>
+  </ModOp>
+  
+  <!-- 100000 (100.000) amount is the max allowed amount for all products it seems. dont know where money has an exception, maybe hardcoded -->
+  <ModOp Type="AddNextSibling" GUID="1010017">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005506</GUID>
+          <Name>PopUp Shown Counter Fake Product</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product>
+          <StorageLevel>Meta</StorageLevel>
+          <CanBeNegative>0</CanBeNegative>
+          <HideInUI>1</HideInUI>
+        </Product>
+      </Values>
+    </Asset>
+  </ModOp>
+
+  <!-- Important Info: -->
+  <!-- <ActionTriggerPopup> is a bit bugged. You should not use it in a Trigger that is AutoRegisterTrigger ! -->
+   <!-- Otherwise it will show for every single peer (player) in Multiplayer, even if they did not executed the Trigger. -->
+    <!-- This only happens once, even if you reset the trigger. Only AutoRegisterTrigger is causing the issue once. -->
+  <!-- That is why we register the Trigger on the bottom within 1500004636 -->
+
+  <!-- Every mod using shared PopUp needs their own FeatureUnlock (use 1500005505 as BaseAssetGUID with TriggerCondition), because of problems in coop multiplayer. -->
+   <!-- (there is no way to start this popup via lua, but lua is checking if the player hit a button. -->
+    <!-- xml ActionTriggerPopup does start the popup for all coop players. So having 2 players who hit the button of previous -->
+     <!-- PopUp at different timing might still rsult in sending the same PopUp twice) -->
+  <!-- info: a GUID of a trigger can be absued to also display text, so its the same GUID 1500005505 -->
+  <!-- Using a FeatureUnlock here for Coop compatibility. -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005505</GUID>
+          <Name>Display Shared PopUp</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005505</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500005506</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionTriggerPopup</Template>
+                <Values>
+                  <Action />
+                  <ActionTriggerPopup>
+                    <PopupType>ResetConsoleOptionsConfirmation</PopupType>
+                  </ActionTriggerPopup>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <!-- wichtig: wenn ich TimeLimit hier ändern sollte, dann auch im sharedpopup_main lua die Wartezeit vor Relock ändern! erst Relock, dann Reset! -->
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+
+  <!-- loading our shared script ourself here (instead making the other mods calling it) -->
+   <!-- because we have to reset the lua code on every game load (to not remember old popups from previous save, if we left game while popup was shown) -->
+   <!-- since this mod loads first, it seems g_shared_PopUp_Serp is already defined fine after the other scripts are run -->
+  
+  <!-- also adding registering of "Display PopUp" here because of the ActionTriggerPopup Bug. -->
+   <!-- Techincally we only need them to register this way once, since they use ResetTrigger. -->
+    <!-- But ActionRegisterTrigger does nothing if the Trigger is already registerd, so it ok to put it here into the "OnSavegameLoaded" Event. -->
+  <ModOp Type="add" GUID="1500004636" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionRegisterTrigger</Template>
+        <Values>
+          <Action />
+          <ActionRegisterTrigger>
+            <TriggerAsset>1500005505</TriggerAsset>
+          </ActionRegisterTrigger>
+        </Values>
+      </TriggerAction>
+    </Item>
+    <Item>
+      <TriggerAction>
+        <Template>ActionAddResource</Template>
+        <Values>
+          <Action />
+          <ActionAddResource>
+            <Resource>1500005506</Resource>
+            <ResourceAmount>-100000</ResourceAmount>
+          </ActionAddResource>
+        </Values>
+      </TriggerAction>
+    </Item>
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/sharedpopup_main.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+
+  
+    
+</ModOps>

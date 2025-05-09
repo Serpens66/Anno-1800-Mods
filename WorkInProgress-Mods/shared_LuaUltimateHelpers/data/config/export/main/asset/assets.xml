@@ -1,85 +1,49 @@
 <ModOps>
   
-  <!-- Serp GUIDs 1500004620 to 1500004629 -->
+  <!-- Serp GUIDs 1500004620 to 1500004635. and 1500005527 and 1500005530 -->
 
-  <!-- Mix of savestuff and objectfinder xml, since they both have similar code, saves GUIDs -->
 
+<!-- -- Uses CompanyName from Scenario3_Challenger3 for DoForSessionGameObject (they exist in every vanilla game in every session) -->
+   <!-- -- And adds+uses Nameable for these Participants (for sharing info and saving info) -->
+   <!-- -- CompanyName Scenario3_Challenger1 and Scenario3_Challenger2 used in shared_PopUp mod. -->
+    <!-- -- Nameable from Scenario3_Challenger1+Scenario3_Challenger2 used here -->
+   <!-- -- Scenario3_Challenger1  GUID: 100132 , PID: 118 -->
+   <!-- -- Scenario3_Challenger2  GUID: 100938 , PID: 119 -->
+   <!-- -- Scenario3_Challenger3  GUID: 100939 , PID: 120 -->
+   <!-- -- Scenario3_Challenger4  GUID: 101507 , PID: 120 -->
+   <!-- -- Scenario3_Challenger5  GUID: 101508 , PID: 121 -->
+   <!-- -- Scenario3_Challenger6  GUID: 101509 , PID: 122 -->
+   <!-- -- Scenario3_Challenger7  GUID: 101517 , PID: 123 -->
+   <!-- -- Scenario3_Challenger8  GUID: 101518 , PID: 124 -->
+   <!-- -- Scenario3_Challenger9  GUID: 101519 , PID: 125 -->
+   <!-- -- Scenario3_Challenger10  GUID: 101520 , PID: 126 -->
+   <!-- -- Scenario3_Challenger11  GUID: 101521 , PID: 127 -->
+   <!-- -- Scenario3_Challenger12  GUID: 101522 , PID: 128 -->
+   <!-- -- Scenario3_Queen  GUID: 101523 , PID: 129 -->
+   <!-- -- Scenario3_Editor  GUID: 100131 , PID: 117 -->
+   <!-- -- Scenario3_Ketema  GUID: 103129 , PID: 136 -->
+   <!-- -- Scenario3_Eli  GUID: 103130 , PID: 135 -->
+   <!-- -- Scenario3_Archie  GUID: 103131 , PID: 137 -->
+
+  <!-- Add Nameable to these SessionParticipants (they exist in every session in vanilla, although they are scenario participants good/bad work Ubi :D) -->
+    <!-- Nameable will be used in lua to store and share information -->
+    <!-- OverwriteNameWithTextAsset will be used to show that it is currently not used -->
+  <ModOp Type="merge" GUID='100132,100938,100939,101507,101508,101509,101517,101518,101519,101520,101521,101522,101523,100131,103129,103130,103131' Path="/Values">
+    <Nameable>
+      <OverwriteNameWithTextAsset>1500004625</OverwriteNameWithTextAsset>
+    </Nameable>
+  </ModOp>
   
-  
-  <!-- You can add your own nameable helpers to Trigger 1500004628 -->
-     <!-- as Subtrigger eg (only replac the GUID 1500004625 in exmaple, nothing more): -->
-     <!-- <Item> -->
-        <!-- <SubTrigger> -->
-          <!-- <Template>AutoCreateTrigger</Template> -->
-          <!-- <Values> -->
-            <!-- <Trigger> -->
-              <!-- <TriggerCondition> -->
-                <!-- <Template>ConditionPlayerCounter</Template> -->
-                <!-- <Values> -->
-                  <!-- <Condition> -->
-                    <!-- <IsOptional>1</IsOptional> -->
-                  <!-- </Condition> -->
-                  <!-- <ConditionPlayerCounter> -->
-                    <!-- <Context>1500004625</Context> -->
-                    <!-- <CounterAmount>0</CounterAmount> -->
-                    <!-- <ComparisonOp>AtMost</ComparisonOp> -->
-                    <!-- <CheckSpecificParticipant>Third_party_01_Queen</CheckSpecificParticipant> -->
-                    <!-- <CheckedParticipant>Third_party_01_Queen</CheckedParticipant> -->
-                  <!-- </ConditionPlayerCounter> -->
-                <!-- </Values> -->
-              <!-- </TriggerCondition> -->
-              <!-- <TriggerActions> -->
-                <!-- <Item> -->
-                  <!-- <TriggerAction> -->
-                    <!-- <Template>ActionSpawnObjects</Template> -->
-                    <!-- <Values> -->
-                      <!-- <Action /> -->
-                      <!-- <ActionSpawnObjects> -->
-                        <!-- <SpawnGUID>1500004625</SpawnGUID> -->
-                        <!-- <Amount>1</Amount> -->
-                        <!-- <Owner>Third_party_01_Queen</Owner> -->
-                      <!-- </ActionSpawnObjects> -->
-                      <!-- <SpawnArea> -->
-                        <!-- <DistanceToBorder>Near</DistanceToBorder> -->
-                        <!-- <DistanceToIsland>Far</DistanceToIsland> -->
-                      <!-- </SpawnArea> -->
-                      <!-- <SessionFilter> -->
-                        <!-- <Sessions> -->
-                          <!-- <Item> -->
-                            <!-- <Session>180023</Session> -->
-                          <!-- </Item> -->
-                        <!-- </Sessions> -->
-                      <!-- </SessionFilter> -->
-                    <!-- </Values> -->
-                  <!-- </TriggerAction> -->
-                <!-- </Item> -->
-              <!-- </TriggerActions> -->
-            <!-- </Trigger> -->
-          <!-- </Values> -->
-        <!-- </SubTrigger> -->
-      <!-- </Item> -->
-   <!-- And your own help-quest that spawns your nameable helper as subtrigger to trigger 1500004626 -->
-  
-  
-  <!-- ####################################################################################### -->
- 
- <!-- Zum Laden es wäre einfacher das helper schiff in jeder session zu haben, weil man dann über geProperty gehen kann, egal in welcher sessinon das schiff ist. -->
-  <!-- aber das spawnen in jeder session einmalig ist der komplizierte Teil, besonders in Multiplayer da UseCurrentSession nur in session von coopleader spawnen kann -->
-   <!-- man könnte höchstens testen ob ein direkter Start der SpawnQuest aus lua heraus dann auch für coop spieler spawned, wenn diese erstmalig die session betreten, -->
-    <!-- aber da lässt sich nur schwer verhindern, dass mehrfach gespawned wird. -->
-  <!-- Deswegen spawnen wir schiff nur einmalig, dafür dauert das Laden bei großen Spielständen die den Mod erst später aktiviert haben ein klein wenig länger. -->
-   <!-- da wir evlt über hundertausende IDs in jeder Session loopen müssen ums zu finden -->
-   <!-- .. daher versuchen es zuerst in old world zu spawnen (sollte immer klappen, wenn man spiel darin startet, ansonsten current) -->
   
   <!-- call our register scripts on savegame load -->
-	<ModOp Type="AddPrevSibling" GUID="1500004525" Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Values/ActionDelayedActions/DelayedActions/Values/ActionList/Actions/Item/Action/Values/ActionExecuteScript[ScriptFileName='data/scripts_serp/event_savegameloaded.lua']]">
+  <ModOp Type="add" GUID="1500004636" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
     <Item>
       <TriggerAction>
         <Template>ActionExecuteScript</Template>
         <Values>
           <Action />
           <ActionExecuteScript>
-            <ScriptFileName>data/scripts_serp/saveload/register_savestuff_ongameloaded.lua</ScriptFileName>
+            <ScriptFileName>data/scripts_serp/objectfinder.lua</ScriptFileName>
           </ActionExecuteScript>
         </Values>
       </TriggerAction>
@@ -90,111 +54,23 @@
         <Values>
           <Action />
           <ActionExecuteScript>
-            <ScriptFileName>data/scripts_serp/objectfinder/register_loadcache_ongameloaded.lua</ScriptFileName>
+            <ScriptFileName>data/scripts_serp/savetablestuff.lua</ScriptFileName>
           </ActionExecuteScript>
         </Values>
       </TriggerAction>
     </Item>
   </ModOp>
   
-  <!-- give the Queen participant PlayerCounter property, so we can check for objects (tried with Neutral first, but for whatever reason did not get PlayerCounter to work, even with ProfileCounter) -->
-   <!-- (nameable helpers will be owned by it, so they are not shown in shiplist-statistic menu of players) -->
-  <ModOp Type="merge" GUID='75' Path="/Values">
-    <ProfileCounter />
-  </ModOp>
-  
- 
-  <ModOp Type="addNextSibling" GUID="1731">
-    <!-- here we save a table into nameable that we will read out at savegame-loaded to have persistent lua data over different savegames (lua ist otherwise not saved for savegames) -->
-    <Asset>
-      <Template>ObjectDummyWithOwner</Template>
-      <Values>
-        <Standard>
-          <GUID>1500004625</GUID>
-          <Name>Nameable Helper for saving</Name>
-        </Standard>
-        <Nameable>
-          <OverwriteNameWithTextAsset>1500004625</OverwriteNameWithTextAsset>
-        </Nameable>
-      </Values>
-    </Asset>
-    <!-- see lua objectfinder DoForSessionGameObject function to see how it is used -->
-    <Asset>
-      <Template>ObjectDummyWithOwner</Template>
-      <Values>
-        <Standard>
-          <GUID>1500004620</GUID>
-          <Name>Nameable Helper for textsource embed</Name>
-        </Standard>
-        <Nameable>
-          <OverwriteNameWithTextAsset>1500004625</OverwriteNameWithTextAsset>
-        </Nameable>
-      </Values>
-    </Asset>
-    <!-- eg to share in lua with other humans: info what the human has unlocked (since in lua we can only check what we ourself have unlocked, but not what others have -.-)  -->
-    <Asset>
-      <Template>ObjectDummyWithOwner</Template>
-      <Values>
-        <Standard>
-          <GUID>1500004621</GUID>
-          <Name>Nameable Helper for Human0 Info Sharing</Name>
-        </Standard>
-        <Nameable>
-          <OverwriteNameWithTextAsset>1500004625</OverwriteNameWithTextAsset>
-        </Nameable>
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>ObjectDummyWithOwner</Template>
-      <Values>
-        <Standard>
-          <GUID>1500004622</GUID>
-          <Name>Nameable Helper for Human1 Info Sharing</Name>
-        </Standard>
-        <Nameable>
-          <OverwriteNameWithTextAsset>1500004625</OverwriteNameWithTextAsset>
-        </Nameable>
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>ObjectDummyWithOwner</Template>
-      <Values>
-        <Standard>
-          <GUID>1500004623</GUID>
-          <Name>Nameable Helper for Human2 Info Sharing</Name>
-        </Standard>
-        <Nameable>
-          <OverwriteNameWithTextAsset>1500004625</OverwriteNameWithTextAsset>
-        </Nameable>
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>ObjectDummyWithOwner</Template>
-      <Values>
-        <Standard>
-          <GUID>1500004624</GUID>
-          <Name>Nameable Helper for Human3 Info Sharing</Name>
-        </Standard>
-        <Nameable>
-          <OverwriteNameWithTextAsset>1500004625</OverwriteNameWithTextAsset>
-        </Nameable>
-      </Values>
-    </Asset>
-  </ModOp>
-  
-  <!-- UseCurrentSession uses the current active session from the coop leader -->
-    <!-- it does not matter for us which session though -->
-   <!-- we have to check SessionEnter first, because with alwaystrue the trigger fires before we are in the session, which makes the Spawn AllowProcessingSession fail.. -->
-  <ModOp GUID="153271" Type="AddNextSibling">
-    
-    <!-- first time register on sessionenter, so the other trigger can use alwaystrue, while still only ever triggering after session was finally entered -->
-     <!-- (will reset on SessionEnter which allows other mods to add their nameables into the trigger, since on reset possibly new code is used) -->
+  <!-- using a small delay because:  -->
+   <!-- 1) it gets triggered on game start while our scripts might not be ready yet.  -->
+   <!-- 2) to give the game enough time to spawn eg. SessionParticipants -->
+  <ModOp GUID="130248" Type="AddNextSibling">
     <Asset>
       <Template>Trigger</Template>
       <Values>
         <Standard>
-          <GUID>1500004629</GUID>
-          <Name>First Register on SessionEnter</Name>
+          <GUID>1500005527</GUID>
+          <Name>Refresh Lua on every new Session Load (eg save SessionParticipants)</Name>
         </Standard>
         <Trigger>
           <TriggerCondition>
@@ -202,49 +78,270 @@
             <Values>
               <Condition />
               <ConditionEvent>
-                <ConditionEvent>SessionEnter</ConditionEvent>
+                <ConditionEvent>SessionLoaded</ConditionEvent>
                 <ContextAssetInfolayer>0</ContextAssetInfolayer>
               </ConditionEvent>
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions>
-            <Item>
-              <TriggerAction>
-                <Template>ActionRegisterTrigger</Template>
-                <Values>
-                  <Action />
-                  <ActionRegisterTrigger>
-                    <TriggerAsset>1500004628</TriggerAsset>
-                  </ActionRegisterTrigger>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+                <SubTriggers>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001613</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>5000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_loaded_h0.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001614</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>5000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_loaded_h1.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001615</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>5000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_loaded_h2.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001616</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>5000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_loaded_h3.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
+                <TriggerActions />
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
         <TriggerSetup>
-          <AutoRegisterTrigger>1</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
         </TriggerSetup>
       </Values>
     </Asset>
     
-    
-    <!-- first try to spawn in old world session. knowing the session makes searching for this helper object faster -->
-    <!-- should be enough to spawn it only for Human0 (unlock 1500001613) -->
-     <!-- and is enough to only check ConditionPlayerCounter for 1500004625, not the other helpers, because if one fails, all will fail -->
+    <!-- IslandSettled wird auch bei Übernahme einer Insel getriggert. Übernahme einer Insel geht auch, wenn Spieler gerade in anderer Session ist.. was bei lua schwierig ist ..(aber dennoch besser als nichts) -->
+      <!-- und auch bei Spielstart mit startinseln wirds einmal getriggert -->
+     <!-- regardless who settles, we want the script to be executed for every human, because every human should save eg. the kontor OID from every settled island, regardless who owns it -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
         <Standard>
-          <GUID>1500004628</GUID>
-          <Name>Spawn Helper in 180023 session, or initiate in current if it fails (no old world exists)</Name>
+          <GUID>1500005530</GUID>
+          <Name>Refresh Lua Area Cache on SessionEnter/IslandSettled (eg get kontor OID and save it)</Name>
         </Standard>
         <Trigger>
           <TriggerCondition>
-            <Template>ConditionAlwaysTrue</Template>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
             <Values>
-              <Condition />
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
               <ConditionAlwaysTrue />
             </Values>
           </TriggerCondition>
@@ -255,223 +352,304 @@
                 <Values>
                   <Trigger>
                     <TriggerCondition>
-                      <Template>ConditionUnlocked</Template>
+                      <Template>ConditionEvent</Template>
                       <Values>
                         <Condition />
-                        <ConditionUnlocked>
-                          <UnlockNeeded>1500001613</UnlockNeeded>
-                        </ConditionUnlocked>
+                        <ConditionEvent>
+                          <ConditionEvent>SessionEnter</ConditionEvent>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
                         <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
-                    <SubTriggers>
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionPlayerCounter</Template>
-                                <Values>
-                                  <Condition>
-                                    <IsOptional>1</IsOptional>
-                                  </Condition>
-                                  <ConditionPlayerCounter>
-                                    <Context>1500004625</Context>
-                                    <CounterAmount>0</CounterAmount>
-                                    <ComparisonOp>AtMost</ComparisonOp>
-                                    <CheckSpecificParticipant>Third_party_01_Queen</CheckSpecificParticipant>
-                                    <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
-                                  </ConditionPlayerCounter>
-                                </Values>
-                              </TriggerCondition>
-                              <TriggerActions>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionSpawnObjects</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionSpawnObjects>
-                                        <SpawnGUID>1500004625</SpawnGUID>
-                                        <Amount>1</Amount>
-                                        <Owner>Third_party_01_Queen</Owner>
-                                      </ActionSpawnObjects>
-                                      <SpawnArea>
-                                        <DistanceToBorder>Near</DistanceToBorder>
-                                        <DistanceToIsland>Far</DistanceToIsland>
-                                      </SpawnArea>
-                                      <SessionFilter>
-                                        <Sessions>
-                                          <Item>
-                                            <Session>180023</Session>
-                                          </Item>
-                                        </Sessions>
-                                      </SessionFilter>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionSpawnObjects</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionSpawnObjects>
-                                        <SpawnGUID>1500004620</SpawnGUID>
-                                        <Amount>1</Amount>
-                                        <Owner>Third_party_01_Queen</Owner>
-                                      </ActionSpawnObjects>
-                                      <SpawnArea>
-                                        <DistanceToBorder>Near</DistanceToBorder>
-                                        <DistanceToIsland>Far</DistanceToIsland>
-                                      </SpawnArea>
-                                      <SessionFilter>
-                                        <Sessions>
-                                          <Item>
-                                            <Session>180023</Session>
-                                          </Item>
-                                        </Sessions>
-                                      </SessionFilter>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionSpawnObjects</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionSpawnObjects>
-                                        <SpawnGUID>1500004621</SpawnGUID>
-                                        <Amount>1</Amount>
-                                        <Owner>Third_party_01_Queen</Owner>
-                                      </ActionSpawnObjects>
-                                      <SpawnArea>
-                                        <DistanceToBorder>Near</DistanceToBorder>
-                                        <DistanceToIsland>Far</DistanceToIsland>
-                                      </SpawnArea>
-                                      <SessionFilter>
-                                        <Sessions>
-                                          <Item>
-                                            <Session>180023</Session>
-                                          </Item>
-                                        </Sessions>
-                                      </SessionFilter>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionSpawnObjects</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionSpawnObjects>
-                                        <SpawnGUID>1500004622</SpawnGUID>
-                                        <Amount>1</Amount>
-                                        <Owner>Third_party_01_Queen</Owner>
-                                      </ActionSpawnObjects>
-                                      <SpawnArea>
-                                        <DistanceToBorder>Near</DistanceToBorder>
-                                        <DistanceToIsland>Far</DistanceToIsland>
-                                      </SpawnArea>
-                                      <SessionFilter>
-                                        <Sessions>
-                                          <Item>
-                                            <Session>180023</Session>
-                                          </Item>
-                                        </Sessions>
-                                      </SessionFilter>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionSpawnObjects</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionSpawnObjects>
-                                        <SpawnGUID>1500004623</SpawnGUID>
-                                        <Amount>1</Amount>
-                                        <Owner>Third_party_01_Queen</Owner>
-                                      </ActionSpawnObjects>
-                                      <SpawnArea>
-                                        <DistanceToBorder>Near</DistanceToBorder>
-                                        <DistanceToIsland>Far</DistanceToIsland>
-                                      </SpawnArea>
-                                      <SessionFilter>
-                                        <Sessions>
-                                          <Item>
-                                            <Session>180023</Session>
-                                          </Item>
-                                        </Sessions>
-                                      </SessionFilter>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionSpawnObjects</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionSpawnObjects>
-                                        <SpawnGUID>1500004624</SpawnGUID>
-                                        <Amount>1</Amount>
-                                        <Owner>Third_party_01_Queen</Owner>
-                                      </ActionSpawnObjects>
-                                      <SpawnArea>
-                                        <DistanceToBorder>Near</DistanceToBorder>
-                                        <DistanceToIsland>Far</DistanceToIsland>
-                                      </SpawnArea>
-                                      <SessionFilter>
-                                        <Sessions>
-                                          <Item>
-                                            <Session>180023</Session>
-                                          </Item>
-                                        </Sessions>
-                                      </SessionFilter>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionDelayedActions</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionDelayedActions>
-                                        <ExecutionDelay>1200</ExecutionDelay>
-                                        <DelayedActions>
-                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                          <Values>
-                                            <ActionList>
-                                              <Actions>
-                                                <Item>
-                                                  <Action>
-                                                    <Template>ActionExecuteScript</Template>
-                                                    <Values>
-                                                      <Action />
-                                                      <ActionExecuteScript>
-                                                        <ScriptFileName>data/scripts_serp/objectfinder/save_helper_oid.lua</ScriptFileName>
-                                                      </ActionExecuteScript>
-                                                    </Values>
-                                                  </Action>
-                                                </Item>
-                                              </Actions>
-                                            </ActionList>
-                                          </Values>
-                                        </DelayedActions>
-                                      </ActionDelayedActions>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                              </TriggerActions>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>IslandSettled</ConditionEvent>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
                   </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
           </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+                <SubTriggers>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001613</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>2000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_entered_h0.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001614</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>2000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_entered_h1.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001615</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>2000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_entered_h2.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001616</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>2000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_entered_h3.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
+                <TriggerActions />
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- relocked in lua directly. one trigger per peerint (16) -->
+     <!-- Using FeatureUnlock instead of Triggers, because lua RegisterTriggerForCurrentParticipant is executed for every Coop Peer, so multiple times. -->
+      <!-- While with Unlock it does not matter how often sth is unlocked at the same time, its still only executed once.  -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004620</GUID>
+          <Name>Execute For Everyone FromPeerInt 0</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004620</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
           <TriggerActions>
             <Item>
               <TriggerAction>
@@ -479,22 +657,26 @@
                 <Values>
                   <Action />
                   <ActionDelayedActions>
-                    <ExecutionDelay>2000</ExecutionDelay>
+                    <ExecutionDelay>600</ExecutionDelay>
                     <DelayedActions>
                       <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                       <Values>
                         <ActionList>
                           <Actions>
                             <Item>
-                              <TriggerAction>
-                                <Template>ActionRegisterTrigger</Template>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
                                 <Values>
                                   <Action />
-                                  <ActionRegisterTrigger>
-                                    <TriggerAsset>1500004626</TriggerAsset>
-                                  </ActionRegisterTrigger>
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004620</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
                                 </Values>
-                              </TriggerAction>
+                              </Action>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -504,284 +686,1125 @@
                 </Values>
               </TriggerAction>
             </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer0.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
           </TriggerActions>
           <ResetTrigger>
             <Template>AutoCreateTrigger</Template>
             <Values>
               <Trigger>
                 <TriggerCondition>
-                  <Template>ConditionEvent</Template>
+                  <Template>ConditionTimer</Template>
                   <Values>
                     <Condition />
-                    <ConditionEvent>
-                      <ConditionEvent>SessionEnter</ConditionEvent>
-                      <ContextAssetInfolayer>0</ContextAssetInfolayer>
-                    </ConditionEvent>
-                    <ConditionPropsNegatable />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
                   </Values>
                 </TriggerCondition>
+                <TriggerActions />
               </Trigger>
             </Values>
           </ResetTrigger>
         </Trigger>
         <TriggerSetup>
-          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
           <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
         </TriggerSetup>
       </Values>
     </Asset>
     
-    
-    <!-- if spawning in old world session failed, try again in current active session (should only happen if old world session does not exist/is not the starting session) -->
     <Asset>
-      <Template>Trigger</Template>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004621</GUID>
+          <Name>Execute For Everyone FromPeerInt 1</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004621</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004621</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer1.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004622</GUID>
+          <Name>Execute For Everyone FromPeerInt 2</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004622</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004622</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer2.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004623</GUID>
+          <Name>Execute For Everyone FromPeerInt 3</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004623</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004623</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer3.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004624</GUID>
+          <Name>Execute For Everyone FromPeerInt 4</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004624</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004624</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer4.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004625</GUID>
+          <Name>Execute For Everyone FromPeerInt 5</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004625</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004625</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer5.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
       <Values>
         <Standard>
           <GUID>1500004626</GUID>
-          <Name>start quest- Spawn Helper in current session</Name>
+          <Name>Execute For Everyone FromPeerInt 6</Name>
         </Standard>
+        <Locked />
         <Trigger>
           <TriggerCondition>
-            <Template>ConditionAlwaysTrue</Template>
+            <Template>ConditionUnlocked</Template>
             <Values>
               <Condition />
-              <ConditionAlwaysTrue />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004626</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <SubTriggers>
+          <TriggerActions>
             <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
                 <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                    <Template>ConditionPlayerCounter</Template>
-                    <Values>
-                      <Condition>
-                        <IsOptional>1</IsOptional>
-                      </Condition>
-                      <ConditionPlayerCounter>
-                        <Context>1500004625</Context>
-                        <CounterAmount>0</CounterAmount>
-                        <ComparisonOp>AtMost</ComparisonOp>
-                      </ConditionPlayerCounter>
-                      <CheckSpecificParticipant>Third_party_01_Queen</CheckSpecificParticipant>
-                      <CheckedParticipant>Third_party_01_Queen</CheckedParticipant>
-                    </Values>
-                  </TriggerCondition>
-                  <TriggerActions>
-                    <Item>
-                      <TriggerAction>
-                        <Template>ActionStartQuest</Template>
-                        <Values>
-                          <Action />
-                          <ActionStartQuest>
-                            <Quest>1500004627</Quest>
-                            <UseCurrentSession>1</UseCurrentSession>
-                          </ActionStartQuest>
-                        </Values>
-                      </TriggerAction>
-                    </Item>
-                  </TriggerActions>
-                  </Trigger>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004626</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
                 </Values>
-              </SubTrigger>
+              </TriggerAction>
             </Item>
-          </SubTriggers>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer6.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
         </Trigger>
-        <TriggerSetup>
-          <AutoRegisterTrigger>0</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-        </TriggerSetup>
       </Values>
     </Asset>
-  </ModOp>
     
-  <ModOp Type="AddNextSibling" GUID="152264">
     <Asset>
-      <Template>A7_QuestDummyQuest</Template>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
       <Values>
         <Standard>
           <GUID>1500004627</GUID>
-          <Name>Spawn Helper in current session</Name>
+          <Name>Execute For Everyone FromPeerInt 7</Name>
         </Standard>
-        <Quest>
-          <OnQuestStart>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
             <Values>
-              <ActionList>
-                <Actions>
-                  <Item>
-                    <Action>
-                      <Template>ActionSpawnObjects</Template>
-                      <Values>
-                        <Action />
-                        <ActionSpawnObjects>
-                          <SpawnGUID>1500004625</SpawnGUID>
-                          <Amount>1</Amount>
-                          <Owner>Third_party_01_Queen</Owner>
-                        </ActionSpawnObjects>
-                        <SpawnArea>
-                          <DistanceToBorder>Near</DistanceToBorder>
-                          <DistanceToIsland>Far</DistanceToIsland>
-                        </SpawnArea>
-                        <SessionFilter>
-                          <AllowProcessingSession>1</AllowProcessingSession>
-                          <AllowParentConditionSession>0</AllowParentConditionSession>
-                          <AllowQuestSession>0</AllowQuestSession>
-                        </SessionFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <Item>
-                    <Action>
-                      <Template>ActionSpawnObjects</Template>
-                      <Values>
-                        <Action />
-                        <ActionSpawnObjects>
-                          <SpawnGUID>1500004620</SpawnGUID>
-                          <Amount>1</Amount>
-                          <Owner>Third_party_01_Queen</Owner>
-                        </ActionSpawnObjects>
-                        <SpawnArea>
-                          <DistanceToBorder>Near</DistanceToBorder>
-                          <DistanceToIsland>Far</DistanceToIsland>
-                        </SpawnArea>
-                        <SessionFilter>
-                          <AllowProcessingSession>1</AllowProcessingSession>
-                          <AllowParentConditionSession>0</AllowParentConditionSession>
-                          <AllowQuestSession>0</AllowQuestSession>
-                        </SessionFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <Item>
-                    <Action>
-                      <Template>ActionSpawnObjects</Template>
-                      <Values>
-                        <Action />
-                        <ActionSpawnObjects>
-                          <SpawnGUID>1500004621</SpawnGUID>
-                          <Amount>1</Amount>
-                          <Owner>Third_party_01_Queen</Owner>
-                        </ActionSpawnObjects>
-                        <SpawnArea>
-                          <DistanceToBorder>Near</DistanceToBorder>
-                          <DistanceToIsland>Far</DistanceToIsland>
-                        </SpawnArea>
-                        <SessionFilter>
-                          <AllowProcessingSession>1</AllowProcessingSession>
-                          <AllowParentConditionSession>0</AllowParentConditionSession>
-                          <AllowQuestSession>0</AllowQuestSession>
-                        </SessionFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <Item>
-                    <Action>
-                      <Template>ActionSpawnObjects</Template>
-                      <Values>
-                        <Action />
-                        <ActionSpawnObjects>
-                          <SpawnGUID>1500004622</SpawnGUID>
-                          <Amount>1</Amount>
-                          <Owner>Third_party_01_Queen</Owner>
-                        </ActionSpawnObjects>
-                        <SpawnArea>
-                          <DistanceToBorder>Near</DistanceToBorder>
-                          <DistanceToIsland>Far</DistanceToIsland>
-                        </SpawnArea>
-                        <SessionFilter>
-                          <AllowProcessingSession>1</AllowProcessingSession>
-                          <AllowParentConditionSession>0</AllowParentConditionSession>
-                          <AllowQuestSession>0</AllowQuestSession>
-                        </SessionFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <Item>
-                    <Action>
-                      <Template>ActionSpawnObjects</Template>
-                      <Values>
-                        <Action />
-                        <ActionSpawnObjects>
-                          <SpawnGUID>1500004623</SpawnGUID>
-                          <Amount>1</Amount>
-                          <Owner>Third_party_01_Queen</Owner>
-                        </ActionSpawnObjects>
-                        <SpawnArea>
-                          <DistanceToBorder>Near</DistanceToBorder>
-                          <DistanceToIsland>Far</DistanceToIsland>
-                        </SpawnArea>
-                        <SessionFilter>
-                          <AllowProcessingSession>1</AllowProcessingSession>
-                          <AllowParentConditionSession>0</AllowParentConditionSession>
-                          <AllowQuestSession>0</AllowQuestSession>
-                        </SessionFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <Item>
-                    <Action>
-                      <Template>ActionSpawnObjects</Template>
-                      <Values>
-                        <Action />
-                        <ActionSpawnObjects>
-                          <SpawnGUID>1500004624</SpawnGUID>
-                          <Amount>1</Amount>
-                          <Owner>Third_party_01_Queen</Owner>
-                        </ActionSpawnObjects>
-                        <SpawnArea>
-                          <DistanceToBorder>Near</DistanceToBorder>
-                          <DistanceToIsland>Far</DistanceToIsland>
-                        </SpawnArea>
-                        <SessionFilter>
-                          <AllowProcessingSession>1</AllowProcessingSession>
-                          <AllowParentConditionSession>0</AllowParentConditionSession>
-                          <AllowQuestSession>0</AllowQuestSession>
-                        </SessionFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <Item>
-                    <Action>
-                      <Template>ActionDelayedActions</Template>
-                      <Values>
-                        <Action />
-                        <ActionDelayedActions>
-                          <ExecutionDelay>1000</ExecutionDelay>
-                          <DelayedActions>
-                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                            <Values>
-                              <ActionList>
-                                <Actions>
-                                  <Item>
-                                    <Action>
-                                      <Template>ActionExecuteScript</Template>
-                                      <Values>
-                                        <Action />
-                                        <ActionExecuteScript>
-                                          <ScriptFileName>data/scripts_serp/objectfinder/save_helper_oid.lua</ScriptFileName>
-                                        </ActionExecuteScript>
-                                      </Values>
-                                    </Action>
-                                  </Item>
-                                </Actions>
-                              </ActionList>
-                            </Values>
-                          </DelayedActions>
-                        </ActionDelayedActions>
-                      </Values>
-                    </Action>
-                  </Item>
-                </Actions>
-              </ActionList>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004627</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
             </Values>
-          </OnQuestStart>
-        </Quest>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004627</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer7.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
       </Values>
     </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004628</GUID>
+          <Name>Execute For Everyone FromPeerInt 8</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004628</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004628</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer8.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004629</GUID>
+          <Name>Execute For Everyone FromPeerInt 9</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004629</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004629</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer9.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004630</GUID>
+          <Name>Execute For Everyone FromPeerInt 10</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004630</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004630</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer10.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004631</GUID>
+          <Name>Execute For Everyone FromPeerInt 11</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004631</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004631</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer11.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004632</GUID>
+          <Name>Execute For Everyone FromPeerInt 12</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004632</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004632</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer12.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004633</GUID>
+          <Name>Execute For Everyone FromPeerInt 13</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004633</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004633</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer13.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004634</GUID>
+          <Name>Execute For Everyone FromPeerInt 14</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004634</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004634</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer14.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500004620</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004635</GUID>
+          <Name>Execute For Everyone FromPeerInt 15</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004635</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>600</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004635</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/per_peer/exforevery_peer15.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+      </Values>
+    </Asset>
+    
   </ModOp>
+    
   
+  <!-- add to every 10 minutes Tick Trigger, only for Human -->
+  <ModOp Type="add" GUID="1500005534" Path="/Values/Trigger/ResetTrigger/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger[TriggerCondition/Values/ConditionUnlocked/UnlockNeeded='1500001600']/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/ticksavecache.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
 
 </ModOps>
