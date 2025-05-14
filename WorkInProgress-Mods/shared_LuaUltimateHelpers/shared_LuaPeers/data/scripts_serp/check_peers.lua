@@ -23,10 +23,10 @@ if g_LuaScriptBlockers[ModID]==nil then
     if g_LuaTools==nil then
       console.startScript("data/scripts_serp/luatools.lua")
     end
-    g_LuaTools.modlog("check_peers.lua registered",ModID)
+    g_AnnoTools.modlog("check_peers.lua registered",ModID)
     
     local function OnlyOnePeer()
-      g_LuaTools.modlog("Singleplayer / OnlyOnePeer, done",ModID)
+      g_AnnoTools.modlog("Singleplayer / OnlyOnePeer, done",ModID)
       g_PeersInfo_Serp.PeerInt , g_PeersInfo_Serp.Username = next(g_PeersInfo_Serp.Everactive_Usernames)
       g_PeersInfo_Serp.ActiveCoopPeers[g_PeersInfo_Serp.PeerInt] = g_PeersInfo_Serp.Username
       g_PeersInfo_Serp.ActivePeers[g_PeersInfo_Serp.PeerInt] = g_PeersInfo_Serp.Username
@@ -37,7 +37,7 @@ if g_LuaScriptBlockers[ModID]==nil then
 
     local function Start()
     
-      g_LuaTools.modlog("Start",ModID)
+      g_AnnoTools.modlog("Start",ModID)
       local usernames = {}
       for peerint=0,15 do
         usernames[peerint] = ts.Online.GetUsername(peerint)
@@ -87,17 +87,17 @@ if g_LuaScriptBlockers[ModID]==nil then
               -- g_PeersInfo_Serp.ActivePeers[peerint] = username
             -- end
             -- g_PeersInfo_Serp.FullFinished = true
-            -- g_LuaTools.modlog("EveryHumanSingleCoop active, done",ModID)
+            -- g_AnnoTools.modlog("EveryHumanSingleCoop active, done",ModID)
             -- return
           -- end
         -- end
         
         if g_PeersInfo_Serp.IsUsingPopUp and g_MP_PopUps_Serp~=nil then
-          g_LuaTools.start_thread("g_MP_PopUps_Serp Start mp_popup",ModID,g_MP_PopUps_Serp.t_Start,everactive_coops)
+          g_AnnoTools.start_thread("g_MP_PopUps_Serp Start mp_popup",ModID,g_MP_PopUps_Serp.t_Start,everactive_coops)
         elseif g_Peer_Tricks_Serp~=nil then -- Now do the ui/session thing
-          g_LuaTools.start_thread("g_Peer_Tricks_Serp Start peer_tricks",ModID,g_Peer_Tricks_Serp.t_Start,everactive_coops)
+          g_AnnoTools.start_thread("g_Peer_Tricks_Serp Start peer_tricks",ModID,g_Peer_Tricks_Serp.t_Start,everactive_coops)
         else
-          g_LuaTools.modlog("ERROR Lua wont work well in multiplayer! Neither g_MP_PopUps_Serp ("..tostring(g_MP_PopUps_Serp)..") nor g_Peer_Tricks_Serp ("..tostring(g_Peer_Tricks_Serp)..") is loaded?!",ModID)
+          g_AnnoTools.modlog("ERROR Lua wont work well in multiplayer! Neither g_MP_PopUps_Serp ("..tostring(g_MP_PopUps_Serp)..") nor g_Peer_Tricks_Serp ("..tostring(g_Peer_Tricks_Serp)..") is loaded?!",ModID)
           GameManager.OnlineManager.leaveSession()
           return
         end
@@ -223,9 +223,9 @@ if g_LuaScriptBlockers[ModID]==nil then
       console.startScript("data/scripts_serp/peer_tricks.lua") -- within this mod
     end
     
-    g_LuaTools.start_thread("Start check_peers",ModID,Start)
+    g_AnnoTools.start_thread("Start check_peers",ModID,Start) -- TODO test wieder einkommentieren
     
-    g_LuaTools.start_thread("g_OnGameLeave_serp",ModID,function()
+    g_AnnoTools.start_thread("g_OnGameLeave_serp",ModID,function()
       while g_OnGameLeave_serp==nil do
         coroutine.yield()
       end
@@ -235,8 +235,8 @@ if g_LuaScriptBlockers[ModID]==nil then
         end
       end
     end)
-    g_LuaTools.start_thread("g_LuaScriptBlockers",ModID,function()
-      g_LuaTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
+    g_AnnoTools.start_thread("g_LuaScriptBlockers",ModID,function()
+      g_AnnoTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
       g_LuaScriptBlockers[ModID] = nil
     end)
 end

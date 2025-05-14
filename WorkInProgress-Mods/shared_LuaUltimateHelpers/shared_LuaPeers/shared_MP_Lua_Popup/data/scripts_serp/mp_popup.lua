@@ -39,10 +39,10 @@ if g_LuaScriptBlockers[ModID]==nil then
     if g_LuaTools==nil then
       console.startScript("data/scripts_serp/luatools.lua")
     end
-    g_LuaTools.modlog("mp_popup.lua registered",ModID)
+    g_AnnoTools.modlog("mp_popup.lua registered",ModID)
     if g_shared_PopUp_Serp==nil then
       print("mp_popup.lua ERROR: g_shared_PopUp_Serp is missing!")
-      g_LuaTools.modlog("mp_popup.lua ERROR: g_shared_PopUp_Serp is missing!",ModID)
+      g_AnnoTools.modlog("mp_popup.lua ERROR: g_shared_PopUp_Serp is missing!",ModID)
     end
     
     -- we currently only ask for coop teammates, not all players. to save code and also number of popups
@@ -73,7 +73,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             local coopcountPopUp = g_PeersInfo_Serp.GetCoopCount()
             if coopcountPopUp ~= g_CoopCountRes.CountPerPID[g_PeersInfo_Serp.PID] then
               print("sharedPopUp_ButtonHit_MP_Lua ERROR: PopUp active Peers "..tostring(coopcountPopUp).." does not match Res-Test active peers: "..tostring(g_CoopCountRes.CountPerPID[g_PeersInfo_Serp.PID]))
-              g_LuaTools.modlog("sharedPopUp_ButtonHit_MP_Lua ERROR: PopUp active Peers "..tostring(coopcountPopUp).." does not match Res-Test active peers: "..tostring(g_CoopCountRes.CountPerPID[g_PeersInfo_Serp.PID]),ModID)
+              g_AnnoTools.modlog("sharedPopUp_ButtonHit_MP_Lua ERROR: PopUp active Peers "..tostring(coopcountPopUp).." does not match Res-Test active peers: "..tostring(g_CoopCountRes.CountPerPID[g_PeersInfo_Serp.PID]),ModID)
               ts.Conditions.RegisterTriggerForCurrentParticipant(1500005528) -- show notification and leave game in 15 seconds
               return
             end
@@ -97,7 +97,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       if button==1 then -- its me
         if g_PeersInfo_Serp.PeerInt~=nil and g_PeersInfo_Serp.PeerInt~=PeerInt then
           print("sharedPopUp_ButtonHit_MP_Lua ERROR: User said at least twice -its me-")
-          g_LuaTools.modlog("sharedPopUp_ButtonHit_MP_Lua ERROR: User said at least twice -its me-",ModID)
+          g_AnnoTools.modlog("sharedPopUp_ButtonHit_MP_Lua ERROR: User said at least twice -its me-",ModID)
           ts.Conditions.RegisterTriggerForCurrentParticipant(1500005528) -- show notification and leave game in 15 seconds
         end
         g_PeersInfo_Serp.PeerInt = PeerInt
@@ -113,7 +113,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       
       g_MP_PopUps_Serp.PopUpsStatus.NShown = g_MP_PopUps_Serp.PopUpsStatus.NShown + 1
       if g_MP_PopUps_Serp.PopUpsStatus.NShown == g_MP_PopUps_Serp.PopUpsStatus.NToShow then
-        g_LuaTools.start_thread("call OnAllPopUpsAnswered after ButtonHit",ModID,g_MP_PopUps_Serp.OnAllPopUpsAnswered)
+        g_AnnoTools.start_thread("call OnAllPopUpsAnswered after ButtonHit",ModID,g_MP_PopUps_Serp.OnAllPopUpsAnswered)
       end
     end
 
@@ -135,7 +135,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           g_MP_PopUps_Serp.PopUpsStatus.NToShow = i
           game.playSound(234152) -- TODO test ob das desynced, wobei wirs hier eig. zeitgleich abspielen sollten
         else -- local player has and never had a coop team. syncing is still required
-          g_LuaTools.start_thread("call OnAllPopUpsAnswered",ModID,g_MP_PopUps_Serp.OnAllPopUpsAnswered)
+          g_AnnoTools.start_thread("call OnAllPopUpsAnswered",ModID,g_MP_PopUps_Serp.OnAllPopUpsAnswered)
         end
       end
     end
@@ -151,7 +151,7 @@ if g_LuaScriptBlockers[ModID]==nil then
 
     -- t_Start() -- is now called from within check_peers.lua from shared_LuaPeers mod
     
-    g_LuaTools.start_thread("g_OnGameLeave_serp",ModID,function()
+    g_AnnoTools.start_thread("g_OnGameLeave_serp",ModID,function()
       while g_OnGameLeave_serp==nil do
         coroutine.yield()
       end
@@ -161,8 +161,8 @@ if g_LuaScriptBlockers[ModID]==nil then
         end
       end
     end)
-    g_LuaTools.start_thread("g_LuaScriptBlockers",ModID,function()
-      g_LuaTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
+    g_AnnoTools.start_thread("g_LuaScriptBlockers",ModID,function()
+      g_AnnoTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
       g_LuaScriptBlockers[ModID] = nil
     end)
 

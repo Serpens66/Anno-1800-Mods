@@ -4,6 +4,6 @@ if g_LuaTools==nil then
   console.startScript("data/scripts_serp/luatools.lua")
 end
 system.start(function()
-  g_LuaTools.waitForTimeDelta(10000)
+  g_AnnoTools.waitForTimeDelta(10000)
   GameManager.OnlineManager.leaveSession()
 end,"leavegame_wronganswer.lua")

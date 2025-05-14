@@ -21,7 +21,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       console.startScript("data/scripts_serp/luatools.lua")
     end
 
-    g_LuaTools.modlog("savetablestuff.lua registered",ModID)
+    g_AnnoTools.modlog("savetablestuff.lua registered",ModID)
 
 
     if g_StringTableConvertSerpNyk==nil then
@@ -38,16 +38,17 @@ if g_LuaScriptBlockers[ModID]==nil then
             -- sessionparticipants[PID][CheckingSessionGuid] = {OID=OID,PID=PID,ObjectID=ObjectID,AreaID=AreaID,SessionID=SessionID}
             -- local sessionparticipants = g_ObjectFinderSerp.GetAllLoadedSessionsParticipants({g_ObjectFinderSerp.PIDToSaveData})  -- save it in every SessionParticipant GameObject, so it does not matter from which we load it (which means we can use ts.SessionParticipants on loading)
             
-            local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{g_ObjectFinderSerp.PIDToSaveData},"First") -- saving it in first-found is enough, because this will alawys be the same for everyone (assuming we all start in the same session).
-            if status==false then
-              g_LuaTools.modlog("ERROR : "..tostring(sessionparticipants),ModID)
-              error(sessionparticipants) 
-            end
+            local sessionparticipants = g_ObjectFinderSerp.GetAllLoadedSessionsParticipants({g_ObjectFinderSerp.PIDToSaveData},"First") -- saving it in first-found is enough, because this will alawys be the same for everyone (assuming we all start in the same session).
+            -- local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{g_ObjectFinderSerp.PIDToSaveData},"First") -- saving it in first-found is enough, because this will alawys be the same for everyone (assuming we all start in the same session).
+            -- if status==false then
+              -- g_AnnoTools.modlog("ERROR : "..tostring(sessionparticipants),ModID)
+              -- error(sessionparticipants) 
+            -- end
             
             for SessionID,session_pids in pairs(sessionparticipants) do
-              g_ObjectFinderSerp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(session_pids[g_ObjectFinderSerp.PIDToSaveData].OID)..") Nameable Name("..tostring(namestring)..")]")
+              g_AnnoTools.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(session_pids[g_ObjectFinderSerp.PIDToSaveData].OID)..") Nameable Name("..tostring(namestring)..")]")
             end
-            g_LuaTools.waitForTimeDelta(5000) -- wait at least 2-3 seconds for the Nameable to be synced for all Peers
+            g_AnnoTools.waitForTimeDelta(5000) -- wait at least 2-3 seconds for the Nameable to be synced for all Peers
             
           end
           task = table.remove(g_SaveLuaStuff_Serp.SaveQueue,1)
@@ -63,12 +64,8 @@ if g_LuaScriptBlockers[ModID]==nil then
         
         -- local namestring = ts.SessionParticipants.GetParticipant(g_ObjectFinderSerp.PIDToSaveData).Nameable.Name -- only works if we changed the name of all SessionParticipants in all Sessions
         -- this already updates the Cache SessionParticipants and also LoadedSessions
-        local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{g_ObjectFinderSerp.PIDToSaveData},"First")
-        if status==false then
-          g_LuaTools.modlog("ERROR : "..tostring(sessionparticipants),ModID)
-          error(sessionparticipants) 
-        end
-        
+        local sessionparticipants = g_ObjectFinderSerp.GetAllLoadedSessionsParticipants({g_ObjectFinderSerp.PIDToSaveData},"First")
+
         local namestring = nil
         for SessionID,session_pids in pairs(sessionparticipants) do
           namestring = ts.GetGameObject(session_pids[g_ObjectFinderSerp.PIDToSaveData].OID).Nameable.Name -- if Name was changed with DoForSessionGameObject, then GetGameObject works to get the name regardless of player and session
@@ -129,7 +126,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       LoopIsRunning = false, -- internal usage
     }
     
-    g_LuaTools.start_thread("g_OnGameLeave_serp",ModID,function()
+    g_AnnoTools.start_thread("g_OnGameLeave_serp",ModID,function()
       while g_OnGameLeave_serp==nil do
         coroutine.yield()
       end
@@ -139,8 +136,8 @@ if g_LuaScriptBlockers[ModID]==nil then
         end
       end
     end)
-    g_LuaTools.start_thread("g_LuaScriptBlockers",ModID,function()
-      g_LuaTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
+    g_AnnoTools.start_thread("g_LuaScriptBlockers",ModID,function()
+      g_AnnoTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
       g_LuaScriptBlockers[ModID] = nil
     end)
     

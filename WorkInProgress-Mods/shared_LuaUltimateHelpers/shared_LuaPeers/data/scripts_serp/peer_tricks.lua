@@ -6,20 +6,6 @@ local DoHideUI = false -- hides the UI while we do our stuff. But also does not 
 local HelpSessionGuid = 1500005538
 
 
--- TODO: text in allen sprachen ausdenken
-
-
--- Hab n savegame, bei dem es in neuer welt keinen neutralen particiapnt gibt (zumnidest nicht die ersten 1000, die sind alle 0)
--- Ist das Save in dem ich sehr of trein/raus bin und jedesmal ne hilfssession erstellt wurde.
- -- offiziell ist die neue welt sessionID 6
- -- Aber kann natürlich sein, dass die Hilfssession die SessionIDs stark erhöht?!
- -- TODO: das kontrollieren!
--- Ja liegt daran. Lösung:
- -- Die hilfssession nicht unloaden, sondern erst unloaden wenn jeder peer eine alternative session besucht hat
- 
--- dennoch nochmal testen wie sich das unloaden einer session genau auswirkt
-
-
 -- TODO:
  -- Hinweis in Mod Description die diesen shared Mod nutzen:
   -- Bevor Mod in Savegame deaktiviert werden kann, muss dummysession unloaded werden. zb. console: session.unload(1500005538)
@@ -41,14 +27,14 @@ if g_LuaScriptBlockers[ModID]==nil then
     if g_LuaTools==nil then
       console.startScript("data/scripts_serp/luatools.lua")
     end
-    g_LuaTools.modlog("peer_tricks.lua registered",ModID)
+    g_AnnoTools.modlog("peer_tricks.lua registered",ModID)
     
     
     local function t_Unload_EmptySession(GoToSession)
-      g_LuaTools.modlog("t_Unload_EmptySession: Checking if we still need it...",ModID)
+      g_AnnoTools.modlog("t_Unload_EmptySession: Checking if we still need it...",ModID)
       GoToSession = GoToSession or 180023
-      if not g_Peer_Tricks_Serp.DoWeNeedHelpSession() then
-        g_LuaTools.modlog("t_Unload_EmptySession: Dont need it anymore, UNLOADING the session now...",ModID)
+      -- if not g_Peer_Tricks_Serp.DoWeNeedHelpSession() then -- TODO test wieder einkommentieren
+        g_AnnoTools.modlog("t_Unload_EmptySession: Dont need it anymore, UNLOADING the session now...",ModID)
         ts.Unlock.SetRelockNet(1500005544) -- relock the IslandSettled check, we dont need it anymore
         local peers_in_empty_session = 16 -- only unload after everyone left again
         local notstop = 0
@@ -61,11 +47,11 @@ if g_LuaScriptBlockers[ModID]==nil then
           end
           notstop = notstop + 1
           if notstop > 5 then -- wait max of 5 seconds
-            g_LuaTools.modlog("ERROR Unload_EmptySession not all peers left the session within 5 seconds?! May crash now... "..tostring(ts.GameClock.CorporationTime),ModID)
+            g_AnnoTools.modlog("ERROR Unload_EmptySession not all peers left the session within 5 seconds?! May crash now... "..tostring(ts.GameClock.CorporationTime),ModID)
             break
           end
           if peers_in_empty_session~=0 then
-            g_LuaTools.waitForTimeDelta(1000)
+            g_AnnoTools.waitForTimeDelta(1000)
             if session.getSessionGUID() == HelpSessionGuid then
               ts.Interface.JumpToSession(GoToSession)
             end
@@ -76,8 +62,8 @@ if g_LuaScriptBlockers[ModID]==nil then
           coroutine.yield()
         end
         g_ObjectFinderSerp.t_ExecuteFnWithArgsForPeers("session.unloadSession",3000,nil,"Everyone",HelpSessionGuid) -- unload session for everyone calling it at the same time, to not desync
-      end
-      g_LuaTools.modlog("t_Unload_EmptySession: Function finisehd",ModID)
+      -- end
+      g_AnnoTools.modlog("t_Unload_EmptySession: Function finisehd",ModID)
     end
     
     local function DoWeNeedHelpSession()
@@ -109,40 +95,40 @@ if g_LuaScriptBlockers[ModID]==nil then
     
      
     local function t_Do_GetCoopPeersAtMarker(needs_CoopPeersAtMarker_UI,everactive_coops)
-      g_LuaTools.modlog("Do_GetCoopPeersAtMarker started ",ModID)
+      g_AnnoTools.modlog("Do_GetCoopPeersAtMarker started ",ModID)
       local coops_at_marker = {}
       if needs_CoopPeersAtMarker_UI then -- only if we have active coop players, we need to check GetCoopPeersAtMarker then
         local UI_ID = 176 -- 29:ToggleDiplomacyMenu(), 176=OpenStatisticsShipList
         -- local UI_ID = 29 -- 29:ToggleDiplomacyMenu(), 176=OpenStatisticsShipList
         ts.Interface.OpenStatisticsShipList() -- using OpenStatisticsShipList now instead, because we can call this multiple times if needed without it being closed again. And JumpToSession closes the menu anyways
         -- ts.Interface.ToggleDiplomacyMenu()
-        -- g_LuaTools.modlog("Do_GetCoopPeersAtMarker vor waitForTimeDelta ",ModID)
-        g_LuaTools.waitForTimeDelta(500)
-        -- g_LuaTools.modlog("Do_GetCoopPeersAtMarker nach waitForTimeDelta ",ModID)
+        -- g_AnnoTools.modlog("Do_GetCoopPeersAtMarker vor waitForTimeDelta ",ModID)
+        g_AnnoTools.waitForTimeDelta(500)
+        -- g_AnnoTools.modlog("Do_GetCoopPeersAtMarker nach waitForTimeDelta ",ModID)
         local notstop = 0
-        coops_at_marker = g_ObjectFinderSerp.GetCoopPeersAtMarker(UI_ID,0) -- these will be all existing coop peers, except of me
-        -- g_LuaTools.modlog("Do_GetCoopPeersAtMarker nach GetCoopPeersAtMarker ",ModID)
+        coops_at_marker = g_AnnoTools.GetCoopPeersAtMarker(UI_ID,0) -- these will be all existing coop peers, except of me
+        -- g_AnnoTools.modlog("Do_GetCoopPeersAtMarker nach GetCoopPeersAtMarker ",ModID)
         while g_LuaTools.table_len(coops_at_marker) ~= g_CoopCountRes.LocalCount-1 do
-          -- g_LuaTools.modlog("Do_GetCoopPeersAtMarker loop... "..tostring(notstop),ModID)
-          g_LuaTools.waitForTimeDelta(500)
-          -- g_LuaTools.modlog("Do_GetCoopPeersAtMarker nach wait loop... "..tostring(notstop),ModID)
-          coops_at_marker = g_ObjectFinderSerp.GetCoopPeersAtMarker(UI_ID,0) -- peerint as key and true as value
-          -- g_LuaTools.modlog("Do_GetCoopPeersAtMarker nach GetCoopPeersAtMarker... "..tostring(notstop),ModID)
+          -- g_AnnoTools.modlog("Do_GetCoopPeersAtMarker loop... "..tostring(notstop),ModID)
+          g_AnnoTools.waitForTimeDelta(500)
+          -- g_AnnoTools.modlog("Do_GetCoopPeersAtMarker nach wait loop... "..tostring(notstop),ModID)
+          coops_at_marker = g_AnnoTools.GetCoopPeersAtMarker(UI_ID,0) -- peerint as key and true as value
+          -- g_AnnoTools.modlog("Do_GetCoopPeersAtMarker nach GetCoopPeersAtMarker... "..tostring(notstop),ModID)
           notstop = notstop + 1
           if notstop > 10 then -- wait max of 5 seconds
-            g_LuaTools.modlog("ERROR Lua wont work well in multiplayer! Do_GetCoopPeersAtMarker failed to get all coop peers into the same UI...",ModID)
+            g_AnnoTools.modlog("ERROR Lua wont work well in multiplayer! Do_GetCoopPeersAtMarker failed to get all coop peers into the same UI...",ModID)
             GameManager.OnlineManager.leaveSession()
             return
           end
-          -- g_LuaTools.modlog("Do_GetCoopPeersAtMarker nach notstop... "..tostring(notstop),ModID)
+          -- g_AnnoTools.modlog("Do_GetCoopPeersAtMarker nach notstop... "..tostring(notstop),ModID)
           if UI_ID==176 and g_LuaTools.table_len(coops_at_marker) ~= g_CoopCountRes.LocalCount-1 then
             ts.Interface.OpenStatisticsShipList()
           end
         end
       else
-        g_LuaTools.modlog("Skip GetCoopPeersAtMarker "..tostring(ts.GameClock.CorporationTime),ModID)
+        g_AnnoTools.modlog("Skip GetCoopPeersAtMarker "..tostring(ts.GameClock.CorporationTime),ModID)
       end
-      -- g_LuaTools.modlog("Do_GetCoopPeersAtMarker nach maybe_coop... ",ModID)
+      -- g_AnnoTools.modlog("Do_GetCoopPeersAtMarker nach maybe_coop... ",ModID)
       for peerint,value in pairs(coops_at_marker) do
         g_PeersInfo_Serp.ActiveCoopPeers[peerint] = everactive_coops[g_PeersInfo_Serp.PID][peerint]
         g_PeersInfo_Serp.ActivePeers[peerint] = g_PeersInfo_Serp.ActiveCoopPeers[peerint]
@@ -154,13 +140,13 @@ if g_LuaScriptBlockers[ModID]==nil then
       
       g_Peer_Tricks_Serp.CoopPeersAtMarker_Done = true
       -- for the final result we need to wait and use this info after the session trick is done
-      g_LuaTools.modlog("Do_GetCoopPeersAtMarker done ",ModID)
+      g_AnnoTools.modlog("Do_GetCoopPeersAtMarker done ",ModID)
     end
     
     
     
     local function t_Start(everactive_coops)
-      g_LuaTools.modlog("Start "..tostring(ts.GameClock.CorporationTime),ModID)
+      g_AnnoTools.modlog("Start "..tostring(ts.GameClock.CorporationTime),ModID)
       
       -- normal gamespeed, coroutines can have trouble on slower speed in some menues (eg statistic menu. diplo menu is fine, but we have no "Open" command, just toggle)
       ts.GameClock.SetSetGameSpeed(3) -- it will not update the speed button in singleplayer, but this code is used for MP only anyways
@@ -172,11 +158,11 @@ if g_LuaScriptBlockers[ModID]==nil then
       if DoHideUI then -- also wont show notification, so we decided against this
         ts.Interface.ToggleUI()
       else
-        if g_ObjectFinderSerp.WasNewGameJustStarted() then -- we need at least 1 second delay for new game when showing the notification for unknown reason.
-          g_LuaTools.waitForTimeDelta(1500)
+        if g_AnnoTools.WasNewGameJustStarted() then -- we need at least 1 second delay for new game when showing the notification for unknown reason.
+          g_AnnoTools.waitForTimeDelta(1500)
         end
         ts.Conditions.RegisterTriggerForCurrentParticipant(1500005543) -- notification warning to tell users to not click anything
-        g_LuaTools.waitForTimeDelta(2000) -- give player time to start reading and stop doing stuff
+        g_AnnoTools.waitForTimeDelta(2000) -- give player time to start reading and stop doing stuff
       end
       
       
@@ -193,11 +179,11 @@ if g_LuaScriptBlockers[ModID]==nil then
         -- for peerint,username in pairs(g_PeersInfo_Serp.Everactive_Usernames) do
           -- g_PeersInfo_Serp.ActivePeers[peerint] = username
         -- end
-        -- g_LuaTools.modlog("SkipSessionTrick "..tostring(ts.GameClock.CorporationTime),ModID)
+        -- g_AnnoTools.modlog("SkipSessionTrick "..tostring(ts.GameClock.CorporationTime),ModID)
       -- end
       
       
-      g_LuaTools.modlog("FindOutInactivePlayersViaSessionTrick "..tostring(ts.GameClock.CorporationTime),ModID)
+      g_AnnoTools.modlog("FindOutInactivePlayersViaSessionTrick "..tostring(ts.GameClock.CorporationTime),ModID)
       
       if not SkipSessionTrick then
       
@@ -224,31 +210,31 @@ if g_LuaScriptBlockers[ModID]==nil then
       end
       
       local needs_CoopPeersAtMarker_UI = true -- g_CoopCountRes.LocalCount>1 -- TODO test change back to normal
-      g_LuaTools.start_thread("Do_GetCoopPeersAtMarker",ModID,t_Do_GetCoopPeersAtMarker,needs_CoopPeersAtMarker_UI,everactive_coops)
+      g_AnnoTools.start_thread("Do_GetCoopPeersAtMarker",ModID,t_Do_GetCoopPeersAtMarker,needs_CoopPeersAtMarker_UI,everactive_coops)
       
       if not SkipSessionTrick then
         if WeLoadEmptySession then -- then we need to load our small helper session...
           OtherSessionGuid = HelpSessionGuid
           if not game.isSessionLoadingDone(OtherSessionGuid) then
-            g_LuaTools.modlog("Start Loading empty Helper Session "..tostring(ts.GameClock.CorporationTime),ModID)
+            g_AnnoTools.modlog("Start Loading empty Helper Session "..tostring(ts.GameClock.CorporationTime),ModID)
             ts.Unlock.SetUnlockNet(1500005541) -- load empty session
             local notstop = 0
             while true do
-              g_LuaTools.waitForTimeDelta(500)
+              g_AnnoTools.waitForTimeDelta(500)
               if game.isSessionLoadingDone(OtherSessionGuid) then
                 break
               end
               notstop = notstop + 1
               if notstop > 30 then -- 15 seconds
-                g_LuaTools.modlog("ERROR Lua wont work well in multiplayer! shared_LuaPeers_peer_tricks failed to load the helper session...",ModID)
+                g_AnnoTools.modlog("ERROR Lua wont work well in multiplayer! shared_LuaPeers_peer_tricks failed to load the helper session...",ModID)
                 GameManager.OnlineManager.leaveSession()
                 return
               end
             end
             ts.Unlock.SetUnlockNet(1500005544) -- unlock the IslandSettled check, which checks on IslandSettled if we meanwhile can unload the helper session again
-            g_LuaTools.modlog("Loading empty Helper Session DONE "..tostring(ts.GameClock.CorporationTime),ModID)
+            g_AnnoTools.modlog("Loading empty Helper Session DONE "..tostring(ts.GameClock.CorporationTime),ModID)
           else
-            g_LuaTools.modlog("Helper Session is already loaded "..tostring(ts.GameClock.CorporationTime),ModID)
+            g_AnnoTools.modlog("Helper Session is already loaded "..tostring(ts.GameClock.CorporationTime),ModID)
           end
         end
       end
@@ -260,7 +246,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       if not SkipSessionTrick then
         num_activepeers = g_CoopCountRes.TotalCount -- so this number of peers has to switch sessions. use it to find out if everyone who can, already switched sessions
         local notstop = 0
-        g_LuaTools.modlog("Now switching Session to "..(WeLoadEmptySession and tostring(HelpSessionGuid) or tostring(OtherSessionGuid)).." ... "..tostring(ts.GameClock.CorporationTime),ModID)
+        g_AnnoTools.modlog("Now switching Session to "..(WeLoadEmptySession and tostring(HelpSessionGuid) or tostring(OtherSessionGuid)).." ... "..tostring(ts.GameClock.CorporationTime),ModID)
         local peers_switched = {}
         while num_activepeers ~= #peers_switched do
           if WeLoadEmptySession then
@@ -268,7 +254,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           else -- cant use ActionEnterSession, because in xml we have to hardcode the SessionGuid
             ts.Interface.JumpToSession(OtherSessionGuid) -- might be different for everyone  -- this also closes menus statistics and popups
           end
-          g_LuaTools.waitForTimeDelta(1000)
+          g_AnnoTools.waitForTimeDelta(1000)
           for peerint,username in pairs(g_PeersInfo_Serp.Everactive_Usernames) do
             if ts.MetaGameManager.GetActiveSessionGUIDOfPeerInt(peerint) ~= PreviousSessions[peerint] then -- GetActiveSessionGUIDOfPeerInt takes longer to update than getSessionGUID, but we need to know a success for everyone
               if not g_LuaTools.table_contains_value(peers_switched,peerint) then
@@ -279,19 +265,20 @@ if g_LuaScriptBlockers[ModID]==nil then
           end
           notstop = notstop + 1
           if notstop > 10 then -- 10 seconds
-            g_LuaTools.modlog("ERROR Lua wont work well in multiplayer! shared_LuaPeers_peer_tricks failed to make every active player switch session. num_activepeers: "..tostring(num_activepeers).." numpeers_switchdone:"..tostring(#peers_switched),ModID)
+            g_AnnoTools.modlog("ERROR Lua wont work well in multiplayer! shared_LuaPeers_peer_tricks failed to make every active player switch session. num_activepeers: "..tostring(num_activepeers).." numpeers_switchdone:"..tostring(#peers_switched),ModID)
             GameManager.OnlineManager.leaveSession()
             return
           end
         end
         
-        g_LuaTools.modlog("switching Session done, now switch back to "..tostring(CurrentSessionGuid).." ... "..tostring(ts.GameClock.CorporationTime),ModID)
-        g_LuaTools.waitForTimeDelta(250) -- short extra delay, because jumping too fast there and back causes graphic issues
+        g_AnnoTools.modlog("switching Session done, now switch back to "..tostring(CurrentSessionGuid).." ... "..tostring(ts.GameClock.CorporationTime),ModID)
+        g_AnnoTools.waitForTimeDelta(250) -- short extra delay, because jumping too fast there and back causes graphic issues
         
         ts.Interface.JumpToSession(CurrentSessionGuid) -- jump back to original session -- this also closes menus statistics and popups
         
         if WeLoadEmptySession then
           ts.Unlock.SetRelockNet(HelpSessionGuid) -- lock session again. 
+          -- g_AnnoTools.start_thread("t_Unload_EmptySession",ModID,t_Unload_EmptySession,CurrentSessionGuid)
           -- t_Unload_EmptySession is called from in xml on IslandSettled event. This then checks if every peer has 
           -- HasPossibleSession , so the helper session is no longer neeeded.
           -- We dont unload and load it everytime again and again, because this increases the max SessionID everytime we do it.
@@ -329,7 +316,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       g_PeersInfo_Serp.CoopFinished = true
       g_PeersInfo_Serp.FullFinished = true
 
-      g_LuaTools.modlog("DONE FindOutInactivePlayersViaSessionTrick "..tostring(ts.GameClock.CorporationTime),ModID)
+      g_AnnoTools.modlog("DONE FindOutInactivePlayersViaSessionTrick "..tostring(ts.GameClock.CorporationTime),ModID)
       
       -- theoretisch sollte man hier warten, bis sicher alle fertig sind (weil wird für alle angezeigt)
        -- aber an sich ist das session loaden der Teil der am längsten dauert und da wird ja bereits gewartet, dass
@@ -347,7 +334,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     }
     
         
-    g_LuaTools.start_thread("g_OnGameLeave_serp",ModID,function()
+    g_AnnoTools.start_thread("g_OnGameLeave_serp",ModID,function()
       while g_OnGameLeave_serp==nil do
         coroutine.yield()
       end
@@ -357,8 +344,8 @@ if g_LuaScriptBlockers[ModID]==nil then
         end
       end
     end)
-    g_LuaTools.start_thread("g_LuaScriptBlockers",ModID,function()
-      g_LuaTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
+    g_AnnoTools.start_thread("g_LuaScriptBlockers",ModID,function()
+      g_AnnoTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
       g_LuaScriptBlockers[ModID] = nil
     end)
     

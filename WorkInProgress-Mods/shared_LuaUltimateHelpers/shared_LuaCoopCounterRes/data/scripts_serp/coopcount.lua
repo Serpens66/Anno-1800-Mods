@@ -18,7 +18,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- block it directly at start of the script (to prevent ActionExecuteScript to call this multiple times per local player)
     g_LuaScriptBlockers[ModID] = true
     
-    g_LuaTools.modlog("coopcount.lua registered",ModID)
+    g_AnnoTools.modlog("coopcount.lua registered",ModID)
     
     
     -- a function that returns how many coop human players are sharing the local player slot
@@ -38,7 +38,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             oldamounts[PID] = ts.Participants.GetParticipant(PID).ProfileCounter.Stats.GetCounter(0,6,1500004521,3)
           end
           ts.Economy.MetaStorage.AddAmount(1500004521, 1) -- add 1
-          g_LuaTools.waitForTimeDelta(2000) -- 100 is too short, 1000 enough for local, but use 2000 to be sure its also synced to all other players
+          g_AnnoTools.waitForTimeDelta(2000) -- 100 is too short, 1000 enough for local, but use 2000 to be sure its also synced to all other players
           for PID=0,3,1 do -- looping through all 4 Human PIDs
             local newamount = ts.Participants.GetParticipant(PID).ProfileCounter.Stats.GetCounter(0,6,1500004521,3)
             g_CoopCountRes.CountPerPID[PID] = newamount - oldamounts[PID]
@@ -48,7 +48,7 @@ if g_LuaScriptBlockers[ModID]==nil then
               g_CoopCountRes.LocalCount = g_CoopCountRes.CountPerPID[PID]
               if newamount > 99990 then -- (100000 is the max allowed amount)
                 ts.Economy.MetaStorage.AddAmount(1500004521, -100000) -- can not get negative
-                g_LuaTools.waitForTimeDelta(1000)
+                g_AnnoTools.waitForTimeDelta(1000)
               end
             end
           end
@@ -95,7 +95,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     end,ModID.." g_OnGameLeave_serp")
     
     system.start(function()
-      g_LuaTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
+      g_AnnoTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
       g_LuaScriptBlockers[ModID] = nil
     end,ModID.." g_LuaScriptBlockers")
     

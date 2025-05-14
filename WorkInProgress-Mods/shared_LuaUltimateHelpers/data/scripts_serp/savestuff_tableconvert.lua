@@ -51,7 +51,7 @@ function ValueToString(_value)
     end
   else --failsafe
     print("unsupported value type for ValueToString:", type(_value), _value)
-    g_LuaTools.modlog("unsupported value type for ValueToString: "..tostring(type(_value)).." "..tostring(_value),ModID)
+    g_AnnoTools.modlog("unsupported value type for ValueToString: "..tostring(type(_value)).." "..tostring(_value),ModID)
     return 'nil'
   end
 end
@@ -63,7 +63,7 @@ function IndexToString(_index)
     return "[\'".._index.."\']"
   else --failsafe
     print("unsupported index type for IndexToString:",type(_index), _index)
-    g_LuaTools.modlog("unsupported index type for IndexToString: "..tostring(type(_index)).." "..tostring(_index),ModID)
+    g_AnnoTools.modlog("unsupported index type for IndexToString: "..tostring(type(_index)).." "..tostring(_index),ModID)
     return 'nil'
   end
 end

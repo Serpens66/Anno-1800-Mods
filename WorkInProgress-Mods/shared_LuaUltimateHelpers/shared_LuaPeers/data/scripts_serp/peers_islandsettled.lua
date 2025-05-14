@@ -12,7 +12,7 @@ system.start(function()
   end
   local status, err = pcall(g_Peer_Tricks_Serp.t_Unload_EmptySession) 
   if status==false then -- error
-    g_LuaTools.modlog("ERROR : "..tostring(err),ModID)
+    g_AnnoTools.modlog("ERROR : "..tostring(err),ModID)
     error(err)
   end
 end,"peers_islandsettled.lua Unload_EmptySession")

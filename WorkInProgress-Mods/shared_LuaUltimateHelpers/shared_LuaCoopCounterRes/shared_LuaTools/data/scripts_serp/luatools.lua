@@ -7,7 +7,7 @@ print("luatools.lua registered")
 -- if g_LuaTools==nil then
   -- console.startScript("data/scripts_serp/luatools.lua")
 -- end
--- then you can use eg. g_LuaTools.modlog(text) or g_LuaTools.table_len(t) and so on in your script
+-- then you can use eg. g_AnnoTools.modlog(text) or g_LuaTools.table_len(t) and so on in your script
 
 -- ####################################################################################
 -- ####################################################################################

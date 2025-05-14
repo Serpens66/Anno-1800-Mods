@@ -57,10 +57,10 @@ end
 local function Do_OnLeaveUIState(UILeft_ID)
 
   if UILeft_ID == LoadingScreenLeft_ID then
-    g_LuaTools.modlog("LoadingScreenLeft",ModID)
-    g_LuaTools.start_thread("LoadingScreenLeft Execute_SavegameLoadedEvent",ModID,t_OnGameLoaded,true)
+    g_AnnoTools.modlog("LoadingScreenLeft",ModID)
+    g_AnnoTools.start_thread("LoadingScreenLeft Execute_SavegameLoadedEvent",ModID,t_OnGameLoaded,true)
   elseif UILeft_ID == GameLeft_ID then -- also when just going to main menu and then back to the game (just like LoadingScreenLeft_ID)
-    g_LuaTools.modlog("GameLeft",ModID)
+    g_AnnoTools.modlog("GameLeft",ModID)
     -- we can not use Triggers/Unlocks here, because game gets closed. So we will use global table g_OnGameLeave_serp
     if ts.GameSetup.GetIsMultiPlayerGame() then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
       ts.GameClock.SetSetGameSpeed(3) -- normal gamespeed, coroutines can have trouble on slower speed in some menues
@@ -70,18 +70,18 @@ local function Do_OnLeaveUIState(UILeft_ID)
         local status, err = pcall(fn)
         if status==false then -- error
           print("ERROR OnGameLeave: Function from mod "..tostring(id).." had an error: "..tostring(err))
-          g_LuaTools.modlog("ERROR OnGameLeave: Function from mod "..tostring(id).." had an error: "..tostring(err),ModID)
+          g_AnnoTools.modlog("ERROR OnGameLeave: Function from mod "..tostring(id).." had an error: "..tostring(err),ModID)
         end
       else
         print("ERROR OnGameLeave: Function from mod "..tostring(id).." is no function: "..tostring(fn))
-        g_LuaTools.modlog("ERROR OnGameLeave: Function from mod "..tostring(id).." is no function: "..tostring(fn),ModID)
+        g_AnnoTools.modlog("ERROR OnGameLeave: Function from mod "..tostring(id).." is no function: "..tostring(fn),ModID)
       end
     end
     
-    g_LuaTools.StopAllThreads()
+    g_AnnoTools.StopAllThreads()
   elseif UILeft_ID == SessionViewLeft_ID then
     if ts.GameSetup.GetIsMultiPlayerGame() and g_CurrentClock_GameSpeed_Serp < 3 and g_ObjectFinderSerp~=nil then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
-      g_LuaTools.start_thread("SessionViewLeft SetSetGameSpeed",ModID,g_ObjectFinderSerp.t_ExecuteFnWithArgsForPeers,"ts.GameClock.SetSetGameSpeed",nil,nil,"Everyone",3)
+      g_AnnoTools.start_thread("SessionViewLeft SetSetGameSpeed",ModID,g_ObjectFinderSerp.t_ExecuteFnWithArgsForPeers,"ts.GameClock.SetSetGameSpeed",nil,nil,"Everyone",3)
       ts.GameClock.SetSetGameSpeed(3) -- also call it directly for local, to minimize Menu problems, since t_ExecuteFnWithArgsForPeers takes some seconds and is a thread itself which gets problems on low speed
       ts.Unlock.SetUnlockNet(1500004525) -- notification that speed was changed by mod
     end
@@ -96,7 +96,7 @@ if event.OnLeaveUIState[ModID] == nil then -- only add it once
     console.startScript("data/scripts_serp/luatools.lua")
   end
   
-  g_LuaTools.modlog("Register OnLeaveUIState",ModID)
+  g_AnnoTools.modlog("Register OnLeaveUIState",ModID)
   
   -- define a global variable early (before other scripts are executed with help of this mod)
   -- This can be used by other mods to be used like g_LuaScriptBlockers[ModID] = true/nil
@@ -110,7 +110,7 @@ if event.OnLeaveUIState[ModID] == nil then -- only add it once
     local status, err = pcall(Do_OnLeaveUIState,UILeft_ID) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
     if status==false then -- error
       print(ModID,"ERROR OnLeaveUIState: Function Do_OnLeaveUIState had an error: "..tostring(err))
-      g_LuaTools.modlog("ERROR OnLeaveUIState: Function Do_OnLeaveUIState had an error: "..tostring(err),ModID)
+      g_AnnoTools.modlog("ERROR OnLeaveUIState: Function Do_OnLeaveUIState had an error: "..tostring(err),ModID)
     end
   end
   
@@ -126,7 +126,7 @@ if event.OnLeaveUIState[ModID] == nil then -- only add it once
    -- because right now we can only execute lua with help of xml, while xml is not yet available when we first enter the main menu or are in the first loading screen
     -- that means if Do_OnLeaveUIState was not yet added, Anno was just recently started, so the first SessionEnter for sure means a savegame was loaded.
     -- after that, the lua event.OnLeaveUIState will continue to work outside of a savegame, so also in main menu, so checking for LoadingScreenLeft_ID is enough then, to catch another savegame load without restarting the whole game
-  g_LuaTools.start_thread("LoadingScreenLeft Execute_SavegameLoadedEvent",ModID,t_OnGameLoaded)
+  g_AnnoTools.start_thread("LoadingScreenLeft Execute_SavegameLoadedEvent",ModID,t_OnGameLoaded)
   
 end
 
