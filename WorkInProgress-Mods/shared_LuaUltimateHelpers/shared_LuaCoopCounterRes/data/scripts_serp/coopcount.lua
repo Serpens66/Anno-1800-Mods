@@ -18,6 +18,8 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- block it directly at start of the script (to prevent ActionExecuteScript to call this multiple times per local player)
     g_LuaScriptBlockers[ModID] = true
     
+    g_LuaTools.modlog("coopcount.lua registered",ModID)
+    
     
     -- a function that returns how many coop human players are sharing the local player slot
     -- this is achieved by using the coop weakness: every local player, even in the same playerslot is executing the script once (with ActionExecuteScript)
@@ -51,7 +53,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             end
           end
           g_CoopCountRes.Finished = true
-        end)
+        end,ModID.." MakeNewCount")
       else -- singleplayer, no need to check
         g_CoopCountRes.LocalCount = 1
         g_CoopCountRes.TotalCount = 1
@@ -80,10 +82,21 @@ if g_LuaScriptBlockers[ModID]==nil then
 
     -- script is only called on savegame load
     MakeNewCount()
-
+    
     system.start(function()
-      g_LuaTools.waitForTimeDelta(5000) -- unblock it again, so it can be executed the next time we load a game
+      while g_OnGameLeave_serp==nil do
+        coroutine.yield()
+      end
+      if g_OnGameLeave_serp[ModID]==nil then
+        g_OnGameLeave_serp[ModID] = function()
+          g_SaveLuaStuff_Serp = nil -- stop everything (might crash some currently running functions, but I think its ok)
+        end
+      end
+    end,ModID.." g_OnGameLeave_serp")
+    
+    system.start(function()
+      g_LuaTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
       g_LuaScriptBlockers[ModID] = nil
-    end)
+    end,ModID.." g_LuaScriptBlockers")
     
 end

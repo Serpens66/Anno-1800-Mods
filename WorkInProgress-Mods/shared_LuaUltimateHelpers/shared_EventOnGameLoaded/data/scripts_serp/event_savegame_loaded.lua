@@ -3,11 +3,23 @@
 -- ###################################################
 
 -- Unfortunately there is no xml event (which works) to fire on every savegame load. So most mods execute their stuff on SessionEnter, but this fires quite often.
+-- Use xml Unlock to use this mod as savegameloaded event.
+-- use lua to use the on game left event.
 
--- My Execute_SavegameLoadedEvent function unlocks a FeatureUnlock ~1 second after a savegame was loaded (and locks it directly again). 
+-- My Execute_SavegameLoadedEvent unlocks a FeatureUnlock ~1 second after a savegame was loaded (and locks it directly again). 
 -- (It may be the very same game though, eg. go to main menu and back into game).
 -- it is for sure better to execute your possibly expensive code with help of this event, instead on every single SessionEnter, if it is enough to call it once per savegame load
  -- If your code is not expensive, you can of course simply call it on your own once per SessionEnter, if that is no problem.
+
+-- ###################
+
+
+-- Important info for "event." from the game:
+   -- If a function you call within that event causes an error, the game will crash without printing this error to the lua log!
+   -- So better always use pcall in them
+
+-- This script will be called on every SessionEnter. Keep this in mind when changing code, you might want to add it within the if statement instead for one time per Anno start execution
+
 
 local LoadingScreenLeft_ID = 60
 -- this integer is passed with the games OnLeaveUIState event whenever we leave the loading screen.
@@ -15,22 +27,44 @@ local LoadingScreenLeft_ID = 60
 
 local GameLeft_ID = 63 -- or 170/171, but 63 fits more and they all 3 are shown at the same moments
 
+local SessionViewLeft_ID = 151 -- entering ingame menus or also going back to main menu. Use it for SetSetGameSpeed to prevent problems with coroutines
 
-local ModID = "EventOnGameLoaded_Serp"
 
-local function g_OnLeaveUIState_serp(UILeft_ID)
+local ModID = "shared_LuaOnGameLoaded_Serp"
+
+
+-- TODO:
+ -- testen multiplayer mit gamespeed 2, laden, verlassen und menü öffnen
+  -- ob zb verlassen ohne t_ExecuteFnWithArgsForPeers zu problemem führt
+
+
+
+
+local function t_OnGameLoaded(withwait)
+  if ts.GameSetup.GetIsMultiPlayerGame() then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
+    ts.GameClock.SetSetGameSpeed(3) -- normal gamespeed, coroutines can have trouble on slower speed in some menues
+  end
+  if withwait then -- very first execution needs no wait, because the first execution is after SessionEnter, so players are already ingame
+    -- use a delay (at least 0.7 second), because multiplayer needs this for the code to be executed already ingame (because LeaveUIState fires too fast there)
+    system.waitForGameTimeDelta(700)
+  end
+  g_LuaScriptBlockers = {} -- also reset these tables on game load
+  g_OnGameLeave_serp = {}
+  ts.Unlock.SetUnlockNet(1500004636) -- Execute_SavegameLoadedEvent, unlock this FeatureUnlock to notify other mods
+end
+
+
+local function Do_OnLeaveUIState(UILeft_ID)
+
   if UILeft_ID == LoadingScreenLeft_ID then
     g_LuaTools.modlog("LoadingScreenLeft",ModID)
-    system.start(function()
-      -- use a delay (at least 0.7 second), because multiplayer needs this for the code to be executed already ingame (because LeaveUIState fires too fast there)
-      system.waitForGameTimeDelta(700)
-      ts.Unlock.SetUnlockNet(1500004636) -- Execute_SavegameLoadedEvent, unlock this FeatureUnlock to notify other mods
-    end)
-    
+    g_LuaTools.start_thread("LoadingScreenLeft Execute_SavegameLoadedEvent",ModID,t_OnGameLoaded,true)
   elseif UILeft_ID == GameLeft_ID then -- also when just going to main menu and then back to the game (just like LoadingScreenLeft_ID)
     g_LuaTools.modlog("GameLeft",ModID)
     -- we can not use Triggers/Unlocks here, because game gets closed. So we will use global table g_OnGameLeave_serp
-    
+    if ts.GameSetup.GetIsMultiPlayerGame() then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
+      ts.GameClock.SetSetGameSpeed(3) -- normal gamespeed, coroutines can have trouble on slower speed in some menues
+    end
     for id,fn in pairs(g_OnGameLeave_serp) do
       if fn~=nil and type(fn)=="function" then
         local status, err = pcall(fn)
@@ -44,42 +78,56 @@ local function g_OnLeaveUIState_serp(UILeft_ID)
       end
     end
     
-    -- stop all current lua threads. Put "NoStopGameLeft" in the unique name of your thread (2nd argument of system.start()), if you dont want it to be stopped on game left.
-    local threadstostop = {}
-    for name,thread in pairs(system.internal.coroutines) do
-      if #g_LuaTools.mysplit(name,"NoStopGameLeft") <= 1 then
-        table.insert(threadstostop,name) -- should not alter the talbe we are currently looping through..
-      end
+    g_LuaTools.StopAllThreads()
+  elseif UILeft_ID == SessionViewLeft_ID then
+    if ts.GameSetup.GetIsMultiPlayerGame() and g_CurrentClock_GameSpeed_Serp < 3 and g_ObjectFinderSerp~=nil then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
+      g_LuaTools.start_thread("SessionViewLeft SetSetGameSpeed",ModID,g_ObjectFinderSerp.t_ExecuteFnWithArgsForPeers,"ts.GameClock.SetSetGameSpeed",nil,nil,"Everyone",3)
+      ts.GameClock.SetSetGameSpeed(3) -- also call it directly for local, to minimize Menu problems, since t_ExecuteFnWithArgsForPeers takes some seconds and is a thread itself which gets problems on low speed
+      ts.Unlock.SetUnlockNet(1500004525) -- notification that speed was changed by mod
     end
-    for _,name in ipairs(threadstostop) do
-      system.internal.coroutines[name] = nil
-    end
-    
   end
+
 end
 
-if event.OnLeaveUIState["shared_LuaOnGameLoaded_Serp"] == nil then -- only add it once
+if event.OnLeaveUIState[ModID] == nil then -- only add it once
   
-  g_OnGameLeave_serp = {} -- global table where other mods can add their functions to
+  g_OnGameLeave_serp = {} -- global table where other mods can add their functions to.
   if g_LuaTools==nil then
     console.startScript("data/scripts_serp/luatools.lua")
   end
+  
+  g_LuaTools.modlog("Register OnLeaveUIState",ModID)
+  
   -- define a global variable early (before other scripts are executed with help of this mod)
-  -- This can be used by other mods to be used like g_LuaScriptBlockers.MyMod = true/nil
+  -- This can be used by other mods to be used like g_LuaScriptBlockers[ModID] = true/nil
   -- When you add your script with ActionExecuteScript to the xml 1500004636 FeatureUnlock, then it will be executed for every Human Participant in Multiplayer,
    -- causing your script to be executed multiple times also for the local player.
     -- To make sure your script is only executed once per load per local player, you can check and define g_LuaScriptBlockers.MyMod = true
      -- and set it to nil again within a thread after eg. 5000 ms, to be unblocked for the next game loading. 
   g_LuaScriptBlockers = {}
   
-  event.OnLeaveUIState["shared_LuaOnGameLoaded_Serp"] = g_OnLeaveUIState_serp
+  event.OnLeaveUIState[ModID] = function(UILeft_ID)
+    local status, err = pcall(Do_OnLeaveUIState,UILeft_ID) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+    if status==false then -- error
+      print(ModID,"ERROR OnLeaveUIState: Function Do_OnLeaveUIState had an error: "..tostring(err))
+      g_LuaTools.modlog("ERROR OnLeaveUIState: Function Do_OnLeaveUIState had an error: "..tostring(err),ModID)
+    end
+  end
+  
+  g_CurrentClock_GameSpeed_Serp = 3 -- only useable in Multiplayer (SP uses an unaccesable system with its buttons...) and only relevant if using the Gamespeed mod for Multiplayer
+  local SetSetGameSpeed_old = ts.GameClock.SetSetGameSpeed -- overwriting this to be notified whenever it is called anywhere, even other mods
+  ts.GameClock.SetSetGameSpeed = function(new) -- no need to do it for IncreaseGameSpeed/DecreaseGameSpeed because they dont work well anyways (once slowest is reached, you can not increase anymore, so no modder should use them anyways)
+    print("SetSetGameSpeed called with:",new)
+    g_CurrentClock_GameSpeed_Serp = new
+    return SetSetGameSpeed_old(new)
+  end
   
   -- The first time this script is called with help of SessionEnter, it will already be too late for the very first OnLeaveUIState,
    -- because right now we can only execute lua with help of xml, while xml is not yet available when we first enter the main menu or are in the first loading screen
-    -- that means if g_OnLeaveUIState_serp was not yet added, Anno was just recently started, so the first SessionEnter for sure means a savegame was loaded.
+    -- that means if Do_OnLeaveUIState was not yet added, Anno was just recently started, so the first SessionEnter for sure means a savegame was loaded.
     -- after that, the lua event.OnLeaveUIState will continue to work outside of a savegame, so also in main menu, so checking for LoadingScreenLeft_ID is enough then, to catch another savegame load without restarting the whole game
-  -- modlog("register OnLeaveUIState")
-  ts.Unlock.SetUnlockNet(1500004636) -- Execute_SavegameLoadedEvent, unlock this FeatureUnlock to notify other mods
+  g_LuaTools.start_thread("LoadingScreenLeft Execute_SavegameLoadedEvent",ModID,t_OnGameLoaded)
+  
 end
 
 
@@ -103,7 +151,7 @@ end
 -- registered OnLeaveUIState
 
 
--- 151 kommt wenn man von Session in Statistikmenü/handelsrouten wechselt -> SessionView left oderso? (wobei es nicht bei worldmap kommt)
+-- 151 kommt wenn man von Session in Statistikmenü/handelsrouten/Diplo wechselt (und auch bei zurück zum Hauptmenü)-> SessionView left oderso? (wobei es nicht bei worldmap kommt)
 -- 176 wenn man statistikmenü wieder verlässt
 -- Handelsroutenmenü ist 165 oder 177
 -- EinflussFenster ist 52

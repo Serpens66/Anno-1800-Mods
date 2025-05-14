@@ -1,4 +1,4 @@
-print("savetablestuff.lua called")
+
 
   -- This uses Nameable from this SessionParticipant to save information into the savegame
    -- g_ObjectFinderSerp.PIDToSaveData
@@ -21,7 +21,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       console.startScript("data/scripts_serp/luatools.lua")
     end
 
-    g_LuaTools.modlog("savetablestuff.lua called",ModID)
+    g_LuaTools.modlog("savetablestuff.lua registered",ModID)
 
 
     if g_StringTableConvertSerpNyk==nil then
@@ -40,6 +40,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             
             local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{g_ObjectFinderSerp.PIDToSaveData},"First") -- saving it in first-found is enough, because this will alawys be the same for everyone (assuming we all start in the same session).
             if status==false then
+              g_LuaTools.modlog("ERROR : "..tostring(sessionparticipants),ModID)
               error(sessionparticipants) 
             end
             
@@ -61,9 +62,10 @@ if g_LuaScriptBlockers[ModID]==nil then
       if fetchnameagain or not next(g_SaveLuaStuff_Serp.SavedTable) or (sModID~=nil and g_SaveLuaStuff_Serp.SavedTable[sModID]==nil) then
         
         -- local namestring = ts.SessionParticipants.GetParticipant(g_ObjectFinderSerp.PIDToSaveData).Nameable.Name -- only works if we changed the name of all SessionParticipants in all Sessions
-        
+        -- this already updates the Cache SessionParticipants and also LoadedSessions
         local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{g_ObjectFinderSerp.PIDToSaveData},"First")
         if status==false then
+          g_LuaTools.modlog("ERROR : "..tostring(sessionparticipants),ModID)
           error(sessionparticipants) 
         end
         
@@ -114,7 +116,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           end
         end
         
-      end)
+      end,ModID.." SaveTableToNameable")
     end
 
     -- script only called on savegame load and then resetted
@@ -127,7 +129,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       LoopIsRunning = false, -- internal usage
     }
     
-    system.start(function()
+    g_LuaTools.start_thread("g_OnGameLeave_serp",ModID,function()
       while g_OnGameLeave_serp==nil do
         coroutine.yield()
       end
@@ -137,9 +139,8 @@ if g_LuaScriptBlockers[ModID]==nil then
         end
       end
     end)
-    
-    system.start(function()
-      g_LuaTools.waitForTimeDelta(5000) -- unblock it again, so it can be executed the next time we load a game
+    g_LuaTools.start_thread("g_LuaScriptBlockers",ModID,function()
+      g_LuaTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
       g_LuaScriptBlockers[ModID] = nil
     end)
     

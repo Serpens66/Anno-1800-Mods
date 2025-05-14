@@ -357,6 +357,7 @@
      <!-- In that case the police will spawn on the wrong island... we could make the 1500001565 to not fly, so it can not change the island.. but then it also can not pass rivers and the police will spawn on top of the spy in this case.. -->
       <!-- (sobald (falls ich es hinbekomme) LimitToQuestArea funktioniert, können wir die police units aber auch direkt in der stadt spawnen und brauchen den helper 1500001565 nicht mehr) -->
             <!-- wir spawnen ein spawn-dummy was nicht direkt auf den spy schiesst weil ForceContextPosition das einzige ist was funzt um auf der richtigen Insel zu spawnen (LimitToQuestArea klappt leider nur mit Quest), aber immer exakt auf der stelle des spies spawned -->
+    <!-- checking for 1500001720 in the Main Condition is mandatory to assign the island/area to the trigger for ActionSpawnObjects to work (must be an building!) -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
@@ -1950,7 +1951,7 @@
                       <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                       <Values>
                         <VariableValue>
-                          <FloatValue>30</FloatValue>
+                          <FloatValue>10</FloatValue>
                         </VariableValue>
                       </Values>
                     </ChanceValue>
@@ -1959,94 +1960,6 @@
                       <Values>
                         <ActionList>
                           <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionSpawnObjects</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionSpawnObjects>
-                                    <SpawnGUID>1500001206</SpawnGUID>
-                                    <Amount>1</Amount>
-                                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                                  </ActionSpawnObjects>
-                                  <SpawnArea>
-                                    <SpawnContext>ForceContextPosition</SpawnContext>
-                                    <MatcherGUID>1500001730</MatcherGUID>
-                                  </SpawnArea>
-                                  <SessionFilter>
-                                    <AllowParentConditionSession>0</AllowParentConditionSession>
-                                    <AllowQuestSession>1</AllowQuestSession>
-                                    <AllowQuestArea>1</AllowQuestArea>
-                                  </SessionFilter>
-                                </Values>
-                              </Action>
-                            </Item>
-                            <Item>
-                              <Action>
-                                <Template>ActionSpawnObjects</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionSpawnObjects>
-                                    <SpawnGUID>1500001206</SpawnGUID>
-                                    <Amount>1</Amount>
-                                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                                  </ActionSpawnObjects>
-                                  <SpawnArea>
-                                    <SpawnContext>ForceContextPosition</SpawnContext>
-                                    <MatcherGUID>1500001730</MatcherGUID>
-                                  </SpawnArea>
-                                  <SessionFilter>
-                                    <AllowParentConditionSession>0</AllowParentConditionSession>
-                                    <AllowQuestSession>1</AllowQuestSession>
-                                    <AllowQuestArea>1</AllowQuestArea>
-                                  </SessionFilter>
-                                </Values>
-                              </Action>
-                            </Item>
-                            <Item>
-                              <Action>
-                                <Template>ActionSpawnObjects</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionSpawnObjects>
-                                    <SpawnGUID>1500001206</SpawnGUID>
-                                    <Amount>1</Amount>
-                                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                                  </ActionSpawnObjects>
-                                  <SpawnArea>
-                                    <SpawnContext>ForceContextPosition</SpawnContext>
-                                    <MatcherGUID>1500001730</MatcherGUID>
-                                  </SpawnArea>
-                                  <SessionFilter>
-                                    <AllowParentConditionSession>0</AllowParentConditionSession>
-                                    <AllowQuestSession>1</AllowQuestSession>
-                                    <AllowQuestArea>1</AllowQuestArea>
-                                  </SessionFilter>
-                                </Values>
-                              </Action>
-                            </Item>
-                            <Item>
-                              <Action>
-                                <Template>ActionSpawnObjects</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionSpawnObjects>
-                                    <SpawnGUID>1500001206</SpawnGUID>
-                                    <Amount>1</Amount>
-                                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                                  </ActionSpawnObjects>
-                                  <SpawnArea>
-                                    <SpawnContext>ForceContextPosition</SpawnContext>
-                                    <MatcherGUID>1500001730</MatcherGUID>
-                                  </SpawnArea>
-                                  <SessionFilter>
-                                    <AllowParentConditionSession>0</AllowParentConditionSession>
-                                    <AllowQuestSession>1</AllowQuestSession>
-                                    <AllowQuestArea>1</AllowQuestArea>
-                                  </SessionFilter>
-                                </Values>
-                              </Action>
-                            </Item>
                             <Item>
                               <Action>
                                 <Template>ActionSpawnObjects</Template>
@@ -2172,6 +2085,9 @@
         </TriggerSetup>
       </Values>
     </Asset>
+
+    <!-- TODO: -->
+    <!-- neuen code (mind. steal und rep) auch in Human1 bis Human3 Datei reinkopieren -->
 
     <!-- # code for stealing gold / manipulating reputation, also for human vs human (this is substracting, see guid 1500001594 for adding the money) -->
     <!-- only valid for land spies on enemies island (with the helper building 1500001720) to be able to identify the victim -->
@@ -2574,35 +2490,13 @@
     </Asset>
     
     
-    <!-- reputation -->
-    <!-- Wir machen es so: -->
-    <!-- ein item für alle +- richtungen für jeden Spieler.  -->
-    <!-- Und für notification nutzen wir das reaction system, weil hilfsquests bräcuhten wir eine für jeden spieer und in jede richtug. -->
-    <!-- auf diese weise brauchen wir also weder eine decision noch eine hilfsquest für denjenigen starten, über den die meinung geändert werden soll, was auch den trigger aufbau massiv erleichtert -->
     
-    <!-- also wir spawnen über projektil eine bestimmte GUID und diese löst trigger aus, welcher an dieselbe Stelle ein ojbekt desjenigen spielers spawned pber den die meinung geändert werden soll -->
-     <!-- und mit trigger der prüft ob auf Insel von A dieses Objekt von B ist, spawnen wir dann die reaction-luftschiffe damit die meinung geändertw rid -->
-    
-    <!-- für meinung vom human über Andere ändern hab ich noch nicht wirklich eine idee, erstmal insult eingebaut, also dass zb KI den human beleidigt, damit human schlechter von KI denkt. -->
-    <!-- Allerdings funzt das glaube ich nicht, KI hat keine Insult Action (human to human noch testen). Müsste man dann also über ActionNotification aus Sicht des humans machen, was komplizierter ist. -->
-    <!-- Aber erst weiter darüber nachdenken, wenn ich weiß ob ich das wirklich so machen will, vllt die meinung vom human ja doch iwie anders beeinflussen -->
-    
-    <!-- für Meinung von Ziel über einen selbst kann man natürlich das "Hilfspakete" Projektil nehmen -->
-    <!-- mit fremden owner kann ich das projektil glaube ich nicht spawnen, sonst wäre das der einfachste Weg die Meinung zwischen 2 anderen zu ändern.. -->
-
-  <!-- TODO: Reputation projectile in <RelevantProjectiles> packen, dann reagiert KI darauf mit +-5 für Propaganda/Hilfe  -->
-    <!-- und wir könnten für Rep change zwischen 2 spielern einen unsichtbaren spy spawnen der einmal damit  -->
-    <!-- angreift und dann gelöscht wird -->
-  <!-- dann bräuchten wir den reputation trigger nicht -->
-
-
-    <!-- WIP (teils noch steal money code) -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
         <Standard>
-          <GUID>TODOGUID</GUID>
-          <Name>Human0 changed opinion from processing human/AI about someone (depending on which item was used)</Name>
+          <GUID>1500001545</GUID>
+          <Name>Spawn Rep -5 for AI Helper Done by Human0</Name>
         </Standard>
         <Trigger>
           <TriggerCondition>
@@ -2630,9 +2524,7 @@
                     <TriggerCondition>
                       <Template>ConditionUnlocked</Template>
                       <Values>
-                        <Condition>
-                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                        </Condition>
+                        <Condition />
                         <ConditionUnlocked>
                           <UnlockNeeded>1500001613</UnlockNeeded>
                         </ConditionUnlocked>
@@ -2641,394 +2533,27 @@
                         </ConditionPropsNegatable>
                       </Values>
                     </TriggerCondition>
-                    <SubTriggers>
-                      <!-- negative reputation about Bente -->
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionPlayerCounter</Template>
-                                <Values>
-                                  <Condition>
-                                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                                  </Condition>
-                                  <ConditionPlayerCounter>
-                                    <Context>TODOGUID</Context>
-                                    <CounterAmount>1</CounterAmount>
-                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                    <CheckedParticipant>Human0</CheckedParticipant>
-                                  </ConditionPlayerCounter>
-                                </Values>
-                              </TriggerCondition>
-                              <SubTriggers>
-                              <!-- change reputation from processing AI about Bente: ActionAddReputation (the direction is limited, but works in this case and it does not show a notification, so we only use this for AI) -->
-                              <Item>
-                                <SubTrigger>
-                                  <Template>AutoCreateTrigger</Template>
-                                  <Values>
-                                    <Trigger>
-                                      <TriggerCondition>
-                                        <Template>ConditionUnlocked</Template>
-                                        <Values>
-                                          <Condition />
-                                          <ConditionUnlocked>
-                                            <UnlockNeeded>1500001601</UnlockNeeded>
-                                          </ConditionUnlocked>
-                                          <ConditionPropsNegatable />
-                                        </Values>
-                                      </TriggerCondition>
-                                      <TriggerActions>
-                                        <Item>
-                                          <TriggerAction>
-                                            <Template>ActionAddReputation</Template>
-                                            <Values>
-                                              <Action />
-                                              <ActionAddReputation>
-                                                <ReputationAmount>-5</ReputationAmount>
-                                                <ParticipantTarget>Second_ai_01_Jorgensen</ParticipantTarget>
-                                              </ActionAddReputation>
-                                            </Values>
-                                          </TriggerAction>
-                                        </Item>
-                                      </TriggerActions>
-                                    </Trigger>
-                                  </Values>
-                                </SubTrigger>
-                              </Item>
-                              <!-- change reputation from processing human about Bente .. how can we manipulate the opinion from human about someone else? maybe sending an insult character-notification from AI to human? -->
-                              <Item>
-                                <SubTrigger>
-                                  <Template>AutoCreateTrigger</Template>
-                                  <Values>
-                                    <Trigger>
-                                      <TriggerCondition>
-                                        <Template>ConditionUnlocked</Template>
-                                        <Values>
-                                          <Condition />
-                                          <ConditionUnlocked>
-                                            <UnlockNeeded>1500001600</UnlockNeeded>
-                                          </ConditionUnlocked>
-                                          <ConditionPropsNegatable />
-                                        </Values>
-                                      </TriggerCondition>
-                                      <TriggerActions>
-                                        <Item>
-                                          <TriggerAction>
-                                            <Template>ActionExecuteDiplomaticAction</Template>
-                                            <Values>
-                                              <Action />
-                                              <ActionExecuteDiplomaticAction>
-                                                <DiplomacyAction>Insult</DiplomacyAction>
-                                                <DiplomaticSourceUseProcessingParticipant>1</DiplomaticSourceUseProcessingParticipant>
-                                                <DiplomaticTargetParticipant>Second_ai_01_Jorgensen</DiplomaticTargetParticipant>
-                                              </ActionExecuteDiplomaticAction>
-                                            </Values>
-                                          </TriggerAction>
-                                        </Item>
-                                      </TriggerActions>
-                                    </Trigger>
-                                  </Values>
-                                </SubTrigger>
-                              </Item>
-                            </SubTriggers>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                      
-                      <!-- positive reputation about Bente -->
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionPlayerCounter</Template>
-                                <Values>
-                                  <Condition>
-                                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                                  </Condition>
-                                  <ConditionPlayerCounter>
-                                    <Context>TODOGUID</Context>
-                                    <CounterAmount>1</CounterAmount>
-                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                    <CheckedParticipant>Human0</CheckedParticipant>
-                                  </ConditionPlayerCounter>
-                                </Values>
-                              </TriggerCondition>
-                              <SubTriggers>
-                              <!-- change reputation from processing AI about Bente: ActionAddReputation (the direction is limited, but works in this case and it does not show a notification, so we only use this for AI) -->
-                              <Item>
-                                <SubTrigger>
-                                  <Template>AutoCreateTrigger</Template>
-                                  <Values>
-                                    <Trigger>
-                                      <TriggerCondition>
-                                        <Template>ConditionUnlocked</Template>
-                                        <Values>
-                                          <Condition />
-                                          <ConditionUnlocked>
-                                            <UnlockNeeded>1500001601</UnlockNeeded>
-                                          </ConditionUnlocked>
-                                          <ConditionPropsNegatable />
-                                        </Values>
-                                      </TriggerCondition>
-                                      <TriggerActions>
-                                        <Item>
-                                          <TriggerAction>
-                                            <Template>ActionAddReputation</Template>
-                                            <Values>
-                                              <Action />
-                                              <ActionAddReputation>
-                                                <ReputationAmount>5</ReputationAmount>
-                                                <ParticipantTarget>Second_ai_01_Jorgensen</ParticipantTarget>
-                                              </ActionAddReputation>
-                                            </Values>
-                                          </TriggerAction>
-                                        </Item>
-                                      </TriggerActions>
-                                    </Trigger>
-                                  </Values>
-                                </SubTrigger>
-                              </Item>
-                              <!-- change reputation from processing human about Bente .. how can we manipulate the opinion from human about someone else? maybe sending an insult character-notification from AI to human? -->
-                              <Item>
-                                <SubTrigger>
-                                  <Template>AutoCreateTrigger</Template>
-                                  <Values>
-                                    <Trigger>
-                                      <TriggerCondition>
-                                        <Template>ConditionUnlocked</Template>
-                                        <Values>
-                                          <Condition />
-                                          <ConditionUnlocked>
-                                            <UnlockNeeded>1500001600</UnlockNeeded>
-                                          </ConditionUnlocked>
-                                          <ConditionPropsNegatable />
-                                        </Values>
-                                      </TriggerCondition>
-                                      <TriggerActions>
-                                        <Item>
-                                          <TriggerAction>
-                                            <Template>ActionExecuteDiplomaticAction</Template>
-                                            <Values>
-                                              <Action />
-                                              <ActionExecuteDiplomaticAction>
-                                                <DiplomacyAction>Flatter</DiplomacyAction>
-                                                <DiplomaticSourceUseProcessingParticipant>1</DiplomaticSourceUseProcessingParticipant>
-                                                <DiplomaticTargetParticipant>Second_ai_01_Jorgensen</DiplomaticTargetParticipant>
-                                              </ActionExecuteDiplomaticAction>
-                                            </Values>
-                                          </TriggerAction>
-                                        </Item>
-                                      </TriggerActions>
-                                    </Trigger>
-                                  </Values>
-                                </SubTrigger>
-                              </Item>
-                            </SubTriggers>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                      
-                      
-                      
-                      
-                      
-                      <!-- negative reputation about Human0 -->
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionPlayerCounter</Template>
-                                <Values>
-                                  <Condition>
-                                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                                  </Condition>
-                                  <ConditionPlayerCounter>
-                                    <Context>TODOGUID</Context>
-                                    <CounterAmount>1</CounterAmount>
-                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                    <CheckedParticipant>Human0</CheckedParticipant>
-                                  </ConditionPlayerCounter>
-                                </Values>
-                              </TriggerCondition>
-                              <SubTriggers>
-                                <!-- change reputation from processing AI about Human0: we want a notification together with the rep change, which is only possible by quest or by reaction as far as I know, so we will use the reaction system. We spawn helper objects and the one will destroy the other triggering our reaction -->
-                                <Item>
-                                  <SubTrigger>
-                                    <Template>AutoCreateTrigger</Template>
-                                    <Values>
-                                      <Trigger>
-                                        <TriggerCondition>
-                                          <Template>ConditionUnlocked</Template>
-                                          <Values>
-                                            <Condition />
-                                            <ConditionUnlocked>
-                                              <UnlockNeeded>1500001601</UnlockNeeded>
-                                            </ConditionUnlocked>
-                                            <ConditionPropsNegatable />
-                                          </Values>
-                                        </TriggerCondition>
-                                        <TriggerActions>
-                                          <Item>
-                                            <TriggerAction>
-                                              <Template>ActionSpawnObjects</Template>
-                                              <Values>
-                                                <Action />
-                                                
-                                              </Values>
-                                            </TriggerAction>
-                                          </Item>
-                                        </TriggerActions>
-                                      </Trigger>
-                                    </Values>
-                                  </SubTrigger>
-                                </Item>
-                                <!-- change reputation from processing human about Human0 .. how can we manipulate the opinion from human about someone else? maybe sending an insult character-notification? -->
-                                <Item>
-                                  <SubTrigger>
-                                    <Template>AutoCreateTrigger</Template>
-                                    <Values>
-                                      <Trigger>
-                                        <TriggerCondition>
-                                          <Template>ConditionUnlocked</Template>
-                                          <Values>
-                                            <Condition />
-                                            <ConditionUnlocked>
-                                              <UnlockNeeded>1500001600</UnlockNeeded>
-                                            </ConditionUnlocked>
-                                            <ConditionPropsNegatable />
-                                          </Values>
-                                        </TriggerCondition>
-                                        <TriggerActions>
-                                          <Item>
-                                            <TriggerAction>
-                                              <Template>ActionExecuteDiplomaticAction</Template>
-                                              <Values>
-                                                <Action />
-                                                <ActionExecuteDiplomaticAction>
-                                                  <DiplomacyAction>Insult</DiplomacyAction>
-                                                  <DiplomaticSourceUseProcessingParticipant>1</DiplomaticSourceUseProcessingParticipant>
-                                                  <DiplomaticTargetParticipant>Human0</DiplomaticTargetParticipant>
-                                                </ActionExecuteDiplomaticAction>
-                                              </Values>
-                                            </TriggerAction>
-                                          </Item>
-                                        </TriggerActions>
-                                      </Trigger>
-                                    </Values>
-                                  </SubTrigger>
-                                </Item>
-                              </SubTriggers>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                      
-                      <!-- positive reputation about Human0 -->
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionPlayerCounter</Template>
-                                <Values>
-                                  <Condition>
-                                    <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                                  </Condition>
-                                  <ConditionPlayerCounter>
-                                    <Context>TODOGUID</Context>
-                                    <CounterAmount>1</CounterAmount>
-                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                    <CheckedParticipant>Human0</CheckedParticipant>
-                                  </ConditionPlayerCounter>
-                                </Values>
-                              </TriggerCondition>
-                              <SubTriggers>
-                              <!-- change reputation from processing AI about Human0: we want a notification together with the rep change, which is only possible by quest or by reaction as far as I know, so we will use the reaction system. We spawn helper objects and the one will destroy the other triggering our reaction -->
-                                <Item>
-                                  <SubTrigger>
-                                    <Template>AutoCreateTrigger</Template>
-                                    <Values>
-                                      <Trigger>
-                                        <TriggerCondition>
-                                          <Template>ConditionUnlocked</Template>
-                                          <Values>
-                                            <Condition />
-                                            <ConditionUnlocked>
-                                              <UnlockNeeded>1500001601</UnlockNeeded>
-                                            </ConditionUnlocked>
-                                            <ConditionPropsNegatable />
-                                          </Values>
-                                        </TriggerCondition>
-                                        <TriggerActions>
-                                          <Item>
-                                            <TriggerAction>
-                                              <Template>ActionSpawnObjects</Template>
-                                              <Values>
-                                                <Action />
-                                                
-                                              </Values>
-                                            </TriggerAction>
-                                          </Item>
-                                        </TriggerActions>
-                                      </Trigger>
-                                    </Values>
-                                  </SubTrigger>
-                                </Item>
-                              <!-- change reputation from processing human about Human0 .. how can we manipulate the opinion from human about someone else? maybe sending an insult character-notification? -->
-                              <Item>
-                                <SubTrigger>
-                                  <Template>AutoCreateTrigger</Template>
-                                  <Values>
-                                    <Trigger>
-                                      <TriggerCondition>
-                                        <Template>ConditionUnlocked</Template>
-                                        <Values>
-                                          <Condition />
-                                          <ConditionUnlocked>
-                                            <UnlockNeeded>1500001600</UnlockNeeded>
-                                          </ConditionUnlocked>
-                                          <ConditionPropsNegatable />
-                                        </Values>
-                                      </TriggerCondition>
-                                      <TriggerActions>
-                                        <Item>
-                                          <TriggerAction>
-                                            <Template>ActionExecuteDiplomaticAction</Template>
-                                            <Values>
-                                              <Action />
-                                              <ActionExecuteDiplomaticAction>
-                                                <DiplomacyAction>Flatter</DiplomacyAction>
-                                                <DiplomaticSourceUseProcessingParticipant>1</DiplomaticSourceUseProcessingParticipant>
-                                                <DiplomaticTargetParticipant>Human0</DiplomaticTargetParticipant>
-                                              </ActionExecuteDiplomaticAction>
-                                            </Values>
-                                          </TriggerAction>
-                                        </Item>
-                                      </TriggerActions>
-                                    </Trigger>
-                                  </Values>
-                                </SubTrigger>
-                              </Item>
-                            </SubTriggers>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                      
-                      
-                      
-                      
-                    </SubTriggers>
-
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500001837</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Human0</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
                   </Trigger>
                 </Values>
               </SubTrigger>
@@ -3059,27 +2584,150 @@
                 </Values>
               </TriggerAction>
             </Item>
-            <!-- spawn a steal confirmation helper, so spy-player does not get money credited in trigger 1500001594 when eg. targetting neutral buildings... -->
+            <!-- spawn reaction victim+attacker -->
             <Item>
               <TriggerAction>
                 <Template>ActionSpawnObjects</Template>
                 <Values>
                   <Action />
                   <ActionSpawnObjects>
-                    <SpawnGUID>1500001492</SpawnGUID>
+                    <SpawnGUID>1500001829</SpawnGUID>
                     <Amount>1</Amount>
-                    <Owner>Human0</Owner>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
                   </ActionSpawnObjects>
                   <SpawnArea>
-                    <SpawnContext>ForceContextPosition</SpawnContext>
-                    <MatcherGUID>1500001203</MatcherGUID>
-                    <LimitToQuestArea>1</LimitToQuestArea>
+                    <SpawnContext>Random</SpawnContext>
+                    <DistanceToBorder>Near</DistanceToBorder>
+                    <DistanceToIsland>Far</DistanceToIsland>
                   </SpawnArea>
                   <SessionFilter>
                     <AllowParentConditionSession>0</AllowParentConditionSession>
                     <AllowQuestSession>1</AllowQuestSession>
                     <AllowQuestArea>1</AllowQuestArea>
                   </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500001830</SpawnGUID>
+                    <Amount>1</Amount>
+                    <Owner>Human0</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <MatcherGUID>1500001548</MatcherGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>5000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <!-- change owner to neutral before deleting, so it does not drop random loot... -->
+                            <Item>
+                              <Action>
+                                <Template>ActionChangeParticipant</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionChangeParticipant>
+                                    <NewParticipantID>Neutral</NewParticipantID>
+                                  </ActionChangeParticipant>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001829</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionChangeParticipant</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionChangeParticipant>
+                                    <NewParticipantID>Neutral</NewParticipantID>
+                                  </ActionChangeParticipant>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001830</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>Human0</ObjectParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>1000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionDeleteObjects</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionDeleteObjects />
+                                                  <ObjectFilter>
+                                                    <ObjectGUID>1500001829</ObjectGUID>
+                                                    <CheckParticipantID>1</CheckParticipantID>
+                                                    <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                                  </ObjectFilter>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionDeleteObjects</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionDeleteObjects />
+                                                  <ObjectFilter>
+                                                    <ObjectGUID>1500001830</ObjectGUID>
+                                                    <CheckParticipantID>1</CheckParticipantID>
+                                                    <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                                  </ObjectFilter>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
                 </Values>
               </TriggerAction>
             </Item>
@@ -3106,14 +2754,14 @@
                                       <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                       <Values>
                                         <SideNotification>
-                                          <IconAsset>1500001489</IconAsset>
+                                          <IconAsset>1500001835</IconAsset>
                                           <FilterType>Military</FilterType>
                                           <Infotip>0</Infotip>
                                           <HasJumpLocation>0</HasJumpLocation>
                                           <IsWarning>0</IsWarning>
                                         </SideNotification>
                                         <BaseNotification>
-                                          <NotificationText>1500001425</NotificationText>
+                                          <NotificationText>1500001545</NotificationText>
                                           <NotificationAudioAsset>9818769</NotificationAudioAsset>
                                           <NotificationPriority>300</NotificationPriority>
                                           <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
@@ -3144,7 +2792,7 @@
                   <Values>
                     <Condition />
                     <ConditionPlayerCounter>
-                      <Context>1500001424</Context>
+                      <Context>1500001837</Context>
                       <CounterAmount>0</CounterAmount>
                       <ComparisonOp>AtMost</ComparisonOp>
                       <CheckSpecificParticipant>1</CheckSpecificParticipant>
@@ -3162,6 +2810,467 @@
         </TriggerSetup>
       </Values>
     </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001546</GUID>
+          <Name>Spawn Rep -5 for Pirates Helper Done by Human0</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionPlayerCounter>
+                <Context>1500001720</Context>
+                <CounterAmount>1</CounterAmount>
+                <CounterScope>Area</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Human0</CheckedParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001613</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500001840</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Human0</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <!-- spawn the sabotage helper object to count this action as sabotage at land spy position -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500001716</SpawnGUID>
+                    <Amount>1</Amount>
+                    <Owner>Human0</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <MatcherGUID>1500001203</MatcherGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- spawn reaction victim+attacker -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500001831</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>Random</SpawnContext>
+                    <DistanceToBorder>Near</DistanceToBorder>
+                    <DistanceToIsland>Far</DistanceToIsland>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500001830</SpawnGUID>
+                    <Amount>1</Amount>
+                    <Owner>Human0</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <MatcherGUID>1500001832</MatcherGUID>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>5000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <!-- change owner to neutral before deleting, so it does not drop random loot... -->
+                            <Item>
+                              <Action>
+                                <Template>ActionChangeParticipant</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionChangeParticipant>
+                                    <NewParticipantID>Neutral</NewParticipantID>
+                                  </ActionChangeParticipant>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001831</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionChangeParticipant</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionChangeParticipant>
+                                    <NewParticipantID>Neutral</NewParticipantID>
+                                  </ActionChangeParticipant>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001830</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>Human0</ObjectParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>1000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionDeleteObjects</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionDeleteObjects />
+                                                  <ObjectFilter>
+                                                    <ObjectGUID>1500001831</ObjectGUID>
+                                                    <CheckParticipantID>1</CheckParticipantID>
+                                                    <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                                  </ObjectFilter>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionDeleteObjects</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionDeleteObjects />
+                                                  <ObjectFilter>
+                                                    <ObjectGUID>1500001830</ObjectGUID>
+                                                    <CheckParticipantID>1</CheckParticipantID>
+                                                    <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                                  </ObjectFilter>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- notify the victim ~1 minute later -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>55000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionNotification</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionNotification>
+                                    <Notification>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <SideNotification>
+                                          <IconAsset>1500001835</IconAsset>
+                                          <FilterType>Military</FilterType>
+                                          <Infotip>0</Infotip>
+                                          <HasJumpLocation>0</HasJumpLocation>
+                                          <IsWarning>0</IsWarning>
+                                        </SideNotification>
+                                        <BaseNotification>
+                                          <NotificationText>1500001546</NotificationText>
+                                          <NotificationAudioAsset>9818769</NotificationAudioAsset>
+                                          <NotificationPriority>300</NotificationPriority>
+                                          <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
+                                          <DisplayTimeout>330000</DisplayTimeout>
+                                        </BaseNotification>
+                                        <NotificationSubtitle />
+                                      </Values>
+                                    </Notification>
+                                  </ActionNotification>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500001840</Context>
+                      <CounterAmount>0</CounterAmount>
+                      <ComparisonOp>AtMost</ComparisonOp>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                      <CheckedParticipant>Human0</CheckedParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    
+    <!-- spawning on top of spy unit, not at destination of projectile to save code and the distance is tiny anyways to prevent spawning in other buildings -->
+    <!-- TODO: limit to ~2-3 per island and also mention this in the description -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001843</GUID>
+          <Name>Spawn Spionage Posten Building by Human0</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>Linear</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionPlayerCounter>
+                <Context>1500001720</Context>
+                <CounterAmount>1</CounterAmount>
+                <CounterScope>Area</CounterScope>
+                <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                <CheckedParticipant>Human0</CheckedParticipant>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <!-- TODO: nach tests wieder einkommentieren, damits nicht auf eigener insel spawnbar ist. -->
+            <!-- <Item> -->
+              <!-- <SubTrigger> -->
+                <!-- <Template>AutoCreateTrigger</Template> -->
+                <!-- <Values> -->
+                  <!-- <Trigger> -->
+                    <!-- <TriggerCondition> -->
+                      <!-- <Template>ConditionUnlocked</Template> -->
+                      <!-- <Values> -->
+                        <!-- <Condition /> -->
+                        <!-- <ConditionUnlocked> -->
+                          <!-- <UnlockNeeded>1500001613</UnlockNeeded> -->
+                        <!-- </ConditionUnlocked> -->
+                        <!-- <ConditionPropsNegatable> -->
+                          <!-- <NegateCondition>1</NegateCondition> -->
+                        <!-- </ConditionPropsNegatable> -->
+                      <!-- </Values> -->
+                    <!-- </TriggerCondition> -->
+                  <!-- </Trigger> -->
+                <!-- </Values> -->
+              <!-- </SubTrigger> -->
+            <!-- </Item> -->
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <Context>1500001842</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                          <CheckedParticipant>Human0</CheckedParticipant>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500001547</SpawnGUID>
+                    <Amount>1</Amount>
+                    <Owner>Human0</Owner>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <SpawnContext>ForceContextPosition</SpawnContext>
+                    <MatcherGUID>1500001203</MatcherGUID>
+                    <LimitToQuestArea>1</LimitToQuestArea>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowParentConditionSession>0</AllowParentConditionSession>
+                    <AllowQuestSession>1</AllowQuestSession>
+                    <AllowQuestArea>1</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDeleteObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionDeleteObjects />
+                  <ObjectFilter>
+                    <ObjectGUID>1500001842</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <ObjectParticipantID>Human0</ObjectParticipantID>
+                  </ObjectFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500001842</Context>
+                      <CounterAmount>0</CounterAmount>
+                      <ComparisonOp>AtMost</ComparisonOp>
+                      <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                      <CheckedParticipant>Human0</CheckedParticipant>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
     
     
     

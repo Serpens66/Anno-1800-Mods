@@ -34,11 +34,15 @@
   <!-- movebefehl sound, wo kann ich den ändern? ist aktuell wassergeräscu bei befehligen -->
   
   
+   <!-- das automatische "fliehen" wenn eine unit angegriffen wird ist ein problem... -->
+    <!-- denn das unterbricht sogar das geforcde stehenbelbein wenn man x sekunden lang ein item einsetzen muss, -->
+     <!-- bei dem man sich nicht bewegen kann. Dann flieht unit trotzdem und trifft am Ende dennoch das Ziel -->
+      <!-- was nun lange nicht mehr in reichweite ist... FleeDistance Stance usw ändert nichts -->
+      <!-- Wobei das kein Problem ist wenn Spy nur 1 hitpoint hat, da ist er ja dann sofort tot. -->
   
-  <!-- WICHTIG IMPRTANT TODO: -->
-   <!-- test the Pirate mode applied via Buff for human spies! -->
-    <!-- Taube says that the piratemode does not apply properly to new sessions (if the spy switches sessions) -->
   
+   
+    
   
   <!-- bzgl damage: -->
    <!-- man könnte auch allen projektilen ein Effectivities geben, sodass sie *0 schaden an allem außer spies machen (zb für police units), -->
@@ -54,6 +58,14 @@
   <!-- info: -->
    <!-- mit AttackerUpgrade/DamageFactor kann man noch einstellen ob eine unit gegen Building/SailShip/SteamShip mehr/weniger Schaden machen soll. -->
     <!-- TODO: dies evlt mit UpgradeList/DefaultBuff den police units geben mit wert 0, damit sie sicher keinen Schaden an diesen machen können? (testen ob spy als eines von diesen dingen gilt) -->
+  
+  <!-- TODO: -->
+   <!-- für mensch. Spieler noch eine mobilere Police unit zufügen, zb. fliegend, damit man auch inseln von verbündeten  -->
+    <!-- beschützen kann/helfen kann. Ist vorallem relevant für Rep-Malus System, weil das technisch so aufgebaut ist, -->
+     <!-- dass der Spion nicht auf der Insel des Opfers ist. -->
+   <!-- Problem: damit Police Spy angreifen kann ist er im "attackeverything" Modus.. gucken obs klappt wenn er kein piratemode hat -->
+    <!-- und nur sehr wenig schaden macht. dann sollte er verbündete nicht angreifen und nur für spy jagd sinnvoll sein. -->
+    <!-- (evtl. auch garnicht von allein angreifen, sondern nur über spy-kill-item manuell?) -->
   
   
   <!-- ObjectDummy Templates are from my submod shared_ObjectDummies (ObjectDummies_Serp) -->
@@ -454,10 +466,10 @@
         </Drifting>        
         <ItemContainer>
           <CanStoreProducts>0</CanStoreProducts>
-          <!-- <UnlimitedSlotCount>1</UnlimitedSlotCount> -->
-          <!-- <UnlimitedStack>1</UnlimitedStack> -->
-          <SlotCount>10</SlotCount>
-          <SocketAllocation>Warship</SocketAllocation>
+          <UnlimitedSlotCount>1</UnlimitedSlotCount>
+          <UnlimitedStack>1</UnlimitedStack>
+          <!-- <SlotCount>10</SlotCount> -->
+          <SocketAllocation>Mod2</SocketAllocation>
           <SocketScope>None</SocketScope>
           <SocketScopeRadius>[NONE]</SocketScopeRadius>
           <SocketScopeRadiusOverlapCategory>None</SocketScopeRadiusOverlapCategory>
@@ -467,8 +479,20 @@
           <UnsocketSound>247106</UnsocketSound>
           <SocketSound>203866</SocketSound>
           <InitSlotItems>
+            <!-- <Item> -->
+              <!-- <Item>1500001535</Item> -->
+              <!-- <StackSize>1</StackSize> -->
+            <!-- </Item> -->
             <Item>
-              <Item>1500001535</Item>
+              <Item>1500001835</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001838</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001834</Item>
               <StackSize>1</StackSize>
             </Item>
             
@@ -536,7 +560,6 @@
           <ShootingTracking>Front</ShootingTracking>
           <BaseDamage>0</BaseDamage>
           <AttackRange>0</AttackRange>
-          <!-- <AttackRange>7</AttackRange> -->
           <LineOfSightRange>0</LineOfSightRange>
           <ProjectileAsset>1500001439</ProjectileAsset>
           <TargetAngleVariation>30</TargetAngleVariation>
@@ -613,6 +636,8 @@
             </PatrolCommand>
           </BarkMapping>
         </SoundEmitterCommandBarks>
+        
+
       </Values>
     </Asset>
     
@@ -956,22 +981,24 @@
           <GUID>1500001436</GUID>
           <Name>Spy KILLER AI (invisible)</Name>
         </Standard>
-        <Object>
-          <Variations />
-          <Skins />
-        </Object>
+        <!-- <Object> -->
+          <!-- <Variations /> -->
+          <!-- <Skins /> -->
+        <!-- </Object> -->
         <Mesh>
           <MeshPlacement>IgnoreTerrain</MeshPlacement>
         </Mesh>
         <Walking>
           <ForwardSpeed>0</ForwardSpeed>
           <PathPlannerLayer>Air</PathPlannerLayer>
+          <SpecialMovementType>AirConstantHeight</SpecialMovementType>
+          <StartHeight>5</StartHeight>
         </Walking>
         <Attacker>
           <ProjectileAsset>1500001174</ProjectileAsset>
           <BaseDamage>1</BaseDamage>
-          <AttackRange>5</AttackRange>
-          <LineOfSightRange>5</LineOfSightRange>
+          <AttackRange>10</AttackRange>
+          <LineOfSightRange>10</LineOfSightRange>
           <ReloadTime>1</ReloadTime>
           <AccuracyBase>0</AccuracyBase>
           <AccuracyIncreaseOverDistance>0</AccuracyIncreaseOverDistance>
@@ -1003,6 +1030,7 @@
     <!-- police_officer_with_lantern -->
     <!-- mounted_police -->
     <!-- police_officer -->
+    <!-- nur eine GUID für police nehmen. falls in anderen anderes aussehen sein soll, dann über skin machen -->
     <Asset>
       <Template>LandSpy_Serp</Template>
       <Values>
@@ -1094,7 +1122,7 @@
           <UnlimitedSlotCount>1</UnlimitedSlotCount>
           <!-- <SlotCount>8</SlotCount> -->
           <UnlimitedStack>1</UnlimitedStack>
-          <SocketAllocation>Warship</SocketAllocation>
+          <SocketAllocation>Mod2</SocketAllocation>
           <SocketScope>None</SocketScope>
           <SocketScopeRadius>[NONE]</SocketScopeRadius>
           <SocketScopeRadiusOverlapCategory>None</SocketScopeRadiusOverlapCategory>
@@ -1118,6 +1146,10 @@
             </Item>
             <Item>
               <Item>1500001516</Item>
+              <StackSize>1</StackSize>
+            </Item>
+            <Item>
+              <Item>1500001517</Item>
               <StackSize>1</StackSize>
             </Item>
           </InitSlotItems>
@@ -1190,73 +1222,6 @@
           <AllowedToCollect>[NONE]</AllowedToCollect>
           <MaxDragShips>0</MaxDragShips>
         </Collector>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001499</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001507</GUID>
-          <Name>Police new world</Name>
-        </Standard>
-        <!-- <Object> -->
-          <!-- <Variations> -->
-            <!-- <Item> -->
-              <!-- <Filename>data/sabotage_graphics_serp/units/mounted_police.cfg</Filename> -->
-            <!-- </Item> -->
-          <!-- </Variations> -->
-          <!-- <Skins /> -->
-        <!-- </Object> -->
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001499</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001508</GUID>
-          <Name>Police Africa</Name>
-        </Standard>
-        <!-- <Object> -->
-          <!-- <Variations> -->
-            <!-- <Item> -->
-              <!-- <Filename>data/sabotage_graphics_serp/units/mounted_police.cfg</Filename> -->
-            <!-- </Item> -->
-          <!-- </Variations> -->
-          <!-- <Skins /> -->
-        <!-- </Object> -->
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001499</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001509</GUID>
-          <Name>Police Arctic</Name>
-        </Standard>
-        <!-- <Object> -->
-          <!-- <Variations> -->
-            <!-- <Item> -->
-              <!-- <Filename>data/sabotage_graphics_serp/units/mounted_police.cfg</Filename> -->
-            <!-- </Item> -->
-          <!-- </Variations> -->
-          <!-- <Skins /> -->
-        <!-- </Object> -->
-        <ItemContainer>
-          <InitSlotItems>
-            <Item>
-              <Item>1500001514</Item>
-              <StackSize>1</StackSize>
-            </Item>
-            <Item>
-              <Item>1500001517</Item>
-              <StackSize>1</StackSize>
-            </Item>
-            <Item>
-              <Item>1500001516</Item>
-              <StackSize>1</StackSize>
-            </Item>
-          </InitSlotItems>
-        </ItemContainer>
       </Values>
     </Asset>
     
@@ -1354,7 +1319,7 @@
           <UseSlowDownTactic>1</UseSlowDownTactic>
         </Drifting>
         <ItemContainer>
-          <SocketAllocation>Warship</SocketAllocation>
+          <SocketAllocation>Mod2</SocketAllocation>
           <SocketScope>None</SocketScope>
           <SocketScopeRadius>[NONE]</SocketScopeRadius>
           <SocketScopeRadiusOverlapCategory>None</SocketScopeRadiusOverlapCategory>
@@ -1483,7 +1448,7 @@
         </ShipIncident>
         <ItemContainer>
           <CanStoreProducts>0</CanStoreProducts>
-          <SocketAllocation>Warship</SocketAllocation>
+          <SocketAllocation>Mod2</SocketAllocation>
           <SocketScope>None</SocketScope>
           <SocketScopeRadius>[NONE]</SocketScopeRadius>         
           <SocketScopeRadiusOverlapCategory>None</SocketScopeRadiusOverlapCategory>
@@ -1493,7 +1458,7 @@
           <FlotsamNoRadius>1</FlotsamNoRadius>
           <UnsocketSound>247106</UnsocketSound>
           <SocketSound>203866</SocketSound>
-          <InitSlotItems>
+          <!-- <InitSlotItems> -->
             <!-- <Item> -->
               <!-- <Item>1500001180</Item> -->
               <!-- <StackSize>1</StackSize> -->
@@ -1510,16 +1475,16 @@
               <!-- <Item>1500001725</Item> -->
               <!-- <StackSize>1</StackSize> -->
             <!-- </Item> -->
-            <Item>
-              <Item>1500001535</Item>
-              <StackSize>1</StackSize>
-            </Item>
+            <!-- <Item> -->
+              <!-- <Item>1500001535</Item> -->
+              <!-- <StackSize>1</StackSize> -->
+            <!-- </Item> -->
             <!-- <Item> -->
               <!-- <Item>1500001208</Item> -->
               <!-- <StackSize>1</StackSize> -->
             <!-- </Item> -->
 
-          </InitSlotItems>
+          <!-- </InitSlotItems> -->
           <InitSocketItems>
             <Item>
               <Item>1500001481</Item>
@@ -1566,7 +1531,8 @@
         </Attacker>
         <Attackable>
           <AttackableType>IslandBuilding</AttackableType>
-          <MaximumHitPoints>1</MaximumHitPoints>
+          <!-- <MaximumHitPoints>1</MaximumHitPoints> -->
+          <MaximumHitPoints>1000</MaximumHitPoints>
           <SelfHealPerHealTick>0</SelfHealPerHealTick>
         </Attackable>
         <Craftable>
@@ -1739,22 +1705,24 @@
           <GUID>1500001206</GUID>
           <Name>Spy Ship KILLER AI (invisible)</Name>
         </Standard>
-        <Object>
-          <Variations />
-          <Skins />
-        </Object>
+        <!-- <Object> -->
+          <!-- <Variations /> -->
+          <!-- <Skins /> -->
+        <!-- </Object> -->
         <Mesh>
           <MeshPlacement>IgnoreTerrain</MeshPlacement>
         </Mesh>
         <Walking>
           <ForwardSpeed>0</ForwardSpeed>
           <PathPlannerLayer>Air</PathPlannerLayer>
+          <SpecialMovementType>AirConstantHeight</SpecialMovementType>
+          <StartHeight>5</StartHeight>
         </Walking>
         <Attacker>
           <ProjectileAsset>1500001174</ProjectileAsset>
           <BaseDamage>1</BaseDamage>
-          <AttackRange>20</AttackRange>
-          <LineOfSightRange>20</LineOfSightRange>
+          <AttackRange>25</AttackRange>
+          <LineOfSightRange>25</LineOfSightRange>
           <ReloadTime>1</ReloadTime>
           <AccuracyBase>0</AccuracyBase>
           <AccuracyIncreaseOverDistance>0</AccuracyIncreaseOverDistance>
@@ -1825,7 +1793,6 @@
   <ModOp Type="addNextSibling" GUID='1654'>
 		<Asset>
       <Template>ObjectDummyWithoutOwner</Template>
-      <!-- <BaseAssetGUID>1654</BaseAssetGUID> -->
 			<Values>
 				<Standard>
 					<GUID>1500001559</GUID>
@@ -1836,7 +1803,6 @@
     
     <Asset>
       <Template>ObjectDummyWithOwner_FastMove</Template>
-      <!-- <BaseAssetGUID>1654</BaseAssetGUID> -->
 			<Values>
 				<Standard>
 					<GUID>1500001565</GUID>
@@ -1874,49 +1840,72 @@
 				</Standard>
 			</Values>
 		</Asset>
+  
+    <Asset>
+      <Template>ObjectDummyWithOwner</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001837</GUID>
+          <Name>Rep Malus AI Helper</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001840</GUID>
+          <Name>Rep Malus Helper Pirates</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner</Template>
+			<Values>
+				<Standard>
+					<GUID>1500001842</GUID>
+          <Name>Spawn Spionage Posten Building Helper</Name>
+				</Standard>
+			</Values>
+		</Asset>
+    
+    <Asset>
+      <Template>ObjectDummyWithOwner_Victim</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001829</GUID>
+          <Name>Helper Victim AI -5</Name>
+        </Standard>
+        <Mesh />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner_Attacker</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001830</GUID>
+          <Name>Helper Attacker</Name>
+        </Standard>
+        <Mesh />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner_Victim</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001831</GUID>
+          <Name>Helper Victim Pirates -5</Name>
+        </Standard>
+        <Mesh />
+      </Values>
+    </Asset>
+    
   </ModOp>
   
-  <!-- TODO: Testen ob dieses victim/Attacker system auch bei verdeckten Karten klappt, wenn die Helper Objekte <DiscoverRadius>0</DiscoverRadius> haben! -->
-  <ModOp Type="addNextSibling" GUID='1731'>
-    <Asset>
-      <Template>ObjectDummyWithOwner_Victim</Template>
-			<Values>
-				<Standard>
-					<GUID>1500001545</GUID>
-          <Name>PositiveReputationHelper_Victim</Name>
-				</Standard>
-			</Values>
-		</Asset>
-    <Asset>
-      <Template>ObjectDummyWithOwner_Attacker</Template>
-			<Values>
-				<Standard>
-					<GUID>1500001546</GUID>
-          <Name>PositiveReputationHelper_Attacker</Name>
-				</Standard>
-			</Values>
-		</Asset>
-    <Asset>
-      <Template>ObjectDummyWithOwner_Victim</Template>
-			<Values>
-				<Standard>
-					<GUID>1500001547</GUID>
-          <Name>NegativeReputationHelper_Victim</Name>
-				</Standard>
-			</Values>
-		</Asset>
-    <Asset>
-      <Template>ObjectDummyWithOwner_Attacker</Template>
-			<Values>
-				<Standard>
-					<GUID>1500001548</GUID>
-          <Name>NegativeReputationHelper_Attacker</Name>
-				</Standard>
-			</Values>
-		</Asset>
-    
-    
-  </ModOp>
+
+  
+  
+  
   
   <!-- zur DefaultSequence: -->
   <!-- ohne Blender: In der jeweiligen cfg. Dein saboteur_final verweist in der cfg auf eine quest_worker_m_01.cfg, die dann sämtliche Sequences dieser Figur enthält. Was in der assets.xml protestwalk03 heißt, wird in der cfg mit revoltwalk01 bezeichnet. Diese Bezeichnungen sind also nicht sehr verlässlich. In der assets.xml gibt´s aber eine schöne Liste mit Zuordnung zur SequenceID (suche nach <SequenceIDs>), protestwalk03 ist dort ID 5302. Die zulässigen IDs sind in der cfg des quest_worker_m01 ganz unten gelistet (wenn du die im Outline anklickst, dann siehst du dort unter TrackElement eine AnimationID. In diesem Fall '34'. In der cfg unter Animations ist nun Nr. 34 (Index startet bei 0!) die zugehörige Trivialbezeichnung der Animation). -->

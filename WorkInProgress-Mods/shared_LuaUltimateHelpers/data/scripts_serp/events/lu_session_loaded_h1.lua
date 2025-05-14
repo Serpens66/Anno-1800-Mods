@@ -14,4 +14,4 @@ system.start(function()
     coroutine.yield()
   end
   g_ObjectFinderSerp.OnSessionLoaded(PID)
-end)
+end,"lu_loaded_entered.lua")

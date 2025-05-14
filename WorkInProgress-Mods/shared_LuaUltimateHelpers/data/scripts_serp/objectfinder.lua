@@ -28,6 +28,34 @@
 -- (wichtige infos für neue mod participants: SessionParticipants wird nicht automaitsch zu einem savegame zugefügt, deswegen hierfür nur vanilla participants nehmen)
 
 
+-- TODO/INFO:
+ -- Es scheint als wäre Spielgeschwindigkeit der Totfeind von lua Threads...
+  -- Einfacher Testcode geht irgendwie (solange nicht auf superslow mow aka Pause)
+ -- aber mein ganzen lua construct schläft ein, wenn man im MP oder auch Singpleplayer auf halben Speed macht,
+ -- obwohl ein test mit waitForTimeDelta mit halber geschw. eigentlich funzt
+  -- das ganze sessionswitch system. Aber sogar auch Spiel verlassen (MP) dauert bei halber geschw. hundert jahre
+ -- und geht sofort weiter sobald man ts.GameClock.SetSetGameSpeed(3) macht
+
+
+-- TODO 
+-- Am ende nochmal richtige Ladereihenfolge der ganzen lua mods aufstellen und sicherstellen, dass LoadAfterIds 
+-- überall korrekt ist
+-- zb LuaPeers und Objectfinder brauchen sich gegenseitig. Ladereihenfolge sollte theoretisch egal sein, aber wenns in beiden mods steht gibts bestimmt n fehler
+
+
+-- TODO:
+ -- für SessionLoaded und SessionEnter die lua events nehmen, statt xml trigger.
+  -- das spart scripts und ist denke ich besser, weil wir auch direkt wissen welche session loaded wurde
+   -- (und da meine helper session 1500005538 ausschließen)
+
+
+-- TODO:
+ -- lu_session_loaded_h0 und lu_session_entered scripte basierend auf h0 für alle humans anpassen
+
+
+
+-- TODO:
+ -- funktionen die aus einem thread heraus aufgerufen werden müssen mit t_ am namen kennzeichnen
 
 
 -- Offtopic:
@@ -35,17 +63,30 @@
  -- Soll da wohl andere Buffs geben, die stark aber auch n Nachteil haben.
 
 
+-- TODO Crash:
+-- Scheint aktuell noch n Crash zu geben in meinem Coop Savegame (alleine gestartet, ohne KI)
+ -- wenn ich da ein save lade und ~1-5 minuten im loading screen warte (während spiel schon losgeht)
+  -- crasht das Spiel. Passiert auch wenn ich savecache.lua tick abschalten und alle event. bis auf OnLeaveUI in ongameloaded
+   -- abschalte. Es wird nichts im modlog/log geschrieben, also meine lua funktionen werden an sich nicht ausgeführt
+  -- crashed auch, wenn ich vorher kein anderes spiel starte, also kein lua jemals aktiv war, auch kein event..
+   -- Kann also eigentlich nur an Triggern wie ticks liegen, aber warum crashed es nicht, wenn ich im Spiel bin (und savecache ist der einzie aktive tick,  crashed auch wenn ich lua datei umbenenne)
+     -- wobei es auch mal schon nach 1min und mal auch erst nach 5 min crashed
+ -- Wenn ich n MP Spiel alleine starte und lade, passiert das nicht.
+-- evtl. nochmal mit neuem coop spiel testen, ob das dann auch passiert, oder ob das savegame einfach nur iwie kaputt ist.
+-- Neues Coop Spiel crasht beim Laden bisher nicht..
+-- ok doch , mittlerweile crasht das auch im ladebildschirm (auch wenn beide coops da sind. für client crashed es nicht!)
+ -- hilfssession war unloaded
+-- crashed auch ohne Ultimate Helpers mod (also das Laden. War natürlich vorher aktiv, kann also n Trigger sein..)
+-- crashed auch ohne mods die es verursachen können und das leider komplett random
+ -- kommt auch vor dass es garnicht crashed oder bis zu 10 min dauert...
+ -- wobei es mit allen mods schon deutlich schneller crashed.. komisch..
+-- also ist irgendwie im savegame drin das problem... 
+-- vllt nochmal n coop game ohne hilftssession und ohne das session template starten.
+ -- und gucken ob das auch iwann crashed
 
--- TODO:
- -- testen welche OID (AreaID) das Spy Gebäude hat, welches wir auf fremder Insel spawnen.
- -- vermutlich gehört es zur Insel, hat aber n anderen Owner als der Rest und als die Insel
- -- erhöht aber vermutlich dennoch die ObjectID der Insel, oder?
--- Und testen obs mit der Property Suche gefunden wird. Vermutlich schon. Wichtig ist dann, dass
- -- wir basierend auf dem Objekt nicht daraus schließen, dass die Insel dem Objekt-Owner gehört...
- 
--- Und wem gehört Insel, wenn ich so ein building auf unbesiedelter Insel spawne?
- -- (dazu muss ich trigger testweise abändern, dass er auf FixedPosition spawned)
- 
+
+
+
  
 
 -- TODO:
@@ -71,15 +112,8 @@
       -- LeereObIDs ist noch drin, aber es wäre vermutlich weniger inhalt, wenn wir vergebene (und nicht leer) abspeichern würden.
         -- aber beides keine gute Idee... Idee war sonst Spannen, statt einzelne IDS anzugeben.. aber auch doof...
        
-       
-    -- GetAnyObjectsFromAnyone am besten so umschreiben,
-     -- dass es nur funktioniert, wenn wir zumindest die KontorObjectID der Area haben und somit prüfen können ob Insel valid und wer Owner ist
-      -- andernfalls ist es einfach viel zu ineffizient.
-       
+              
 
-    -- evlt auch reinpacken:
-    -- - welche Sessions/AreaIDs invalid sind, also garnicht existieren (wobei invalide SessionIDs gibts nicht direkt, denn es könnten ja noch Sessions geladen werden. da reicht also unser IsLoadedSessionByID-check aus)
-       -- das könnte man machen indem man zb [SessionID]={[AreaID]=false} setzt
 
     -- - welche ObjectIDs zwischen gefüllten ids leer sind, also zb 1 ist Kontor und dann ist bis 10k erstmal nichts, weil soviel abgerissen wurde
      -- dann sich merken, dass man 2 bis 10k erstmal skippen kann
@@ -96,35 +130,13 @@
       -- und dann solange gelooped wird, bis die GUID des einzigartigen objekt gefunden wurde, weil dann sicher ist, dass es maximal bis da ging zum zieptunkt des spawnens
 
 
--- TODO:
-    -- LeereObIDs entfernen, zu viel um sich da was zu merken,
-     -- Und dafür sorgen dass mithilfe von ShareLuaInfo infos zwischen alle Spielern ausgetauscht werden,
-      -- vorallem LowObID und invalide AreaIDs
-      
-      -- LowObID auch für Area nutzen! 
-       -- Wenn LowObID bekannt und auch noch valid ist, dann in GetAnyObjectsFromAnyone DoForSessionGameObject nutzen
-        -- um an Area des Objects zu kommen und auf diese Weise AreaOwnerName zu prüfen!
-      -- wobei ... wenn wir ein LowObID haben, dann heißt das automatisch bereits, dass das Area valid ist.
-        -- und die valid-Prüfung ist ja erstmal das einzige was uns in GetAnyObjectsFromAnyone fehlt.  
-       -- und nur weil ein Area garkein Objekt hat, heißt es halt leider nicht, dass es invalid ist,
-        -- sondern kann auch einfach noch unbesiedelt sein... und solange es in fremder session ist, können wir das nicht prüfen...
-      -- Aber:
-       -- man könnte on IslandSettled jedesmal den AreaLooper anstoßen, welcher sich dabei jedesmal den Kontor als LowObID merkt,
-        -- da mindestens einer der Spieler beim settlen ja wohl offensichtlich in der session ist (Inselübernahme testen)
-         -- (bei islandsettle von KI klappt das natürlich nicht unbedingt)
-       -- und dann könnte man bei GetAnyObjectsFromAnyone dann allgemein nur Areas prüfen, die bekannt sind...
-        -- (bzw. dieses "nur islands prüfen die bekannt sind" könnte man evlt noch als Argument übergeben?)
-          -- IslandSettled wird auch bei Übernahme einer Insel getriggert. Übernahme einer Insel geht auch, wenn Spieler gerade in anderer Session ist..
-         
-         -- Und als Tipp zufügen, dass man next_AreaID returnen soll, wenns der falsche Participant ist
-
 
 
 -- #######################################
 -- Wenn sonst alles fertig:
 
 -- TODO:
- -- IDConverter und auch loop um OID zu finden evtl. so auslagern, dass es auch ohne Save/Cache verwendet werden kann?
+ -- IDConverter und auch simple loop um OID zu finden evtl. so auslagern, dass es auch ohne Save/Cache verwendet werden kann?
   -- Damit Mods zumindest leichtere Loops wie AreaLoop oder GetCurrentSessionObjectsFromLocaleByProperty nutzen können,
    -- ohne das MP PopUp zu brauchen?
 
@@ -154,29 +166,36 @@
 
 -- load your lua scripts with my shared mod OnGameLoaded. 
 -- And use what I use in my scripts at the bottom:
--- system.start(function()
+-- g_LuaTools.start_thread("g_OnGameLeave_serp",ModID,function()
   -- while g_OnGameLeave_serp==nil do
     -- coroutine.yield()
   -- end
   -- if g_OnGameLeave_serp[ModID]==nil then
     -- g_OnGameLeave_serp[ModID] = function()
-      -- g_SaveLuaStuff_Serp = nil -- stop everything (might crash some currently running functions, but I think its ok)
+      -- g_ObjectFinderSerp = nil -- stop everything (might crash some currently running functions, but I think its ok)
+      -- event.OnSessionEnter[ModID] = nil
+      -- event.OnSessionLoaded[ModID] = nil
     -- end
   -- end
 -- end)
--- system.start(function()
-  -- g_LuaTools.waitForTimeDelta(5000) -- unblock it again, so it can be executed the next time we load a game
+-- g_LuaTools.start_thread("g_LuaScriptBlockers",ModID,function()
+  -- g_LuaTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
   -- g_LuaScriptBlockers[ModID] = nil
 -- end)
 
 
 -- system.start(function()...) threads und vermutlich auch sonstige Funktionen laufen nicht weiter, wenn der Spieler zurücl
- -- im Hauptmenü ist. Aber sie laufen weiter sobald im Ladebildschirm/zurück im Spiel. Auch die alten Threads laufen weriter
+ -- im Hauptmenü ist (oder pausiert). Aber sie laufen weiter sobald im Ladebildschirm/zurück im Spiel. Auch die alten Threads laufen weriter
   -- auch wenn das skript mit allen Funktionen neu gestartet wurde!!
+  -- ACHTUNG: Menüs, wie zb das ingame Statistikmenü, machen threads probleme (SP und MP) wenn Gamespeed verlangsamt ist, auch bei 0.5.
+   -- denn ein yield dauert plötzlich ~10-30 sec statt 100ms (auf höhrerem Gamespeed geht alles)
+    -- Im Diplo Menü besteht das Problem nicht.
   -- lieber keine endlosen Threads machen, sondern wenn etwas alle x minuten gemacht werden soll, lieber mit Trigger
 -- Und das heißt auch, dass man keine zu langen Wartezeiten in lua einbauen sollte, so maximal 5 sekunden.
  -- damit diese nicht in anderen savegames ausgeführt werden und sie werden ja auch nicht im savegame gespeichert
-
+--  (bzw. mein OnGameLoaded Mod killt beim Wechsel zum Hauptmenü alle Threads, welche kein "NoStopGameLeft" im Namen haben)
+-- Anstatt system.start() nutze lieber meine Funktion g_LuaTools.start_thread(threadname,ModID,fn,...). Denn diese hat 
+ -- noch Fehler-Logging integriert, was extremst hilfreich beim coden/debuggen/testen ist, weil sonst threads einfach ohne irgendeine Fehlermeldung abbrechen
 
 -- AreaID (und damit auch SessionID,IslandIndex,AreaIndex) bleiben nach Spiel Generierung/Session Load, dann immer dieselben, egal wem was gehört. 
 
@@ -230,8 +249,8 @@ if g_LuaScriptBlockers[ModID]==nil then
 
     -- only call this function directly if you have really important info to save, that should not be get lost.
      -- Otherwise rely on the "every x minutes autosave" savecache.lua called via Trigger 
-    local function SaveCache()
-      system.start(function()
+    local function t_SaveCache()
+
         while g_SaveLuaStuff_Serp==nil or g_PeersInfo_Serp==nil or g_PeersInfo_Serp.CoopFinished~=true or g_CoopCountRes==nil or g_CoopCountRes.Finished~=true do
           coroutine.yield()
         end
@@ -241,28 +260,28 @@ if g_LuaScriptBlockers[ModID]==nil then
         -- TODO:
          -- überlegen wie wir in SaveCache sicherstellen können,
           -- dass alle infos geteilt wurden, bevor wir SaveTableToNameable als FirstActivePeer aufrufen
-          -- eigentlich nur möglich, indem wir für jeden Spieler SyncCacheToEveryone machen, auch welche die keine Änderungen hatten.
+          -- eigentlich nur möglich, indem wir für jeden Spieler t_SyncCacheToEveryone machen, auch welche die keine Änderungen hatten.
            -- Nur dann können wir zählen, ob wir von jedem etwas empfangen haben
         
-        if g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed or g_PeersInfo_Serp.AmIFirstActivePeer()==true then -- do it always for the FirstActivePeer, because he needs to know the current average waiting time of ExecuteFnWithArgsForPeers , since he will be the one to save it to Nameable and it should be save that everyone completed ExecuteFnWithArgsForPeers
-          local status,err = pcall(g_ObjectFinderSerp.SyncCacheToEveryone)
+        if g_ObjectFinderSerp.ObjectFinderCacheSerp.Changed or g_PeersInfo_Serp.AmIFirstActivePeer()==true then -- do it always for the FirstActivePeer, because he needs to know the current average waiting time of t_ExecuteFnWithArgsForPeers , since he will be the one to save it to Nameable and it should be save that everyone completed t_ExecuteFnWithArgsForPeers
+          local status,err = pcall(g_ObjectFinderSerp.t_SyncCacheToEveryone)
           if status==false then
+            g_LuaTools.modlog("ERROR : "..tostring(err),ModID)
             error(err) 
           end
           g_LuaTools.waitForTimeDelta(1000) -- little extra time to make sure everything was shared before we call SaveTableToNameable
-        else -- we had no change. But someone else maybe had and is currently sending it to us. So also wait a short time to see if ObjectFinderCacheSerp_SyncChanged updates
-          g_LuaTools.waitForTimeDelta(6000) -- problem is depending on usage ExecuteFnWithArgsForPeers can take between 4 and endless seconds..
+        else -- we had no change. But someone else maybe had and is currently sending it to us. So also wait a short time to see if ObjectFinderCacheSerp.SyncChanged updates
+          g_LuaTools.waitForTimeDelta(6000) -- problem is depending on usage t_ExecuteFnWithArgsForPeers can take between 4 and endless seconds..
         end
-        if g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed or g_ObjectFinderSerp.ObjectFinderCacheSerp_SyncChanged then
+        if g_ObjectFinderSerp.ObjectFinderCacheSerp.Changed or g_ObjectFinderSerp.ObjectFinderCacheSerp.SyncChanged then
           g_SaveLuaStuff_Serp.SaveTableToNameable("g_ObjectFinderSerp",g_ObjectFinderSerp.ObjectFinderCacheSerp) -- will only be executed for first peer, but this is checked within savetabestuff.lua
-          g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed = nil
-          g_ObjectFinderSerp.ObjectFinderCacheSerp_SyncChanged = nil
+          g_ObjectFinderSerp.ObjectFinderCacheSerp.Changed = nil
+          g_ObjectFinderSerp.ObjectFinderCacheSerp.SyncChanged = nil
         end
-      end)
+
     end
     
-    local function LoadCache()
-      system.start(function()
+    local function t_LoadCache()
         while g_SaveLuaStuff_Serp==nil do
           coroutine.yield()
         end
@@ -271,23 +290,24 @@ if g_LuaScriptBlockers[ModID]==nil then
         if ObjectFinderCacheSerp~=nil and type(ObjectFinderCacheSerp)=="table" and ObjectFinderCacheSerp.LoadedSessionsParticipants~=nil then
           g_ObjectFinderSerp.ObjectFinderCacheSerp = ObjectFinderCacheSerp
         end
-      end)
+        g_ObjectFinderSerp.ObjectFinderCacheSerp.Loaded = true
     end
     
     -- call to sync the ObjectFinderCacheSerp for every human peer
-    local function SyncCacheToEveryone(skip_equalcheck)
+    -- called from within a thread
+    local function t_SyncCacheToEveryone(skip_equalcheck)
       if ts.GameSetup.GetIsMultiPlayerGame() then
-        g_ObjectFinderSerp.ExecuteFnWithArgsForPeers("g_ObjectFinderSerp.SyncCache",3000,true,"Everyone",g_ObjectFinderSerp.ObjectFinderCacheSerp,skip_equalcheck) -- waits for it to finish
+        g_ObjectFinderSerp.t_ExecuteFnWithArgsForPeers("g_ObjectFinderSerp.SyncCache",3000,true,"Everyone",g_ObjectFinderSerp.ObjectFinderCacheSerp,skip_equalcheck) -- waits for it to finish
       end
     end
-    -- Called via SyncCacheToEveryone to sync the caches between all peers
+    -- Called via t_SyncCacheToEveryone to sync the caches between all peers
      -- skip_equalcheck=true might be better for really huge lists and we want to save time
     local function SyncCache(Other_ObjectFinderCacheSerp,skip_equalcheck)
       if Other_ObjectFinderCacheSerp~=nil and type(Other_ObjectFinderCacheSerp)=="table" then
         local Merged = g_LuaTools.MergeMapsDeep(g_ObjectFinderSerp.ObjectFinderCacheSerp,Other_ObjectFinderCacheSerp)
         if skip_equalcheck or not g_LuaTools.tables_equal(g_ObjectFinderSerp.ObjectFinderCacheSerp,Merged) then
           g_ObjectFinderSerp.ObjectFinderCacheSerp = Merged
-          g_ObjectFinderSerp.ObjectFinderCacheSerp_SyncChanged = true
+          g_ObjectFinderSerp.ObjectFinderCacheSerp.SyncChanged = true
         end
       end
     end
@@ -389,7 +409,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- to get username use: ts.Online.GetUsername(peerint)
     -- for StatisticsMenu UIState = 176, for ships it is 119 (it is called RefGuid in infotips for whatever reason), get them eg with adding your log function to table event.OnLeaveUIState and log the one paramater of this function
     -- CompynaMenu (hitting on your profile) is UIState = 0, diplomenu=29, TradeRoutemenu is 165 or 177, ESC Menü 132, Optionsmenü 129, Annopedia 174, EinflussFenster ist 52, Stadt Attraktivität ist 3, 
-      -- 116 Bauernhaus, 103 Marktplatz, 102 Kontor/Lagerhaus,97 handelskammer UI, 113 Kirche, 120 Werft
+      -- 116 Bauernhaus, 103 Marktplatz, 102 Kontor/Lagerhaus,97 handelskammer UI, 113 Kirche, 120 Werft, 192/193 oder 194 ist Movie beenden
     -- RefOid = 0 for whole menus , for ships/buildings: g_ObjectFinderSerp.IDConverter.get_OID(session.getSelectedFactory()) 
     local function GetCoopPeersAtMarker(UIState,RefOid)
       local count = g_ObjectFinderSerp.DoForSessionGameObject("[Online GetCoopPeersAtMarker("..tostring(UIState)..","..tostring(RefOid)..") Count]",true)
@@ -455,13 +475,13 @@ if g_LuaScriptBlockers[ModID]==nil then
      -- ###################################################################################
      -- ###################################################################################
 
-    -- t_ShareLuaInfo / ExecuteFnWithArgsForPeers can also be used to get an OID more efficient from another human peer who is in the correct session.
+    -- t_ShareLuaInfo / t_ExecuteFnWithArgsForPeers can also be used to get an OID more efficient from another human peer who is in the correct session.
      -- Because he can use the fast GetCurrentSessionObjectsFromLocaleByProperty (note that he must own it) function or at least GetCurrentSessionObjectsFromAnyone
       -- which is still faster/efficient than the everywhere function.
     
     
     local function StartShareThread()
-      system.start(function()
+      g_LuaTools.start_thread("StartShareThread",ModID,function()
         -- g_LuaTools.modlog("StartShareThread "..tostring(ts.GameClock.CorporationTime),ModID)
         local task = table.remove(g_ObjectFinderSerp.ShareQueue,1)
         while task~=nil do
@@ -471,21 +491,13 @@ if g_LuaScriptBlockers[ModID]==nil then
             local waittime = task.waittime
             
             -- g_LuaTools.modlog("StartShareThread before DoneVariableString "..tostring(ts.GameClock.CorporationTime),ModID)
-            local DoneVariableString_parts = g_LuaTools.mysplit(task.DoneVariableString, ".")
-            local DoneVariable = _G
-            local t_len = #DoneVariableString_parts
-            local last_key = nil
-            for i,DoneVariableString_part in ipairs(DoneVariableString_parts) do
-              if i==t_len then
-                last_key = DoneVariableString_part -- for a table we need to use the last_key to preserve the pointer nature of tables, to be able to change that variable value
-                break
-              end
-              DoneVariable = DoneVariable[DoneVariableString_part]
-            end
+            local DoneVariable,last_key = g_LuaTools.getGlobalWithString(task.DoneVariableString,true)
+
             -- g_LuaTools.modlog("StartShareThread after DoneVariableString "..tostring(ts.GameClock.CorporationTime),ModID)
             local PID_OID = nil
             local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session
             if status==false then
+              g_LuaTools.modlog("ERROR : "..tostring(sessionparticipants),ModID)
               error(sessionparticipants) 
             end
             
@@ -494,6 +506,7 @@ if g_LuaScriptBlockers[ModID]==nil then
               PID_OID = session_pids[SharePID].OID
               local status,err = pcall(g_ObjectFinderSerp.DoForSessionGameObject,"[MetaObjects SessionGameObject("..tostring(PID_OID)..") Nameable Name("..tostring(infostring)..")]")
               if status==false then
+                g_LuaTools.modlog("ERROR : "..tostring(err),ModID)
                 error(err) 
               end
             end
@@ -546,6 +559,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         SharePID = g_ObjectFinderSerp.PIDsToShareData[FromPeerInt+1]
         local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session
         if status==false then
+          g_LuaTools.modlog("ERROR : "..tostring(sessionparticipants),ModID)
           error(sessionparticipants) 
         end
         local text = nil
@@ -557,7 +571,7 @@ if g_LuaScriptBlockers[ModID]==nil then
 
 
 
-
+    -- call it from within a thread
     -- this function is called from one peer and shares the information with all other peers and makes
      -- them execute the command all at the same time. (only needed if other peers dont have the required information, eg. an OID. IF everyone has all info, then simply start a trigger with ActionExecuteScript)
     -- funcname (string) must either directly exist as global variable. or be included in a global table. Then use eg. "g_ObjectFinderSerp.MyFunc" as string
@@ -575,8 +589,8 @@ if g_LuaScriptBlockers[ModID]==nil then
      -- In case you want Peers to execute a static function without the need to sync special arguments,
       -- it might be better to do the old bit more code intensive way:
        -- Start a Trigger/FeatureUnlock that does ActionExecuteScript (executed for everyone) and start a script with your custom static code.
-    local function ExecuteFnWithArgsForPeers(funcname,waittime,returnafterfinish,ForPeers,...)
-        g_LuaTools.modlog("ExecuteFnWithArgsForPeers start "..tostring(funcname).." "..tostring(ts.GameClock.CorporationTime),ModID)
+    local function t_ExecuteFnWithArgsForPeers(funcname,waittime,returnafterfinish,ForPeers,...)
+        g_LuaTools.modlog("t_ExecuteFnWithArgsForPeers start "..tostring(funcname).." "..tostring(ts.GameClock.CorporationTime),ModID)
         local args = {...} -- does put the "..." arguments into a table
         local intable = {funcname=funcname,args=args,ForPeers=ForPeers}
         local inhex = g_StringTableConvertSerpNyk.TableToHex(intable)
@@ -585,6 +599,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             -- g_LuaTools.modlog("DoExecuteFnWithArgsForPeers before share "..tostring(ts.GameClock.CorporationTime),ModID)
             local status,err = pcall(g_ObjectFinderSerp.t_ShareLuaInfo,inhex,waittime,"g_ObjectFinderSerp.ExecuteDone")
             if status==false then
+              g_LuaTools.modlog("ERROR : "..tostring(err),ModID)
               error(err) 
             end
             -- g_LuaTools.modlog("DoExecuteFnWithArgsForPeers shared "..tostring(ts.GameClock.CorporationTime),ModID)
@@ -603,12 +618,12 @@ if g_LuaScriptBlockers[ModID]==nil then
         else -- execute in new thread (and return before it is finished)
           system.start(function()
             DoExecuteFnWithArgsForPeers(inhex,waittime)
-          end)
+          end,ModID.." DoExecuteFnWithArgsForPeers")
         end
     end
     
     
-    -- internal use only (used by ExecuteFnWithArgsForPeers process (exforevery_peer0.lua). use ExecuteFnWithArgsForPeers directly)
+    -- internal use only (used by t_ExecuteFnWithArgsForPeers process (exforevery_peer0.lua). use t_ExecuteFnWithArgsForPeers directly)
     local function DoTheExecutionFor(FromPeerInt)
       g_LuaTools.modlog("DoTheExecutionFor FromPeerInt "..tostring(FromPeerInt).." "..tostring(ts.GameClock.CorporationTime),ModID)
       local inhex = g_ObjectFinderSerp.GetSharedLuaInfo(FromPeerInt)
@@ -670,31 +685,25 @@ if g_LuaScriptBlockers[ModID]==nil then
               ShouldIExecute = g_PeersInfo_Serp.PID==3 and g_PeersInfo_Serp.AmIFirstActiveCoopPeer()
             end
           else
-            g_LuaTools.modlog("ERROR DoTheExecutionFor (ExecuteFnWithArgsForPeers): invalid -ForPeers- was provided: "..tostring(ForPeers).." . Will execute for everyone now",ModID)
+            g_LuaTools.modlog("ERROR DoTheExecutionFor (t_ExecuteFnWithArgsForPeers): invalid -ForPeers- was provided: "..tostring(ForPeers).." . Will execute for everyone now",ModID)
             ShouldIExecute = true
           end
         elseif type(ForPeers)=="table" then
           ShouldIExecute = g_LuaTools.table_contains_value(ForPeers,g_PeersInfo_Serp.PeerInt)
         else
-          g_LuaTools.modlog("ERROR DoTheExecutionFor (ExecuteFnWithArgsForPeers): invalid -ForPeers- was provided: "..tostring(ForPeers).." . Will execute for everyone now",ModID)
+          g_LuaTools.modlog("ERROR DoTheExecutionFor (t_ExecuteFnWithArgsForPeers): invalid -ForPeers- was provided: "..tostring(ForPeers).." . Will execute for everyone now",ModID)
           ShouldIExecute = true
         end
         -- g_LuaTools.modlog("DoTheExecutionFor before ShouldIExecute",ModID)
         if ShouldIExecute then
           -- g_LuaTools.modlog("DoTheExecutionFor yes ShouldIExecute",ModID)
-          local funcname_parts = g_LuaTools.mysplit(intable.funcname, ".")
-          local func = _G
-          for i,funcname_part in ipairs(funcname_parts) do
-            func = func[funcname_part]
+          func = g_LuaTools.getGlobalWithString(intable.funcname)
+          -- g_LuaTools.modlog("func call "..tostring(ts.GameClock.CorporationTime),ModID)
+          local success, err = pcall(func,table.unpack(intable.args))
+          if success==false then
+            g_LuaTools.modlog("ERROR while trying to call funcname "..tostring(intable.funcname).." error: "..tostring(err),ModID)
           end
-          if func~=_G and func~=nil and type(func)=="function" and type(intable.args)=="table" then
-            -- g_LuaTools.modlog("func call "..tostring(ts.GameClock.CorporationTime),ModID)
-            local success, err = pcall(func,g_LuaTools.myunpack(intable.args))
-            if success==false then
-              g_LuaTools.modlog("ERROR while trying to call funcname "..tostring(intable.funcname).." error: "..tostring(err),ModID)
-            end
             -- g_LuaTools.modlog("DoTheExecutionFor after call",ModID)
-          end
         end
       end
     end
@@ -816,7 +825,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         local AreaID = ((OID) >> 32)
         local ObjectID = (OID & 0xFFFFFFFF)
         local Areatable = AreaIDToAreatable(AreaID)
-        return {ObjectID=ObjectID,AreaID=Areatable}
+        return {ObjectID=ObjectID,AreaID=Areatable} -- named AreaID although its a table, because this is what the game expects as OIDtable format
       end
     end
 
@@ -853,6 +862,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         -- wovon man ein Objekt sucht, dann kann man gleich GetCurrentSessionObjectsFromLocaleByProperty nach einem passenden Property
          -- durchsuchen und findet das Objekt direkt, was man dann teilt.
       -- Performance ist aber gut, selbst in giga spielstand in größter Session dauert Building+Walking nur klitzekleinen Ruckler
+    -- Wenns nicht um eigenes in eigener session geht, dann am besten SpawnMaxObjIdHelpers nutzen
     local function GetHighestObIDsLocalPlayerCurrentSessionByProperty(Property)
       local ret = g_ObjectFinderSerp.GetCurrentSessionObjectsFromLocaleByProperty(Property)
       for OID,objinfo in pairs(ret.Objects) do
@@ -870,14 +880,21 @@ if g_LuaScriptBlockers[ModID]==nil then
           CacheObIDsSessionID[AreaID] = {valid=true}
         end
         if ObjectID~=nil then
-          if (CacheObIDsSessionID[AreaID]["LowObID"]==nil or ObjectID < CacheObIDsSessionID[AreaID]["LowObID"]) then  
-            CacheObIDsSessionID[AreaID]["LowObID"] = ObjectID
+          if (CacheObIDsSessionID[AreaID].LowObID==nil or ObjectID < CacheObIDsSessionID[AreaID].LowObID) then  
+            CacheObIDsSessionID[AreaID].LowObID = ObjectID
           end
-          if (CacheObIDsSessionID[AreaID]["HighObID"]==nil or ObjectID > CacheObIDsSessionID[AreaID]["HighObID"]) then  
-            CacheObIDsSessionID[AreaID]["HighObID"] = ObjectID
+          if (CacheObIDsSessionID[AreaID].HighObID==nil or ObjectID > CacheObIDsSessionID[AreaID].HighObID) then  
+            CacheObIDsSessionID[AreaID].HighObID = ObjectID
           end
         end
       end
+      -- reset HighObID after 10 seconds, because it gets outdated fast
+      g_LuaTools.start_thread("reset HighObID",ModID,function()
+        g_LuaTools.waitForTimeDelta(10000)
+        for areaid,info in pairs(CacheObIDsSessionID) do
+          info.HighObID = nil
+        end
+      end)
     end
     
     -- GetCurrentSessionObjectsFromLocaleByProperty
@@ -923,8 +940,12 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- (we use Neutral instead of local player, because neutral is created first and also exists in loaded sessions the player was not yet into, while locale SessionParticipant does not exist in this case yet)
      -- dontusecache ist eig nur sinnvoll, wenn wir davon ausgehen, dass jemand eine Session unloaded, was wohl eher nie passiert
     local function IsLoadedSessionByID(SessionID,dontusecache)
-      if not dontusecache and g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID]~=nil and g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID][g_ObjectFinderSerp.PID_Neutral]~=nil then
-        return g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID][g_ObjectFinderSerp.PID_Neutral].SessionGuid
+      if not dontusecache then
+        if g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessions[SessionID]~=nil then
+          return g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessions[SessionID]
+        elseif g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID]~=nil and g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID][g_ObjectFinderSerp.PID_Neutral]~=nil then
+          return g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID][g_ObjectFinderSerp.PID_Neutral].SessionGuid
+        end
       end
       local IslandID,AreaIndex = 0,0
       local SessionGuid
@@ -933,9 +954,12 @@ if g_LuaScriptBlockers[ModID]==nil then
         OID = OIDtableToOID({ObjectID=ObjectID,AreaID=AreaID})
         local GUID = ts.GetGameObject(OID).GUID
         local sGUID = ts.Participants.GetParticipant(g_ObjectFinderSerp.PID_Neutral).Guid -- Meta and SessionParticipant have the same GUID. using Meta here because they always exist, while Session may only exist in a specific one (although we only use P who exist everywhere)
+        -- if SessionID==6 and GUID~=0 then
+          -- print(GUID)
+        -- end
         if GUID==sGUID then
           SessionGuid = ts.GetGameObject(OID).SessionGuid
-          if SessionGuid~=1500004631 then -- is my empty fake session. worldmap 180039 has not Neutral participant I think
+          if SessionGuid~=1500005538 then -- is my empty fake session. worldmap 180039 has not Neutral participant I think
             if g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID]==nil then
               g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID] = {}
             end
@@ -950,6 +974,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       end
     end
     
+    -- could also use instead game.isSessionLoadingDone(CheckingSessionGuid) ? But we would need a complete list of all ever exsiting session guids, which we dont have.
     local function GetLoadedSessions(FromSessionID,ToSessionID,dontusecache)
       local Sessions = {}
       FromSessionID = FromSessionID or 1
@@ -1018,7 +1043,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           local dothesearch = false -- check if we already have it in cache (SessionParticipants do not change ever (except for newly loaded sessions))
           if g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID]==nil then
             g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID] = {}
-            g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed = true
+            g_ObjectFinderSerp.ObjectFinderCacheSerp.Changed = true
             dothesearch = true
           else -- already have it in cache?
             for i,PID in ipairs(PIDs) do
@@ -1040,7 +1065,7 @@ if g_LuaScriptBlockers[ModID]==nil then
                 local PID = ts.GetGameObject(OID).Owner -- will be the original PID in PIDs
                 sessionparticipants[SessionID][PID] = {OID=OID,PID=PID,GUID=GUID,SessionGuid=SessionGuid,ObjectID=ObjectID,AreaID=AreaID,SessionID=SessionID}
                 g_ObjectFinderSerp.ObjectFinderCacheSerp.LoadedSessionsParticipants[SessionID][PID] = {OID=OID,PID=PID,GUID=GUID,SessionGuid=SessionGuid,ObjectID=ObjectID,AreaID=AreaID,SessionID=SessionID}
-                g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed = true
+                g_ObjectFinderSerp.ObjectFinderCacheSerp.Changed = true
               end
             end
           else -- use cache
@@ -1052,9 +1077,6 @@ if g_LuaScriptBlockers[ModID]==nil then
           end
         end
       end
-      -- if update_done then
-        -- SaveCache()
-      -- end
       return sessionparticipants
     end
 
@@ -1072,137 +1094,124 @@ if g_LuaScriptBlockers[ModID]==nil then
 
     -- Does not work for objects with EditorFlag, which are mostly objects at the map from beginning, like Pirate/Archibald harbor/objects. (because their OID is higher than lua can handle eg archibald harbor 9223413826886612345)
     -- see also my comments below for GetAnyObjectsFromAnyone
-    function GetCurrentSessionObjectsFromAnyone(myargs)
-      local ObjectFilter,FromSessionID,ToSessionID,FromIslandID,ToIslandID,FromAreaIndex,ToAreaIndex,FromObjectID,ToObjectID,withyield,nosave = myargs["ObjectFilter"],myargs["FromSessionID"],myargs["ToSessionID"],myargs["FromIslandID"],myargs["ToIslandID"],myargs["FromAreaIndex"],myargs["ToAreaIndex"],myargs["FromObjectID"],myargs["ToObjectID"],myargs["withyield"],myargs["nosave"]
-      local Objects = {}
-      local AreaID,OID,CheckingSessionGuid
-      local filterresult,AreaOwnerName,AreaOwner,Kontor_OIDtable,Kontor_OID,objectcount,HighestObjectID,LowestObjectID,GUID,SessionGuid,ParticipantID,userdata,sessionisloaded,CheckingSessionGuid
-      local ExecutingSessionGUID = session:getSessionGUID()
-      FromSessionID = FromSessionID or 1
-      ToSessionID = ToSessionID or g_ObjectFinderSerp.l_MaxSessionID
-      FromIslandID = FromIslandID or 0 -- is 0 for eg. ships and other things not bound to islands
-      ToIslandID = ToIslandID or g_ObjectFinderSerp.l_MaxIslandID
-      FromAreaIndex = FromAreaIndex or 0 -- is 0 for eg. ships and other things not bound to islands
-      ToAreaIndex = ToAreaIndex or 1 -- can be 2 for islands sharing two owners , like ketema island. but unlikely that we need it, so default to only 1
-      FromObjectID_ = FromObjectID or 1 -- removed objects/ships leaving session leave empty OBjectIDs, so sometimes, especially on takeover of islands, the first valid ObjectID might be in the tenthousands.
-      ToObjectID_ = ToObjectID or 1000000 -- on very big/old savegames you should check up to 1 million or even more ... better try to save/check your current lowest/highest OID and enter lower number here
-      for SessionID=FromSessionID,ToSessionID do
-        CheckingSessionGuid = g_ObjectFinderSerp.IsLoadedSessionByID(SessionID)
-        if ExecutingSessionGUID == CheckingSessionGuid then -- here we only chek the current session
-          if g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID]==nil then
-            g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID] = {}
-          end
-          if g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID]== nil then
-            g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID] = {}
-            g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed = true
-          end
-          for IslandID=FromIslandID,ToIslandID do
-            for AreaIndex=FromAreaIndex,ToAreaIndex do
-              if not ((IslandID==0 and AreaIndex~=0) or (IslandID~=0 and AreaIndex==0)) then -- on water both are 0. on islands none of them is 0, so do not allow only one of them being 0.
-                AreaID = AreatableToAreaID({SessionID=SessionID,IslandID=IslandID,AreaIndex=AreaIndex})
-                local CacheObIDsSessionID = g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID] -- I think its better for performance to save it in a variable
-                if CacheObIDsSessionID[AreaID]~=false then
-                  if CacheObIDsSessionID[AreaID]==nil or CacheObIDsSessionID[AreaID]["valid"]~=true then
-                    AreaOwnerName = ts.Area.GetAreaFromID(AreaID).OwnerName -- check if the Area is valid
-                    AreaOwner = ts.Area.GetAreaFromID(AreaID).Owner
-                    if IslandID~=0 and (AreaOwnerName=="" and AreaOwner==0) then -- invalid area. while for unsettled area owner will be -1. (OwnerName is better than Owner here, because invalid areas are nullpointer and would return 0 for Owner, which also might be Human0 on valid areas)
+    -- function GetCurrentSessionObjectsFromAnyone(myargs)
+      -- local ObjectFilter,FromSessionID,ToSessionID,FromIslandID,ToIslandID,FromAreaIndex,ToAreaIndex,FromObjectID,ToObjectID,withyield,nosave = myargs["ObjectFilter"],myargs["FromSessionID"],myargs["ToSessionID"],myargs["FromIslandID"],myargs["ToIslandID"],myargs["FromAreaIndex"],myargs["ToAreaIndex"],myargs["FromObjectID"],myargs["ToObjectID"],myargs["withyield"],myargs["nosave"]
+      -- local Objects = {}
+      -- local AreaID,OID,CheckingSessionGuid
+      -- local filterresult,AreaOwnerName,AreaOwner,Kontor_OIDtable,Kontor_OID,objectcount,HighestObjectID,LowestObjectID,GUID,SessionGuid,ParticipantID,userdata,sessionisloaded,CheckingSessionGuid
+      -- local ExecutingSessionGUID = session:getSessionGUID()
+      -- FromSessionID = FromSessionID or 1
+      -- ToSessionID = ToSessionID or g_ObjectFinderSerp.l_MaxSessionID
+      -- FromIslandID = FromIslandID or 0 -- is 0 for eg. ships and other things not bound to islands
+      -- ToIslandID = ToIslandID or g_ObjectFinderSerp.l_MaxIslandID
+      -- FromAreaIndex = FromAreaIndex or 0 -- is 0 for eg. ships and other things not bound to islands
+      -- ToAreaIndex = ToAreaIndex or 1 -- can be 2 for islands sharing two owners , like ketema island. but unlikely that we need it, so default to only 1
+      -- FromObjectID_ = FromObjectID or 1 -- removed objects/ships leaving session leave empty OBjectIDs, so sometimes, especially on takeover of islands, the first valid ObjectID might be in the tenthousands.
+      -- ToObjectID_ = ToObjectID or 1000000 -- on very big/old savegames you should check up to 1 million or even more ... better try to save/check your current lowest/highest OID and enter lower number here
+      -- for SessionID=FromSessionID,ToSessionID do
+        -- CheckingSessionGuid = g_ObjectFinderSerp.IsLoadedSessionByID(SessionID)
+        -- if ExecutingSessionGUID == CheckingSessionGuid then -- here we only chek the current session
+          -- if g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID]==nil then
+            -- g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID] = {}
+          -- end
+          -- if g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID]== nil then
+            -- g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID] = {}
+            -- g_ObjectFinderSerp.ObjectFinderCacheSerp.Changed = true
+          -- end
+          -- for IslandID=FromIslandID,ToIslandID do
+            -- for AreaIndex=FromAreaIndex,ToAreaIndex do
+              -- if not ((IslandID==0 and AreaIndex~=0) or (IslandID~=0 and AreaIndex==0)) then -- on water both are 0. on islands none of them is 0, so do not allow only one of them being 0.
+                -- AreaID = AreatableToAreaID({SessionID=SessionID,IslandID=IslandID,AreaIndex=AreaIndex})
+                -- local CacheObIDsSessionID = g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID] -- I think its better for performance to save it in a variable
+                -- if CacheObIDsSessionID[AreaID]== nil then
+                  -- CacheObIDsSessionID[AreaID] = {}
+                -- end
+                -- if not CacheObIDsSessionID[AreaID]["invalid"] then
+                  -- AreaOwnerName = ts.Area.GetAreaFromID(AreaID).OwnerName -- check if the Area is valid
+                  -- AreaOwner = ts.Area.GetAreaFromID(AreaID).Owner
+                  -- if IslandID~=0 and (AreaOwnerName=="" and AreaOwner==0) then -- invalid area. while for unsettled area owner will be -1. (OwnerName is better than Owner here, because invalid areas are nullpointer and would return 0 for Owner, which also might be Human0 on valid areas)
+                    -- CacheObIDsSessionID[AreaID]["invalid"] = true -- remember this Area as invalid, so we don't have to check it ever again.
+                    -- g_ObjectFinderSerp.ObjectFinderCacheSerp.Changed = true
+                  -- end
+
+                  -- if not CacheObIDsSessionID[AreaID]["invalid"] then
+                    -- if withyield then
+                      -- coroutine.yield()
+                    -- end
+                    -- FromObjectID_ = FromObjectID or 1 -- we changed it below based on Cache potentially for the previous Area. so change it to default here again.
+                    -- ToObjectID_ = ToObjectID or 1000000
+                    
+                    -- Kontor_OIDtable = ts.Area.GetAreaFromID(AreaID).KontorID
+                    -- Kontor_OID = OIDtableToOID(Kontor_OIDtable)
+                    
+                    -- g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID][AreaID] = {OID=Kontor_OID,AreaOwner=AreaOwner,Owner=ts.Objects.GetObject(Kontor_OID).Owner}-- filling it like this makes sure that outdated information is automatically overwritten
+                    
+                    -- if IslandID==0 or AreaOwnerName~="" then -- if not Water (IslandID==0), make sure Area is owned by someone
                       
-                      -- TODO: hier setze ich AreaID value direkt auf false. Wieso nicht den valid Eintrag?
-                        -- überlegen und auf eins festlegen (wenn dann "valid").
-                      
-                      CacheObIDsSessionID[AreaID] = false -- remember this Area as invalid, so we don't have to check it ever again.
-                      g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed = true
-                    end
-                  end
-                  if CacheObIDsSessionID[AreaID]~=false then
-                    if withyield then
-                      coroutine.yield()
-                    end
-                    FromObjectID_ = FromObjectID or 1 -- we changed it below based on Cache potentially for the previous Area. so change it to default here again.
-                    ToObjectID_ = ToObjectID or 1000000
-                    
-                    
-                    -- Area = ts.Area.GetAreaFromID(AreaID) -- also corrupts on multi use, so we have to call GetAreaFromID everytime again!
-                    
-                    Kontor_OIDtable = ts.Area.GetAreaFromID(AreaID).KontorID
-                    Kontor_OID = OIDtableToOID(Kontor_OIDtable)
-                    
-                    -- filling it like this makes sure that outdated information is automatically overwritten
-                    g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID][AreaID] = {OID=Kontor_OID,AreaOwner=AreaOwner,Owner=ts.Objects.GetObject(Kontor_OID).Owner}
-                    
-                    if CacheObIDsSessionID[AreaID]== nil then
-                      CacheObIDsSessionID[AreaID] = {}
-                    end
-                    CacheObIDsSessionID[AreaID]["valid"] = true -- if we reach here, below the AreaOwnerName+Owner check, we know for sure the area is valid, so we dont have to check that again in the future
-                    g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed = true
-                    if IslandID==0 or AreaOwnerName~="" then -- if not Water (IslandID==0), make sure Area is owned by someone
-                      if IslandID~=0 and Kontor_OIDtable["ObjectID"]~=nil and Kontor_OIDtable["ObjectID"]~=0 then -- assuming the KontorObjectID is always the lowest on an island, it makes sense to set LowObID to this value. If we assume that there may be exceptions to this, then we can not use it at all...
-                        if CacheObIDsSessionID[AreaID]["LowObID"]~=nil and Kontor_OIDtable["ObjectID"]~=CacheObIDsSessionID[AreaID]["LowObID"] then
-                          g_LuaTools.modlog("GetCurrentSessionObjectsFromAnyone KontorObjectID "..tostring(Kontor_OIDtable["ObjectID"]).." is unequal LowObID "..tostring(CacheObIDsSessionID[AreaID]["LowObID"]).." ?! (may only happen on island takeover?)",ModID)
-                        end
-                        CacheObIDsSessionID[AreaID]["LowObID"] = Kontor_OIDtable["ObjectID"] -- Kontor should be the first building on every owned island, so it is enough to start there with counting
-                      end
-                      if FromObjectID==nil and CacheObIDsSessionID[AreaID]["LowObID"]~=nil then
-                        FromObjectID_ = CacheObIDsSessionID[AreaID]["LowObID"]
-                      end -- dont use HighObID Cache here, because its possible that this changed meanwhile by unknown amount. Instead eg. use GetHighestObIDsLocalPlayerCurrentSessionByProperty to update the cache and provide the HighObID as ToObjectID to this function
-                      objectcount = 0
-                      LowestObjectID = nil
-                      for ObjectID=FromObjectID_,ToObjectID_ do
-                        filterresult = nil
-                        OID = OIDtableToOID({ObjectID=ObjectID,AreaID=AreaID})
-                        if withyield then
-                          objectcount = objectcount + 1
-                          if objectcount % 10000 == 0 then
-                            coroutine.yield()
-                          end
-                        end
-                        GUID = ts.Objects.GetObject(OID).GUID
-                        if GUID~=0 then -- GUID==0 means nullpointer, does not have an object
-                          SessionGuid = ts.Objects.GetObject(OID).SessionGuid -- should be the same as CheckingSessionGuid, but just to be sure
-                          ParticipantID = ts.Objects.GetObject(OID).Owner
-                          userdata = session.getObjectByID(OID)
-                          if LowestObjectID==nil then
-                            LowestObjectID = ObjectID
-                          end
-                          if type(ObjectFilter)=="function" then
-                            filterresult = ObjectFilter(OID,GUID,userdata,SessionGuid,ParticipantID,AreaID,SessionID,IslandID,AreaIndex,ObjectID,AreaOwner,Kontor_OID)
-                          end
-                          if filterresult~=nil and type(filterresult)=="table" and filterresult["addthis"] then
-                            Objects[OID] = {GUID=GUID,ParticipantID=ParticipantID,userdata=userdata,SessionGuid=SessionGuid,SessionID=SessionID,IslandID=IslandID,AreaIndex=AreaIndex,ObjectID=ObjectID,AreaOwner=AreaOwner,Kontor_OID=Kontor_OID}
-                          end
-                          if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_AreaID"] or filterresult["done"]) then
-                            break
-                          end
-                        elseif Kontor_OID==OID then -- if it claims to have a kontor, but its GUID is 0, then just skip this area
-                          CacheObIDsSessionID[AreaID] = false -- remember this Area as invalid, so we don't have to check it ever again.
-                          break -- this happens for Editor Objects, eg. Kontor from third parties. They have in fact OID 9223413826886612345 and EditorFlag=1 which makes the number much higher. But lua can not handle this high number (bint?) anyways, trying to get GUID from 9223413826886612345 just results in an error.  -- so no suport for Editor Objects.
-                        end
-                      end
-                      if LowestObjectID~=nil and (CacheObIDsSessionID[AreaID]["LowObID"]==nil or LowestObjectID > CacheObIDsSessionID[AreaID]["LowObID"]) then -- checking > here is correct, because the obj only can get bigger, never lower, eg. when taking over an island
-                        CacheObIDsSessionID[AreaID]["LowObID"] = LowestObjectID
-                      end
-                      if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
-                        break
-                      end
-                    end
-                  end
-                end
-              end
-            end
-            if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
-              break
-            end
-          end
-        end
-        if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
-          break
-        end
-      end
-      -- if not nosave then -- eg when searching for the save helper object, we can not save already
-        -- SaveCache()
+                      -- if IslandID~=0 and Kontor_OIDtable["ObjectID"]~=nil and Kontor_OIDtable["ObjectID"]~=0 then -- assuming the KontorObjectID is always the lowest on an island, it makes sense to set LowObID to this value. If we assume that there may be exceptions to this, then we can not use it at all...
+                        -- if CacheObIDsSessionID[AreaID].LowObID~=nil and Kontor_OIDtable["ObjectID"]~=CacheObIDsSessionID[AreaID].LowObID then
+                          -- g_LuaTools.modlog("GetCurrentSessionObjectsFromAnyone KontorObjectID "..tostring(Kontor_OIDtable["ObjectID"]).." is unequal LowObID "..tostring(CacheObIDsSessionID[AreaID].LowObID).." ?! (may only happen on island takeover?)",ModID)
+                        -- end
+                        -- CacheObIDsSessionID[AreaID].LowObID = Kontor_OIDtable["ObjectID"] -- Kontor should be the first building on every owned island, so it is enough to start there with counting
+                      -- end
+                      -- if FromObjectID==nil and CacheObIDsSessionID[AreaID].LowObID~=nil then
+                        -- FromObjectID_ = CacheObIDsSessionID[AreaID].LowObID
+                      -- end -- dont use HighObID Cache here, because its possible that this changed meanwhile by unknown amount. Instead eg. use GetHighestObIDsLocalPlayerCurrentSessionByProperty to update the cache and provide the HighObID as ToObjectID to this function
+                      -- objectcount = 0
+                      -- LowestObjectID = nil
+                      -- for ObjectID=FromObjectID_,ToObjectID_ do
+                        -- filterresult = nil
+                        -- OID = OIDtableToOID({ObjectID=ObjectID,AreaID=AreaID})
+                        -- if withyield then
+                          -- objectcount = objectcount + 1
+                          -- if objectcount % 10000 == 0 then
+                            -- coroutine.yield()
+                          -- end
+                        -- end
+                        -- GUID = ts.Objects.GetObject(OID).GUID
+                        -- if GUID~=0 then -- GUID==0 means nullpointer, does not have an object
+                          -- SessionGuid = ts.Objects.GetObject(OID).SessionGuid -- should be the same as CheckingSessionGuid, but just to be sure
+                          -- ParticipantID = ts.Objects.GetObject(OID).Owner
+                          -- userdata = session.getObjectByID(OID)
+                          -- if LowestObjectID==nil then
+                            -- LowestObjectID = ObjectID
+                          -- end
+                          -- if type(ObjectFilter)=="function" then
+                            -- filterresult = ObjectFilter(OID,GUID,userdata,SessionGuid,ParticipantID,AreaID,SessionID,IslandID,AreaIndex,ObjectID,AreaOwner,Kontor_OID)
+                          -- end
+                          -- if filterresult~=nil and type(filterresult)=="table" and filterresult["addthis"] then
+                            -- Objects[OID] = {GUID=GUID,ParticipantID=ParticipantID,userdata=userdata,SessionGuid=SessionGuid,SessionID=SessionID,IslandID=IslandID,AreaIndex=AreaIndex,ObjectID=ObjectID,AreaOwner=AreaOwner,Kontor_OID=Kontor_OID}
+                          -- end
+                          -- if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_AreaID"] or filterresult["done"]) then
+                            -- break
+                          -- end
+                        -- elseif Kontor_OIDtable["ObjectID"]==ObjectID then -- if it claims to have a kontor, but its GUID is 0, then just skip this area
+                          -- CacheObIDsSessionID[AreaID]["invalid"] = "ThirdParty" -- remember this Area as invalid, so we don't have to check it ever again.
+                          -- break -- this happens for Editor Objects, eg. Kontor from third parties. They have in fact OID 9223413826886612345 and EditorFlag=1 which makes the number much higher. But lua can not handle this high number (bint?) anyways, trying to get GUID from 9223413826886612345 just results in an error.  -- so no suport for Editor Objects.
+                        -- end
+                      -- end
+                      -- if LowestObjectID~=nil and (CacheObIDsSessionID[AreaID].LowObID==nil or LowestObjectID > CacheObIDsSessionID[AreaID].LowObID) then -- checking > here is correct, because the obj only can get bigger, never lower, eg. when taking over an island
+                        -- CacheObIDsSessionID[AreaID].LowObID = LowestObjectID
+                      -- end
+                      -- if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
+                        -- break
+                      -- end
+                    -- end
+                  -- end
+                -- end
+              -- end
+            -- end
+            -- if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
+              -- break
+            -- end
+          -- end
+        -- end
+        -- if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
+          -- break
+        -- end
       -- end
-      return Objects
-    end
+      -- return Objects
+    -- end
 
 
     -- ###################################################################################################
@@ -1240,103 +1249,167 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- BUT: objects of other sessions (where the executing player is not in currently), only work in a limited way!
     -- eg. you can no get the userdata and some ts commands also don't work (Name/SetName works, but CheatItemInSlot does not, you have to test what works and what not)
      -- if you saved userdata on a previous visit of the player in that session, it can also be used in very limited way from within other sessions. But most likely only getName() and getOID() works, not more..
-    -- And eg. ts.Area.GetAreaFromID(AreaID).CityName will NOT WORK for other session than the current one! (therefore the "Area" provided to the ObjectFilter function will be nil in this case)
+    -- And eg. ts.Area.GetAreaFromID(AreaID).CityName will NOT WORK for other session than the current one!
       -- (also ts.GetGameObject(OID).Area does not work for objects from other sessions)
       -- this also means my function is far more inefficient in other sessions than the currently active one (since it can not properly check for invalid Areas and KontorObjectID)
      -- if you want to check Area Stuff on Sessions that are not the current one, use function "DoForSessionGameObject" on a found valid OID: "[MetaObjects SessionGameObject("..tostring(OID)..") Area CityName]"
 
     -- Does not work for objects with EditorFlag, which are mostly objects at the map from beginning, like Pirate/Archibald harbor/objects. (because their OID is higher than lua can handle eg archibald harbor 9223413826886612345)
 
-    -- TODO:
-     -- nur noch nutzen, wenn wir n Cache für das Area haben um zu wissen, dass es valid ist.
-      -- andernfalls ist das einfach zu ineffizient (code entsprechend umschreiben)
-
     -- BEWARE: using too high ToObjectID, this can take VERY LONG, like hours. By default I will use ToObjectID = 100.000, this only takes few seconds, but may not be enough on very big/old savegames
       -- So reduce the search-work by using the ObjectFilter and return in a table "done=true" (called "filterresult" here), as soon as you found the object you are searching for (to stop the search-loop)
       -- Or change FromObjectID/ToObjectID to match the expected currently used ObjectIDs-range. Eg. spawn a new object for local player and get his ObjectID somehow (eg with GetCurrentSessionObjectsFromLocaleByProperty) to find out the current highest ObjectID used (within the spawned AreaID!) 
     -- see "my_ObjectFilter" below for examples how to use it
     -- set withyield to true and start the function within a coroutine to yield on every new areaand every 10k objects, to prevent game-blocking on big searches (search takes longer then, but does not block. so use this if time does not matter much)
-    function GetAnyObjectsFromAnyone(myargs)
-      local ObjectFilter,SessionFilter,FromSessionID,ToSessionID,FromIslandID,ToIslandID,FromAreaIndex,ToAreaIndex,FromObjectID,ToObjectID,withyield,nosave = myargs["ObjectFilter"],myargs["SessionFilter"],myargs["FromSessionID"],myargs["ToSessionID"],myargs["FromIslandID"],myargs["ToIslandID"],myargs["FromAreaIndex"],myargs["ToAreaIndex"],myargs["FromObjectID"],myargs["ToObjectID"],myargs["withyield"],myargs["nosave"]
+    
+    
+    
+    -- kind="Area" for Area helper. anything else for Walkable Helper
+    local function SpawnMaxObjIdHelpers(kind)
+      local unlockguid = kind=="Area" and g_ObjectFinderSerp.MaxObjIdAreaHelper.Unlock or g_ObjectFinderSerp.MaxObjIdWalkableHelper.Unlock
+      if not ts.Unlock.GetIsUnlocked(unlockguid) then
+        ts.Unlock.SetUnlockNet(unlockguid)
+        return true
+      end
+      return false -- if already unlocked, wait few seconds 10/30 to try again
+    end
+    
+    -- Area/Building IslandID~=0 or Walkable IslandID==0)
+    -- does check if on the Area / in the session the MaxObjIdAreaHelper.Guid/MaxObjIdWalkableHelper.Guid exists. 
+     -- AreaOwner nil for Walkable (IslandID=0)
+    local function DoesMaxObjIdHelperExists(AreaID,AreaOwner,MaxObjIdWalkableHelperGuid,MaxObjIdAreaHelperGuid)
+      MaxObjIdWalkableHelperGuid = MaxObjIdWalkableHelperGuid or g_ObjectFinderSerp.MaxObjIdWalkableHelper.Guid
+      MaxObjIdAreaHelperGuid = MaxObjIdAreaHelperGuid or g_ObjectFinderSerp.MaxObjIdAreaHelper.Guid
+      local Areatable = g_LuaTools.AreaIDToAreatable(AreaID)
+      local SessionID = Areatable.SessionID
+      local IslandID = Areatable.IslandID
+      local PIDs = AreaOwner~=nil and and IslandID~=0 and {AreaOwner} or {0,1,2,3} -- for an island, only the owner matters. For water the owner does not matter, so check every player
+      local CounterScope = IslandID==0 and 1 or 0 -- 1 is Session, 0 is Area
+      local ScopeContext = IslandID==0 and g_ObjectFinderSerp.IsLoadedSessionByID(SessionID) or AreaID -- SessionGuid or AreaID
+      local helperGUID = IslandID==0 and MaxObjIdWalkableHelperGuid or MaxObjIdAreaHelperGuid
+      local found = false
+      for _,PID in pairs(PIDs) do
+        local count = ts.Participants.GetParticipant(PID).ProfileCounter.Stats.GetCounter(0,0,helperGUID,CounterScope,ScopeContext)
+        if count > 0 then -- one per island/per session
+          found = true
+        end
+      end
+      return found
+    end
+    
+    -- To limit it to only the current Session, use a SessionFilter function that returns false if the SessionGUID is not the current one
+    -- scroll down for "EXAMPLE ObjectFilter"
+    local function GetAnyObjectsFromAnyone(myargs)
+      local ObjectFilter,SessionFilter,FromSessionID,ToSessionID,FromIslandID,ToIslandID,FromAreaIndex,ToAreaIndex,FromObjectID,ToObjectID,withyield,waitforhelper = myargs["ObjectFilter"],myargs["SessionFilter"],myargs["FromSessionID"],myargs["ToSessionID"],myargs["FromIslandID"],myargs["ToIslandID"],myargs["FromAreaIndex"],myargs["ToAreaIndex"],myargs["FromObjectID"],myargs["ToObjectID"],myargs["withyield"],myargs["waitforhelper"]
       local Objects = {}
-      local AreaID,OID,SessionIsCurrent,CheckingSessionGuid
-      local filterresult,AreaOwnerName,AreaOwner,Kontor_OIDtable,Kontor_OID,objectcount,HighestObjectID,LowestObjectID,GUID,SessionGuid,ParticipantID,userdata,sessionisloaded,CheckingSessionGuid,CurrentSessionObjects
       local ExecutingSessionGUID = session:getSessionGUID()
+      local filterresult
       FromSessionID = FromSessionID or 1
       ToSessionID = ToSessionID or g_ObjectFinderSerp.l_MaxSessionID
       FromIslandID = FromIslandID or 0 -- is 0 for eg. ships and other things not bound to islands
       ToIslandID = ToIslandID or g_ObjectFinderSerp.l_MaxIslandID
       FromAreaIndex = FromAreaIndex or 0 -- is 0 for eg. ships and other things not bound to islands
       ToAreaIndex = ToAreaIndex or 1 -- can be 2 for islands sharing two owners , like ketema island. but unlikely that we need it, so default to only 1
-      FromObjectID_ = FromObjectID or 1
-      ToObjectID_ = ToObjectID or 10000 -- TODO wieder auf 100k erhöhen -- could be something in billion (milliarden) range on very big/old savegames... better try to save/check your current highest OID and enter lower number here
+      local FromObjectID_ = FromObjectID or 1 -- removed objects/ships leaving session leave empty OBjectIDs, so sometimes, especially on takeover of islands, the first valid ObjectID might be in the tenthousands.
+      local ToObjectID_ = ToObjectID or 1000000 -- on very big/old savegames you should check up to 1 million or even more ... better try to save/check your current lowest/highest OID and enter lower number here
       for SessionID=FromSessionID,ToSessionID do
-        CheckingSessionGuid = g_ObjectFinderSerp.IsLoadedSessionByID(SessionID)
-        SessionIsCurrent = ExecutingSessionGUID == CheckingSessionGuid
+        local CheckingSessionGuid = g_ObjectFinderSerp.IsLoadedSessionByID(SessionID)
         if CheckingSessionGuid~=nil then
-          if g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID]==nil then
-            g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID] = {}
-            g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed = true
+          local session_ok = true
+          if type(SessionFilter)=="function" then
+            session_ok = SessionFilter(SessionID,CheckingSessionGuid) 
           end
-          local session_ok = type(SessionFilter)=="function" and SessionFilter(SessionID,CheckingSessionGuid) or true
-          if session_ok then -- not really needed if we find objects and reach the ObjectFilter call (then use next_SessionID), but eg. if we want to only check Areas then we wont find Neutral object and reach ObjectFilter quite late. So use SessionFilter to sort out unwanted session early to save performance
-            if SessionIsCurrent then
-              local sessionargs = g_LuaTools.deepcopy(myargs)
-              sessionargs["FromSessionID"] = SessionID
-              sessionargs["ToSessionID"] = SessionID
-              CurrentSessionObjects = GetCurrentSessionObjectsFromAnyone(sessionargs)
-              for CS_OID,CS_objectinfo in pairs(CurrentSessionObjects) do
-                Objects[CS_OID] = CS_objectinfo
-              end
-              -- TODO: testen ob das so problemlos funzt
-               -- wenn man in GetCurrentSessionObjectsFromAnyone ein "done" returned, kommt das hier in dieser FKT nicht an...
-                -- entweder ändern was fkt returned..
-                 -- oder uns bei Anwendung außerhalb vom ObjectFilter merken, dass wir einmal schon bei "done=true" waren und das dann bei folgenden
-                  -- Aufrufen immer wieder returnen
-                  -- Lösung: einfach einen weiteren paramter in GetCurrentSessionObjectsFromAnyone zufügen sowas wie "returne bitte done" den ich nur hier setze,
-                   -- und dadurch dann hier auch done returned bekomme und umsetzen kann (bzw einfach das ganze filterresult)
-            else
-              for IslandID=FromIslandID,ToIslandID do
-                for AreaIndex=FromAreaIndex,ToAreaIndex do
-                  if not ((IslandID==0 and AreaIndex~=0) or (IslandID~=0 and AreaIndex==0)) then -- on water both are 0. on islands none of them is 0, so do not allow only one of them being 0.
-                    AreaID = AreatableToAreaID({SessionID=SessionID,IslandID=IslandID,AreaIndex=AreaIndex})
-                    local CacheObIDsSessionID = g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID] -- I think its better for performance to save it in a variable
-                    if CacheObIDsSessionID[AreaID]~=false then -- dont check Areas we already marked as invalid
+          if session_ok then
+            local SessionIsCurrent = ExecutingSessionGUID == CheckingSessionGuid
+            if g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID]==nil then
+              g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID] = {}
+            end
+            if g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID]== nil then
+              g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID] = {}
+              g_ObjectFinderSerp.ObjectFinderCacheSerp.Changed = true
+            end
+            for IslandID=FromIslandID,ToIslandID do
+              for AreaIndex=FromAreaIndex,ToAreaIndex do
+                if not ((IslandID==0 and AreaIndex~=0) or (IslandID~=0 and AreaIndex==0)) then -- on water both are 0. on islands none of them is 0, so do not allow only one of them being 0.
+                  local AreaID = AreatableToAreaID({SessionID=SessionID,IslandID=IslandID,AreaIndex=AreaIndex})
+                  local CacheObIDsSessionID = g_ObjectFinderSerp.ObjectFinderCacheSerp.ObIDs[SessionID] -- I think its better for performance to save it in a variable
+                  if CacheObIDsSessionID[AreaID]== nil then
+                    CacheObIDsSessionID[AreaID] = {}
+                  end
+                  if not CacheObIDsSessionID[AreaID]["invalid"] then
+                    if IslandID~=0 then
+                      local AreaOwnerName,AreaOwner,Kontor_OIDtable,Kontor_OID
+                      if not SessionIsCurrent then -- we can not check Area in other sessions, except we know any building OID on the Area already
+                        if g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID]~=nil and g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID][AreaID]~=nil then
+                          AreaOwner = g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID][AreaID].AreaOwner
+                          AreaOwnerName = g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID][AreaID].AreaOwnerName
+                          Kontor_OIDtable = g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID][AreaID].Kontor_OIDtable
+                          Kontor_OID = g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID][AreaID].Kontor_OID
+                        end
+                      else
+                        AreaOwnerName = ts.Area.GetAreaFromID(AreaID).OwnerName -- check if the Area is valid
+                        AreaOwner = ts.Area.GetAreaFromID(AreaID).Owner
+                      end
+                      if AreaOwner==nil and AreaOwnerName==nil then
+                        break -- then we can not check this Area, so skip it (we are unable to check if empty/invalid or owned. So it would mean searching long time invalid IDs)
+                      end
+                      if (AreaOwnerName=="" and AreaOwner==0) then -- invalid area. while for unsettled area owner will be -1. (OwnerName is better than Owner here, because invalid areas are nullpointer and would return 0 for Owner, which also might be Human0 on valid areas)
+                        CacheObIDsSessionID[AreaID]["invalid"] = true -- remember this Area as invalid, so we don't have to check it ever again.
+                        g_ObjectFinderSerp.ObjectFinderCacheSerp.Changed = true
+                      end
+                    end
+                    if not CacheObIDsSessionID[AreaID]["invalid"] then
                       if withyield then
                         coroutine.yield()
                       end
-                      AreaOwner = nil
-                      FromObjectID_ = FromObjectID or 1
-                      ToObjectID_ = ToObjectID or 10000
-                      -- we have no way to check if the Area is valid/settled (checking Area only works in correct session),
-                        -- if we did not mark it already as invalid in ObjectFinderCacheSerp, so it will be quite inefficient at first
-                        -- if we find an not-null object here, we can get info about Area via SessionGameObject text-embed. But this does not help
-                         -- to to filter invalid/unsettled Areas, because this way we only now the current is valid and settled, but other might get settled in the future, so we should not skip them the next times
-                        if CacheObIDsSessionID[AreaID]==nil then
-                          CacheObIDsSessionID[AreaID] = {}
+                      if IslandID==0 or AreaOwnerName~="" then -- if not Water (IslandID==0), make sure Area is owned by someone
+                        local MaxObjIdHelperExists = g_ObjectFinderSerp.DoesMaxObjIdHelperExists(AreaID,AreaOwner)
+                        
+                        while waitforhelper and not MaxObjIdHelperExists do
+                          coroutine.yield()
+                          MaxObjIdHelperExists = g_ObjectFinderSerp.DoesMaxObjIdHelperExists(AreaID,AreaOwner)
                         end
-                        if FromObjectID==nil and CacheObIDsSessionID[AreaID]["LowObID"]~=nil then
-                          FromObjectID_ = CacheObIDsSessionID[AreaID]["LowObID"]
+                        if SessionIsCurrent then
+                          Kontor_OIDtable = ts.Area.GetAreaFromID(AreaID).KontorID
+                          Kontor_OID = OIDtableToOID(Kontor_OIDtable)
+                          -- filling it like this makes sure that outdated information is automatically overwritten
+                          g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[SessionID][AreaID] = {Kontor_OID=Kontor_OID,Kontor_OIDtable=Kontor_OIDtable,AreaOwner=AreaOwner,AreaOwnerName=AreaOwnerName,Owner=ts.GetGameObject(Kontor_OID).Owner}
+                          
+                          if IslandID~=0 and Kontor_OIDtable["ObjectID"]~=nil and Kontor_OIDtable["ObjectID"]~=0 then -- assuming the KontorObjectID is always the lowest on an island, it makes sense to set LowObID to this value. If we assume that there may be exceptions to this, then we can not use it at all...
+                            if CacheObIDsSessionID[AreaID].LowObID~=nil and Kontor_OIDtable["ObjectID"]~=CacheObIDsSessionID[AreaID].LowObID then
+                              g_LuaTools.modlog("WARNING GetAnyObjectsFromAnyone KontorObjectID "..tostring(Kontor_OIDtable["ObjectID"]).." is unequal LowObID "..tostring(CacheObIDsSessionID[AreaID].LowObID).." ?! (may only happen on island takeover?)",ModID)
+                            end
+                            CacheObIDsSessionID[AreaID].LowObID = Kontor_OIDtable["ObjectID"] -- Kontor should be the first building on every owned island, so it is enough to start there with counting
+                          end
                         end
-                        objectcount = 0
-                        -- HighestObjectID = 0 -- können wir hier nicht immer messen, weil wir ja evlt vorher breaken. lieber außerhalb in einer ObjectFilter fkt testen
-                        LowestObjectID = nil
+                        
+                        FromObjectID_ = FromObjectID or 1 -- we changed it below based on Cache potentially for the previous Area. so change it to default here again.
+                        ToObjectID_ = ToObjectID or MaxObjIdHelperExists and 100000000 or 1000000 -- do until we find the helper object
+                        
+                        if FromObjectID==nil and CacheObIDsSessionID[AreaID].LowObID~=nil then
+                          FromObjectID_ = CacheObIDsSessionID[AreaID].LowObID
+                        end
+                        if not MaxObjIdHelperExists and ToObjectID==nil and CacheObIDsSessionID[AreaID].HighObID~=nil then
+                          ToObjectID_ = CacheObIDsSessionID[AreaID].HighObID
+                        end -- HighObID is set via GetHighestObIDsLocalPlayerCurrentSessionByProperty and gets resetted to nil after 10 seconds time, because it is outdated quite quickly 
+                        
+                        local objectcount = 0
+                        local LowestObjectID = nil
                         for ObjectID=FromObjectID_,ToObjectID_ do
                           filterresult = nil
-                          OID = OIDtableToOID({ObjectID=ObjectID,AreaID=AreaID})
+                          local OID = OIDtableToOID({ObjectID=ObjectID,AreaID=AreaID})
                           if withyield then
                             objectcount = objectcount + 1
                             if objectcount % 10000 == 0 then
                               coroutine.yield()
                             end
                           end
-                          GUID = ts.GetGameObject(OID).GUID -- using GetGameObject to also fetch objects from other sessions. if it does not exist, it will be nullpointer
+                          local GUID = ts.GetGameObject(OID).GUID -- using GetGameObject to also fetch objects from other sessions. if it does not exist, it will be nullpointer
                           if GUID~=0 then -- GUID==0 means nullpointer, does not have an object
-                            -- g_LuaTools.modlog(tostring(OID)..","..tostring(AreaID)..","..tostring(GUID)..","..tostring(ts.Area.GetAreaFromID(AreaID).Owner)..", KontorObjectID :"..tostring(Kontor_OIDtable["ObjectID"]),ModID)
-                            SessionGuid = ts.GetGameObject(OID).SessionGuid -- should be the same as CheckingSessionGuid but just to be sure
-                            ParticipantID = ts.GetGameObject(OID).Owner
-                            userdata = nil -- game.MetaGameManager.getObjectByID(OID)  -- only accessable in same session
-                            if LowestObjectID==nil then
+                            local SessionGuid = CheckingSessionGuid
+                            local ParticipantID = ts.GetGameObject(OID).Owner
+                            local userdata = SessionIsCurrent and session.getObjectByID(OID) or nil -- no way to get userdata in foreign session... But you can use t_ExecuteFnWithArgsForPeers for a peer who is in that session and give him the OID to do what you want on that userdata (most operations on userdata desync though if not all peers do it at the same time)
+                            if LowestObjectID==nil then -- we increase, so the first is the lowest
                               LowestObjectID = ObjectID
                             end
                             if type(ObjectFilter)=="function" then
@@ -1345,35 +1418,38 @@ if g_LuaScriptBlockers[ModID]==nil then
                             if filterresult~=nil and type(filterresult)=="table" and filterresult["addthis"] then
                               Objects[OID] = {GUID=GUID,ParticipantID=ParticipantID,userdata=userdata,SessionGuid=SessionGuid,SessionID=SessionID,IslandID=IslandID,AreaIndex=AreaIndex,ObjectID=ObjectID,AreaOwner=AreaOwner,Kontor_OID=Kontor_OID}
                             end
-                            if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["next_AreaID"] or filterresult["done"]) then
+                            if (IslandID==0 and GUID == g_ObjectFinderSerp.MaxObjIdWalkableHelper.Guid) or (IslandID~=0 and GUID == g_ObjectFinderSerp.MaxObjIdAreaHelper.Guid) then
+                              break -- reached the max ObjectID for this IslandID (if island/session is settled) (they only exist for 10 / 30 seconds after we made them spawn with unlock 1500005552 / 1500005549 )
+                            end
+                            if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_AreaID"] or filterresult["done"]) then
                               break
                             end
+                          elseif Kontor_OIDtable["ObjectID"]==ObjectID then -- if it claims to have a kontor, but its GUID is 0, then just skip this area
+                            CacheObIDsSessionID[AreaID]["invalid"] = "EditorObject" -- remember this Area as invalid, so we don't have to check it ever again.
+                            break -- this happens for Editor Objects, eg. Kontor from third parties. They have in fact OID 9223413826886612345 and EditorFlag=1 which makes the number much higher. But lua can not handle this high number (bint?) anyways, trying to get GUID from 9223413826886612345 just results in an error.  -- so no suport for Editor Objects.
                           end
                         end
-                        if LowestObjectID~=nil and (CacheObIDsSessionID[AreaID]["LowObID"]==nil or LowestObjectID > CacheObIDsSessionID[AreaID]["LowObID"]) then  
-                          CacheObIDsSessionID[AreaID]["LowObID"] = LowestObjectID
-                          g_ObjectFinderSerp.ObjectFinderCacheSerp_Changed = true
+                        if LowestObjectID~=nil and (CacheObIDsSessionID[AreaID].LowObID==nil or LowestObjectID > CacheObIDsSessionID[AreaID].LowObID) then -- checking > here is correct, because the obj only can get bigger, never lower, eg. when taking over an island
+                          CacheObIDsSessionID[AreaID].LowObID = LowestObjectID
                         end
                         if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
                           break
                         end
+                      end
                     end
                   end
                 end
-                if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
-                  break
-                end
+              end
+              if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
+                break
               end
             end
           end
         end
-        if filterresult~=nil and type(filterresult)=="table" and filterresult["done"] then
+        if filterresult~=nil and type(filterresult)=="table" and (filterresult["next_SessionID"] or filterresult["done"]) then
           break
         end
       end
-      -- if not nosave then -- eg when searching for the save helper object, we can not save already
-        -- SaveCache()
-      -- end
       return Objects
     end
 
@@ -1512,6 +1588,13 @@ if g_LuaScriptBlockers[ModID]==nil then
     end
     -- Or even optimzie it further and search the island you are looking for a specific object (not walkable!) by checking first:
     -- ts.Participants.GetParticipant(searchParticipantID).ProfileCounter.Stats.GetCounter(0,0,searchGUID,0,AreaID)
+
+    local function mySessionFilter(SessionID,SessionGUID)
+      if SessionGUID~=session.getSessionGUID() then -- eg. only check the current session
+        return false
+      end
+    end
+
 
     -- ###################################################################################################
     -- ###################################################################################################
@@ -1654,21 +1737,22 @@ if g_LuaScriptBlockers[ModID]==nil then
 
     -- ###################################################################################################
     -- ###################################################################################################
+    -- you can call this function to find out if a game was just newly started (by checking ts.GameClock.CorporationTime)
+    local function WasNewGameJustStarted() -- call it within the first 30 seconds of a new game for it to work
+      return ts.GameClock.CorporationTime < 30000 -- if the game is not older than 30 seconds, we consider it new
+    end
     
     -- update Kontor_OIDs Cache
     local function OnIslandSettledSessionEnter(PID)
       
       if ts.Participants.GetGetCurrentParticipantID() == PID then -- just to make sure its not 4 times for the same local player executed if there are 4 humans (for coop it does not matter because the trigger is only executed once per coop-team, so its fine)
         local SessionGuid = session.getSessionGUID()
-        if not OnIslandSettledSessionEnter_Block[SessionGuid] then
-          OnIslandSettledSessionEnter_Block[SessionGuid] = true -- block calling this function for 5 seconds, so its not called multiple times within very short time for the same session, since it grants no benefit
-          system.start(function()
-            g_LuaTools.waitForTimeDelta(5000)
-            OnIslandSettledSessionEnter_Block[SessionGuid] = nil -- unblock it again
-          end)
-          g_LuaTools.modlog("OnIslandSettledSessionEnter Update Areas Cache",ModID)
           
-          system.start(function()
+          
+          g_LuaTools.modlog("OnIslandSettledSessionEnter "..tostring(SessionGuid).." Update Areas Cache",ModID)
+          
+          
+          g_LuaTools.start_thread("OnIslandSettledSessionEnter",ModID,function()
             -- wait for everything to initial finish
             while g_ObjectFinderSerp==nil or g_SaveLuaStuff_Serp==nil or g_PeersInfo_Serp==nil or g_PeersInfo_Serp.CoopFinished~=true or g_CoopCountRes==nil or g_CoopCountRes.Finished~=true do
               coroutine.yield()
@@ -1682,27 +1766,35 @@ if g_LuaScriptBlockers[ModID]==nil then
                 break
               end
             end
+            g_LuaTools.modlog("OnIslandSettledSessionEnter "..tostring(SessionGuid).." before Kontor_OIDs_before",ModID)
             local Kontor_OIDs_before
             if curSessionID~=nil then
               Kontor_OIDs_before = g_LuaTools.deepcopy(g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[curSessionID])
             end
+            g_LuaTools.modlog("OnIslandSettledSessionEnter "..tostring(SessionGuid).." after Kontor_OIDs_before",ModID)
           -- loop through Areas of current session and save owner+Kontor OID to cache
             g_ObjectFinderSerp.AreasCurrentSessionLooper(function(SessionGuid,ParticipantID,AreaID,SessionID,IslandID,AreaIndex,AreaOwner,Kontor_OID)
               -- its enough to only call this and run it to the end. This makes sure that Cache Kontor_OIDs is updated within GetCurrentSessionObjectsFromAnyone
             end)
+            g_LuaTools.modlog("OnIslandSettledSessionEnter "..tostring(SessionGuid).." after AreasCurrentSessionLooper",ModID)
                
             if Kontor_OIDs_before~=nil and not g_LuaTools.tables_equal(Kontor_OIDs_before,g_ObjectFinderSerp.ObjectFinderCacheSerp.Kontor_OIDs[curSessionID]) then
-              g_ObjectFinderSerp.SyncCacheToEveryone()
+                g_LuaTools.modlog("OnIslandSettledSessionEnter "..tostring(SessionGuid).." before t_SyncCacheToEveryone",ModID)
+              g_ObjectFinderSerp.t_SyncCacheToEveryone()
             end
+            
+            g_LuaTools.modlog("OnIslandSettledSessionEnter "..tostring(SessionGuid).." Updated Areas Cache Done",ModID)
+            
           end)
-        end
+          
       end
     end
-    -- update Kontor_OIDs Cache
+    -- update SessionParticipants Cache
     local function OnSessionLoaded(PID)
       if ts.Participants.GetGetCurrentParticipantID() == PID then -- just to make sure its not 4 times for the same local player executed if there are 4 humans (for coop it does not matter because the trigger is only executed once per coop-team, so its fine)
         g_LuaTools.modlog("OnSessionLoaded Update SessionParticipants Cache",ModID)
-        system.start(function()
+        g_LuaTools.start_thread("OnSessionLoaded",ModID,function()
+          g_LuaTools.waitForTimeDelta(2000) -- small delay to give the game time to finish everything, like spawning SessionParticipants
           -- wait for everything to initial finish
           while g_ObjectFinderSerp==nil or g_SaveLuaStuff_Serp==nil or g_PeersInfo_Serp==nil or g_PeersInfo_Serp.CoopFinished~=true or g_CoopCountRes==nil or g_CoopCountRes.Finished~=true do
             coroutine.yield()
@@ -1714,6 +1806,88 @@ if g_LuaScriptBlockers[ModID]==nil then
           g_ObjectFinderSerp.GetAllLoadedSessionsParticipants(All_PIDS) -- this updates also the LoadedSessions Cache
         end)
       end
+    end
+    
+    
+    local function RegisterEvents() -- not called anymore, since event. does crash too often. using triggers again
+      -- Since the events can only call our functions after we added them, which is done in first SessionEnter via Trigger (no way to init out scripts earlier)
+       -- the first session loading on new game and the first sessionenter on loading a game will not fire
+      
+      -- Important info for "event." from the game:
+       -- If a function you call within that event causes an error, the game will crash without printing this error to the lua log!
+       -- So better always use pcall in them
+        -- SessionContext does not seem useful unfortunately...
+          -- __type : table: 000001DEE5166718 
+          -- __eq : function: 00007FF7CDED4BE0 C
+          -- class_cast : userdata: 00007FF7CE89F200 
+          -- __newindex : function: 000001DEE4F00098 C
+          -- __name : sol.rdgs::SessionEnteredContext 
+            -- __index : table: 000001DEE4DEF3B8 
+          -- class_check : userdata: 00007FF7CE89F270 
+          -- __pairs : function: 00007FF7CDED2980 C
+          -- __index : table: 000001DEE51668F8 
+          -- __gc : function: 00007FF7CD9E8C20 C
+          -- new : function: 000001DEE5181558 C
+          -- debug.getmetatable(SessionEnteredContext)
+      local was_already_registered = true
+      if event.OnSessionLoaded[ModID] == nil then -- only add it once
+        g_LuaTools.modlog("Register OnSessionLoaded",ModID)
+        was_already_registered = false
+        event.OnSessionLoaded[ModID] = function(SessionContext)
+          system.start(function()
+            while g_ObjectFinderSerp==nil do
+              coroutine.yield()
+            end
+            local status, err = pcall(g_ObjectFinderSerp.OnSessionLoaded,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+            if status==false then -- error
+              print(ModID,"ERROR OnSessionLoaded: Function OnSessionLoaded had an error: "..tostring(err))
+              g_LuaTools.modlog("ERROR OnSessionLoaded: Function OnSessionLoaded had an error: "..tostring(err),ModID)
+            end
+          end,ModID.." OnSessionLoaded")
+        end
+      end
+      if event.OnSessionEnter[ModID] == nil then -- only add it once
+        g_LuaTools.modlog("Register OnSessionEnter",ModID)
+        was_already_registered = false
+        event.OnSessionEnter[ModID] = function(SessionContext)
+          system.start(function()
+            while g_ObjectFinderSerp==nil do
+              coroutine.yield()
+            end
+            local status, err = pcall(g_ObjectFinderSerp.OnIslandSettledSessionEnter,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+            if status==false then -- error
+              print(ModID,"ERROR OnSessionEnter: Function OnIslandSettledSessionEnter had an error: "..tostring(err))
+              g_LuaTools.modlog("ERROR OnSessionEnter: Function OnIslandSettledSessionEnter had an error: "..tostring(err),ModID)
+            end
+          end,ModID.." OnSessionEnter")
+        end
+      end
+      
+      -- delete lu_session_loaded_h0.lua and the Trigger in xml scripts if this works
+       -- and maybe reanme the session enter scripts to islandsettled
+       -- oder doch xml, weil event nutzen einfach zu oft crashed, trotz pcall -.-
+       
+      
+      -- on game loaded, call the events sessionloaded and sessionenter once (since they are not called via the event yet)
+      if not was_already_registered then
+        system.start(function()
+          while not g_ObjectFinderSerp.ObjectFinderCacheSerp.Loaded do -- wait for cache to load
+            coroutine.yield()
+          end
+          local status, err = pcall(g_ObjectFinderSerp.OnSessionLoaded,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+          if status==false then -- error
+            print(ModID,"ERROR OnSessionLoaded: Function OnSessionLoaded had an error: "..tostring(err))
+            g_LuaTools.modlog("ERROR OnSessionLoaded: Function OnSessionLoaded had an error: "..tostring(err),ModID)
+          end
+          local status, err = pcall(g_ObjectFinderSerp.OnIslandSettledSessionEnter,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+          if status==false then -- error
+            print(ModID,"ERROR OnSessionEnter: Function OnIslandSettledSessionEnter had an error: "..tostring(err))
+            g_LuaTools.modlog("ERROR OnSessionEnter: Function OnIslandSettledSessionEnter had an error: "..tostring(err),ModID)
+          end
+        end,ModID.." Call initial OnSessionEnter/OnSessionLoaded")
+      end
+      
+      
     end
 
 
@@ -1729,13 +1903,12 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- 
     g_ObjectFinderSerp = {
       -- stuff for internal use
-      ObjectFinderCacheSerp = {ObIDs={},LoadedSessionsParticipants={},LoadedSessions={},Kontor_OIDs={}},
+      ObjectFinderCacheSerp = {ObIDs={},LoadedSessionsParticipants={},LoadedSessions={},Kontor_OIDs={},Loaded=nil,Changed=nil,SyncChanged=nil},
       DoTheExecutionFor = DoTheExecutionFor, -- internal use!
       StartShareThread = StartShareThread, -- internal use!
       OnIslandSettledSessionEnter = OnIslandSettledSessionEnter, -- internal use!
-      OnIslandSettledSessionEnter_Block = {}, -- internal use!
       OnSessionLoaded = OnSessionLoaded, -- internal use!
-      SaveCache = SaveCache, -- internal use!
+      t_SaveCache = t_SaveCache, -- internal use!
       ShareQueue = {},
       ShareLoopIsRunning = false,
       ExecuteDone = false,
@@ -1761,11 +1934,11 @@ if g_LuaScriptBlockers[ModID]==nil then
         AffectedByStatusEffect = AffectedByStatusEffect,
       },
       -- helper constructs you can use
-      SyncCacheToEveryone = SyncCacheToEveryone, -- syncs ObjectFinderCacheSerp to all peers
+      t_SyncCacheToEveryone = t_SyncCacheToEveryone, -- syncs ObjectFinderCacheSerp to all peers
       DoForSessionGameObject = DoForSessionGameObject,
       t_ShareLuaInfo = t_ShareLuaInfo,
       GetSharedLuaInfo = GetSharedLuaInfo,
-      ExecuteFnWithArgsForPeers = ExecuteFnWithArgsForPeers,
+      t_ExecuteFnWithArgsForPeers = t_ExecuteFnWithArgsForPeers,
       GetFertilitiesOrLodesFromArea_CurrentSession = GetFertilitiesOrLodesFromArea_CurrentSession,
       GetVectorGuidsFromSessionObject = GetVectorGuidsFromSessionObject,
       GetCoopPeersAtMarker = GetCoopPeersAtMarker,
@@ -1778,31 +1951,40 @@ if g_LuaScriptBlockers[ModID]==nil then
       GetFirst100LoadedSessionsGameObjects = GetFirst100LoadedSessionsGameObjects,
       GetAllLoadedSessionsParticipants = GetAllLoadedSessionsParticipants,
       GetHighestObIDsLocalPlayerCurrentSessionByProperty = GetHighestObIDsLocalPlayerCurrentSessionByProperty,
+      WasNewGameJustStarted = WasNewGameJustStarted,
       PIDsToShareData = {117,118,119,120,121,122,123,124,125,126,127,128,129,136,137,138},
       ExForEveryUnlocks = {1500004620,1500004621,1500004622,1500004623,1500004624,1500004625,1500004626,1500004627,1500004628,
         1500004629,1500004630,1500004631,1500004632,1500004633,1500004634,1500004635}, -- GUIDs for FeatureUnlock to start peer scripts
       PIDToSaveData = 130,
       PID_Neutral = 8,
       l_MaxSessionID = 20, -- used as default max SessionID when looping through all sessions. In vanilla we have ~8 sessions, so I think 20 should be fine even with alot of session mods installed
-      l_MaxIslandID = 80,
+      l_MaxIslandID = 80, -- per Session
+      MaxObjIdAreaHelper = {Guid=1500005548,Unlock=1500005549}, -- IslandID ~= 0
+      MaxObjIdWalkableHelper = {Guid=1500005550,Unlock=1500005552}, -- IslandID = 0
+      DoesMaxObjIdHelperExists = DoesMaxObjIdHelperExists,
+      SpawnMaxObjIdHelpers = SpawnMaxObjIdHelpers,
     }
     
-    LoadCache()
+    g_LuaTools.start_thread("t_LoadCache",ModID,t_LoadCache) -- this already updates on game start the Cache SessionParticipants and also LoadedSessions, while OnSessionEnter updates Kontor_OIDs
     
-    system.start(function()
+    -- RegisterEvents() -- not called anymore, since event. does crash too often. using triggers again
+    
+    
+    g_LuaTools.start_thread("g_OnGameLeave_serp",ModID,function()
       while g_OnGameLeave_serp==nil do
         coroutine.yield()
       end
       if g_OnGameLeave_serp[ModID]==nil then
         g_OnGameLeave_serp[ModID] = function()
           g_ObjectFinderSerp = nil -- stop everything (might crash some currently running functions, but I think its ok)
+          event.OnSessionEnter[ModID] = nil
+          event.OnSessionLoaded[ModID] = nil
         end
       end
     end)
-    
-    system.start(function()
-      g_LuaTools.waitForTimeDelta(5000) -- unblock it again, so it can be executed the next time we load a game
+    g_LuaTools.start_thread("g_LuaScriptBlockers",ModID,function()
+      g_LuaTools.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
       g_LuaScriptBlockers[ModID] = nil
     end)
-    
+
 end

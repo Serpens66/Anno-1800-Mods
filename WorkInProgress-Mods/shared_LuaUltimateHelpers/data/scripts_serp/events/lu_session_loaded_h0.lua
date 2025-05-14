@@ -8,10 +8,15 @@
 local PID = 0
 
 
-system.start(function()
+
+if g_LuaTools==nil then
+  console.startScript("data/scripts_serp/luatools.lua")
+end
+
+g_LuaTools.start_thread("lu_loaded_entered.lua","",function()
   -- wait for everything to initial finish
   while g_ObjectFinderSerp==nil or g_SaveLuaStuff_Serp==nil or g_PeersInfo_Serp==nil or g_PeersInfo_Serp.CoopFinished~=true or g_CoopCountRes==nil or g_CoopCountRes.Finished~=true do
     coroutine.yield()
   end
-  g_ObjectFinderSerp.OnSessionLoaded(PID)
+  g_LuaTools.CallGlobalFnBlocked("g_ObjectFinderSerp.OnSessionLoaded",nil,1000,PID)
 end)

@@ -18,4 +18,4 @@ system.start(function()
     coroutine.yield()
   end
   g_ObjectFinderSerp.OnIslandSettledSessionEnter(PID)
-end)
+end,"lu_session_entered.lua")

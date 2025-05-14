@@ -5,20 +5,73 @@
   <!-- ##  Reactions from AI  ## -->
   <!-- ################################################### -->
 
-  <!-- if I change values of: RequiredReputation or RequiredContextAsset or MyRole or RequiredReputationState, I need to adjust the Paths below that replace the SubtitleGroup -->
+  <!-- if I change values of: RequiredReputation or RequiredContextAsset or MyRole or RequiredReputationState, I need to adjust the ModOp Paths below that replace the SubtitleGroup -->
 
   <!-- RequiredContextAsset can not be a AssetPool or ItemEffectTargetPool ... so we have to add this code for each single spy GUID we have -->
 
-  
-  
+
   <!-- TODO: -->
-   <!-- man könnte evlt noch Treaty mit spieler prüfen und mehr minus rep geben, wenn spieler mit KI handels/allianz hat aber dennoch spioniert -->
-    <!-- muss aber nicht sein -->
-    
+   <!-- für das Rep Malus Item: -->
+    <!-- Beim Opfer (wenn dieser Human ist) wird leider noch eine "schiff versenkt" Meldung gemacht (lässt sich das verhindern?) -->
+     <!-- und auch eine CharacterNotification mit -5 Ruf kommt (nur halt ohne Text). -->
+    <!-- Wäre gut wenn wir das noch unterbinden könnten, damit man nicht in der Sekunde der Sabotage weiß dass es gerade stattfindet.. -->
+   <!-- (die destroy meldung könnte man wegkriegen, falls wir die owner der attacker/victim vertauschen,also dass ein KI schiff zerstört wird) -->
+        <!-- Oder wir nutzen ne andere Reaction wie ObjectBuilt, falls das über ActionSpawn auslöbar ist. -->
+
   <!-- TODO:  -->
     <!-- attacker fake ship evtl. durch lua code Object.Attackable.SetAddDamagePercent(100,damagedealerID) ersetzen -->
      <!-- dann könnte victim attackabletype=none sein und sie würden sich dadurch niemals irgendwie einmischen können -->
-    
+   <!-- Klappt vermutlich im MP nicht gut, bzw. nochmal prüfen wenn meine lua helper alle fertig sind  -->
+    <!-- und das keine Probleme im MP macht und auch egal ist wer in welcher Session ist. -->
+  
+  <!-- Rep Malus Item used: AI, no Notification because we dont want to reveal the spy (a general notification will be send via trigger) -->
+  <ModOp Type="AddPrevSibling" GUID='125,130,131,132,133,134,135,136,137,138,219' Path="/Values/ParticipantMessages/MessageTriggers/MilitaryShipDestroyed/Reactions/Item[1]">
+    <Item>
+      <MyRole>ObserverToTarget</MyRole>
+      <RequiredReputationState>DontCare</RequiredReputationState>
+      <RequiredReputationParticipant>[NONE]</RequiredReputationParticipant>
+      <RequiredContextAsset>1500001829</RequiredContextAsset>
+      <Probability>1</Probability>
+      <CooldownTime>0</CooldownTime>
+      <SideEffect>AddReputation</SideEffect>
+      <SideEffectValue>-5</SideEffectValue>
+      <Notification>
+        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+        <Values>
+          <CharacterNotification />
+          <BaseNotification />
+          <NotificationSubtitle />
+        </Values>
+      </Notification>
+      <ReputationLogEntry>1500001400</ReputationLogEntry>
+      <NotificationFilter>Diplomacy</NotificationFilter>
+    </Item>
+  </ModOp>
+  <!-- Rep Malus Item used: Pirates -->
+  <ModOp Type="AddPrevSibling" GUID='148,149' Path="/Values/ParticipantMessages/MessageTriggers/MilitaryShipDestroyed/Reactions/Item[1]">
+    <Item>
+      <MyRole>ObserverToTarget</MyRole>
+      <RequiredReputationState>DontCare</RequiredReputationState>
+      <RequiredReputationParticipant>[NONE]</RequiredReputationParticipant>
+      <RequiredContextAsset>1500001831</RequiredContextAsset>
+      <Probability>1</Probability>
+      <CooldownTime>0</CooldownTime>
+      <SideEffect>AddReputation</SideEffect>
+      <SideEffectValue>-5</SideEffectValue>
+      <Notification>
+        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+        <Values>
+          <CharacterNotification />
+          <BaseNotification />
+          <NotificationSubtitle />
+        </Values>
+      </Notification>
+      <ReputationLogEntry>1500001400</ReputationLogEntry>
+      <NotificationFilter>Diplomacy</NotificationFilter>
+    </Item>
+  </ModOp>
+  
+  
   <ModOp Type="AddPrevSibling" GUID='125,130,131,132,133,134,135,136,137,138,219' Path="/Values/ParticipantMessages/MessageTriggers/MilitaryShipDestroyed/Reactions/Item[1]">
     <Item>
       <MyRole>Initiator</MyRole>

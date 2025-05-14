@@ -1,0 +1,83 @@
+<ModOps>
+  
+  <!-- uses Serp GUIDs 1500005500 to 1500005504 (currently only 1500005500 and 1500005501 in use)  -->
+    
+  <!-- This shared mod adds a "incompatible mods" PopUp everytime the game is started and incompatible mods are known (added by the modders to IncompatibleIds in the modinfo.json). -->
+
+
+  <!-- ############################################################################################# -->
+  <!-- ############################################################################################# -->
+  <!-- ############################################################################################# -->
+  
+  
+  <!-- first idea was to display a "letter" (ActionTriggerTextPopup with TextPopupLayout=Letter), but there are several compatibility problems with this: -->
+    <!-- it does close any already displayed letter (eg from other mods introducing their features) and also closes opened menus like statistic screen (which may be relevant for my lua-code-multiplayer check, that forces everyone into statistic screen at start of a game). -->
+  <!-- Therefore I decided to use a real PopUp instead, although they are heavily limited by Enums (datasets.xml) and we have to abuse a vanilla one, -->
+  <!-- while the only one that is not needed on PC is "ResetConsoleOptionsConfirmation" (there are no mods on console eg. PS4). -->
+    <!-- I consider this "incompatible mods" message more important than any other usecase this PopUp could be used for, so I think it is fine to use it here. -->
+ <!-- NEW 1.022: Now using a shared PopUp! can be used by multiple mods, as long as they dont want to display it at the same time!  -->
+
+
+  <!-- info: a GUID of a trigger can be absued to also display text, so its the same GUID 1500005501 -->
+  <!-- Using a FeatureUnlock here for Coop compatibility. -->
+  <!-- Every mod using shared PopUp needs their own FeatureUnlock, because of problems in coop multiplayer. -->
+   <!-- (there is no way to start this popup via lua, but lua is checking if the player hit a button. -->
+    <!-- xml ActionTriggerPopup does start the popup for all coop players. So having 2 players who hit the button of previous -->
+     <!-- PopUp at different timing might still rsult in sending the same PopUp twice) -->
+  <ModOp Type="addNextSibling" GUID="1500005505">
+    <Asset>
+      <BaseAssetGUID>1500005505</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500005501</GUID>
+          <Name>Display Shared PopUp</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005501</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+        </Trigger>
+      </Values>
+    </Asset>
+  </ModOp>
+
+   
+  
+    <!-- info:  -->
+  <!-- we use the EventOnGameLoaded shared mod trigger (GUID 1500004636, is included in shared_PopUp_Serp) to show our popup everytime the game was loaded  -->
+  <!-- if there is any incompatible mod (using "ResetTrigger" part, to allow changes to the trigger midgame) -->
+  <ModOp Type="add" GUID="1500004636" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionRegisterTrigger</Template>
+        <Values>
+          <Action />
+          <ActionRegisterTrigger>
+            <TriggerAsset>1500005501</TriggerAsset>
+          </ActionRegisterTrigger>
+        </Values>
+      </TriggerAction>
+    </Item>
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/checkmodlog_incompatible.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+
+  
+    
+</ModOps>
