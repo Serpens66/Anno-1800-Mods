@@ -1,0 +1,645 @@
+<ModOps>
+  
+  <!-- 1500005527,1500005530,1500005602 -->
+  
+  <!-- first the OnGameLoaded 1500004636 FeatureUnlock part -->
+  <Include File="./OnGameLoaded.include.xml" />
+  
+  <!-- On PlayerDisconnected/PlayerLeft PopUp if the local peer clicks "continue" then start the CoopCountRes again -->
+  <ModOp Type="merge" GUID='500115' Path="/Values/GenericPopup/Popups/*[self::PlayerDisconnected or self::PlayerLeft]/Buttons/Item[1]">
+    <Command/>
+  </ModOp>
+  <ModOp Type="add" GUID='500115' Path="/Values/GenericPopup/Popups/*[self::PlayerDisconnected or self::PlayerLeft]/Buttons/Item[1]/Command">Conditions.RegisterTriggerForCurrentParticipant(1500005602);</ModOp>
+  
+  
+  
+  <!-- using a small delay because:  -->
+   <!-- 1) it gets triggered on game start while our scripts might not be ready yet.  -->
+   <!-- 2) to give the game enough time to spawn eg. SessionParticipants -->
+  <ModOp GUID="130248" Type="AddNextSibling">
+    
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005602</GUID>
+          <Name>CoopCountRes Again (on PlayerLeft)</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/events/coopcount_again.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005527</GUID>
+          <Name>Refresh Lua Cache on every new Session Load (eg SessionParticipants)</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>SessionLoaded</ConditionEvent>
+                <ContextAssetInfolayer>0</ContextAssetInfolayer>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+                <SubTriggers>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001613</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>5000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_loaded_h0.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001614</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>5000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_loaded_h1.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001615</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>5000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_loaded_h2.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001616</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>5000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_loaded_h3.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
+                <TriggerActions />
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- IslandSettled wird auch bei Übernahme einer Insel getriggert. Übernahme einer Insel geht auch, wenn Spieler gerade in anderer Session ist.. was bei lua schwierig ist ..(aber dennoch besser als nichts) -->
+      <!-- und auch bei Spielstart mit startinseln wirds einmal getriggert -->
+     <!-- regardless who settles, we want the script to be executed for every human, because every human should save eg. the kontor OID from every settled island, regardless who owns it -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005530</GUID>
+          <Name>Refresh Lua Area Cache on IslandSettled/SessionEnter (eg get kontor OID)</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>SessionEnter</ConditionEvent>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>IslandSettled</ConditionEvent>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+                <SubTriggers>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001613</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>2000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_entered_h0.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001614</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>2000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_entered_h1.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001615</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>2000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_entered_h2.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>ConditionUnlocked</Template>
+                            <Values>
+                              <Condition>
+                                <IsOptional>1</IsOptional>
+                              </Condition>
+                              <ConditionUnlocked>
+                                <UnlockNeeded>1500001616</UnlockNeeded>
+                              </ConditionUnlocked>
+                              <ConditionPropsNegatable />
+                            </Values>
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>2000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionExecuteScript</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionExecuteScript>
+                                                    <ScriptFileName>data/scripts_serp/events/lu_session_entered_h3.lua</ScriptFileName>
+                                                  </ActionExecuteScript>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
+                                      </Values>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
+                <TriggerActions />
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  
+  <!-- call our register scripts on savegame load -->
+  <ModOp Type="add" GUID="1500004636" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/mediumtools.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  
+  
+  <Include File="./CoopCount.include.xml" />
+  
+  
+
+</ModOps>
