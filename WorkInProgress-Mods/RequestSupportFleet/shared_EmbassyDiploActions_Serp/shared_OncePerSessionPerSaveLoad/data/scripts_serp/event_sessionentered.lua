@@ -6,6 +6,14 @@ g_SessionEnter_Done_serp = {} -- empty this on every savegame load, because we d
 -- should also work fine in multiplayer/coop because unlock is not a problem and even if the players are in different sessions, reappling a buff works on all sessions loaded.
  -- but in multiplayer the unlock will be done once per session and per human player (but again: still better than on every SessionEnter)
 
+-- ##############
+
+-- Important info for "event." from the game:
+   -- If a function you call within that event causes an error, the game will crash without printing this error to the lua log!
+   -- So better always use pcall in them
+
+local ModID = "shared_OncePerSessionPerSaveLoad_Serp"
+
 local OnSessionEnter_serp = OnSessionEnter_serp or function()
   local S_ID = session.getSessionGUID()
   S_ID = tostring(S_ID)
@@ -16,8 +24,14 @@ local OnSessionEnter_serp = OnSessionEnter_serp or function()
     end
   end
 end
-if event.OnSessionEnter["shared_OncePerSession_Serp"] == nil then -- only add it once
-  event.OnSessionEnter["shared_OncePerSession_Serp"] = OnSessionEnter_serp
+if event.OnSessionEnter[ModID] == nil then -- only add it once
+  event.OnSessionEnter[ModID] = function()
+    local status, err = pcall(OnSessionEnter_serp) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+    if status==false then -- error
+      print(ModID,"ERROR OnSessionEnter: Function OnSessionEnter_serp had an error: "..tostring(err))
+      g_LuaTools.modlog("ERROR OnSessionEnter: Function OnSessionEnter_serp had an error: "..tostring(err),ModID)
+    end
+  end
 end
 -- first time executing we already entered a session without having the event OnSessionEnter registered, so execute it once here
 -- info: OnSessionEnter is NOT executed on loading a savegame and thus jumping into the current session.

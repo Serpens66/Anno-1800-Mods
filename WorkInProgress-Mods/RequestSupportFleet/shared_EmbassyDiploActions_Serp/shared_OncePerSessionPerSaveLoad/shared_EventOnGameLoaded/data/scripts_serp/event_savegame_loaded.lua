@@ -14,6 +14,9 @@ local LoadingScreenLeft_ID = 60
 -- It also happens when we went from within a SP game to the main menu and then again back into the same game, so its not a 100% "load game"!
 
 
+
+
+
 local function g_OnLeaveUIState_serp(UILeft_ID)
   if UILeft_ID == LoadingScreenLeft_ID then
     -- modlog("g_OnLeaveUIState_serp")
@@ -27,6 +30,15 @@ local function g_OnLeaveUIState_serp(UILeft_ID)
 end
 
 if event.OnLeaveUIState["shared_LuaOnGameLoaded_Serp"] == nil then -- only add it once
+  
+  -- define a global variable early (before other scripts are executed with help of this mod)
+  -- This can be used by other mods to be used like g_LuaScriptBlockers.MyMod = true/nil
+  -- When you add your script with ActionExecuteScript to the xml 1500004636 FeatureUnlock, then it will be executed for every Human Participant in Multiplayer,
+   -- causing your script to be executed multiple times also for the local player.
+    -- To make sure your script is only executed once per load per local player, you can check and define g_LuaScriptBlockers.MyMod = true
+     -- and set it to nil again within a thread after eg. 5000 ms, to be unblocked for the next game loading. 
+  g_LuaScriptBlockers = {}
+  
   event.OnLeaveUIState["shared_LuaOnGameLoaded_Serp"] = g_OnLeaveUIState_serp
   
   -- The first time this script is called with help of SessionEnter, it will already be too late for the very first OnLeaveUIState,
