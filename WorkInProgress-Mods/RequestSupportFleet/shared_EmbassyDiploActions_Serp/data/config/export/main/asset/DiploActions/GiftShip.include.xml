@@ -2,13 +2,14 @@
 
   <!-- This will add diplo action: -->
    <!-- Gifting a ship to another player -->
+  <!-- 1500005306 unbenutzt -->
+  <!-- GUIDs 1500005300 bis 1500005350 reserviert hierfür, aktuell unbesetzt ab einschl. 1500005309 -->
   
-  <!-- GUIDs 1500005300 bis 1500005350 reserviert hierfür, aktuell nbesetzt bis einschl. 1500005309 -->
   
-    <!-- 1500005306 to 1500005309 genutzt im shared_LuaChangeOwner mod -->
+  <!-- using 1500005257 PlayerCounterContextPool "CP - All Choose-Target Button Helpers" from assets.xml from shared_EmbassyDiploActions mod -->
   
-  <!-- using 1500005257 PlayerCounterContextPool from assets.xml from shared_EmbassyDiploActions mod -->
   
+
   
   
   <!-- <GUID>3242</GUID><Text>[AssetData([NotificationContext CharacterGUID]) Text] dankt Ihnen für Ihr Geschenk.</Text> -->
@@ -52,6 +53,13 @@
   </ModOp>
   
   <ModOp Type="add" GUID="1500005252" Path="/Values/AssetPool/AssetList">
+    <Item>
+      <Asset>1500005300</Asset>
+    </Item>
+  </ModOp>
+  
+  <!-- ignore dummy asset for FunFactsCounter -->
+  <ModOp Type="add" GUID="140560" Path="/Values/PlayerCounterConfig/CounterConfig/FunFactsCounter/Item[not(PlayerCounter) or PlayerCounter='ObjectDestroyed' or PlayerCounter='ObjectLost']/FilterResults/IgnoreContexts">
     <Item>
       <Asset>1500005300</Asset>
     </Item>
@@ -129,7 +137,8 @@
   <!-- #####  -->
   
   <ModOp Type="addNextSibling" GUID="130248">
-    <!-- TODO: nur unlocken, wenn mindestens traderights und man nicht sich selbst als ziel gewählt hat -->
+    <!-- Lock/Unlock/unhide no longer needed here, will be done in lua (started via Trigger 1500005307 if anything from Pool 1500005257 was build) -->
+     <!-- so instead add your diploaction to lua code (TODO: make it easy for other mods to add their code) -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
@@ -151,26 +160,6 @@
             </Values>
           </TriggerCondition>
           <TriggerActions>
-            <Item>
-              <TriggerAction>
-                <Template>ActionUnlockAsset</Template>
-                <Values>
-                  <Action />
-                  <ActionUnlockAsset>
-                    <UnhideAssets>
-                      <Item>
-                        <Asset>1500005300</Asset>
-                      </Item>
-                    </UnhideAssets>
-                    <UnlockAssets>
-                      <Item>
-                        <Asset>1500005300</Asset>
-                      </Item>
-                    </UnlockAssets>
-                  </ActionUnlockAsset>
-                </Values>
-              </TriggerAction>
-            </Item>
             <!-- delay, so the shared "Back-Button" is added in front -->
             <Item>
               <TriggerAction>
@@ -229,7 +218,7 @@
     </Asset>
     
     <!-- something like <Command>[Selection Object Sellable BuyNet(25)]</Command> was planned for the notifications, to only change selection of the user who hits the button (not all coop players selection) -->
-     <!-- but ThirdpartyNotificationButtons seems to not accept anything related to "Selection" >.< ... so only option left is to register a trigger that starts a script for everyone and show a big warning, that coop player should delect what the do not want to gift.. -->
+     <!-- but ThirdpartyNotificationButtons seems to not accept anything related to "Selection" >.< ... so using my workaround from shared_LuaTools_Light_Serp FnViaTextEmbed (1500005600) and ChangeOwnerOfSelectionToPID from shared_LuaTools_Medium_Serp  -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
@@ -251,25 +240,14 @@
             </Values>
           </TriggerCondition>
           <SubTriggers>
-          
             <Item>
               <SubTrigger>
                 <Template>AutoCreateTrigger</Template>
                 <Values>
                   <Trigger>
                     <TriggerCondition>
-                      <Template>ConditionUnlocked</Template>
-                      <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
-                        <ConditionUnlocked>
-                          <UnlockNeeded>1500005244</UnlockNeeded>
-                        </ConditionUnlocked>
-                        <ConditionPropsNegatable>
-                          <NegateCondition>1</NegateCondition>
-                        </ConditionPropsNegatable>
-                      </Values>
+                      <Template>Diplo_Selected_Human0</Template>
+                      <Values />
                     </TriggerCondition>
                     <TriggerActions>
                       <Item>
@@ -283,6 +261,19 @@
                                 <Values>
                                   <CharacterNotification>
                                     <Profile>41</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|0|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
                                   </CharacterNotification>
                                   <NotificationSubtitle>
                                     <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
@@ -305,18 +296,8 @@
                 <Values>
                   <Trigger>
                     <TriggerCondition>
-                      <Template>ConditionUnlocked</Template>
-                      <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
-                        <ConditionUnlocked>
-                          <UnlockNeeded>1500005245</UnlockNeeded>
-                        </ConditionUnlocked>
-                        <ConditionPropsNegatable>
-                          <NegateCondition>1</NegateCondition>
-                        </ConditionPropsNegatable>
-                      </Values>
+                      <Template>Diplo_Selected_Human1</Template>
+                      <Values />
                     </TriggerCondition>
                     <TriggerActions>
                       <Item>
@@ -330,6 +311,119 @@
                                 <Values>
                                   <CharacterNotification>
                                     <Profile>600069</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|1|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Human2</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>600070</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|2|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Human3</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>42</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|3|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
                                   </CharacterNotification>
                                   <NotificationSubtitle>
                                     <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
@@ -353,18 +447,8 @@
                 <Values>
                   <Trigger>
                     <TriggerCondition>
-                      <Template>ConditionUnlocked</Template>
-                      <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
-                        <ConditionUnlocked>
-                          <UnlockNeeded>1500005223</UnlockNeeded>
-                        </ConditionUnlocked>
-                        <ConditionPropsNegatable>
-                          <NegateCondition>1</NegateCondition>
-                        </ConditionPropsNegatable>
-                      </Values>
+                      <Template>Diplo_Selected_Jorgensen</Template>
+                      <Values />
                     </TriggerCondition>
                     <TriggerActions>
                       <Item>
@@ -378,6 +462,19 @@
                                 <Values>
                                   <CharacterNotification>
                                     <Profile>47</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|25|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
                                   </CharacterNotification>
                                   <NotificationSubtitle>
                                     <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
@@ -394,477 +491,595 @@
               </SubTrigger>
             </Item>
             
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005224</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_02_Qing</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005225</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_03_Wibblesock</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005226</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_04_Smith</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005227</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_05_OMara</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005228</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_06_Gasparov</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005229</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_07_von_Malching</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005230</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_08_Gravez</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005231</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_09_Silva</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005232</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_10_Hunt</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005233</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Second_ai_11_Mercier</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005234</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Third_party_03_Pirate_Harlow</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <SubTrigger> -->
-                <!-- <Template>AutoCreateTrigger</Template> -->
-                <!-- <Values> -->
-                  <!-- <Trigger> -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <IsOptional>1</IsOptional> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>1500005235</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable> -->
-                          <!-- <NegateCondition>1</NegateCondition> -->
-                        <!-- </ConditionPropsNegatable> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <!-- <TriggerActions> -->
-                      <!-- <Item> -->
-                        <!-- <TriggerAction> -->
-                          <!-- <Template>ActionExecuteDiplomaticAction</Template> -->
-                          <!-- <Values> -->
-                            <!-- <Action /> -->
-                            <!-- <ActionExecuteDiplomaticAction> -->
-                              <!-- <DiplomacyAction>DeclareWar</DiplomacyAction> -->
-                              <!-- <DiplomaticSourceParticipant>Third_party_04_Pirate_LaFortune</DiplomaticSourceParticipant> -->
-                              <!-- <DiplomaticTargetParticipant>Second_ai_06_Gasparov</DiplomaticTargetParticipant> -->
-                            <!-- </ActionExecuteDiplomaticAction> -->
-                          <!-- </Values> -->
-                        <!-- </TriggerAction> -->
-                      <!-- </Item> -->
-                    <!-- </TriggerActions> -->
-                 <!-- </Trigger> -->
-                <!-- </Values> -->
-              <!-- </SubTrigger> -->
-            <!-- </Item> -->
-            <!-- TODO: noch Humans zufügen -->
-          </SubTriggers>
-          <TriggerActions>
             <Item>
-              <TriggerAction>
-                <Template>ActionExecuteScript</Template>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
                 <Values>
-                  <Action />
-                  <ActionExecuteScript>
-                  <ScriptFileName>data/scripts_serp/gift_ship_init.lua</ScriptFileName>
-                  </ActionExecuteScript>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Quing</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>79</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|26|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
                 </Values>
-              </TriggerAction>
+              </SubTrigger>
             </Item>
-          </TriggerActions>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Wibblesock</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>80</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|27|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Smith</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>81</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|28|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_OMara</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>82</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|29|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Gasparov</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>83</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|30|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Malching</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>11</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|31|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Gravez</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>48</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|32|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Silva</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>84</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|33|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Hunt</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>79</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|34|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Mercier</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>220</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|64|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_Harlow</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>73</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|17|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>Diplo_Selected_LaFortune</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionNotification</Template>
+                          <Values>
+                            <Action />
+                            <ActionNotification>
+                              <Notification>
+                                <Template>CharacterNotification_GiftShip_Serp</Template>
+                                <Values>
+                                  <CharacterNotification>
+                                    <Profile>76</Profile>
+                                    <ThirdpartyNotificationButtons>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>0</InheritedIndex>
+                                        </VectorElement>
+                                        <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.ChangeOwnerOfSelectionToPID|18|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                      </Item>
+                                      <Item>
+                                        <VectorElement>
+                                          <InheritedIndex>1</InheritedIndex>
+                                        </VectorElement>
+                                      </Item>
+                                    </ThirdpartyNotificationButtons>
+                                  </CharacterNotification>
+                                  <NotificationSubtitle>
+                                    <!-- <SubtitleGroup>1180219215</SubtitleGroup> -->
+                                  </NotificationSubtitle>
+                                </Values>
+                              </Notification>
+                            </ActionNotification>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
           <ResetTrigger>
             <Template>AutoCreateTrigger</Template>
             <Values>
@@ -886,249 +1101,10 @@
         </TriggerSetup>
       </Values>
     </Asset>
-    
-    
-    <!-- This Trigger will only be registered for the human who gifted the ship to someone else -->
-     <!-- the gifting is using "sell"-code, so the gifter received money (already reduced again in notification code) -->
-      <!-- and the "buyer" lost money, which will be credited back here (I hope this trigger is executed before the trade?!) -->
-       <!-- it will start a lua script for all humans, to credit the buyer the money back -->
-    <Asset>
-      <Template>Trigger</Template>
-      <Values>
-        <Standard>
-          <GUID>1500005304</GUID>
-          <Name>Notification-Button Hit to gift ship</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionAlwaysTrue</Template>
-            <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionAlwaysTrue />
-            </Values>
-          </TriggerCondition>
-          <SubTriggers>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionUnlocked</Template>
-                      <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
-                        <ConditionUnlocked>
-                          <UnlockNeeded>1500001613</UnlockNeeded>
-                        </ConditionUnlocked>
-                        <ConditionPropsNegatable />
-                      </Values>
-                    </TriggerCondition>
-                    <SubTriggers>
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionUnlocked</Template>
-                                <Values>
-                                  <Condition>
-                                    <IsOptional>1</IsOptional>
-                                  </Condition>
-                                  <ConditionUnlocked>
-                                    <UnlockNeeded>1500005223</UnlockNeeded>
-                                  </ConditionUnlocked>
-                                  <ConditionPropsNegatable>
-                                    <NegateCondition>1</NegateCondition>
-                                  </ConditionPropsNegatable>
-                                </Values>
-                              </TriggerCondition>
-                              <TriggerActions>                                
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionExecuteScript</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionExecuteScript>
-                                      <ScriptFileName>data/scripts_serp/gift_ship_0to25.lua</ScriptFileName>
-                                      </ActionExecuteScript>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                              </TriggerActions>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                      <!-- TODO andere targets zufügen -->
-                      
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionUnlocked</Template>
-                                <Values>
-                                  <Condition>
-                                    <IsOptional>1</IsOptional>
-                                  </Condition>
-                                  <ConditionUnlocked>
-                                    <UnlockNeeded>1500005244</UnlockNeeded>
-                                  </ConditionUnlocked>
-                                  <ConditionPropsNegatable>
-                                    <NegateCondition>1</NegateCondition>
-                                  </ConditionPropsNegatable>
-                                </Values>
-                              </TriggerCondition>
-                              <TriggerActions>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionExecuteScript</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionExecuteScript>
-                                      <ScriptFileName>data/scripts_serp/gift_ship_0to0.lua</ScriptFileName>
-                                      </ActionExecuteScript>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                              </TriggerActions>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionUnlocked</Template>
-                                <Values>
-                                  <Condition>
-                                    <IsOptional>1</IsOptional>
-                                  </Condition>
-                                  <ConditionUnlocked>
-                                    <UnlockNeeded>1500005245</UnlockNeeded>
-                                  </ConditionUnlocked>
-                                  <ConditionPropsNegatable>
-                                    <NegateCondition>1</NegateCondition>
-                                  </ConditionPropsNegatable>
-                                </Values>
-                              </TriggerCondition>
-                              <TriggerActions>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionExecuteScript</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionExecuteScript>
-                                      <ScriptFileName>data/scripts_serp/gift_ship_0to1.lua</ScriptFileName>
-                                      </ActionExecuteScript>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                              </TriggerActions>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionUnlocked</Template>
-                                <Values>
-                                  <Condition>
-                                    <IsOptional>1</IsOptional>
-                                  </Condition>
-                                  <ConditionUnlocked>
-                                    <UnlockNeeded>1500005246</UnlockNeeded>
-                                  </ConditionUnlocked>
-                                  <ConditionPropsNegatable>
-                                    <NegateCondition>1</NegateCondition>
-                                  </ConditionPropsNegatable>
-                                </Values>
-                              </TriggerCondition>
-                              <TriggerActions>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionExecuteScript</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionExecuteScript>
-                                      <ScriptFileName>data/scripts_serp/gift_ship_0to2.lua</ScriptFileName>
-                                      </ActionExecuteScript>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                              </TriggerActions>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionUnlocked</Template>
-                                <Values>
-                                  <Condition>
-                                    <IsOptional>1</IsOptional>
-                                  </Condition>
-                                  <ConditionUnlocked>
-                                    <UnlockNeeded>1500005247</UnlockNeeded>
-                                  </ConditionUnlocked>
-                                  <ConditionPropsNegatable>
-                                    <NegateCondition>1</NegateCondition>
-                                  </ConditionPropsNegatable>
-                                </Values>
-                              </TriggerCondition>
-                              <TriggerActions>
-                                <Item>
-                                  <TriggerAction>
-                                    <Template>ActionExecuteScript</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionExecuteScript>
-                                      <ScriptFileName>data/scripts_serp/gift_ship_0to3.lua</ScriptFileName>
-                                      </ActionExecuteScript>
-                                    </Values>
-                                  </TriggerAction>
-                                </Item>
-                              </TriggerActions>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                    </SubTriggers>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-          </SubTriggers>
-        </Trigger>
-        <TriggerSetup>
-          <AutoRegisterTrigger>0</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-        </TriggerSetup>
-      </Values>
-    </Asset>
-    
-    
-    
-    
-    
+
   </ModOp>
+  
+  
   
 
 </ModOps>

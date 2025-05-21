@@ -4,6 +4,15 @@
   <!-- verbraucht bis einschl. 1500005295 (1500005296 bis 1500005299 noch frei) -->
    <!-- nutze 1500005300 bis 1500005350 frei für GiftShips, danach kann für allgemeines weiter verwendet werden -->
   
+  
+  <!-- Das System funktioniert so, dass wir ein Shipyrad-like Building haben,  -->
+   <!-- bei dem wir untersch. Optionen anzeigen. -->
+   <!-- Mithilfe von AddAssembly Buffs fügen wir Optionen hinzu bzw. entziehen sie wieder. -->
+    <!-- Zusätzlich kann dann noch Lock verwendet werden (nach jedem Button Hit werden alle Optionen Unhiden). -->
+    <!-- Das Lock kann verwendet werden um die Option nicht wählbar zu haben, oder um zu markieren welches Target (Mitspieler) gewählt wurde. -->
+  <!-- Es werden dummy-"schiffe" gebaut, die unsichtbar sind und per Trigger dann Actions auslösen und sofort wieder gelöscht werden -->
+  
+  
   <!-- TODO TEST: -->
   <!-- es kann im MP passieren, dass Whichplayer  -->
 <!-- ts.Unlock.GetIsUnlocked(1500001613) -->
@@ -15,6 +24,36 @@
   <!-- Da funktioniert dann auch PlayerInGame Check für KIs nicht! -->
  <!-- WICHTIG! -->
   <!-- das noch iwie gefixt bekommen... -->
+   <!-- Whichplayer scheint zu gehen, aber PlayerInGame nicht... -->
+    <!-- liegt daran, dass der PlayerCounter der prüft ob man irgendein Kontor/Schiff -->
+     <!-- besitzt in diesem Save nicht funktioniert. -->
+    <!-- Erst wenn man einen weiteren Kontor baut, wird dieser gezählt. -->
+   <!-- mal versuchen mit CounterValueType=Max.. -->
+  
+
+
+<!-- TODO: -->
+    <!-- nochmal gucken wie wir das mit der Buttonauswahl bei SessionEnter machen (ich glaub wir erzwingen ein "Back"), -->
+     <!-- das könnte im Coop ziemlich nervig sein, ist das noetig? -->
+
+    
+  <!-- Anstatt Humans direkt in Krieg zu zwingen, -->
+   <!-- für sie eine characternotifications anzeigen lassen und dabei text NpcInvokesAlliance nutzen. -->
+    <!-- Ist für das (vermutlich deaktivierte) allianz system, dass man bei Krieg gefragt wird, ob man nun in allianz -->
+     <!-- hilft und dem ziel den krieg erklärt, oder ob man die Allianz bricht. -->
+    <!-- Dies als Buttons ermöglichen. -->
+     <!-- Und auch KI ne Chance einbauen, dass sie um Beistand bittet und Allianz evlt. auflöst (oder ist das Feature noch drin?) -->
+    <!-- <Text> -->
+      <!-- <GUID>256075</GUID> -->
+      <!-- <Text>Es würde mich nicht wundern, wenn auch du das Haus Harlow verraten würdest.</Text> -->
+    <!-- </Text> -->
+    <!-- <Text> -->
+      <!-- <GUID>261514</GUID> -->
+      <!-- <Text>Ich kämpf auch alleine, aber eigentlich haben wir zwei ja n Abkommen.</Text> -->
+    <!-- </Text> -->
+    <!-- <Text> -->
+      <!-- <GUID>261513</GUID> -->
+      <!-- <Text>Du musst entscheiden, wo du stehst. Bei deinen falschen Freunden oder bei mir.</Text> -->
   
   
   <!-- Evlt nochmal umstrukturieren!? -->
@@ -27,6 +66,7 @@
        <!-- während das hier nicht notwendig ist. -->
   <!-- WOBEI: wir wollen ja auch zb. JoinWar locken, um zu zeigen, dass es da ist, aber nicht gewählt werden kann, soalnge man nicht in allianz ist -->
    <!-- Also erstmal nachdenken, ob das so auch noch ohne das Buff-System funktionieren würde!! -->
+    <!-- bleiben erstmal bei buffs. und wenns fertig ist, kann mans immernoch ändern, ist denke ich kein so großer untersch. vom code her -->
   
   
   <!-- TODO: -->
@@ -34,23 +74,10 @@
     <!-- sah beim Testen so aus... -->
   
   
-  <!-- TODO: -->
-    <!-- basierend auf diesen shared mod vllt auch Optionen zufügen wie: -->
-      <!-- Bente fragen, ob Sie Krieg gegen Quing/Priaten erklären will. -->
-    <!-- am Besten würde man das dann via script auswerten, wer wen wie sehr mag und je nach unterschied ja/nein, bzw mit Geldforderung machen (geldforderung vllt über Quest? oder wie?) -->
-    <!-- Aber solange lua nicht im MP coop geht, wäre vermutlich eine Reaction die automatsch die Reputations vergleich (mit dummy schiffen die sich gegenseitig versenken) -->
-     <!-- am sinnvollsten (auch chance dass bündnis zu human aufgelöst wird, wenn Kis auch verbündet mit 50% chance oderso) -->
-   <!-- Daher besser erstmal simpler gestalten: -->
-    <!-- - nur wenn man in alliance mit jemanden ist, kann man verlangen, dass dieser allen den Krieg erklärt, mit denen man selbst im Krieg ist. -->
-     <!-- am einfachsten ohne rep vergleich -->
+
      
-     <!-- Quest anfordern könnte man auch machen,  -->
-      <!-- indem man per lua ts.Quests.CheatEndPoolCooldownNet macht... -->
-       <!-- aber weiß nicht ob das so gut ist, wenn man dadurch häufiger Quests bekommen kann.. -->
-      <!-- falls es klappt, dann am besten Kosten haben, die man durch Quests erledigen wieder einbekommt (zb honro) -->
-       <!-- sodass man immer eine quest anfordern kann und erst wenn diese erledigtist, die nächste anfordern kann, -->
-        <!-- bzw. wenn man sie abbricht und nicht erledigt halt einen verlust hat -->
-  
+
+  <!-- TODO -->
   <!-- wenn viel zeit evlt sogar noch mehr Diplomatie zufügen, im Sinne von: -->
    <!-- KI fragt nicht mehr random nach Waffenstillstand/frieden, sondern nur zb nach verlieren einer Insel, oder  -->
     <!-- wenn militaryshipscore zu niedrig gegenüber dem spieler ist (dennoch mit cooldown oderso) -->
@@ -77,20 +104,14 @@
   
   
   
-  <!-- TODO: -->
-   <!-- noch iwie kenntlich machen, welche KI aktuell ausgewählt ist (nachdem wir eine gewählt haben und dann zu den Actions wechseln) -->
-    <!-- Am besten evlt indem wir Name/Category des Gebäudes ändern, aber weiß nicht ob das möglich ist.. evlt mit nameable und lua? -->
-    <!-- Oder den gelockten AI button weiterhin anzeigen... evlt daneben dann Back und daneben n platzhalter button, den man zur formatierung nutzen kann (sind ja immer 3 in einer reihe) -->
-     <!-- (wobei ein weiteres anzeigen zu sehr vielen einzelnen Buffs führt die nötig wären...) -->
-  
   <!-- der großteil ist aktuell vom difficultysettings mod kopiert -->
   
   
   <!-- TODO: -->
    <!-- noch Humans zufügen, mit Text: -->
     <!-- [AssetData(8884) Text]:  [Participants GetParticipantName(0)] &lt;img height='48' width='48' src="[AssetData([Participants Participant(0) Profile AvatarPortrait]) Icon]"/&gt; -->
-    <!-- Das Icon der Option lässt sich leider nicht automatisch korrekt anpassen -->
   
+  <!-- TODO: evtl mehr properties zu Embassy zufügen, soll ja schon ein richtige Gebäude sein, nicht nur mindestmaß -->
   <ModOp Type="addNextSibling" GUID="153189">
     <Asset>
       <Template>Min_Shipyard_Serp</Template>
@@ -103,12 +124,11 @@
         </Standard>
         <Selection>
           <!-- <ParticipantMessageArcheType>Arctic_Resident_tier01</ParticipantMessageArcheType> -->
-          <!-- <GUIType>Vehicle</GUIType> -->
           <!-- <ParticipantMessageArcheType>Africa_Resident_tier03</ParticipantMessageArcheType> -->
         </Selection>
         <Building>
           <BuildModeRandomRotation>180</BuildModeRandomRotation>
-          <AssociatedRegions>Moderate</AssociatedRegions>
+          <AssociatedRegions>Moderate;Colony01;Africa;Arctic</AssociatedRegions>
           <TerrainType>Terrain</TerrainType>
           <SecondPartyRelevant>0</SecondPartyRelevant>
           <BuildingCategoryName>14539</BuildingCategoryName>
@@ -172,9 +192,49 @@
       <Building>1500005221</Building>
     </Item>
   </ModOp>
+  
+  
+  <!-- sa construction menu 1 (tier) -->
+  <ModOp Type="add" GUID='25000193' Path="/Values/ConstructionCategory/BuildingList">
+    <Item>
+        <Building>1500005221</Building>
+    </Item>
+  </ModOp>
+  <!-- sa construction menu city (category) -->
+  <ModOp Type="add" GUID='500137' Path="/Values/ConstructionCategory/BuildingList">
+    <Item>
+        <Building>1500005221</Building>
+    </Item>
+  </ModOp>
+  <!-- africa construction menu 1 (tier) -->
+  <ModOp Type="add" GUID='114553' Path="/Values/ConstructionCategory/BuildingList">
+    <Item>
+        <Building>1500005221</Building>
+    </Item>
+  </ModOp>
+  <!-- africa construction menu city (category) -->
+  <ModOp Type="add" GUID='119012' Path="/Values/ConstructionCategory/BuildingList">
+    <Item>
+        <Building>1500005221</Building>
+    </Item>
+  </ModOp>
+  <!-- arctic construction menu 1 (tier) -->
+  <ModOp Type="add" GUID='112790' Path="/Values/ConstructionCategory/BuildingList">
+    <Item>
+        <Building>1500005221</Building>
+    </Item>
+  </ModOp>
+  <!-- arctic construction menu city (category) -->
+  <ModOp Type="add" GUID='116343' Path="/Values/ConstructionCategory/BuildingList">
+    <Item>
+        <Building>1500005221</Building>
+    </Item>
+  </ModOp>
+  
+  
   <!-- adding EffectTargets to this asset, because this way my shared mod shared_ShipyardForBuffsTooltip will hide all the ship-details you normally see in a shipyard and instead displays the InfoDescription (and Buff-effects, if there are any) -->
   <ModOp GUID="114166" Type="addNextSibling">
-    
+    <!-- VisibleWhenLocked=1 to always show it (so no need to do UnideAsset) does not work... -->
     <Asset>
       <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
       <Values>
@@ -436,15 +496,13 @@
           <GUID>1500005237</GUID>
           <Name>Select: Sarmento</Name>
           <IconFilename>data/ui/2kimages/main/profiles/3rd_party_05.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>18113</InfoDescription>
         </Standard>
         <Text>
           <TextOverride>29</TextOverride>
         </Text>
       </Values>
     </Asset>
-    
-    
     <Asset>
       <BaseAssetGUID>1500005223</BaseAssetGUID>
       <Values>
@@ -452,7 +510,7 @@
           <GUID>1500005238</GUID>
           <Name>Select: Nate</Name>
           <IconFilename>data/ui/2kimages/main/profiles/3rd_party_06.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>20098</InfoDescription>
         </Standard>
         <Text>
           <TextOverride>77</TextOverride>
@@ -466,7 +524,7 @@
           <GUID>1500005239</GUID>
           <Name>Select: Bleakworth</Name>
           <IconFilename>data/ui/2kimages/main/profiles/3rd_party_07.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>18114</InfoDescription>
         </Standard>
         <Text>
           <TextOverride>46</TextOverride>
@@ -480,7 +538,7 @@
           <GUID>1500005240</GUID>
           <Name>Select: Kahina</Name>
           <IconFilename>data/ui/2kimages/main/profiles/3rd_party_08.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>18115</InfoDescription>
         </Standard>
         <Text>
           <TextOverride>78</TextOverride>
@@ -494,7 +552,7 @@
           <GUID>1500005241</GUID>
           <Name>Select: Ketema</Name>
           <IconFilename>data/ui/2kimages/main/profiles/3rd_party_13.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>132533</InfoDescription>
         </Standard>
         <Text>
           <TextOverride>119051</TextOverride>
@@ -508,7 +566,7 @@
           <GUID>1500005242</GUID>
           <Name>Select: Inuit</Name>
           <IconFilename>data/ui/2kimages/main/profiles/inuit_trader.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>23193</InfoDescription>
         </Standard>
         <Text>
           <TextOverride>237</TextOverride>
@@ -522,7 +580,7 @@
           <GUID>1500005243</GUID>
           <Name>Select: Queen</Name>
           <IconFilename>data/ui/2kimages/main/profiles/3rd_party_01.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>253038</InfoDescription>
         </Standard>
         <Text>
           <TextOverride>75</TextOverride>
@@ -530,6 +588,8 @@
       </Values>
     </Asset>
     
+    <!-- TODO: -->
+     <!-- In Infodescription Name und Icon (portrait) des Humans eintragen -->
     <Asset>
       <BaseAssetGUID>1500005223</BaseAssetGUID>
       <Values>
@@ -537,10 +597,10 @@
           <GUID>1500005244</GUID>
           <Name>Select: Human0</Name>
           <IconFilename>data/graphics_serp/icon_population_level_1_brown.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>41</InfoDescription>
         </Standard>
         <Text>
-          <TextOverride>0</TextOverride>
+          <TextOverride>1500003852</TextOverride>
         </Text>
       </Values>
     </Asset>
@@ -551,10 +611,10 @@
           <GUID>1500005245</GUID>
           <Name>Select: Human1</Name>
           <IconFilename>data/graphics_serp/icon_population_level_2_brown.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>600069</InfoDescription>
         </Standard>
         <Text>
-          <TextOverride>0</TextOverride>
+          <TextOverride>1500003853</TextOverride>
         </Text>
       </Values>
     </Asset>
@@ -565,10 +625,10 @@
           <GUID>1500005246</GUID>
           <Name>Select: Human2</Name>
           <IconFilename>data/graphics_serp/icon_population_level_3_brown.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>600070</InfoDescription>
         </Standard>
         <Text>
-          <TextOverride>0</TextOverride>
+          <TextOverride>1500003854</TextOverride>
         </Text>
       </Values>
     </Asset>
@@ -579,10 +639,10 @@
           <GUID>1500005247</GUID>
           <Name>Select: Human3</Name>
           <IconFilename>data/graphics_serp/icon_population_level_4_brown.png</IconFilename>
-          <InfoDescription>XXXXXXXXXX</InfoDescription>
+          <InfoDescription>42</InfoDescription>
         </Standard>
         <Text>
-          <TextOverride>0</TextOverride>
+          <TextOverride>1500003855</TextOverride>
         </Text>
       </Values>
     </Asset>
@@ -764,6 +824,20 @@
 
   
   
+  <!-- call our register scripts on savegame load -->
+  <ModOp Type="add" GUID="1500004636" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/diploactions.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
   
   
 

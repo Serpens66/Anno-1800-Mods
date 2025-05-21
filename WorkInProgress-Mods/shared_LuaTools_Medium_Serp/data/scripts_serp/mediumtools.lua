@@ -2,6 +2,26 @@
 -- (ok, event_savegame_loaded.lua is called first via ActionExecuteScript and then starts this here via Unlock 1500004636)
 
 
+-- info:
+  -- this is how we can properly add our code to the functions of another mod:
+      -- local Orig_UpdateOfferedDiploButtons = g_DiploActions_Serp.UpdateOfferedDiploButtons
+      -- g_DiploActions_Serp.UpdateOfferedDiploButtons = function(TargetPID,topdiplostate,...)
+        
+        -- return Orig_UpdateOfferedDiploButtons(TargetPID,topdiplostate,...)
+      -- end
+  -- or executing orig first:
+      -- local Orig_UpdateOfferedDiploButtons = g_DiploActions_Serp.UpdateOfferedDiploButtons
+      -- g_DiploActions_Serp.UpdateOfferedDiploButtons = function(TargetPID,topdiplostate,...)
+        -- local ret = Orig_UpdateOfferedDiploButtons(TargetPID,topdiplostate,...) -- execute original first (so it locks everything first)
+        -- ..mycode..
+        -- return ret
+      -- end
+      
+      
+-- info:
+ -- doing a mods.reload() while a lua coroutine (thread) is running very often crashes the game.
+
+
 local ModID = "shared_LuaTools_Medium_Serp mediumtools.lua" -- used for logging
 
 if g_LuaScriptBlockers[ModID]==nil then
@@ -119,15 +139,19 @@ if g_LuaScriptBlockers[ModID]==nil then
     
     -- #####################################################################################################
     
+    
+    
   -- Multiplayer Compatible ChangeOwner Function (automatically synced), called from within a thread
 
-  -- Minor Problem: No Lua command I tried, neither on GameObject Walking nor on userdata (DebugStop/SetDebugGoto/SetMove/MoveTo) does abort the current task/command of the ship (traderoute/escort) (with xml Trigger ActionMoveObject it might work, but we can not properly target there)
+  -- Minor Problem: No Lua command I tried, neither on GameObject Walking nor on userdata (DebugStop/SetDebugGoto/SetMove/MoveTo) does abort the current task/command of the ship (traderoute/escort)
   -- Luckily the AI does give the ships a new command after receiving it. But the humans should make sure to manually stop doing what they did before.
+    -- TODO: Trigger test with ActionStopObjectMovement? but we can not properly target there, only all ships owned by eg. Nature... at least using a Pool of ships owned by 1st/2nd party, so no Quest/helper ships are hit
+    
     
   -- only works for Sellable Objects! (because we use the BuyNet Feature, which is the only way to change owner without desync/forcing everyone in the same session)
   -- When changing the owner to ThirdParty, the ship will leave map (this is what BuyNet does, so normal behaviour when selling a ship to a shiptrader). I think it is ok, since we dont want Pirates and so on to use the same ship GUID like players. So if we really want gifting ship to Pirate, we should also use changeGUID .. in rare cases it does not leave map!
   -- We assume whichever Peer is calling this, is the owner of OID (will be checked again) and want to gift it to To_PID
-   -- So make sure before calling it, only one peer is calling it (either by using UltLuaHelpers or Notification Trick or whatever)
+   -- So make sure before calling it, only one peer is calling it (either by using UltLuaHelpers or Notification Trick or whatever. if all coop peers execute it, then the buy/sell cost compensation is credited multiple times)
   -- use CallGlobalFnBlocked with "ChangeOwnerOIDToPID_"..OID as blocknameadd with ~2 seconds blocktime when calling this to prevent the same peer from executing it multiple times for the same object (eg if done via CharacterNotification Button and the player hits the button multiple times)
    -- set ignoreowner to true if you want to allow gifting the ship, even if Local Player is not the Owner from it
   local function t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner)
@@ -213,8 +237,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     return true
   end
     
-    
-    
+
     -- #####################################################################################################
     -- #####################################################################################################
 
@@ -226,7 +249,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       CallGlobalFnBlocked = CallGlobalFnBlocked,
       AddToQueue = AddToQueue,
       IsThirdPartyTrader = IsThirdPartyTrader,
-      ChangeOwnerOIDToPID = ChangeOwnerOIDToPID,
+      t_ChangeOwnerOIDToPID = t_ChangeOwnerOIDToPID,
       NatureParticipantPID = 158, -- has traderights with everyone (Enum: Mod10, GUID: 1500004528)
       -- Shared_Cache use your ModID or other unique identifier as key. If the UltraTools mod is enabled, this Shared_Cache 
       -- will be saved to Nameable helper to save it to a savegame and will be loaded on loading a game 
@@ -243,7 +266,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       end
       if g_OnGameLeave_serp[ModID]==nil then
         g_OnGameLeave_serp[ModID] = function()
-          g_ObjectFinderSerp = nil
+          g_LTM_Serp = nil
         end
       end
     end)

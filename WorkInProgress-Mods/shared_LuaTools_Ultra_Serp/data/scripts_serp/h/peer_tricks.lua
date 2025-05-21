@@ -176,14 +176,14 @@ if g_LuaScriptBlockers[ModID]==nil then
       local CurrentSessionGuid,LoadedSessions,PreviousSessions,OtherSessionGuid,WeLoadEmptySession,num_activepeers
       
       local SkipSessionTrick = false -- only if this gets true for every peer, we shold skip session switch (so choose conditions that every peer can check)
-      -- TODO: nach test wieder einkommentieren und testen
-      -- if g_LTL_Serp.table_len(g_PeersInfo_Serp.Everactive_Usernames)==g_CoopCountResSerp.TotalCount then -- if all ever active peer are still active, the we can skip the session
-        -- SkipSessionTrick = true -- we already know all inactive peers (none)
-        -- for peerint,username in pairs(g_PeersInfo_Serp.Everactive_Usernames) do
-          -- g_PeersInfo_Serp.ActivePeers[peerint] = username
-        -- end
-        -- g_LTL_Serp.modlog("SkipSessionTrick "..tostring(ts.GameClock.CorporationTime),ModID)
-      -- end
+      -- for testing: outcomment
+      if g_LTL_Serp.table_len(g_PeersInfo_Serp.Everactive_Usernames)==g_CoopCountResSerp.TotalCount then -- if all ever active peer are still active, the we can skip the session
+        SkipSessionTrick = true -- we already know all inactive peers (none)
+        for peerint,username in pairs(g_PeersInfo_Serp.Everactive_Usernames) do
+          g_PeersInfo_Serp.ActivePeers[peerint] = username
+        end
+        g_LTL_Serp.modlog("SkipSessionTrick "..tostring(ts.GameClock.CorporationTime),ModID)
+      end
       
       
       g_LTL_Serp.modlog("FindOutInactivePlayersViaSessionTrick "..tostring(ts.GameClock.CorporationTime),ModID)
@@ -212,7 +212,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         end
       end
       
-      local needs_CoopPeersAtMarker_UI = true -- g_CoopCountResSerp.LocalCount>1 -- TODO test change back to normal
+      local needs_CoopPeersAtMarker_UI = g_CoopCountResSerp.LocalCount>1 -- test for testing, set to true
       g_LTL_Serp.start_thread("Do_GetCoopPeersAtMarker",ModID,t_Do_GetCoopPeersAtMarker,needs_CoopPeersAtMarker_UI,everactive_coops)
       
       if not SkipSessionTrick then

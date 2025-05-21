@@ -1,12 +1,10 @@
 <ModOps>
 
-  
-  <!-- TODO: testen ob ein trigger mehrfach aktiv sein kann, wenn ich oben ActionRegisterTrigger mache und er selbst ein ResetTrigger hat -->
-   <!-- JA, trigger können merhfach aktiv sein! Daher den Aufbau hier noch abändern! -->
+   <!-- 1500001340 bis 1500001390 für die decision unlock triggers -->
+    <!-- aktuell nur besetz bis einschl.: 1500001350 -->
    
-   <!-- 1500001342 bis 1500001399 für die decision unlock triggers -->
-   <!-- pro KI einen für Allianz und einen für Traderights und einen für den timer -->
-    <!-- TODO: in UnlockREquirements der decision kann man bestimmt merhere zufügen (timer hab ich jetzt durch verzögertes registern von 1500001342 eingebuat, kann man aber noch ändern wenn man will) -->
+   
+
    
    <!-- info: -->
     <!-- ActionSpawnObjects mit AssetPool als SpawnGUID macht desync im Multiplayer (weils n random objekt aus dem pool spawned) -->
@@ -20,570 +18,42 @@
      <!-- eine werft besitzt , zb weil KI aus alter welt vertrieben wurde oderso -->
    
    
+   <!-- starting the same trigger guid twice while it is already running does end the quest for whatever reason -->
+    <!-- aber auch ActionDelayedActions um denselben Trigger delayed nochmal zu starten, macht probleme: -->
+     <!-- denn nur eines der Schiffe wird dann als QuestObject gezählt -->
+       <!-- wenn ich schiffe über A7_QuestDummyQuest startet, funktioniert QuestObject garnicht mehr, für keins der schiffe... -->
+   
+   
   <ModOp Type="addNextSibling" GUID="130248">
+    <!-- TODO: check which Paricipant is currently selected -->
+     <!-- then start the Quest belonging to them -->
+     <!-- checking diplomacy is not needed here, since the button should be locked in tha t case already -->
+     
+     
     <Asset>
-      <Template>FeatureUnlock</Template>
+      <Template>Trigger</Template>
       <Values>
         <Standard>
-          <GUID>1500001342</GUID>
-          <Name>Can Ask Bente for Small Fleet</Name>
+          <GUID>1500001341</GUID>
+          <Name>Start Request Small Fleet Quest</Name>
         </Standard>
-        <Locked />
         <Trigger>
           <TriggerCondition>
-            <Template>ConditionDiplomaticState</Template>
+            <Template>ConditionPlayerCounter</Template>
             <Values>
               <Condition />
-              <ConditionDiplomaticState>
-                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
-                <TargetParticipant2>Second_ai_01_Jorgensen</TargetParticipant2>
-                <!-- todo test -->
-                <!-- <DesiredState>Alliance</DesiredState> -->
-                <DesiredState>Peace</DesiredState>
-              </ConditionDiplomaticState>
-              <ConditionPropsNegatable />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>1500003901</Context>
+                <CounterAmount>1</CounterAmount>
+                <RelativeToQuestStart>1</RelativeToQuestStart>
+                <CounterScopeKeepFirstFound>0</CounterScopeKeepFirstFound>
+                <CounterScopeUseActiveSession>0</CounterScopeUseActiveSession>
+                <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext>
+              </ConditionPlayerCounter>
             </Values>
           </TriggerCondition>
           <SubTriggers>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <!-- mindestens EarlyMidGame erreicht, todo test ermstal aus fürs testen -->
-                    <!-- <TriggerCondition> -->
-                      <!-- <Template>ConditionUnlocked</Template> -->
-                      <!-- <Values> -->
-                        <!-- <Condition> -->
-                          <!-- <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> -->
-                        <!-- </Condition> -->
-                        <!-- <ConditionUnlocked> -->
-                          <!-- <UnlockNeeded>140500</UnlockNeeded> -->
-                        <!-- </ConditionUnlocked> -->
-                        <!-- <ConditionPropsNegatable /> -->
-                      <!-- </Values> -->
-                    <!-- </TriggerCondition> -->
-                    <TriggerCondition>
-                      <Template>ConditionTimer</Template>
-                      <Values>
-                        <Condition>
-                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                        </Condition>
-                        <ConditionTimer>
-                          <TimeLimit>1000</TimeLimit>
-                        </ConditionTimer>
-                      </Values>
-                    </TriggerCondition>
-                    <SubTriggers>
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionPlayerCounter</Template>
-                                <Values>
-                                  <Condition />
-                                  <ConditionPlayerCounter>
-                                    <PlayerCounter>ObjectBuilt</PlayerCounter>
-                                    <!-- TODO playercounter pool für shipyards machen, über ModOpContent -->
-                                    <Context>1010520</Context>
-                                    <!-- <Context>130050</Context> -->
-                                    <CounterAmount>1</CounterAmount>
-                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                    <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
-                                    <!-- <CounterScope>Session</CounterScope> -->
-                                    <!-- <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext> -->
-                                    <!-- <CounterScopeContext>180023</CounterScopeContext> -->
-                                  </ConditionPlayerCounter>
-                                </Values>
-                              </TriggerCondition>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                      <Item>
-                        <SubTrigger>
-                          <Template>AutoCreateTrigger</Template>
-                          <Values>
-                            <Trigger>
-                              <TriggerCondition>
-                                <Template>ConditionPlayerCounter</Template>
-                                <Values>
-                                  <Condition />
-                                  <ConditionPlayerCounter>
-                                    <PlayerCounter>ObjectBuilt</PlayerCounter>
-                                    <Context>1010521</Context>
-                                    <!-- <Context>130051</Context> -->
-                                    <CounterAmount>1</CounterAmount>
-                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                    <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
-                                    <!-- <CounterScope>Session</CounterScope> -->
-                                    <!-- <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext> -->
-                                    <!-- <CounterScopeContext>180023</CounterScopeContext> -->
-                                  </ConditionPlayerCounter>
-                                </Values>
-                              </TriggerCondition>
-                            </Trigger>
-                          </Values>
-                        </SubTrigger>
-                      </Item>
-                    </SubTriggers>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-          </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerCondition>
-                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                  <Values>
-                    <Condition>
-                      <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-                    </Condition>
-                    <ConditionAlwaysTrue />
-                  </Values>
-                </TriggerCondition>
-                <SubTriggers>
-                  <Item>
-                    <SubTrigger>
-                      <Template>AutoCreateTrigger</Template>
-                      <Values>
-                        <Trigger>
-                          <TriggerCondition>
-                            <Template>ConditionDiplomaticState</Template>
-                            <Values>
-                              <Condition />
-                              <ConditionDiplomaticState>
-                                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
-                                <TargetParticipant2>Second_ai_01_Jorgensen</TargetParticipant2>
-                                <!-- todo test -->
-                                <!-- <DesiredState>Alliance</DesiredState> -->
-                                <DesiredState>Peace</DesiredState>
-                              </ConditionDiplomaticState>
-                              <ConditionPropsNegatable>
-                                <NegateCondition>1</NegateCondition>
-                              </ConditionPropsNegatable>
-                            </Values>
-                          </TriggerCondition>
-                        </Trigger>
-                      </Values>
-                    </SubTrigger>
-                  </Item>
-                  <Item>
-                    <SubTrigger>
-                      <Template>AutoCreateTrigger</Template>
-                      <Values>
-                        <Trigger>
-                          <TriggerCondition>
-                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                            <Values>
-                              <Condition />
-                              <ConditionAlwaysTrue />
-                            </Values>
-                          </TriggerCondition>
-                          <SubTriggers>
-                            <Item>
-                              <SubTrigger>
-                                <Template>AutoCreateTrigger</Template>
-                                <Values>
-                                  <Trigger>
-                                    <TriggerCondition>
-                                      <Template>ConditionPlayerCounter</Template>
-                                      <Values>
-                                        <Condition />
-                                        <ConditionPlayerCounter>
-                                          <PlayerCounter>ObjectBuilt</PlayerCounter>
-                                          <Context>1010520</Context>
-                                          <!-- <Context>130050</Context> -->
-                                          <ComparisonOp>LessThan</ComparisonOp>
-                                          <CounterAmount>1</CounterAmount>
-                                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                          <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
-                                          <!-- <CounterScope>Session</CounterScope> -->
-                                          <!-- <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext> -->
-                                          <!-- <CounterScopeContext>180023</CounterScopeContext> -->
-                                        </ConditionPlayerCounter>
-                                      </Values>
-                                    </TriggerCondition>
-                                  </Trigger>
-                                </Values>
-                              </SubTrigger>
-                            </Item>
-                            <Item>
-                              <SubTrigger>
-                                <Template>AutoCreateTrigger</Template>
-                                <Values>
-                                  <Trigger>
-                                    <TriggerCondition>
-                                      <Template>ConditionPlayerCounter</Template>
-                                      <Values>
-                                        <Condition />
-                                        <ConditionPlayerCounter>
-                                          <PlayerCounter>ObjectBuilt</PlayerCounter>
-                                          <Context>1010521</Context>
-                                          <!-- <Context>130051</Context> -->
-                                          <ComparisonOp>LessThan</ComparisonOp>
-                                          <CounterAmount>1</CounterAmount>
-                                          <CheckSpecificParticipant>1</CheckSpecificParticipant>
-                                          <CheckedParticipant>Second_ai_01_Jorgensen</CheckedParticipant>
-                                          <!-- <CounterScope>Session</CounterScope> -->
-                                          <!-- <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext> -->
-                                          <!-- <CounterScopeContext>180023</CounterScopeContext> -->
-                                        </ConditionPlayerCounter>
-                                      </Values>
-                                    </TriggerCondition>
-                                  </Trigger>
-                                </Values>
-                              </SubTrigger>
-                            </Item>
-                          </SubTriggers>
-                        </Trigger>
-                      </Values>
-                    </SubTrigger>
-                  </Item>
-                </SubTriggers>
-                <TriggerActions> 
-                  <Item>
-                    <TriggerAction>
-                      <Template>ActionLockAsset</Template>
-                      <Values>
-                        <Action />
-                        <ActionLockAsset>
-                          <LockAssets>
-                            <Item>
-                              <Asset>1500001342</Asset>
-                            </Item>
-                          </LockAssets>
-                        </ActionLockAsset>
-                      </Values>
-                    </TriggerAction>
-                  </Item>
-                </TriggerActions>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
-        </Trigger>
-        <TriggerSetup>
-          <AutoRegisterTrigger>1</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-          <AutoSelfUnlock>1</AutoSelfUnlock>
-        </TriggerSetup>
-      </Values>
-    </Asset>
-      
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001343</GUID>
-          <Name>AlliedWithQing since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001344</GUID>
-          <Name>AlliedWithWibblesock since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001345</GUID>
-          <Name>AlliedWithSmith since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001346</GUID>
-          <Name>AlliedWithOmara since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001347</GUID>
-          <Name>AlliedWithGasparov since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001348</GUID>
-          <Name>AlliedWithMalching since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001349</GUID>
-          <Name>AlliedWithGravez since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001350</GUID>
-          <Name>AlliedWithSilva since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001351</GUID>
-          <Name>AlliedWithHunt since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001352</GUID>
-          <Name>AlliedWithMercier since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001353</GUID>
-          <Name>NeutralTraders SupportFleet since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001354</GUID>
-          <Name>AlliedWithHarlow since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001355</GUID>
-          <Name>AlliedWithLaFortune since x minutes</Name>
-        </Standard>
-        <Locked />
-        <!-- TODO noch wie 1500001342 aubauen -->
-      </Values>
-    </Asset>
-    
-    
-    
-     <!-- session ist hardcoded auf old world, weil wir hier nicht wirklich drankommen wo KI ne werft hat und auch lua code ist limitiert, also einfach old world als session festlegen -->
-    <!-- 2 aufbau möglichkeiten: -->
-      <!-- 1) vom processing spieler vorm spawn prüfen welche schiffe er unlocked hat und nur diese spawnen -->
-        <!-- komplizierter trigger aufbau... , könnte sinnvoller sein einen trigger pro schiffsguid zu machen und den check dann in lua zu machen.. -->
-      <!-- 2) das ganze Triggerset pro KI machen und darin prüfen ob die KI so ein schiff bereits besitzt (unlock können wir nicht prüfen), um quasi zu sehen, dass sie das herstellen kann und daher auch schicken kann. -->
-         <!-- vorteil: spieler kann von KI zu deren fortschritt passende schiffe bekommen. Nachteil: viel zuviele zusätzliche trigger -.- -->
-    
-    <!-- TODO -->
-    <!-- ich glaube es ist wirklich sinnvoller den check in lua zu machen und stattdessen dann einen trigger pro schiffsguid... -->
-      <!-- obei es dann hilreich wäre, wenn man merhere derselben guid spawnen will, wenn man tirgger mehrfach registern könnte -->
-        <!-- ansonsten dummyquest zum spawnen nehmen, die geht denke ich merhfach aktiv -->
-      <!-- JA, trigger können merhfach aktiv sei -->
-    
-    <!-- nicht für jedes luftschiff nen trigger machen, sondern nur 2-4 ausgewählte -->
-    
-    <!-- für diese Spawn Trigger die GUIDs 1500003870 bis 1500003900 freigehalten (1500003871 und ab 1500003879 noch frei) -->
-    
-    <!-- TODO auch luftschiffe mit reinpacken, wenn passend -->
-    
-    <!-- make sure the amounts credited back here are the same we substract in Decision file with ActionAddGoodsToItemContainer -->
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500003870</GUID>
-          <Name>Credit SupportFleetCostsBack onLuaFail</Name>
-        </Standard>
-        <Locked />
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition />
-              <ConditionUnlocked>
-                <UnlockNeeded>1500003870</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <TriggerActions>
-            <Item>
-              <TriggerAction>
-                <Template>ActionAddResource</Template>
-                <Values>
-                  <Action />
-                  <ActionAddResource>
-                    <Resource>1010017</Resource>
-                    <ResourceAmount>5000</ResourceAmount>
-                  </ActionAddResource>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionAddResource</Template>
-                <Values>
-                  <Action />
-                  <ActionAddResource>
-                    <Resource>1500000240</Resource>
-                    <ResourceAmount>20</ResourceAmount>
-                  </ActionAddResource>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>500</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionLockAsset</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
-                                      <Item>
-                                        <Asset>1500003870</Asset>
-                                      </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerCondition>
-                  <Template>ConditionTimer</Template>
-                  <Values>
-                    <Condition />
-                    <ConditionTimer>
-                      <TimeLimit>1000</TimeLimit>
-                    </ConditionTimer>
-                  </Values>
-                </TriggerCondition>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
-        </Trigger>
-        <TriggerSetup>
-          <AutoRegisterTrigger>1</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-          <AutoSelfUnlock>0</AutoSelfUnlock>
-        </TriggerSetup>
-      </Values>
-    </Asset>
-    
-    
-    <Asset>
-      <Template>FeatureUnlock</Template>
-      <Values>
-        <Standard>
-          <GUID>1500003872</GUID>
-          <Name>SpawnSupportFleet_War1</Name>
-        </Standard>
-        <Locked />
-        <Trigger>
-          <!-- <TriggerCondition> -->
-            <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
-            <!-- <Values> -->
-              <!-- <Condition> -->
-                <!-- <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder> -->
-              <!-- </Condition> -->
-              <!-- <ConditionAlwaysTrue /> -->
-            <!-- </Values> -->
-          <!-- </TriggerCondition> -->
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionUnlocked>
-                <UnlockNeeded>1500003872</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <SubTriggers>
-            
-            <!-- wenn ki schon werft hat während human noch earlygame ist, kann mans dennoch erlauben -->
-            <!-- todo test, aber hier packe ich dennoch erstmal testcode rein -->
-            <!-- ruhig mit ActionExecuteActionByChance arbeiten, sodass man zb im LateGame nicht nur fix Schlechtkreuzer bekommt, sondern mit 50% chance auch Linienschiff oder Fire Monitor usw. -->
             <Item>
               <SubTrigger>
                 <Template>AutoCreateTrigger</Template>
@@ -596,251 +66,1256 @@
                           <IsOptional>1</IsOptional>
                         </Condition>
                         <ConditionUnlocked>
-                          <UnlockNeeded>1500002995</UnlockNeeded>
+                          <UnlockNeeded>1500005223</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001246</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005224</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001248</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005225</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001250</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005226</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001252</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005227</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001254</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005228</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001256</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005229</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001258</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005230</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001260</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005231</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001262</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005232</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001264</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005233</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001266</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005234</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001268</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005235</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001270</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005236</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001272</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005238</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001273</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005243</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001274</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionAlwaysTrue</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- using a seperate trigger for other fleet, because ConditionPlayerCounter needs to be main condition, to remember the area properly.. -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001342</GUID>
+          <Name>Start Request Big Fleet Quest</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>1500003902</Context>
+                <CounterAmount>1</CounterAmount>
+                <RelativeToQuestStart>1</RelativeToQuestStart>
+                <CounterScopeKeepFirstFound>0</CounterScopeKeepFirstFound>
+                <CounterScopeUseActiveSession>0</CounterScopeUseActiveSession>
+                <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005223</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001247</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005224</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001249</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005225</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001251</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005226</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001253</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005227</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001255</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005228</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001257</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005229</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001259</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005230</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001261</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005231</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001263</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005232</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001265</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005233</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001267</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005234</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001269</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005235</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001271</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <!-- Queen only neutral 3rd party with big fleet -->
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500005243</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionStartQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionStartQuest>
+                              <Quest>1500001275</Quest>
+                              <InheritQuestSession>1</InheritQuestSession>
+                              <InheritQuestArea>1</InheritQuestArea>
+                            </ActionStartQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionAlwaysTrue</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001340</GUID>
+          <Name>FleetQuestStarted, call lua for ship chance</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001613</UnlockNeeded>
                         </ConditionUnlocked>
                         <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
                     <TriggerActions>
-                      
                       <Item>
                         <TriggerAction>
-                          <Template>ActionSpawnObjects</Template>
+                          <Template>ActionExecuteScript</Template>
                           <Values>
                             <Action />
-                            <ActionSpawnObjects>
-                              <SpawnGUID>1500001298</SpawnGUID>
-                              <Amount>1</Amount>
-                              <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                            </ActionSpawnObjects>
-                            <SpawnArea>
-                              <DistanceToBorder>Near</DistanceToBorder>
-                              <DistanceToIsland>Far</DistanceToIsland>
-                            </SpawnArea>
-                            <SessionFilter>
-                              <Sessions>
-                                <Item>
-                                  <Session>180023</Session>
-                                </Item>
-                              </Sessions>
-                            </SessionFilter>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionExecuteActionByChance</Template>
-                          <Values>
-                            <Action />
-                            <ActionExecuteActionByChance>
-                              <ChanceValue>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <VariableValue>
-                                    <FloatValue>50</FloatValue>
-                                  </VariableValue>
-                                </Values>
-                              </ChanceValue>
-                              <ActionListChanceSuccess>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <ActionList>
-                                    <Actions>
-                                      <Item>
-                                        <Action>
-                                          <Template>ActionSpawnObjects</Template>
-                                          <Values>
-                                            <Action />
-                                            <ActionSpawnObjects>
-                                              <SpawnGUID>1500001291</SpawnGUID>
-                                              <Amount>1</Amount>
-                                              <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                                            </ActionSpawnObjects>
-                                            <SpawnArea>
-                                              <DistanceToBorder>Near</DistanceToBorder>
-                                              <DistanceToIsland>Far</DistanceToIsland>
-                                            </SpawnArea>
-                                            <SessionFilter>
-                                              <Sessions>
-                                                <Item>
-                                                  <Session>180023</Session>
-                                                </Item>
-                                              </Sessions>
-                                            </SessionFilter>
-                                          </Values>
-                                        </Action>
-                                      </Item>
-                                    </Actions>
-                                  </ActionList>
-                                </Values>
-                              </ActionListChanceSuccess>
-                              <ActionListChanceFailure>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <ActionList>
-                                    <Actions>
-                                      <Item>
-                                        <Action>
-                                          <Template>ActionSpawnObjects</Template>
-                                          <Values>
-                                            <Action />
-                                            <ActionSpawnObjects>
-                                              <SpawnGUID>1500001292</SpawnGUID>
-                                              <Amount>1</Amount>
-                                              <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                                            </ActionSpawnObjects>
-                                            <SpawnArea>
-                                              <DistanceToBorder>Near</DistanceToBorder>
-                                              <DistanceToIsland>Far</DistanceToIsland>
-                                            </SpawnArea>
-                                            <SessionFilter>
-                                              <Sessions>
-                                                <Item>
-                                                  <Session>180023</Session>
-                                                </Item>
-                                              </Sessions>
-                                            </SessionFilter>
-                                          </Values>
-                                        </Action>
-                                      </Item>
-                                    </Actions>
-                                  </ActionList>
-                                </Values>
-                              </ActionListChanceFailure>
-                            </ActionExecuteActionByChance>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionExecuteActionByChance</Template>
-                          <Values>
-                            <Action />
-                            <ActionExecuteActionByChance>
-                              <ChanceValue>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <VariableValue>
-                                    <FloatValue>50</FloatValue>
-                                  </VariableValue>
-                                </Values>
-                              </ChanceValue>
-                              <ActionListChanceSuccess>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <ActionList>
-                                    <Actions>
-                                      <Item>
-                                        <Action>
-                                          <Template>ActionSpawnObjects</Template>
-                                          <Values>
-                                            <Action />
-                                            <ActionSpawnObjects>
-                                              <SpawnGUID>1500001291</SpawnGUID>
-                                              <Amount>1</Amount>
-                                              <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                                            </ActionSpawnObjects>
-                                            <SpawnArea>
-                                              <DistanceToBorder>Near</DistanceToBorder>
-                                              <DistanceToIsland>Far</DistanceToIsland>
-                                            </SpawnArea>
-                                            <SessionFilter>
-                                              <Sessions>
-                                                <Item>
-                                                  <Session>180023</Session>
-                                                </Item>
-                                              </Sessions>
-                                            </SessionFilter>
-                                          </Values>
-                                        </Action>
-                                      </Item>
-                                    </Actions>
-                                  </ActionList>
-                                </Values>
-                              </ActionListChanceSuccess>
-                              <ActionListChanceFailure>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <ActionList>
-                                    <Actions>
-                                      <Item>
-                                        <Action>
-                                          <Template>ActionSpawnObjects</Template>
-                                          <Values>
-                                            <Action />
-                                            <ActionSpawnObjects>
-                                              <SpawnGUID>1500001292</SpawnGUID>
-                                              <Amount>1</Amount>
-                                              <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                                            </ActionSpawnObjects>
-                                            <SpawnArea>
-                                              <DistanceToBorder>Near</DistanceToBorder>
-                                              <DistanceToIsland>Far</DistanceToIsland>
-                                            </SpawnArea>
-                                            <SessionFilter>
-                                              <Sessions>
-                                                <Item>
-                                                  <Session>180023</Session>
-                                                </Item>
-                                              </Sessions>
-                                            </SessionFilter>
-                                          </Values>
-                                        </Action>
-                                      </Item>
-                                    </Actions>
-                                  </ActionList>
-                                </Values>
-                              </ActionListChanceFailure>
-                            </ActionExecuteActionByChance>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>ConditionUnlocked</Template>
-                      <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
-                        <ConditionUnlocked>
-                          <UnlockNeeded>1500002996</UnlockNeeded>
-                        </ConditionUnlocked>
-                        <ConditionPropsNegatable />
-                      </Values>
-                    </TriggerCondition>
-                    <TriggerActions> 
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionSpawnObjects</Template>
-                          <Values>
-                            <Action />
-                            <ActionSpawnObjects>
-                              <SpawnGUID>1500001298</SpawnGUID>
-                              <Amount>2</Amount>
-                              <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                            </ActionSpawnObjects>
-                            <SpawnArea>
-                              <DistanceToBorder>Near</DistanceToBorder>
-                              <DistanceToIsland>Far</DistanceToIsland>
-                            </SpawnArea>
-                            <SessionFilter>
-                              <Sessions>
-                                <Item>
-                                  <Session>180023</Session>
-                                </Item>
-                              </Sessions>
-                            </SessionFilter>
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/events/checksupportfleet_0.lua</ScriptFileName>
+                            </ActionExecuteScript>
                           </Values>
                         </TriggerAction>
                       </Item>
@@ -861,33 +1336,88 @@
                           <IsOptional>1</IsOptional>
                         </Condition>
                         <ConditionUnlocked>
-                          <UnlockNeeded>1500002997</UnlockNeeded>
+                          <UnlockNeeded>1500001614</UnlockNeeded>
                         </ConditionUnlocked>
                         <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
-                    <TriggerActions> 
+                    <TriggerActions>
                       <Item>
                         <TriggerAction>
-                          <Template>ActionSpawnObjects</Template>
+                          <Template>ActionExecuteScript</Template>
                           <Values>
                             <Action />
-                            <ActionSpawnObjects>
-                              <SpawnGUID>1500001291</SpawnGUID>
-                              <Amount>2</Amount>
-                              <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                            </ActionSpawnObjects>
-                            <SpawnArea>
-                              <DistanceToBorder>Near</DistanceToBorder>
-                              <DistanceToIsland>Far</DistanceToIsland>
-                            </SpawnArea>
-                            <SessionFilter>
-                              <Sessions>
-                                <Item>
-                                  <Session>180023</Session>
-                                </Item>
-                              </Sessions>
-                            </SessionFilter>
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/events/checksupportfleet_1.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001615</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/events/checksupportfleet_2.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition>
+                          <IsOptional>1</IsOptional>
+                        </Condition>
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001616</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/events/checksupportfleet_3.lua</ScriptFileName>
+                            </ActionExecuteScript>
                           </Values>
                         </TriggerAction>
                       </Item>
@@ -897,961 +1427,19 @@
               </SubTrigger>
             </Item>
           </SubTriggers>
-          <TriggerActions> 
-            <Item>
-              <TriggerAction>
-                <Template>ActionTriggerMinimapPing</Template>
-                <Values>
-                  <Action />
-                  <ActionTriggerMinimapPing>
-                    <PingDuration>5000</PingDuration>
-                    <PingObjectList>
-                      <Item>
-                        <Object>
-                          <Template>ObjectFilter</Template>
-                          <Values>
-                            <ObjectFilter>
-                              <ObjectGUID>1500001290</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                            </ObjectFilter>
-                          </Values>
-                        </Object>
-                      </Item>
-                    </PingObjectList>
-                  </ActionTriggerMinimapPing>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionLockAsset</Template>
-                <Values>
-                  <Action />
-                  <ActionLockAsset>
-                    <LockAssets>
-                      <Item>
-                        <Asset>1500001342</Asset>
-                      </Item>
-                    </LockAssets>
-                  </ActionLockAsset>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>3600000</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionRegisterTrigger</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionRegisterTrigger>
-                                    <TriggerAsset>1500001342</TriggerAsset>
-                                  </ActionRegisterTrigger>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>500</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionLockAsset</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
-                                      <Item>
-                                        <Asset>1500003872</Asset>
-                                      </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerCondition>
-                  <Template>ConditionTimer</Template>
-                  <Values>
-                    <Condition />
-                    <ConditionTimer>
-                      <TimeLimit>1000</TimeLimit>
-                    </ConditionTimer>
-                  </Values>
-                </TriggerCondition>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
         </Trigger>
         <TriggerSetup>
-          <AutoRegisterTrigger>1</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-          <AutoSelfUnlock>0</AutoSelfUnlock>
+            <AutoRegisterTrigger>0</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
         </TriggerSetup>
       </Values>
     </Asset>
     
     
-    <Asset>
-      <BaseAssetGUID>1500003872</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500003873</GUID>
-          <Name>SpawnSupportFleetWar2</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionUnlocked>
-                <UnlockNeeded>1500003873</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <!-- TODO SubTriggers hier erstellen -->
-          <SubTriggers>
-            
-          </SubTriggers>
-          <TriggerActions> 
-            <Item>
-              <TriggerAction>
-                <Template>ActionTriggerMinimapPing</Template>
-                <Values>
-                  <Action />
-                  <ActionTriggerMinimapPing>
-                    <PingDuration>5000</PingDuration>
-                    <PingObjectList>
-                      <Item>
-                        <Object>
-                          <Template>ObjectFilter</Template>
-                          <Values>
-                            <ObjectFilter>
-                              <ObjectGUID>1500001290</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                            </ObjectFilter>
-                          </Values>
-                        </Object>
-                      </Item>
-                    </PingObjectList>
-                  </ActionTriggerMinimapPing>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionLockAsset</Template>
-                <Values>
-                  <Action />
-                  <ActionLockAsset>
-                    <LockAssets>
-                      <Item>
-                        <Asset>1500001342</Asset>
-                      </Item>
-                    </LockAssets>
-                  </ActionLockAsset>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>3600000</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionRegisterTrigger</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionRegisterTrigger>
-                                    <TriggerAsset>1500001342</TriggerAsset>
-                                  </ActionRegisterTrigger>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>500</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionLockAsset</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
-                                      <Item>
-                                        <Asset>1500003873</Asset>
-                                      </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-        </Trigger>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500003872</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500003874</GUID>
-          <Name>SpawnSupportFleet_Trade1</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionUnlocked>
-                <UnlockNeeded>1500003874</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
-          <SubTriggers>
-            
-          </SubTriggers>
-          <TriggerActions> 
-            <Item>
-              <TriggerAction>
-                <Template>ActionTriggerMinimapPing</Template>
-                <Values>
-                  <Action />
-                  <ActionTriggerMinimapPing>
-                    <PingDuration>5000</PingDuration>
-                    <PingObjectList>
-                      <Item>
-                        <Object>
-                          <Template>ObjectFilter</Template>
-                          <Values>
-                            <ObjectFilter>
-                              <ObjectGUID>1500001290</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                            </ObjectFilter>
-                          </Values>
-                        </Object>
-                      </Item>
-                    </PingObjectList>
-                  </ActionTriggerMinimapPing>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionLockAsset</Template>
-                <Values>
-                  <Action />
-                  <ActionLockAsset>
-                    <LockAssets>
-                      <Item>
-                        <Asset>1500001342</Asset>
-                      </Item>
-                    </LockAssets>
-                  </ActionLockAsset>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>3600000</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionRegisterTrigger</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionRegisterTrigger>
-                                    <TriggerAsset>1500001342</TriggerAsset>
-                                  </ActionRegisterTrigger>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>500</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionLockAsset</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
-                                      <Item>
-                                        <Asset>1500003874</Asset>
-                                      </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-        </Trigger>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500003872</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500003875</GUID>
-          <Name>SpawnSupportFleet_Trade2</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionUnlocked>
-                <UnlockNeeded>1500003875</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
-          <SubTriggers>
-            
-          </SubTriggers>
-          <TriggerActions> 
-            <Item>
-              <TriggerAction>
-                <Template>ActionTriggerMinimapPing</Template>
-                <Values>
-                  <Action />
-                  <ActionTriggerMinimapPing>
-                    <PingDuration>5000</PingDuration>
-                    <PingObjectList>
-                      <Item>
-                        <Object>
-                          <Template>ObjectFilter</Template>
-                          <Values>
-                            <ObjectFilter>
-                              <ObjectGUID>1500001290</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                            </ObjectFilter>
-                          </Values>
-                        </Object>
-                      </Item>
-                    </PingObjectList>
-                  </ActionTriggerMinimapPing>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionLockAsset</Template>
-                <Values>
-                  <Action />
-                  <ActionLockAsset>
-                    <LockAssets>
-                      <Item>
-                        <Asset>1500001342</Asset>
-                      </Item>
-                    </LockAssets>
-                  </ActionLockAsset>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>3600000</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionRegisterTrigger</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionRegisterTrigger>
-                                    <TriggerAsset>1500001342</TriggerAsset>
-                                  </ActionRegisterTrigger>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>500</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionLockAsset</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
-                                      <Item>
-                                        <Asset>1500003875</Asset>
-                                      </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-        </Trigger>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500003872</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500003876</GUID>
-          <Name>SpawnSupportFleet_Mixed</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionUnlocked>
-                <UnlockNeeded>1500003876</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
-          <SubTriggers>
-            
-          </SubTriggers>
-          <TriggerActions> 
-            <Item>
-              <TriggerAction>
-                <Template>ActionTriggerMinimapPing</Template>
-                <Values>
-                  <Action />
-                  <ActionTriggerMinimapPing>
-                    <PingDuration>5000</PingDuration>
-                    <PingObjectList>
-                      <Item>
-                        <Object>
-                          <Template>ObjectFilter</Template>
-                          <Values>
-                            <ObjectFilter>
-                              <ObjectGUID>1500001290</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                            </ObjectFilter>
-                          </Values>
-                        </Object>
-                      </Item>
-                    </PingObjectList>
-                  </ActionTriggerMinimapPing>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionLockAsset</Template>
-                <Values>
-                  <Action />
-                  <ActionLockAsset>
-                    <LockAssets>
-                      <Item>
-                        <Asset>1500001342</Asset>
-                      </Item>
-                    </LockAssets>
-                  </ActionLockAsset>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>3600000</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionRegisterTrigger</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionRegisterTrigger>
-                                    <TriggerAsset>1500001342</TriggerAsset>
-                                  </ActionRegisterTrigger>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>500</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionLockAsset</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
-                                      <Item>
-                                        <Asset>1500003876</Asset>
-                                      </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-        </Trigger>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500003872</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500003877</GUID>
-          <Name>SpawnSupportFleet_Pirates</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionUnlocked>
-                <UnlockNeeded>1500003877</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
-          <SubTriggers>
-            
-          </SubTriggers>
-          <TriggerActions> 
-            <Item>
-              <TriggerAction>
-                <Template>ActionTriggerMinimapPing</Template>
-                <Values>
-                  <Action />
-                  <ActionTriggerMinimapPing>
-                    <PingDuration>5000</PingDuration>
-                    <PingObjectList>
-                      <Item>
-                        <Object>
-                          <Template>ObjectFilter</Template>
-                          <Values>
-                            <ObjectFilter>
-                              <ObjectGUID>1500001290</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                            </ObjectFilter>
-                          </Values>
-                        </Object>
-                      </Item>
-                    </PingObjectList>
-                  </ActionTriggerMinimapPing>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionLockAsset</Template>
-                <Values>
-                  <Action />
-                  <ActionLockAsset>
-                    <LockAssets>
-                      <Item>
-                        <Asset>1500001342</Asset>
-                      </Item>
-                    </LockAssets>
-                  </ActionLockAsset>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>3600000</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionRegisterTrigger</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionRegisterTrigger>
-                                    <TriggerAsset>1500001342</TriggerAsset>
-                                  </ActionRegisterTrigger>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>500</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionLockAsset</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
-                                      <Item>
-                                        <Asset>1500003877</Asset>
-                                      </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-        </Trigger>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500003872</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500003878</GUID>
-          <Name>SpawnSupportFleet_Queen</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionUnlocked</Template>
-            <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
-              <ConditionUnlocked>
-                <UnlockNeeded>1500003878</UnlockNeeded>
-              </ConditionUnlocked>
-              <ConditionPropsNegatable />
-            </Values>
-          </TriggerCondition>
-          <!-- TODO SubTriggers hier erstellen, rest kann geeerbt werden -->
-          <SubTriggers>
-            
-          </SubTriggers>
-          <TriggerActions> 
-            <Item>
-              <TriggerAction>
-                <Template>ActionTriggerMinimapPing</Template>
-                <Values>
-                  <Action />
-                  <ActionTriggerMinimapPing>
-                    <PingDuration>5000</PingDuration>
-                    <PingObjectList>
-                      <Item>
-                        <Object>
-                          <Template>ObjectFilter</Template>
-                          <Values>
-                            <ObjectFilter>
-                              <ObjectGUID>1500001290</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                            </ObjectFilter>
-                          </Values>
-                        </Object>
-                      </Item>
-                    </PingObjectList>
-                  </ActionTriggerMinimapPing>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionLockAsset</Template>
-                <Values>
-                  <Action />
-                  <ActionLockAsset>
-                    <LockAssets>
-                      <Item>
-                        <Asset>1500001342</Asset>
-                      </Item>
-                    </LockAssets>
-                  </ActionLockAsset>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>3600000</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionRegisterTrigger</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionRegisterTrigger>
-                                    <TriggerAsset>1500001342</TriggerAsset>
-                                  </ActionRegisterTrigger>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-            <!-- use a small delay before locking again, because in coop the lua code to unlock is called multiple times. so hopefully wait with the lock after all unlock commands are done -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionDelayedActions</Template>
-                <Values>
-                  <Action />
-                  <ActionDelayedActions>
-                    <ExecutionDelay>500</ExecutionDelay>
-                    <DelayedActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionLockAsset</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
-                                      <Item>
-                                        <Asset>1500003878</Asset>
-                                      </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </DelayedActions>
-                  </ActionDelayedActions>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-        </Trigger>
-      </Values>
-    </Asset>
-    
-    
   </ModOp>
+    
+    
+  
  
 
 

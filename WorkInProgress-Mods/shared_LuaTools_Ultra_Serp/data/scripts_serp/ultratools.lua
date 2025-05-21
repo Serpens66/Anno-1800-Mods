@@ -33,7 +33,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       end
       if g_OnGameLeave_serp[ModID]==nil then
         g_OnGameLeave_serp[ModID] = function()
-          g_ObjectFinderSerp = nil
+          g_LTU_Serp = nil
         end
       end
     end)

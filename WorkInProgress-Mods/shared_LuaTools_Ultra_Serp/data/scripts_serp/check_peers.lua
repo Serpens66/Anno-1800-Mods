@@ -74,8 +74,8 @@ if g_LuaScriptBlockers[ModID]==nil then
         end
       end
       
-      -- TODO test nach test wieder einkommentieren sowie "else"
-      -- if ts.GameSetup.GetIsMultiPlayerGame() and not g_LTL_Serp.table_len(g_PeersInfo_Serp.Everactive_Usernames)==1 then
+      -- for testing: outcomment this if statement (and else)
+      if ts.GameSetup.GetIsMultiPlayerGame() and not g_LTL_Serp.table_len(g_PeersInfo_Serp.Everactive_Usernames)==1 then
         
         local PID = g_PeersInfo_Serp.PID -- dont using fn IsCoopTeam_serp here, because we can only use global stuff here and I dont want to make it global. because other mods should use the same fn without needed to wait for lua load of another mod (by using a local version themself)
         
@@ -93,40 +93,40 @@ if g_LuaScriptBlockers[ModID]==nil then
           coroutine.yield()
         end
         
-        -- TODO nach test wieder einkommentieren und auch testen
-        -- if g_LTL_Serp.table_len(everactive_coops[PID])==1 then -- local player has and never had a coop team, then we already now the following
-          -- g_PeersInfo_Serp.PeerInt , g_PeersInfo_Serp.Username = next(everactive_coops[PID])
-          -- g_PeersInfo_Serp.ActiveCoopPeers[g_PeersInfo_Serp.PeerInt] = g_PeersInfo_Serp.Username
-          -- g_PeersInfo_Serp.ActivePeers[g_PeersInfo_Serp.PeerInt] = g_PeersInfo_Serp.Username
-          -- g_PeersInfo_Serp.CoopFinished = true
-          -- local EveryHumanSingleCoop = true -- if every human team ever had a single peer and also currently has a single peer, we know who is who already
-          -- for lPID,cooppeers in pairs(everactive_coops) do
-            -- if g_CoopCountResSerp.CountPerPID[lPID]~=1 then -- currently active peers in this coop team
-              -- EveryHumanSingleCoop = false
-            -- elseif g_LTL_Serp.table_len(cooppeers)~=1 then -- ever active peers in this coop team
-              -- EveryHumanSingleCoop = false
-            -- end
-          -- end
-          -- if EveryHumanSingleCoop then
-            -- for peerint,username in pairs(g_PeersInfo_Serp.Everactive_Usernames) do
-              -- g_PeersInfo_Serp.ActivePeers[peerint] = username
-            -- end
-              -- for i=1,15 do
-                -- if not g_PeersInfo_Serp.ActivePeers[i] and not g_PeersInfo_Serp.InactivePeers[i] then
-                  -- g_PeersInfo_Serp.NeverActivePeers[i] = true
-                -- end
-              -- end
-              -- local i = 1
-              -- for k,v in g_LTL_Serp.pairsByKeys(g_PeersInfo_Serp.PIDsToShareData) do
-                -- if g_PeersInfo_Serp.NeverActivePeers[i]==true then
-                  -- g_PeersInfo_Serp.PIDsToShareData[k] = false -- mark them as not used, so other mods can use them
-                -- end
-              -- end
-            -- g_PeersInfo_Serp.FullFinished = true
-            -- g_LTL_Serp.modlog("EveryHumanSingleCoop active, done",ModID)
-            -- return
-          -- end
-        -- end
+        -- for testing: outcomment this block 
+        if g_LTL_Serp.table_len(everactive_coops[PID])==1 then -- local player has and never had a coop team, then we already now the following
+          g_PeersInfo_Serp.PeerInt , g_PeersInfo_Serp.Username = next(everactive_coops[PID])
+          g_PeersInfo_Serp.ActiveCoopPeers[g_PeersInfo_Serp.PeerInt] = g_PeersInfo_Serp.Username
+          g_PeersInfo_Serp.ActivePeers[g_PeersInfo_Serp.PeerInt] = g_PeersInfo_Serp.Username
+          g_PeersInfo_Serp.CoopFinished = true
+          local EveryHumanSingleCoop = true -- if every human team ever had a single peer and also currently has a single peer, we know who is who already
+          for lPID,cooppeers in pairs(everactive_coops) do
+            if g_CoopCountResSerp.CountPerPID[lPID]~=1 then -- currently active peers in this coop team
+              EveryHumanSingleCoop = false
+            elseif g_LTL_Serp.table_len(cooppeers)~=1 then -- ever active peers in this coop team
+              EveryHumanSingleCoop = false
+            end
+          end
+          if EveryHumanSingleCoop then
+            for peerint,username in pairs(g_PeersInfo_Serp.Everactive_Usernames) do
+              g_PeersInfo_Serp.ActivePeers[peerint] = username
+            end
+              for i=1,15 do
+                if not g_PeersInfo_Serp.ActivePeers[i] and not g_PeersInfo_Serp.InactivePeers[i] then
+                  g_PeersInfo_Serp.NeverActivePeers[i] = true
+                end
+              end
+              local i = 1
+              for k,v in g_LTL_Serp.pairsByKeys(g_PeersInfo_Serp.PIDsToShareData) do
+                if g_PeersInfo_Serp.NeverActivePeers[i]==true then
+                  g_PeersInfo_Serp.PIDsToShareData[k] = false -- mark them as not used, so other mods can use them
+                end
+              end
+            g_PeersInfo_Serp.FullFinished = true
+            g_LTL_Serp.modlog("EveryHumanSingleCoop active, done",ModID)
+            return
+          end
+        end
         
         if g_PeersInfo_Serp.IsUsingPopUp and g_MP_PopUps_Serp~=nil then
           g_LTL_Serp.start_thread("g_MP_PopUps_Serp Start mp_popup",ModID,g_MP_PopUps_Serp.t_Start,everactive_coops)
@@ -138,10 +138,10 @@ if g_LuaScriptBlockers[ModID]==nil then
           return
         end
         
-      -- else -- not multiplayer game
-        -- OnlyOnePeer()
-        -- return
-      -- end
+      else -- not multiplayer game
+        OnlyOnePeer()
+        return
+      end
     end
 
     -- ##################################################################################

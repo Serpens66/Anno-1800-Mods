@@ -16,6 +16,12 @@ local tools_ModID = "shared_LuaTools_Light_Serp"
 -- Scroll to bottom for a list of functions you can use.
 
 
+
+-- info:
+ -- doing a mods.reload() while a lua coroutine (thread) is running very often crashes the game.
+
+
+
 -- #########################################################################################
 -- General Lua helper functions
 -- #########################################################################################
@@ -214,19 +220,19 @@ local function MergeMapsDeep(...)
 end
 
 -- choices = {choice1=10,choice2=20} --> choice2 as double chance to be chosen.
--- I think every choice can only be chosen once
+-- the same choice can be chosen multiple times
 local function weighted_random_choices(choices, num_choices)
-    local function weighted_total(choices)
-        local total = 0
-        for choice, weight in pairs(choices) do
-            total = total + weight
-        end
-        return total
+  local function weighted_total(choices)
+    local total = 0
+    for choice, weight in pairs(choices) do
+      total = total + weight
     end
+    return total
+  end
   local picks = {}
   for i = 1, num_choices do
-      local pick
-      local threshold = math.random() * weighted_total(choices)
+    local pick
+    local threshold = math.random() * weighted_total(choices)
     for choice, weight in pairs(choices) do
       threshold = threshold - weight
       pick = choice
@@ -236,7 +242,7 @@ local function weighted_random_choices(choices, num_choices)
     end
     table.insert(picks, pick)
   end
-    return picks
+  return picks
 end
 
 -- https://stackoverflow.com/a/32660766
@@ -575,19 +581,27 @@ end
 -- - Trickster Anno Helpers
 -- ########################################################################################################
 
--- FnViaTextEmbed is used to execute your custom lua code via ThirdPartyButton on CharacterNotification (which can only execute textembeds, not lua code)
+  -- FnViaTextEmbed is used to execute your custom lua code via ThirdPartyButton on CharacterNotification (which can only execute textembeds, not lua code)
    -- it also makes sure that only the Peer who clicked the Button executes the code (by storing the CompanyName-change only for him and resetting it quite fast (its a delay of ~200 ms before the script is called))
   -- gets called via Trigger 1500005600 , which is Registered eg via CharacterNotification Buttons:
-   -- <Command>[Conditions RegisterTriggerForCurrentParticipant(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_ObjectFinderSerp.IsLoadedSessionByID_2_false)]</Command>
+   -- <Command>[Participants Participant(121) Profile SetCompanyName(g_ObjectFinderSerp.IsLoadedSessionByID|2|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
    -- using unsynced CompanyName from "Scenario3_Challenger4  GUID: 101507 , PID: 121" as helper.
-    -- several characters are not allowed in Names, so use "_" to seperate functionname from arguments
+    -- several characters are not allowed in Names, so use "|" to seperate functionname from arguments
+    -- ProTip:
+    -- by using also CharacterNotification_DummyCommand (ObjectDummies shared mod) instead of ActionExecuteScript it saves from creating a new script and especially from creating one script per human and checking whcih human we are. -->
+     -- by using CharacterNotification_DummyCommand together with the FnViaTextEmbed system, the function is only executed for the PID who executes the trigger (for coop its still executed multiple times!)
+   -- still dont use this too often, because if more than one is using this within ~200ms all except one might be skipped
+      -- so if you can use the typical human0 to human3 scripts, then use them instead. Only use FnViaTextEmbed if you really need to provide arguments, which otherwise would result in tons of scripts
+    -- TODO: test if we somehow make this execute linear... we need to start the FnViaTextEmbed scripts within the same tick...
+      -- no not really. the execution from the Command alone is done ~200ms after the TriggerAction was done. And doing RegisterTriggerForCurrentParticipant within this command takes another 200ms, so in total 400ms after the CharacterNotification was done, it executes the FnViaTextEmbed function
+       -- Doing a ActionRegisterTrigger in the TriggerActions with 200ms delay (instead of doing it within the command) makes them execute at the same tick, but we can not be sure about the execution order and that it is always 200ms -.-
   local function FnViaTextEmbed(PID)
-    if PID == ts.Participants.GetGetCurrentParticipantID() then -- only the correct Participant 
+    if PID==nil or PID == ts.Participants.GetGetCurrentParticipantID() then -- only the correct Participant 
       local TaskString =  ts.Participants.GetParticipant(121).Profile.CompanyName -- TaskString eg: "g_ObjectFinderSerp.IsLoadedSessionByID_2_false"
       local oldname = ts.GetAssetData(101507).Text
       if TaskString~=oldname then -- only the correct Peer (who hit the button)
         ts.Participants.GetParticipant(121).Profile.SetCompanyName(oldname) -- name it back to original
-        local tasksplit = g_LTL_Serp.mysplit(TaskString,"_")
+        local tasksplit = g_LTL_Serp.mysplit(TaskString,"|")
         local funcname = table.remove(tasksplit,1)
         local func = g_LTL_Serp.myeval(funcname)
         for i=1,#tasksplit do

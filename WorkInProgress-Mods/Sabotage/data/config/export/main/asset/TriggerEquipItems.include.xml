@@ -1,8 +1,27 @@
 <ModOps>
 
+  <!-- ALTERNATIVE Idee: (ok funzt nicht) -->
+   <!-- Einfach Einmal-Nutzbare Items in Mengen von 5 oderso mit InitSlots -->
+    <!-- im SpionagePosten spawnen. Diese kann der Spion dann ausrüsten (er selbst spawned fast ohne Items) -->
+   <!-- Dadurch kann Spy nur an Land sabotieren, wenn er so einen Posten baut. Und um noch mehr zu sabotieren, muss er noch einen zweiten bauen, auf derselben Insel. -->
+   <!-- Und wenn man durch mehr Posten stärkere Items unlocken will, dann werden es halt bis zu 3 untersch. Posten, -->
+    <!-- die mit stärkeren Items spawnen, wobei der erste Posten ein Item enthält um einen zweiten stärkeren Posten zu spawnen    -->
+  <!-- ... -->
+  <!-- TESTEN -->
+   <!-- Sind die Items dann im Gebäude, oder auf der Insel (also kann InselOwner dann drauf zugreifen?!) -->
+    <!-- ja alle nicht gesockelten Items sind im Insellager -.- Mist... -->
+    <!-- und wenn man die Items Transferable macht, dann kann man sie auch in slots von Schiffen packen usw. -->
+     <!-- das wollen wir ja auch nicht. -->
+    <!-- Also doch Items spawnen -->
+    
+  <!-- stattdessen vllt doch Shipyard building, welches dann die items im spy spawned. -->
+   <!-- sonst aber genau so... -->
+    
+
+
   <!-- uses guids 1500001587 bis 1500001589  -->
   <!-- und 1500002151 bis 1500002179 -->
-  <!-- 1500002153,  noch frei -->
+  <!-- ,  noch frei -->
   
   
   <!-- TODO WICHTIG: -->
@@ -113,6 +132,7 @@
       <!-- TODO... ConditionItemUsed funzt leider nicht für schuss-items... -->
       <!-- bleibt also nur der Weg jedem item-projektil ein eigenes SpawnOnImpact zu geben.. -->
   
+  <!-- TODO mal testen ob ItemActionCompleted ConditionEvent funzt und ob man GUID definieren kann -->
 
   
   <!-- TODO  -->
@@ -210,15 +230,6 @@
         </Standard>
       </Values>
     </Asset>
-    <!-- <Asset> -->
-      <!-- <BaseAssetGUID>1500002151</BaseAssetGUID> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>1500002153</GUID> -->
-          <!-- <Name>Ressource Item: </Name> -->
-        <!-- </Standard> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
     <Asset>
       <BaseAssetGUID>1500002151</BaseAssetGUID>
       <Values>
@@ -636,20 +647,6 @@
   </ModOp>
   
   
-  <!-- Call script to provide Spy Items on SessionEnter -->
-  <ModOp Type="add" GUID="1500005530" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
-    <Item>
-      <TriggerAction>
-        <Template>ActionRegisterTrigger</Template>
-        <Values>
-          <Action />
-          <ActionRegisterTrigger>
-            <TriggerAsset>1500001588</TriggerAsset>
-          </ActionRegisterTrigger>
-        </Values>
-      </TriggerAction>
-    </Item>
-  </ModOp>
   
   
   <!--  ConditionInStorage trifft nur in Storage (nicht gesockelt) -->
@@ -903,6 +900,60 @@
       </Values>
     </Asset>
     
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500002153</GUID>
+          <Name>SessionEnter check if spy needs items</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>SessionEnter</ConditionEvent>
+                <ContextAssetInfolayer>0</ContextAssetInfolayer>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500001588</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
     
     
     <!-- TODO... ConditionItemUsed funzt leider nicht für schuss-items... -->

@@ -5,10 +5,17 @@
 -- Ist einfach zu unzuverlässig. Haupproblem, dass popups geschlossen werden, wenn spieler zb garde in dem moment session wechselt.
  -- ohne irgendeine info und ohne möglichkeit es nur für diesen peer erneut anzuzeigen..
  
+-- TODO: fürs auto schließen der popusp bei sessionwechsel mal in xml:
+ -- ShortcutIdentifier
+  -- ausprobieren, ob da irgendein wert dafür sorgt, dass ein button bei diesem schließen ausgeführt wird.
+   -- so würde man zumindest darüber informiert (auch wenns dafür eigentlich n extra button geben muss, sonst weiß man nicht obs dieser fail war oder ob button gedrückt wurde)
+
  
 -- TODO:
 -- was passiert wenn wir vor popup noch das delete popup starten und erst wegklicken wenn andere popups laufen?
  -- dann gibts doch bestimmt n mismatch?
+
+
 
 
 -- TODO:
