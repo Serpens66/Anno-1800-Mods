@@ -34,12 +34,18 @@ if g_LuaScriptBlockers[ModID]==nil then
    -- note to self: do not change this function to a thread-only function, because it will be used in CharacterNotification via FnViaTextEmbed 
   local function ChangeOwnerOfSelectionToPID(To_PID,ignoreowner)
     g_LTL_Serp.start_thread("ChangeOwnerOfSelectionToPID",ModID,function()
-      g_LTL_Serp.modlog("ChangeOwnerOfSelectionToPID "..tostring(To_PID).." , "..tostring(ignoreowner),ModID)
-      local OID = g_LTL_Serp.get_OID(session.getSelectedFactory())
-      if OID~=nil and OID~=0 then
-        local success = g_LTM_Serp.t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner) -- must be called from within a thread
-        if success then --
-          
+      local continue = g_LTM_Serp.ContinueCoopCalled()
+      if continue then
+        g_LTL_Serp.modlog("ChangeOwnerOfSelectionToPID "..tostring(To_PID).." , "..tostring(ignoreowner),ModID)
+        local OID = g_LTL_Serp.get_OID(session.getSelectedFactory())
+        if OID~=nil and OID~=0 then
+          local success = g_LTM_Serp.t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner) -- must be called from within a thread
+          if success and continue=="IsFirst" then -- in theory I would credit 1 Rep per ship.. but it desyncs, so we need to register a trigger which starts data/scripts_serp/rep/rep1_gasparov_h0.lua , but we need every possible combination, so tons of scripts if we want to do it like this :D So we only do it if g_LTU_Serp is enabled (not included)
+            local Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
+            if Owner~=nil then -- increase opinion from To_PID towards the Owner of the gifted object
+              g_LTL_Serp.start_thread("ChangeRep1ForGiftShip",ModID,g_LTU_Serp.PeersInfo.t_ExecuteFnWithArgsForPeers,"ts.Participants.SetChangeParticipantReputationTo",nil,nil,"Everyone",To_PID,Owner,1)
+            end
+          end
         end
       end
     end)
@@ -68,31 +74,41 @@ if g_LuaScriptBlockers[ModID]==nil then
     return TargetPIDs
   end
   
-  
-  -- TODO:
-   -- im Coop hab ich 2 Meldungen bekommen "es herrscht nun Krieg zwischen"
-    -- im sp gabs glaub ich nur eine, oder?
-    -- lässt sich ohne Ultra Mod aber denke ich nicht ändern
-  
+    
   -- should not hurt if executed multiple times in coop ...
   local function DeclareWarToAllMyEnemies(TargetPID)
-    local PID = ts.Participants.GetGetCurrentParticipantID()
-    g_LTL_Serp.modlog("DeclareWarToAllMyEnemies "..tostring(PID).." , "..tostring(TargetPID),ModID)
-    local DiplomacyState = g_DiploActions_Serp.DiplomacyState
-    local success = false
-    local JoinWarCandidates = g_DiploActions_Serp.GetJoinWarCandidatesTargetPID(TargetPID)
-    for _,CheckPID in ipairs(JoinWarCandidates) do -- no exception for humans, also they can be forced into war, if in alliance with another human
-      g_LTL_Serp.modlog("DeclareWarToAllMyEnemies, War Declared to "..tostring(CheckPID),ModID)
-      ts.Participants.SetDeclareWar(TargetPID,CheckPID) -- declare war
-      success = true -- at least one
+    local continue = g_LTM_Serp.ContinueCoopCalled()
+    if continue then
+      local PID = ts.Participants.GetGetCurrentParticipantID()
+      g_LTL_Serp.modlog("DeclareWarToAllMyEnemies "..tostring(PID).." , "..tostring(TargetPID),ModID)
+      local DiplomacyState = g_DiploActions_Serp.DiplomacyState
+      local success = false
+      local JoinWarCandidates = g_DiploActions_Serp.GetJoinWarCandidatesTargetPID(TargetPID)
+      for _,CheckPID in ipairs(JoinWarCandidates) do -- no exception for humans, also they can be forced into war, if in alliance with another human
+        g_LTL_Serp.modlog("DeclareWarToAllMyEnemies, War Declared to "..tostring(CheckPID),ModID)
+        if continue=="IsFirst" then -- only execute it once
+          ts.Participants.SetDeclareWar(TargetPID,CheckPID) -- declare war
+        else -- only downside is that it is declared multiple times once perr coop member (multiple messages), but I dont think its too bad.. unless we get negative rep from others for declaring war also multiple times...
+          ts.Participants.SetDeclareWar(TargetPID,CheckPID) -- declare war
+        end
+        success = true -- at least one
+      end
+      if success then
+        g_DiploActions_Serp.UpdateOfferedDiploButtons(TargetPID) -- update buttons
+        
+        if continue=="IsFirst" then
+          if not g_LTL_Serp.IsHuman(TargetPID) then
+            local repmalus = #JoinWarCandidates * (-5) -- -5 rep per new war. calling it here instead in the above loop, because we should call t_ExecuteFnWithArgsForPeers as seldom as possible
+            g_LTL_Serp.start_thread("ChangeRep-5DeclareWarToAllMyEnemies",ModID,g_LTU_Serp.PeersInfo.t_ExecuteFnWithArgsForPeers,"ts.Participants.SetChangeParticipantReputationTo",nil,nil,"Everyone",TargetPID,PID,repmalus)
+          end
+        end
+        
+      end
+      -- if not success then
+        -- credit costs back or so. if we dont use LuaTools_Ultra, we have to do it via an FeatureUnlock in xml, do to it only once, even if coop
+      -- end
+      return success
     end
-    if success then
-      g_DiploActions_Serp.UpdateOfferedDiploButtons(TargetPID) -- update buttons
-    end
-    -- if not success then
-      -- credit costs back or so. if we dont use LuaTools_Ultra, we have to do it via an FeatureUnlock in xml, do to it only once, even if coop
-    -- end
-    return success
   end
   
   local function IsGiftShipAllowed(TargetPID)
@@ -110,11 +126,6 @@ if g_LuaScriptBlockers[ModID]==nil then
   end
   
   
-  -- TODO:
-   -- im Multiplayer klappt das unhide nach dem LockAllDiploButtons noch nicht so richtig,
-    -- vermutlich racecondition.
-    -- Irgendwie sicherer aufbauen, zb. nach LockAllDiploButtons FeatureUnlock starten, welches alles unhided
-  
   -- locking/unlocking offered diplo buttons based in selection and based on relation towards it
   local function UpdateOfferedDiploButtons(TargetPID,topdiplostate)
     local PID = ts.Participants.GetGetCurrentParticipantID()
@@ -131,9 +142,6 @@ if g_LuaScriptBlockers[ModID]==nil then
       if g_DiploActions_Serp.IsGiftShipAllowed(TargetPID) then
         ts.Unlock.SetUnlockNet(g_DiploActions_Serp.DiploButtonsUnlocks.GiftShip)
       end
-      -- if g_LTL_Serp.IsHuman(TargetPID) then -- exceptions for humans?
-        
-      -- end
     elseif TargetPID==nil then -- back button was hit, so no PID is now selected
       
     end

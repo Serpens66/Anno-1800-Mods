@@ -44,6 +44,9 @@ if g_LuaScriptBlockers[ModID]==nil then
     
     local function IsRequestFleetAllowed(TargetPID,topdiplostate,name)
       local PID = ts.Participants.GetGetCurrentParticipantID()
+      if ts.Unlock.GetIsUnlocked(g_SupportFleet_Serp._OnCooldownunlock) then -- as long as it is unlocked, dont allow it
+        return false
+      end
       if not g_SupportFleet_Serp._IsShipAllowed(PID,TargetPID,100437) then -- if not even gunboat is unlocked, dont allow it
         return false
       end
@@ -60,36 +63,56 @@ if g_LuaScriptBlockers[ModID]==nil then
       return false
     end
     
-    -- a function to check which ships we allow to be spawned by the supportfleet request
+    
+    -- a function to check which ships we allow to be spawned by the supportfleet request.
+     -- The Quest to spawn the ships was already started, so they will spawn for sure
+     -- it is executed for each coop peer!
     local function _CheckWhichShips(PID) 
-      local num_ships = 8 -- The max ship amount of biggest supportfleet is currently 8. the ingame amount of spawned ships is determined by the number of ActionRegisterTrigger in the Quest.
-      local TargetPID = g_DiploActions_Serp.GetDiploSelectedPID()
-      local IsThirdParty = TargetPID==15 or g_LTM_Serp.IsThirdPartyTrader(TargetPID)
-      g_LTL_Serp.modlog("_CheckWhichShips (g_SupportFleet_Serp): "..tostring(PID).." towards "..tostring(TargetPID)..", IsThirdParty "..tostring(IsThirdParty),ModID)
-      local choicetable = {}
-      for shipguid,info in pairs(g_SupportFleet_Serp.ShipSpawnUnlocks) do
-        if g_SupportFleet_Serp._IsShipAllowed(PID,TargetPID,shipguid,IsThirdParty) then -- then based on the local player, if we have unlocked the ship
-          choicetable[shipguid] = info.w_chance
-        end
-      end
-      local chosen = g_LTL_Serp.weighted_random_choices(choicetable, num_ships)
-      for i,shipguid in ipairs(chosen) do
-        local unlock = g_SupportFleet_Serp.ShipSpawnUnlocks[shipguid].unlocks[i]
-        if unlock~=nil then
-          ts.Unlock.SetUnlockNet(unlock)
-        end
-        g_LTL_Serp.modlog("_CheckWhichShips chose: "..tostring(shipguid).." index: "..tostring(i),ModID)
-      end
-
-      g_LTL_Serp.start_thread("_CheckWhichShips_lock_again",ModID,function()
-        system.waitForGameTimeDelta(1600) -- at least 1500ms, because of buggy quests. We are not allowed to unlock the condition of an registered trigger. Thats why we start this script first to unlock it, wait with a sustain-objective for 1 second for it to happen and be synced, then registering the triggers in the quest. and only after that we should lock them again here in lua
-        for shipguid,info in pairs(g_SupportFleet_Serp.ShipSpawnUnlocks) do -- lock them again shortly after
-          for _,unlock in ipairs(info.unlocks) do
-            ts.Unlock.SetRelockNet(unlock)
+      local continue = g_LTM_Serp.ContinueCoopCalled()
+      if continue then
+        local num_ships = 8 -- The max ship amount of biggest supportfleet is currently 8. the ingame amount of spawned ships is determined by the number of ActionRegisterTrigger in the Quest.
+        local TargetPID = g_DiploActions_Serp.GetDiploSelectedPID()
+        local IsThirdParty = TargetPID==15 or g_LTM_Serp.IsThirdPartyTrader(TargetPID)
+        g_LTL_Serp.modlog("_CheckWhichShips (g_SupportFleet_Serp): "..tostring(PID).." towards "..tostring(TargetPID)..", IsThirdParty "..tostring(IsThirdParty),ModID)
+        local choicetable = {}
+        for shipguid,info in pairs(g_SupportFleet_Serp.ShipSpawnUnlocks) do
+          if g_SupportFleet_Serp._IsShipAllowed(PID,TargetPID,shipguid,IsThirdParty) then -- then based on the local player, if we have unlocked the ship
+            choicetable[shipguid] = info.w_chance
           end
         end
-      end)
-      
+        local chosen = {}
+        if continue=="IsFirst" then
+          chosen = g_LTL_Serp.weighted_random_choices(choicetable, num_ships)
+        else -- then we should not do random stuff. instead just fill the list one after the other, so it is the same for every local coop peer
+          local k,i = nil,1
+          while i<=num_ships do
+            local shipguid,chance = next(choicetable,k)
+            if shipguid~=nil then
+              table.insert(chosen,shipguid)
+              i = i + 1
+            end
+            k = shipguid
+          end
+        end
+        for i,shipguid in ipairs(chosen) do
+          local unlock = g_SupportFleet_Serp.ShipSpawnUnlocks[shipguid].unlocks[i]
+          if unlock~=nil then
+            ts.Unlock.SetUnlockNet(unlock)
+          end
+          g_LTL_Serp.modlog("_CheckWhichShips chose: "..tostring(shipguid).." index: "..tostring(i),ModID)
+        end
+        
+        ts.Unlock.SetUnlockNet(g_SupportFleet_Serp._OnCooldownunlock) -- start the cooldown for all requests
+
+        g_LTL_Serp.start_thread("_CheckWhichShips_lock_again",ModID,function()
+          system.waitForGameTimeDelta(1600) -- at least 1500ms, because of buggy quests. We are not allowed to unlock the condition of an registered trigger. Thats why we start this script first to unlock it, wait with a sustain-objective for 1 second for it to happen and be synced, then registering the triggers in the quest. and only after that we should lock them again here in lua
+          for shipguid,info in pairs(g_SupportFleet_Serp.ShipSpawnUnlocks) do -- lock them again shortly after
+            for _,unlock in ipairs(info.unlocks) do
+              ts.Unlock.SetRelockNet(unlock)
+            end
+          end
+        end)
+      end
     end
     
     
@@ -128,6 +151,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       _Start = _Start,
       _CheckWhichShips = _CheckWhichShips,
       _IsShipAllowed = _IsShipAllowed,
+      _OnCooldownunlock = 1500003903, -- block request as long as this is unlocked
       ShipSpawnUnlocks = {
         [100437]={unlocks={1500001343,1500001344,1500001345,1500001346,1500001347,1500001348,1500001349,1500001350},w_chance=10},
         [100439]={unlocks={1500001351,1500001352,1500001353,1500001354,1500001355,1500001356,1500001357,1500001358},w_chance=10},

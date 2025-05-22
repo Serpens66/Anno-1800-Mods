@@ -236,7 +236,18 @@ if g_LuaScriptBlockers[ModID]==nil then
     end
     return true
   end
-    
+  
+  -- function you can call within code that is executed for one Human player, but for all coop peers from it.
+  -- if it returns "AllCoop", you can continue your code, but still have in mind that it gets executed multiple times (once per coop)
+   -- if it returns "IsFirst" you can savely call code and be sure its only executed once
+    -- if it returns false, dont execute your code (if you want it to only be executed for the first coop peer)
+  local function ContinueCoopCalled()
+    local continue = "AllCoop"
+    if g_LTU_Serp~=nil and g_LTU_Serp.PeersInfo~=nil and g_LTU_Serp.PeersInfo~=nil then
+      continue = g_LTU_Serp.PeersInfo.AmIFirstActiveCoopPeer() and "IsFirst" or nil
+    end
+    return continue
+  end
 
     -- #####################################################################################################
     -- #####################################################################################################
@@ -249,6 +260,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       CallGlobalFnBlocked = CallGlobalFnBlocked,
       AddToQueue = AddToQueue,
       IsThirdPartyTrader = IsThirdPartyTrader,
+      ContinueCoopCalled = ContinueCoopCalled,
       t_ChangeOwnerOIDToPID = t_ChangeOwnerOIDToPID,
       NatureParticipantPID = 158, -- has traderights with everyone (Enum: Mod10, GUID: 1500004528)
       -- Shared_Cache use your ModID or other unique identifier as key. If the UltraTools mod is enabled, this Shared_Cache 
