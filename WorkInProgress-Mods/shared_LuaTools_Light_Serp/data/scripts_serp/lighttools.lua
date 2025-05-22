@@ -962,6 +962,17 @@ g_LTL_Serp = {
   OIDToOIDtable= OIDToOIDtable,
   get_OID = get_OID,
   
+  PIDs = {
+    Human0={PID=0,GUID=41},Human1={PID=1,GUID=600069},Human2={PID=2,GUID=600070},Human3={PID=3,GUID=42},
+    General_Enemy={PID=9,GUID=44},Neutral={PID=8,GUID=34},
+    Second_ai_01_Jorgensen={PID=25,GUID=47},Second_ai_02_Qing={PID=26,GUID=79},Second_ai_03_Wibblesock={PID=27,GUID=80},
+    Second_ai_04_Smith={PID=28,GUID=81},Second_ai_05_OMara={PID=29,GUID=82},Second_ai_06_Gasparov={PID=30,GUID=83},
+    Second_ai_07_von_Malching={PID=31,GUID=11},Second_ai_08_Gravez={PID=32,GUID=48},Second_ai_09_Silva={PID=33,GUID=84},
+    Second_ai_10_Hunt={PID=34,GUID=79},Second_ai_11_Mercier={PID=64,GUID=220},
+    Third_party_03_Pirate_Harlow={PID=17,GUID=73},Third_party_04_Pirate_LaFortune={PID=18,GUID=76},
+    -- ={PID=,GUID=},={PID=,GUID=},={PID=,GUID=},
+  },
+  
   -- Trickster Anno Helpers
   FnViaTextEmbed = FnViaTextEmbed,
   DoForSessionGameObject = DoForSessionGameObject,

@@ -38,16 +38,9 @@ if g_LuaScriptBlockers[ModID]==nil then
       local OID = g_LTL_Serp.get_OID(session.getSelectedFactory())
       if OID~=nil and OID~=0 then
         local success = g_LTM_Serp.t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner) -- must be called from within a thread
-        -- if success then -- reaction notification and Reputation? 
-          -- TODO Kann ich eventuell einen Shared Reactions mod machen, 
-           -- ne braucht man nicht, ist eig ziemlich straight forward.
-            -- Aber am besten mal eine Schablone/Beispielmod dazu machen
-             -- den ich copy pasten und nur GUIDs und werte austauschen muss
-              -- kann dann auch github code snippets hochgeladen werden
-             -- bzw. vllt auch mit lua kombinieren. victim in current session spawnen
-              -- und mit lua in currentsession bis zu der guid loopen und AddDamagePercent machen.
-             -- Vorteil: Kein Risiko dass falsche schiffe beschossen werden.
-        -- end
+        if success then --
+          
+        end
       end
     end)
   end
