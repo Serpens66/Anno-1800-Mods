@@ -76,10 +76,12 @@ if g_LuaScriptBlockers[ModID]==nil then
   
     
   -- should not hurt if executed multiple times in coop ...
-  local function DeclareWarToAllMyEnemies(TargetPID)
+   -- one of the PIDs can be nil. this one will be replaced by Current then
+  local function DeclareWarToAllMyEnemies(PID,TargetPID)
     local continue = g_LTM_Serp.ContinueCoopCalled()
     if continue then
-      local PID = ts.Participants.GetGetCurrentParticipantID()
+      PID = PID or ts.Participants.GetGetCurrentParticipantID()
+      TargetPID = TargetPID or ts.Participants.GetGetCurrentParticipantID()
       g_LTL_Serp.modlog("DeclareWarToAllMyEnemies "..tostring(PID).." , "..tostring(TargetPID),ModID)
       local DiplomacyState = g_DiploActions_Serp.DiplomacyState
       local success = false
@@ -127,24 +129,33 @@ if g_LuaScriptBlockers[ModID]==nil then
   
   
   -- locking/unlocking offered diplo buttons based in selection and based on relation towards it
+  -- TODO: since we call this fn also from inside lua to update on lua events,
+   -- we need to start a FeatureUnlock which unhides all buttons again (since locking is hiding)
+   -- AND: currently it seems the LockAllDiploButtons (and also locking in suportfleet lua)
+    -- does not lock the objects (when UpdateOfferedDiploButtons is only called via lua) .. needs more debugging to find out the reason
+    -- ich glaub das mit dem lock ist ne race conditoin oderso. denn ganz selten klappt der lock bei supportfleet (und ist dann halt nicht sichtbar, weil unhide fehlt)
   local function UpdateOfferedDiploButtons(TargetPID,topdiplostate)
-    local PID = ts.Participants.GetGetCurrentParticipantID()
-    g_LTL_Serp.modlog("UpdateOfferedDiploButtons: "..tostring(PID).." towards "..tostring(TargetPID)..", topdiplostate "..tostring(topdiplostate),ModID)
-    g_DiploActions_Serp.LockAllDiploButtons()
-    if PID~=TargetPID and TargetPID~=nil then
-      topdiplostate = topdiplostate or ts.Participants.GetTopLevelDiplomacyStateTo(PID,TargetPID)
-      local DiplomacyState = g_DiploActions_Serp.DiplomacyState
-      
-      local JoinWarCandidates = g_DiploActions_Serp.GetJoinWarCandidatesTargetPID(TargetPID)
-      if next(JoinWarCandidates) then
-        ts.Unlock.SetUnlockNet(g_DiploActions_Serp.DiploButtonsUnlocks.JoinWar)
-      end
-      if g_DiploActions_Serp.IsGiftShipAllowed(TargetPID) then
-        ts.Unlock.SetUnlockNet(g_DiploActions_Serp.DiploButtonsUnlocks.GiftShip)
-      end
-    elseif TargetPID==nil then -- back button was hit, so no PID is now selected
-      
-    end
+    g_LTL_Serp.start_thread("UpdateOfferedDiploButtons",ModID,function() -- mainly to catch any errors for our log..
+    
+        local PID = ts.Participants.GetGetCurrentParticipantID()
+        g_LTL_Serp.modlog("UpdateOfferedDiploButtons: "..tostring(PID).." towards "..tostring(TargetPID)..", topdiplostate "..tostring(topdiplostate),ModID)
+        g_DiploActions_Serp.LockAllDiploButtons()
+        if PID~=TargetPID and TargetPID~=nil then
+          topdiplostate = topdiplostate or ts.Participants.GetTopLevelDiplomacyStateTo(PID,TargetPID)
+          local DiplomacyState = g_DiploActions_Serp.DiplomacyState
+          
+          local JoinWarCandidates = g_DiploActions_Serp.GetJoinWarCandidatesTargetPID(TargetPID)
+          if next(JoinWarCandidates) then
+            ts.Unlock.SetUnlockNet(g_DiploActions_Serp.DiploButtonsUnlocks.JoinWar)
+          end
+          if g_DiploActions_Serp.IsGiftShipAllowed(TargetPID) then
+            ts.Unlock.SetUnlockNet(g_DiploActions_Serp.DiploButtonsUnlocks.GiftShip)
+          end
+        elseif TargetPID==nil then -- back button was hit, so no PID is now selected
+          
+        end
+        
+    end)
   end
   
   local function OnPIDDiploSelection(PID)

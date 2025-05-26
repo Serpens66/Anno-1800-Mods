@@ -4,9 +4,10 @@
   -- it will be 1 for singleplayer games
    -- Important:
     -- at best start your script with help of shared_EventOnGameLoaded and load after this CoopCounter mod
-     -- and before you use it, wait for g_CoopCountResSerp.Finished to be true (not nil/false and also not "running"), takes roughly 2 seconds
+     -- and before you use it, wait for g_CoopCountResSerp.Finished to be true, takes roughly 2 seconds
 
 -- ########################################################################################
+
 
 local ModID = "shared_LuaTools_Medium_Serp coopcount.lua"
 if g_LTL_Serp==nil then
@@ -26,6 +27,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     --  and the result is for most script actions synced. So if we credit 1 Ressource in the script, the Human0 will get 3 if it is shared between 3 human players
     -- make sure to execute this for all humans at once at the same time
     local function t_DoMakeNewCount()
+      g_CoopCountResSerp.Finished = false
       if ts.GameSetup.GetIsMultiPlayerGame() then     -- also execute it if we are alone in our coop team, because we want other Participants to know how much peers are active per participant
           coroutine.yield()
           local MyPID = ts.Participants.GetGetCurrentParticipantID()
@@ -67,14 +69,52 @@ if g_LuaScriptBlockers[ModID]==nil then
     
     local function MakeNewCount()
       g_LTL_Serp.modlog("MakeNewCount",ModID)
-      g_LTM_Serp.AddToQueue("g_CoopCountResSerp_MakeNewCount",t_DoMakeNewCount) -- making sure to execute the calls one after the other, if called again, while previous was not finished (eg. when calling it on PlayerLeft multiple times in a row)
+      g_LTM_Serp.AddToQueue("g_CoopCountResSerp_MakeNewCount",t_DoMakeNewCount) -- using AddToQueue to make sure to execute the calls one after the other, if called again, while previous was not finished (eg. when calling it on PlayerLeft multiple times in a row)
     end
-
+    
+    
+    -- you can use the CoopCount number also to calculate a chance that roughly results in the same chance regardless if code is called once or three times:
+    -- CoopPlayercount chance logic
+    -- 1 - ( 1 - partchance)^X = totalchance
+    -- totalchance = the chance I want to have roughly consistent, regardless of number of players (eg. 80%)
+    -- X = number of coop players (=total executing count of the total code)
+    -- partchance = the chance I have to enter into the script so an execution of X times results in the totalchance
+    -- ->
+    -- partchance = 1 - (1 - totalchance)^(1/X)
+    -- eg:
+    -- partchance = 1 - (1 - 0.8)^(1/2) = 0.5527
+    -- partchance = 1 - (1 - 0.8)^(1/3) = 0.4152
+    -- partchance = 1 - (1 - 0.8)^(1/4) = 0.33126
+    -- partchance = 1 - (1 - 0.95)^(1/2) = 0.776
+    -- partchance = 1 - (1 - 0.95)^(1/3) = 0.6316
+    -- partchance = 1 - (1 - 0.95)^(1/4) = 0.5271
+    -- totalchance a number between 0 and 1.
+    -- returns true if you chance said "execute" and false if not execute.
+     -- returns nil if g_CoopCountResSerp is not yet Finished
+    --  also works fine if coopcount is simply 1
+    local function ContinueWithTotalChanceCoop(totalchance)
+      if totalchance==0 then
+        return false
+      elseif totalchance==1 then
+        return true
+      end
+      if g_CoopCountResSerp.Finished then
+        local partchance = 1 - (1 - totalchance)^(1/g_CoopCountResSerp.LocalCount)
+        if math.random() < partchance then
+          return true
+        else
+          return false
+        end
+      end
+      return nil
+    end
+    
     -- this resets automatically whenever this script is called (only on savegame load)
     g_CoopCountResSerp = {
       MakeNewCount = MakeNewCount,
-      LocalCount = 0,
-      TotalCount = 0,
+      ContinueWithTotalChanceCoop = ContinueWithTotalChanceCoop,
+      LocalCount = 0, -- amount of active coop peers in my coop team
+      TotalCount = 0, -- total amout of all active peers
       CountPerPID = {},
       IsPIDActive = {}, -- basically if CountPerPID is bigger 0, just a shortcut with more readable name
       Finished = nil, -- only if true, use any values from here

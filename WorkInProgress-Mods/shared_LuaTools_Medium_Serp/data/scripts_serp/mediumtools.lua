@@ -22,6 +22,11 @@
  -- doing a mods.reload() while a lua coroutine (thread) is running very often crashes the game.
 
 
+-- TODO:
+ -- g_LTL_Serp.GetActiveQuestInstances evlt noch ab und zu, zb. alle 10 minuten,
+  -- callen und in Shared_Cache speichern, was die aktuell höchste ID ist (zsm mit GameTime abspeichern).
+  -- Das kann man dann als startfromID nutzen, wenn man schneller Quests finden will die nach diesem Zeitpunkt gestartet wurden
+
 local ModID = "shared_LuaTools_Medium_Serp mediumtools.lua" -- used for logging
 
 if g_LuaScriptBlockers[ModID]==nil then
@@ -99,7 +104,8 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- checks if the PID has the Trader Property
     -- provide either PID or PID_OID if you already have it (OID of SessionParticipant)
     -- returns nil if it does not know (not found). returns false, if it is not. true if it is.
-    local function IsThirdPartyTrader(PID,PID_OID)
+    local function IsThirdPartyTrader(PID,PID_OID)              
+      -- g_LTL_Serp.modlog("IsThirdPartyTrader called with: PID: "..tostring(PID)..", PID_OID: "..tostring(PID_OID),ModID)
       local ret_IsThirdPartyTrader = nil
       if (PID~=nil and PID~=0) or (PID_OID~=nil and PID_OID~=0) then
         if PID_OID==nil or PID_OID==0 then -- first search local session (because then we can check userdata within g_LTL_Serp.HasProperty)
@@ -107,6 +113,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           for SessionID,session_pids in pairs(sessionparticipants) do
             if session_pids[PID]~=nil then
               PID_OID = session_pids[PID].OID
+              -- g_LTL_Serp.modlog("IsThirdPartyTrader found PID_OID in current session PID_OID: "..tostring(PID_OID),ModID)
             end
           end
         end
@@ -115,23 +122,28 @@ if g_LuaScriptBlockers[ModID]==nil then
           for SessionID,session_pids in pairs(sessionparticipants) do
             if session_pids[PID]~=nil then
               PID_OID = session_pids[PID].OID
+              -- g_LTL_Serp.modlog("IsThirdPartyTrader found PID_OID in First session PID_OID: "..tostring(PID_OID),ModID)
             end
           end
         end
         if PID_OID~=nil and PID_OID~=0 then
           local HasTraderProp = g_LTL_Serp.HasProperty(nil,"Trader",PID_OID)
           if HasTraderProp==nil then -- we dont know, because we are not in the same session (cant get userdata). so we need a workaround
+            -- g_LTL_Serp.modlog("IsThirdPartyTrader HasProperty does not work, checking RerollCosts instead... ",ModID)
             local RerollCosts = g_LTL_Serp.GetVectorGuidsFromSessionObject("[MetaObjects SessionGameObject("..tostring(PID_OID)..") Trader RerollCosts Costs Count]",{ProductGUID="number",Amount="number"})
             ret_IsThirdPartyTrader = false
             for i,RerollCost in pairs(RerollCosts) do
               ret_IsThirdPartyTrader = true
+              -- g_LTL_Serp.modlog("IsThirdPartyTrader found RerollCost",ModID)
               -- g_LTL_Serp.modlog("RerollCost: Product:"..tostring(RerollCost.ProductGUID)..", Amount:"..tostring(RerollCost.Amount),ModID)
               break
             end
           else
+            -- g_LTL_Serp.modlog("IsThirdPartyTrader HasProperty Trader is not nil",ModID)
             ret_IsThirdPartyTrader = HasTraderProp
           end
         end
+      -- g_LTL_Serp.modlog("IsThirdPartyTrader returns "..tostring(ret_IsThirdPartyTrader),ModID)
       return ret_IsThirdPartyTrader
       end
     end
@@ -243,8 +255,8 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- if it returns false, dont execute your code (if you want it to only be executed for the first coop peer)
   local function ContinueCoopCalled()
     local continue = "AllCoop"
-    if g_LTU_Serp~=nil and g_LTU_Serp.PeersInfo~=nil and g_LTU_Serp.PeersInfo~=nil then
-      continue = g_LTU_Serp.PeersInfo.AmIFirstActiveCoopPeer() and "IsFirst" or nil
+    if g_LTU_Serp~=nil and g_LTU_Serp.PeersInfo~=nil and g_LTU_Serp.PeersInfo~=nil then -- only if we also have ultra tools installed we have PeersInfo and therefore can make sure code is only executed for one peer
+      continue = g_LTU_Serp.PeersInfo.AmIFirstActiveCoopPeer() and "IsFirst" or false
     end
     return continue
   end

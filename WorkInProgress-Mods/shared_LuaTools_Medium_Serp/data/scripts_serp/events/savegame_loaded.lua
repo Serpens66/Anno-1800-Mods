@@ -40,57 +40,59 @@ local ModID = "shared_LuaOnGameLoaded_Serp"
 
 
 
-local function t_OnGameLoaded(withwait)
-  if ts.GameSetup.GetIsMultiPlayerGame() then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
-    ts.GameClock.SetSetGameSpeed(3) -- normal gamespeed, coroutines can have trouble on slower speed in some menues
-  end
-  if withwait then -- very first execution needs no wait, because the first execution is after SessionEnter, so players are already ingame
-    -- use a delay (at least 0.7 second), because multiplayer needs this for the code to be executed already ingame (because LeaveUIState fires too fast there)
-    system.waitForGameTimeDelta(700)
-  end
-  g_LuaScriptBlockers = {} -- also reset these tables on game load
-  g_OnGameLeave_serp = {}
-  ts.Unlock.SetUnlockNet(1500004636) -- Execute_SavegameLoadedEvent, unlock this FeatureUnlock to notify other mods
-end
 
 
-local function Do_OnLeaveUIState(UILeft_ID)
-
-  if UILeft_ID == LoadingScreenLeft_ID then
-    g_LTL_Serp.modlog("LoadingScreenLeft",ModID)
-    g_LTL_Serp.start_thread("LoadingScreenLeft Execute_SavegameLoadedEvent",ModID,t_OnGameLoaded,true)
-  elseif UILeft_ID == GameLeft_ID then -- also when just going to main menu and then back to the game (just like LoadingScreenLeft_ID)
-    g_LTL_Serp.modlog("GameLeft",ModID)
-    -- we can not use Triggers/Unlocks here, because game gets closed. So we will use global table g_OnGameLeave_serp
+if event.OnLeaveUIState[ModID] == nil then -- only add it once (per anno game start)
+  
+  
+  local function t_OnGameLoaded(withwait)
     if ts.GameSetup.GetIsMultiPlayerGame() then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
       ts.GameClock.SetSetGameSpeed(3) -- normal gamespeed, coroutines can have trouble on slower speed in some menues
     end
-    for id,fn in pairs(g_OnGameLeave_serp) do
-      if fn~=nil and type(fn)=="function" then
-        local status, err = pcall(fn)
-        if status==false then -- error
-          print("ERROR OnGameLeave: Function from mod "..tostring(id).." had an error: "..tostring(err))
-          g_LTL_Serp.modlog("ERROR OnGameLeave: Function from mod "..tostring(id).." had an error: "..tostring(err),ModID)
-        end
-      else
-        print("ERROR OnGameLeave: Function from mod "..tostring(id).." is no function: "..tostring(fn))
-        g_LTL_Serp.modlog("ERROR OnGameLeave: Function from mod "..tostring(id).." is no function: "..tostring(fn),ModID)
-      end
+    if withwait then -- very first execution needs no wait, because the first execution is after SessionEnter, so players are already ingame
+      -- use a delay (at least 0.7 second), because multiplayer needs this for the code to be executed already ingame (because LeaveUIState fires too fast there)
+      system.waitForGameTimeDelta(700)
     end
-    
-    g_LTL_Serp.StopAllThreads()
-  elseif UILeft_ID == SessionViewLeft_ID then
-    if ts.GameSetup.GetIsMultiPlayerGame() and g_CurrentClock_GameSpeed_Serp < 3 and g_PeersInfo_Serp~=nil and g_PeersInfo_Serp.CoopFinished==true then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
-      g_LTL_Serp.modlog("On SessionViewLeft_ID : Changing GameSpeed to normal speed while in MP and in Menus...",ModID)
-      g_LTL_Serp.start_thread("SessionViewLeft SetSetGameSpeed",ModID,g_PeersInfo_Serp.t_ExecuteFnWithArgsForPeers,"ts.GameClock.SetSetGameSpeed",nil,nil,"Everyone",3)
-      ts.GameClock.SetSetGameSpeed(3) -- also call it directly for local, to minimize Menu problems, since t_ExecuteFnWithArgsForPeers takes some seconds and is a thread itself which gets problems on low speed
-      ts.Unlock.SetUnlockNet(1500004525) -- notification that speed was changed by mod
-    end
+    g_LuaScriptBlockers = {} -- also reset these tables on game load
+    g_OnGameLeave_serp = {}
+    ts.Unlock.SetUnlockNet(1500004636) -- Execute_SavegameLoadedEvent, unlock this FeatureUnlock to notify other mods
   end
 
-end
 
-if event.OnLeaveUIState[ModID] == nil then -- only add it once
+  local function Do_OnLeaveUIState(UILeft_ID)
+    if UILeft_ID == LoadingScreenLeft_ID then
+      g_LTL_Serp.modlog("LoadingScreenLeft",ModID)
+      g_LTL_Serp.start_thread("LoadingScreenLeft Execute_SavegameLoadedEvent",ModID,t_OnGameLoaded,true)
+    elseif UILeft_ID == GameLeft_ID then -- also when just going to main menu and then back to the game (just like LoadingScreenLeft_ID)
+      g_LTL_Serp.modlog("GameLeft",ModID)
+      -- we can not use Triggers/Unlocks here, because game gets closed. So we will use global table g_OnGameLeave_serp
+      if ts.GameSetup.GetIsMultiPlayerGame() then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
+        ts.GameClock.SetSetGameSpeed(3) -- normal gamespeed, coroutines can have trouble on slower speed in some menues
+      end
+      for id,fn in pairs(g_OnGameLeave_serp) do
+        if fn~=nil and type(fn)=="function" then
+          local status, err = pcall(fn)
+          if status==false then -- error
+            print("ERROR OnGameLeave: Function from mod "..tostring(id).." had an error: "..tostring(err))
+            g_LTL_Serp.modlog("ERROR OnGameLeave: Function from mod "..tostring(id).." had an error: "..tostring(err),ModID)
+          end
+        else
+          print("ERROR OnGameLeave: Function from mod "..tostring(id).." is no function: "..tostring(fn))
+          g_LTL_Serp.modlog("ERROR OnGameLeave: Function from mod "..tostring(id).." is no function: "..tostring(fn),ModID)
+        end
+      end
+      g_LTL_Serp.StopAllThreads()
+    elseif UILeft_ID == SessionViewLeft_ID then
+      if ts.GameSetup.GetIsMultiPlayerGame() and g_CurrentClock_GameSpeed_Serp < 3 and g_PeersInfo_Serp~=nil and g_PeersInfo_Serp.CoopFinished==true then -- singleplayer uses a different system (ts.Pause.DecreaseGameSpeed) and the buttons in menu we dont have any access to. If we use SetSetGameSpeed in SP, the gamespeeed will be different from what the buttons show... for multiplayer its more important anyways, since this has issues leaving the game on slow speed
+        g_LTL_Serp.modlog("On SessionViewLeft_ID : Changing GameSpeed to normal speed while in MP and in Menus...",ModID)
+        g_LTL_Serp.start_thread("SessionViewLeft SetSetGameSpeed",ModID,g_PeersInfo_Serp.t_ExecuteFnWithArgsForPeers,"ts.GameClock.SetSetGameSpeed",nil,nil,"Everyone",3)
+        ts.GameClock.SetSetGameSpeed(3) -- also call it directly for local, to minimize Menu problems, since t_ExecuteFnWithArgsForPeers takes some seconds and is a thread itself which gets problems on low speed
+        ts.Unlock.SetUnlockNet(1500004525) -- notification that speed was changed by mod
+      end
+    end
+  end
+  
+  
   
   g_OnGameLeave_serp = {} -- global table where other mods can add their functions to.
   if g_LTL_Serp==nil then

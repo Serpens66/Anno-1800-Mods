@@ -2,21 +2,12 @@
 
    <!-- 1500001340 bis 1500001390 für die decision unlock triggers -->
     <!-- aktuell nur besetz bis einschl.: 1500001350 -->
+    <!-- wieder frei 1500001342 -->
    
-   
-
    
    <!-- info: -->
     <!-- ActionSpawnObjects mit AssetPool als SpawnGUID macht desync im Multiplayer (weils n random objekt aus dem pool spawned) -->
     <!-- daher für MP auch nicht verwendbar -->
-   
-   <!-- Anstatt eine option für allianz und eine für traderights (kleine flotte) zu haben, -->
-    <!-- könnte man auch nur eine option haben und je nach diplo halt mehr oder weniger schiffe spawnen -->
-   
-   <!-- noch überlegen, ob die schiffe neben einer werft der KI gespawned werden sollen, oder am Kartenrand. -->
-    <!-- wenn Kartenrand, dann kann ich aus der Kontrolle ob KI eine Werft besitzt, die Session rausnehmen, sodass es reicht, wenn die KI irgendwo -->
-     <!-- eine werft besitzt , zb weil KI aus alter welt vertrieben wurde oderso -->
-   
    
    <!-- starting the same trigger guid twice while it is already running does end the quest for whatever reason -->
     <!-- aber auch ActionDelayedActions um denselben Trigger delayed nochmal zu starten, macht probleme: -->
@@ -25,34 +16,59 @@
    
    
   <ModOp Type="addNextSibling" GUID="130248">
-    <!-- TODO: check which Paricipant is currently selected -->
-     <!-- then start the Quest belonging to them -->
-     <!-- checking diplomacy is not needed here, since the button should be locked in tha t case already -->
-     
-     
+    
+      <!-- ConditionPlayerCounter macht nur probleme.. -->
+       <!-- und der grund es zu nutzen ist nur, dass wir die Session bekommen, -->
+        <!-- in der das object gebaut wurden. -->
+       <!-- doch anscheinend bekommen wir die eh nicht ?! -->
+       <!-- obwohls bei tests mal funktioniert hatte mit  -->
+        <!-- <PlayerCounter>ObjectBuilt</PlayerCounter> -->
+        <!-- <Context>1500003901</Context> -->
+        <!-- <CounterAmount>1</CounterAmount> -->
+        <!-- <RelativeToQuestStart>1</RelativeToQuestStart> -->
+        <!-- <CounterScopeKeepFirstFound>0</CounterScopeKeepFirstFound> -->
+        <!-- <CounterScopeUseActiveSession>0</CounterScopeUseActiveSession> -->
+        <!-- <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext> -->
+      <!-- jetzt gehts aber nicht mehr (mit unlock verzögert. evlt nochmal nur mit timer testen) -->
+      <!-- ne.. was funktioniert hatte, war dass alle schiffe in derselben session spawnen. -->
+       <!-- aber das funzt auch mit ConditionEvent. Die Quest selbst startet aber immer in der Session, -->
+        <!-- in der man zum Zeitpunkt der Ausführung ist.. TODO Coop testen, obs immer der Host ist.. -->
+      <!-- Achtung: Falls ich ConditionPlayerCounter doch noch verwenden will, muss ich dran denken, -->
+       <!-- dass diese Dummy objecte ja entfernt werden und damit die Main Condition wieder false werden kann, -->
+        <!-- bevor wir evlt. den Chance-Unlock machen konnten -->
+
     <Asset>
       <Template>Trigger</Template>
       <Values>
         <Standard>
           <GUID>1500001341</GUID>
-          <Name>Start Request Small Fleet Quest</Name>
+          <Name>Start Request Fleet Quest</Name>
         </Standard>
         <Trigger>
           <TriggerCondition>
-            <Template>ConditionPlayerCounter</Template>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
             <Values>
-              <Condition />
-              <ConditionPlayerCounter>
-                <PlayerCounter>ObjectBuilt</PlayerCounter>
-                <Context>1500003901</Context>
-                <CounterAmount>1</CounterAmount>
-                <RelativeToQuestStart>1</RelativeToQuestStart>
-                <CounterScopeKeepFirstFound>0</CounterScopeKeepFirstFound>
-                <CounterScopeUseActiveSession>0</CounterScopeUseActiveSession>
-                <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext>
-              </ConditionPlayerCounter>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
             </Values>
           </TriggerCondition>
+          <!-- <TriggerCondition> -->
+            <!-- <Template>ConditionPlayerCounter</Template> -->
+            <!-- <Values> -->
+              <!-- <Condition /> -->
+              <!-- <ConditionPlayerCounter> -->
+                <!-- <PlayerCounter>ObjectBuilt</PlayerCounter> -->
+                <!-- <Context>1500003901</Context> -->
+                <!-- <CounterAmount>1</CounterAmount> -->
+                <!-- <RelativeToQuestStart>1</RelativeToQuestStart> -->
+                <!-- <CounterScopeKeepFirstFound>0</CounterScopeKeepFirstFound> -->
+                <!-- <CounterScopeUseActiveSession>0</CounterScopeUseActiveSession> -->
+                <!-- <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext> -->
+              <!-- </ConditionPlayerCounter> -->
+            <!-- </Values> -->
+          <!-- </TriggerCondition> -->
           <SubTriggers>
             <Item>
               <SubTrigger>
@@ -61,24 +77,99 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Jorgensen</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001246</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionAddResource</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionAddResource>
+                                        <Resource>1010017</Resource>
+                                        <ResourceAmount>100011</ResourceAmount>
+                                      </ActionAddResource>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001246</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001247</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -89,23 +180,86 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Quing</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001248</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001248</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001249</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
                  </Trigger>
                 </Values>
               </SubTrigger>
@@ -117,24 +271,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Wibblesock</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001250</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001250</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001251</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -145,24 +362,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Smith</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001252</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001252</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001253</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -173,24 +453,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_OMara</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001254</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001254</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001255</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -201,24 +544,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Gasparov</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001256</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001256</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001257</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -229,24 +635,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Malching</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001258</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001258</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001259</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -257,24 +726,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Gravez</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001260</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001260</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001261</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -285,24 +817,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Silva</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001262</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001262</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001263</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -313,24 +908,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Hunt</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001264</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001264</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001265</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -341,24 +999,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Mercier</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001266</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001266</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001267</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -371,24 +1092,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Harlow</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001268</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001268</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001269</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -399,24 +1183,87 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_LaFortune</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001270</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001270</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001271</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -428,24 +1275,51 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Blake</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001272</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001272</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -456,24 +1330,51 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Nate</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001273</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001273</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
-                 </Trigger>
+                    </SubTriggers>
+                  </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
@@ -484,23 +1385,86 @@
                   <Trigger>
                     <TriggerCondition>
                       <Template>Diplo_Selected_Queen</Template>
-                      <Values />
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001274</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001274</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionStartQuest</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionStartQuest>
+                                        <Quest>1500001275</Quest>
+                                        <InheritQuestSession>1</InheritQuestSession>
+                                        <InheritQuestArea>1</InheritQuestArea>
+                                      </ActionStartQuest>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
                   </Trigger>
                 </Values>
               </SubTrigger>
@@ -511,7 +1475,7 @@
             <Values>
               <Trigger>
                 <TriggerCondition>
-                  <Template>ConditionAlwaysTrue</Template>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                   <Values>
                     <Condition />
                     <ConditionAlwaysTrue />
@@ -528,449 +1492,6 @@
       </Values>
     </Asset>
     
-    <!-- using a seperate trigger for other fleet, because ConditionPlayerCounter needs to be main condition, to remember the area properly.. -->
-    <Asset>
-      <Template>Trigger</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001342</GUID>
-          <Name>Start Request Big Fleet Quest</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionPlayerCounter</Template>
-            <Values>
-              <Condition />
-              <ConditionPlayerCounter>
-                <PlayerCounter>ObjectBuilt</PlayerCounter>
-                <Context>1500003902</Context>
-                <CounterAmount>1</CounterAmount>
-                <RelativeToQuestStart>1</RelativeToQuestStart>
-                <CounterScopeKeepFirstFound>0</CounterScopeKeepFirstFound>
-                <CounterScopeUseActiveSession>0</CounterScopeUseActiveSession>
-                <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext>
-              </ConditionPlayerCounter>
-            </Values>
-          </TriggerCondition>
-          <SubTriggers>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Jorgensen</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001247</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Quing</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001249</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Wibblesock</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001251</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Smith</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001253</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_OMara</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001255</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Gasparov</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001257</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Malching</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001259</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Gravez</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001261</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Silva</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001263</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Hunt</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001265</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Mercier</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001267</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            
-            
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Harlow</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001269</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_LaFortune</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001271</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                 </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            <!-- Queen only neutral 3rd party with big fleet -->
-            <Item>
-              <SubTrigger>
-                <Template>AutoCreateTrigger</Template>
-                <Values>
-                  <Trigger>
-                    <TriggerCondition>
-                      <Template>Diplo_Selected_Queen</Template>
-                      <Values />
-                    </TriggerCondition>
-                    <TriggerActions>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionStartQuest</Template>
-                          <Values>
-                            <Action />
-                            <ActionStartQuest>
-                              <Quest>1500001275</Quest>
-                              <InheritQuestSession>1</InheritQuestSession>
-                              <InheritQuestArea>1</InheritQuestArea>
-                            </ActionStartQuest>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                    </TriggerActions>
-                  </Trigger>
-                </Values>
-              </SubTrigger>
-            </Item>
-            
-          </SubTriggers>
-          <ResetTrigger>
-            <Template>AutoCreateTrigger</Template>
-            <Values>
-              <Trigger>
-                <TriggerCondition>
-                  <Template>ConditionAlwaysTrue</Template>
-                  <Values>
-                    <Condition />
-                    <ConditionAlwaysTrue />
-                  </Values>
-                </TriggerCondition>
-              </Trigger>
-            </Values>
-          </ResetTrigger>
-        </Trigger>
-        <TriggerSetup>
-            <AutoRegisterTrigger>1</AutoRegisterTrigger>
-            <UsedBySecondParties>0</UsedBySecondParties>
-        </TriggerSetup>
-      </Values>
-    </Asset>
     
     <Asset>
       <Template>Trigger</Template>
@@ -999,7 +1520,7 @@
                       <Template>ConditionUnlocked</Template>
                       <Values>
                         <Condition>
-                          <IsOptional>1</IsOptional>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
                         </Condition>
                         <ConditionUnlocked>
                           <UnlockNeeded>1500001613</UnlockNeeded>
@@ -1007,19 +1528,76 @@
                         <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionExecuteScript</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionExecuteScript>
-                              <ScriptFileName>data/scripts_serp/events/checksupportfleet_0.lua</ScriptFileName>
-                            </ActionExecuteScript>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteScript</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteScript>
+                                        <ScriptFileName>data/scripts_serp/events/onfleetsmall_0.lua</ScriptFileName>
+                                      </ActionExecuteScript>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteScript</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteScript>
+                                        <ScriptFileName>data/scripts_serp/events/onfleetbig_0.lua</ScriptFileName>
+                                      </ActionExecuteScript>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
                   </Trigger>
                 </Values>
               </SubTrigger>
@@ -1033,7 +1611,7 @@
                       <Template>ConditionUnlocked</Template>
                       <Values>
                         <Condition>
-                          <IsOptional>1</IsOptional>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
                         </Condition>
                         <ConditionUnlocked>
                           <UnlockNeeded>1500001614</UnlockNeeded>
@@ -1041,19 +1619,76 @@
                         <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionExecuteScript</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionExecuteScript>
-                              <ScriptFileName>data/scripts_serp/events/checksupportfleet_1.lua</ScriptFileName>
-                            </ActionExecuteScript>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteScript</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteScript>
+                                        <ScriptFileName>data/scripts_serp/events/onfleetsmall_1.lua</ScriptFileName>
+                                      </ActionExecuteScript>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteScript</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteScript>
+                                        <ScriptFileName>data/scripts_serp/events/onfleetbig_1.lua</ScriptFileName>
+                                      </ActionExecuteScript>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
                   </Trigger>
                 </Values>
               </SubTrigger>
@@ -1067,7 +1702,7 @@
                       <Template>ConditionUnlocked</Template>
                       <Values>
                         <Condition>
-                          <IsOptional>1</IsOptional>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
                         </Condition>
                         <ConditionUnlocked>
                           <UnlockNeeded>1500001615</UnlockNeeded>
@@ -1075,19 +1710,76 @@
                         <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionExecuteScript</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionExecuteScript>
-                              <ScriptFileName>data/scripts_serp/events/checksupportfleet_2.lua</ScriptFileName>
-                            </ActionExecuteScript>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteScript</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteScript>
+                                        <ScriptFileName>data/scripts_serp/events/onfleetsmall_2.lua</ScriptFileName>
+                                      </ActionExecuteScript>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteScript</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteScript>
+                                        <ScriptFileName>data/scripts_serp/events/onfleetbig_2.lua</ScriptFileName>
+                                      </ActionExecuteScript>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
                   </Trigger>
                 </Values>
               </SubTrigger>
@@ -1101,7 +1793,7 @@
                       <Template>ConditionUnlocked</Template>
                       <Values>
                         <Condition>
-                          <IsOptional>1</IsOptional>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
                         </Condition>
                         <ConditionUnlocked>
                           <UnlockNeeded>1500001616</UnlockNeeded>
@@ -1109,27 +1801,98 @@
                         <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
-                    <TriggerActions>
+                    <SubTriggers>
                       <Item>
-                        <TriggerAction>
-                          <Template>ActionExecuteScript</Template>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
                           <Values>
-                            <Action />
-                            <ActionExecuteScript>
-                              <ScriptFileName>data/scripts_serp/events/checksupportfleet_3.lua</ScriptFileName>
-                            </ActionExecuteScript>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003901</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteScript</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteScript>
+                                        <ScriptFileName>data/scripts_serp/events/onfleetsmall_3.lua</ScriptFileName>
+                                      </ActionExecuteScript>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
                           </Values>
-                        </TriggerAction>
+                        </SubTrigger>
                       </Item>
-                    </TriggerActions>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionEvent</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionEvent>
+                                    <ConditionEvent>ObjectBuilt</ConditionEvent>
+                                    <ContextAsset>1500003902</ContextAsset>
+                                    <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                                  </ConditionEvent>
+                                  <ConditionPropsNegatable />
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionExecuteScript</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionExecuteScript>
+                                        <ScriptFileName>data/scripts_serp/events/onfleetbig_3.lua</ScriptFileName>
+                                      </ActionExecuteScript>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
                   </Trigger>
                 </Values>
               </SubTrigger>
             </Item>
           </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
         <TriggerSetup>
-            <AutoRegisterTrigger>0</AutoRegisterTrigger>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
             <UsedBySecondParties>0</UsedBySecondParties>
         </TriggerSetup>
       </Values>

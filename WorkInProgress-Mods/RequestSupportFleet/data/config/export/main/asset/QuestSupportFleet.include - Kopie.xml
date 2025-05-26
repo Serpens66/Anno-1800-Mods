@@ -51,6 +51,14 @@
 
     <!-- Für Ablehnung nutzen wir GenericRejection / Generic Rejection, ist das einzige was halbwegs passt  -->
     
+    
+  
+   <!-- we have to start 1500001340 OnQuestActive/OnQuestStart (here identical), because only then the player still has the Target selected in embassy.  -->
+    <!-- and for the started lua script to properly work, we have to start the spawning of the ships already. No time to add eg a DeliveryObjective for payment to the Quest (do the payment differently, eg in the embassy itself) -->
+   <!-- bug: for whatever reason: The Quests aborts if we register a Trigger with ConditionUnlocked which gets unlocked shortly after registering. Thats why we try to unlock it first with lua started via 1500001340 and then 1 second later (sustain) we register the other triggers -->
+  
+   
+  
   
   
   <ModOp Type="addNextSibling" GUID="130248">
@@ -77,6 +85,104 @@
                         <Min>1000</Min>
                         <Max>2000</Max>
                       </Item>
+                    </DeliveryObject_cqd>
+                    <DeliveryType>TargetObject</DeliveryType>
+                    <AllowKontorsToDeliver>1</AllowKontorsToDeliver>
+                    <ConfirmOnReach>1</ConfirmOnReach>
+                    <AllowedDeliveryObjectLayers>Water;Air</AllowedDeliveryObjectLayers>
+                    <DeliveryExecutionPlace>
+                      
+                      <Template>ConditionObjectClientQuestObject</Template>
+                      <Values>
+                        <ConditionObjectClientQuestObject />
+                        <ConditionScanner />
+                        <ConditionObjectiveSignsAndFeedback />
+                      </Values>
+                      
+                      <!-- <Template>ConditionObjectStarterObject</Template> -->
+                      <!-- <Values> -->
+                        <!-- <ConditionScanner /> -->
+                        <!-- <ConditionObjectStarterObject /> -->
+                        <!-- <ConditionObjectiveSignsAndFeedback /> -->
+                      <!-- </Values> -->
+                    </DeliveryExecutionPlace>
+                  </ConditionQuestDelivery>
+                  <ConditionQuestObjective>
+                    <JumpToVisibility>Show</JumpToVisibility>
+                    <TextCombinedContextValue>14033</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ObjectiveScaling>
+                    <ScaleObjectives>1</ScaleObjectives>
+                    <ScaleFactors>
+                      <EarlyGame>
+                        <Factor>1</Factor>
+                      </EarlyGame>
+                      <EarlyMidGame>
+                        <Factor>2</Factor>
+                      </EarlyMidGame>
+                      <MidGame>
+                        <Factor>4</Factor>
+                      </MidGame>
+                      <LateMidGame>
+                        <Factor>8</Factor>
+                      </LateMidGame>
+                      <LateGame>
+                        <Factor>15</Factor>
+                      </LateGame>
+                      <EndGame>
+                        <Factor>30</Factor>
+                      </EndGame>
+                    </ScaleFactors>
+                  </ObjectiveScaling>
+                  <ConditionPropsSessionSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SubQuestObjective</Template>
+                <Values>
+                  <ConditionQuestSubQuest>
+                    <Asset>1500001287</Asset>
+                  </ConditionQuestSubQuest>
+                  <ConditionQuestObjective>
+                    <JumpToVisibility>Hide</JumpToVisibility>
+                  </ConditionQuestObjective>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>A7_QuestSubQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001288</GUID>
+          <Name>Sub Objectives Parallel Pay and Spawn Big</Name>
+          <IconFilename>data/graphics_serp/bigfleet.png</IconFilename>
+        </Standard>
+        <Objectives>
+          <WinConditionCompletionOrder>Parallel</WinConditionCompletionOrder>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>DeliveryObjective</Template>
+                <Values>
+                  <ConditionQuestDelivery>
+                    <DeliveryObject_cqd>
+                      <Item>
+                        <ObjectGUID>1010017</ObjectGUID>
+                        <Min>1000</Min>
+                        <Max>2000</Max>
+                      </Item>
+                      <!-- <Item> -->
+                        <!-- <ObjectGUID>1010196</ObjectGUID> -->
+                        <!-- <Min>1</Min> -->
+                        <!-- <Max>5</Max> -->
+                      <!-- </Item> -->
                     </DeliveryObject_cqd>
                     <DeliveryType>TargetObject</DeliveryType>
                     <AllowKontorsToDeliver>1</AllowKontorsToDeliver>
@@ -130,472 +236,33 @@
             </Item>
             <Item>
               <Objective>
-                <Template>SustainObjective</Template>
+                <Template>SubQuestObjective</Template>
                 <Values>
+                  <ConditionQuestSubQuest>
+                    <Asset>1500001289</Asset>
+                  </ConditionQuestSubQuest>
                   <ConditionQuestObjective>
-                    <TextCombinedContextValue>1500001343</TextCombinedContextValue>
-                    <QuestTrackerIcon>data/ui/2kimages/main/3dicons/icon_time.png</QuestTrackerIcon>
-                    <JumpToVisibility>ShowOnlyFakePings</JumpToVisibility>
-                    <FakeMinimapPings>
-                      <Objects>
-                        <Item>
-                          <FakeMinimapObjects>
-                            <Template>ObjectFilter</Template>
-                            <Values>
-                              <ObjectFilter>
-                                <ObjectGUID>1500001291</ObjectGUID>
-                                <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                              </ObjectFilter>
-                            </Values>
-                          </FakeMinimapObjects>
-                        </Item>
-                        <Item>
-                          <FakeMinimapObjects>
-                            <Template>ObjectFilter</Template>
-                            <Values>
-                              <ObjectFilter>
-                                <ObjectGUID>1500001292</ObjectGUID>
-                                <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                              </ObjectFilter>
-                            </Values>
-                          </FakeMinimapObjects>
-                        </Item>
-                      </Objects>
-                    </FakeMinimapPings>
+                    <JumpToVisibility>Hide</JumpToVisibility>
                   </ConditionQuestObjective>
-                  <ConditionPlayerCounter>
-                    <Context>1500003867</Context>
-                    <CounterAmount>1</CounterAmount>
-                    <ComparisonOp>AtLeast</ComparisonOp>
-                    <CounterValueType>Max</CounterValueType>
-                  </ConditionPlayerCounter>
-                  <ConditionQuestSustain>
-                    <SustainTime>41000</SustainTime>
-                    <SustainObjectiveText>1500001343</SustainObjectiveText>
-                  </ConditionQuestSustain>
-                  <ConditionPropsExecutionPlaceSettings />
                 </Values>
               </Objective>
             </Item>
-            <!-- <Item> -->
-              <!-- <Objective> -->
-                <!-- <Template>SubQuestObjective</Template> -->
-                <!-- <Values> -->
-                  <!-- <ConditionQuestSubQuest> -->
-                    <!-- <Asset>1500001287</Asset> -->
-                  <!-- </ConditionQuestSubQuest> -->
-                  <!-- <ConditionQuestObjective> -->
-                    <!-- <JumpToVisibility>Hide</JumpToVisibility> -->
-                  <!-- </ConditionQuestObjective> -->
-                <!-- </Values> -->
-              <!-- </Objective> -->
-            <!-- </Item> -->
           </WinConditions>
         </Objectives>
       </Values>
     </Asset>
     
     <Asset>
-      <BaseAssetGUID>1500001286</BaseAssetGUID>
+      <Template>A7_QuestSubQuest</Template>
       <Values>
         <Standard>
-          <GUID>1500001288</GUID>
-          <Name>Sub Objectives Parallel Pay and Spawn Big</Name>
-          <IconFilename>data/graphics_serp/bigfleet.png</IconFilename>
-        </Standard>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestDelivery>
-                    <DeliveryObject_cqd>
-                      <Item>
-                        <ObjectGUID>1010017</ObjectGUID>
-                        <Min>1000</Min>
-                        <Max>2000</Max>
-                      </Item>
-                      <!-- <Item> -->
-                        <!-- <ObjectGUID>1010196</ObjectGUID> -->
-                        <!-- <Min>1</Min> -->
-                        <!-- <Max>5</Max> -->
-                      <!-- </Item> -->
-                    </DeliveryObject_cqd>
-                  </ConditionQuestDelivery>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestSustain>
-                    <SustainTime>81000</SustainTime>
-                  </ConditionQuestSustain>
-                </Values>
-              </Objective>
-            </Item>
-            <!-- <Item> -->
-              <!-- <Objective> -->
-                <!-- <Template>SubQuestObjective</Template> -->
-                <!-- <Values> -->
-                  <!-- <ConditionQuestSubQuest> -->
-                    <!-- <Asset>1500001289</Asset> -->
-                  <!-- </ConditionQuestSubQuest> -->
-                  <!-- <ConditionQuestObjective> -->
-                    <!-- <JumpToVisibility>Hide</JumpToVisibility> -->
-                  <!-- </ConditionQuestObjective> -->
-                <!-- </Values> -->
-              <!-- </Objective> -->
-            <!-- </Item> -->
-          </WinConditions>
-        </Objectives>
-      </Values>
-    </Asset>
-    
-    <!-- <Asset> -->
-      <!-- <Template>A7_QuestSubQuest</Template> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>1500001287</GUID> -->
-          <!-- <Name>Sub Objectives Linear Spawn Ships Small</Name> -->
-          <!-- <IconFilename>data/graphics_serp/smallfleet.png</IconFilename> -->
-        <!-- </Standard> -->
-        <!-- <Objectives> -->
-          <!-- <WinConditionCompletionOrder>Linear</WinConditionCompletionOrder> -->
-          <!-- <WinConditions> -->
-            <!-- <Item> -->
-              <!-- <Objective> -->
-                <!-- <Template>SustainObjective</Template> -->
-                <!-- <Values> -->
-                  <!-- <ConditionQuestObjective> -->
-                    <!-- <IsVisibleInQuestTracker>0</IsVisibleInQuestTracker> -->
-                    <!-- <JumpToVisibility>Hide</JumpToVisibility> -->
-                    <!-- <LinkAllQuestActionsToQuest>1</LinkAllQuestActionsToQuest> -->
-                    
-                  <!-- </ConditionQuestObjective> -->
-                  <!-- <ConditionPlayerCounter> -->
-                    <!-- <Context>1500003867</Context> -->
-                    <!-- <CounterAmount>1</CounterAmount> -->
-                    <!-- <ComparisonOp>AtLeast</ComparisonOp> -->
-                    <!-- <CounterValueType>Max</CounterValueType> -->
-                  <!-- </ConditionPlayerCounter> -->
-                  <!-- <ConditionQuestSustain> -->
-                    <!-- <SustainTime>1000</SustainTime> -->
-                  <!-- </ConditionQuestSustain> -->
-                  <!-- <ConditionPropsExecutionPlaceSettings /> -->
-                <!-- </Values> -->
-              <!-- </Objective> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <Objective> -->
-                <!-- <Template>SustainObjective</Template> -->
-                <!-- <Values> -->
-                  <!-- <ConditionQuestObjective> -->
-                    <!-- <TextCombinedContextValue>1500001343</TextCombinedContextValue> -->
-                    <!-- <QuestTrackerIcon>data/ui/2kimages/main/3dicons/icon_time.png</QuestTrackerIcon> -->
-                    <!-- <JumpToVisibility>ShowOnlyFakePings</JumpToVisibility> -->
-                    <!-- <FakeMinimapPings> -->
-                      <!-- <Objects> -->
-                        <!-- <Item> -->
-                          <!-- <FakeMinimapObjects> -->
-                            <!-- <Template>ObjectFilter</Template> -->
-                            <!-- <Values> -->
-                              <!-- <ObjectFilter> -->
-                                <!-- <ObjectGUID>1500001291</ObjectGUID> -->
-                                <!-- <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects> -->
-                              <!-- </ObjectFilter> -->
-                            <!-- </Values> -->
-                          <!-- </FakeMinimapObjects> -->
-                        <!-- </Item> -->
-                        <!-- <Item> -->
-                          <!-- <FakeMinimapObjects> -->
-                            <!-- <Template>ObjectFilter</Template> -->
-                            <!-- <Values> -->
-                              <!-- <ObjectFilter> -->
-                                <!-- <ObjectGUID>1500001292</ObjectGUID> -->
-                                <!-- <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects> -->
-                              <!-- </ObjectFilter> -->
-                            <!-- </Values> -->
-                          <!-- </FakeMinimapObjects> -->
-                        <!-- </Item> -->
-                      <!-- </Objects> -->
-                    <!-- </FakeMinimapPings> -->
-                  <!-- </ConditionQuestObjective> -->
-                  <!-- <ConditionPlayerCounter> -->
-                    <!-- <Context>1500003867</Context> -->
-                    <!-- <CounterAmount>1</CounterAmount> -->
-                    <!-- <ComparisonOp>AtLeast</ComparisonOp> -->
-                    <!-- <CounterValueType>Max</CounterValueType> -->
-                  <!-- </ConditionPlayerCounter> -->
-                  <!-- <ConditionQuestSustain> -->
-                    <!-- <SustainTime>41000</SustainTime> -->
-                    <!-- <SustainObjectiveText>1500001343</SustainObjectiveText> -->
-                  <!-- </ConditionQuestSustain> -->
-                  <!-- <ConditionPropsExecutionPlaceSettings /> -->
-                <!-- </Values> -->
-              <!-- </Objective> -->
-            <!-- </Item> -->
-          <!-- </WinConditions> -->
-        <!-- </Objectives> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
-    
-    <!-- <Asset> -->
-      <!-- <BaseAssetGUID>1500001287</BaseAssetGUID> -->
-      <!-- <Values> -->
-        <!-- <Standard> -->
-          <!-- <GUID>1500001289</GUID> -->
-          <!-- <Name>Sub Objectives Linear Spawn Ships Big</Name> -->
-          <!-- <IconFilename>data/graphics_serp/bigfleet.png</IconFilename> -->
-        <!-- </Standard> -->
-        <!-- <Objectives> -->
-          <!-- <WinConditionCompletionOrder>Linear</WinConditionCompletionOrder> -->
-          <!-- <WinConditions> -->
-            <!-- <Item> -->
-              <!-- <VectorElement> -->
-                <!-- <InheritedIndex>0</InheritedIndex> -->
-              <!-- </VectorElement> -->
-              <!-- <Objective> -->
-                <!-- <Template>SustainObjective</Template> -->
-                <!-- <Values> -->
-                  <!-- <ConditionQuestObjective> -->
-                    
-                  <!-- </ConditionQuestObjective> -->
-                <!-- </Values> -->
-              <!-- </Objective> -->
-            <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <VectorElement> -->
-                <!-- <InheritedIndex>1</InheritedIndex> -->
-              <!-- </VectorElement> -->
-              <!-- <Objective> -->
-                <!-- <Values> -->
-                  <!-- <ConditionQuestSustain> -->
-                    <!-- <SustainTime>81000</SustainTime> -->
-                  <!-- </ConditionQuestSustain> -->
-                <!-- </Values> -->
-              <!-- </Objective> -->
-            <!-- </Item> -->
-          <!-- </WinConditions> -->
-        <!-- </Objectives> -->
-      <!-- </Values> -->
-    <!-- </Asset> -->
-  
-    <Asset>
-      <Template>A7_QuestStatusQuo</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001246</GUID>
-          <Name>Request Small Fleet Bente</Name>
+          <GUID>1500001287</GUID>
+          <Name>Sub Objectives Linear Spawn Ships Small</Name>
           <IconFilename>data/graphics_serp/smallfleet.png</IconFilename>
         </Standard>
-        <Text>
-          <TextOverride>1500003901</TextOverride>
-        </Text>
-        <Quest>
-          <ResolveConfirmationMessage />
-          <StarterMessage>
-            <SuppressMessage>1</SuppressMessage>
-          </StarterMessage>
-          <AbortedAutomaticallyMessage>
-            <Notification>
-              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-              <Values>
-                <CharacterNotification>
-                  <NotificationTextFemale>10152</NotificationTextFemale>
-                </CharacterNotification>
-                <BaseNotification>
-                  <NotificationText>10155</NotificationText>
-                  <NotificationPriority>-1</NotificationPriority>
-                  <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
-                  <DisplayTimeout>120000</DisplayTimeout>
-                  <NotificationAudioAsset>216801</NotificationAudioAsset>
-                </BaseNotification>
-                <NotificationSubtitle>
-                  <SubtitleGroup>1929094510</SubtitleGroup>
-                </NotificationSubtitle>
-              </Values>
-            </Notification>
-          </AbortedAutomaticallyMessage>
-          <SuccessMessage>
-            <Notification>
-              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-              <Values>
-                <CharacterNotification>
-                  <NotificationTextFemale>17275</NotificationTextFemale>
-                </CharacterNotification>
-                <BaseNotification>
-                  <NotificationText>17279</NotificationText>
-                  <NotificationPriority>600</NotificationPriority>
-                  <NotificationMinDisplayTime>5000</NotificationMinDisplayTime>
-                  <DisplayTimeout>60000</DisplayTimeout>
-                </BaseNotification>
-                <NotificationSubtitle>
-                  <SubtitleGroup>-1805220221</SubtitleGroup>
-                </NotificationSubtitle>
-              </Values>
-            </Notification>
-          </SuccessMessage>
-          <OnQuestEnd>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-            <Values>
-              <ActionList>
-                <Actions>
-                  <!-- start global cooldown -->
-                  <Item>
-                    <Action>
-                      <Template>ActionUnlockAsset</Template>
-                      <Values>
-                        <Action />
-                        <ActionUnlockAsset>
-                          <UnlockAssets>
-                            <Item>
-                              <Asset>1500003903</Asset>
-                            </Item>
-                          </UnlockAssets>
-                        </ActionUnlockAsset>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <Item>
-                    <Action>
-                      <Template>ActionDeleteObjects</Template>
-                      <Values>
-                        <Action />
-                        <ActionDeleteObjects>
-                          <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
-                        </ActionDeleteObjects>
-                        <ObjectFilter>
-                          <ObjectGUID>1500001290</ObjectGUID>
-                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                          <CheckParticipantID>1</CheckParticipantID>
-                          <ObjectParticipantID>Neutral</ObjectParticipantID>
-                        </ObjectFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <!-- removing ships which spawned after the quest was aborted (using highest spawn delay) -->
-                  <Item>
-                    <Action>
-                      <Template>ActionDelayedActions</Template>
-                      <Values>
-                        <Action />
-                        <ActionDelayedActions>
-                          <ExecutionDelay>80000</ExecutionDelay>
-                          <DelayedActions>
-                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                            <Values>
-                              <ActionList>
-                                <Actions>
-                                  <Item>
-                                    <Action>
-                                      <Template>ActionDeleteObjects</Template>
-                                      <Values>
-                                        <Action />
-                                        <ActionDeleteObjects>
-                                          <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
-                                        </ActionDeleteObjects>
-                                        <ObjectFilter>
-                                          <ObjectGUID>1500001290</ObjectGUID>
-                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                                          <CheckParticipantID>1</CheckParticipantID>
-                                          <ObjectParticipantID>Neutral</ObjectParticipantID>
-                                        </ObjectFilter>
-                                      </Values>
-                                    </Action>
-                                  </Item>
-                                </Actions>
-                              </ActionList>
-                            </Values>
-                          </DelayedActions>
-                        </ActionDelayedActions>
-                      </Values>
-                    </Action>
-                  </Item>
-                </Actions>
-              </ActionList>
-            </Values>
-          </OnQuestEnd>
-          <QuestGiver>47</QuestGiver>
-          <!-- important for lua to set DescriptionText to the Quest GUID -->
-          <DescriptionText>1500001246</DescriptionText>
-          <QuestDifficulty>Easy</QuestDifficulty>
-          <NeededProgressLevel>EarlyGame;EarlyMidGame;MidGame;LateMidGame;LateGame;EndGame</NeededProgressLevel>
-          <StoryText>1500001291</StoryText>
-          <PreActivationTimer>0</PreActivationTimer>
-          <DelayTimer>0</DelayTimer>
-          <QuestTimeLimit>7200000</QuestTimeLimit>
-          <QuestCategory>RandomQuest</QuestCategory>
-          <QuestActivation>QuestStart</QuestActivation>
-          <!-- will be made Global visible via lua -->
-          <QuestTrackerVisibility>Never</QuestTrackerVisibility>
-          <QuestBookVisibility>SameAsQuestTracker</QuestBookVisibility>
-          <IsAbortable>1</IsAbortable>
-          <CanBeActiveForMultipleParticipants>1</CanBeActiveForMultipleParticipants>
-          <ConfirmOnReached>0</ConfirmOnReached>
-          <HasExclusiveQuestGiver>0</HasExclusiveQuestGiver>
-          <HasReminderMessage>1</HasReminderMessage>
-          <KeepCheckingPreconditionsWhenRunning>1</KeepCheckingPreconditionsWhenRunning>
-          <ResetPreconditionsAfterQuestWasTriggered>1</ResetPreconditionsAfterQuestWasTriggered>
-          <QuestBookBackground>data/ui/2kimages/main/assets16/questbackground/bg_quest_docklands.png</QuestBookBackground>
-          <QuestHints>
-            <Item>
-              <Text>1500003914</Text>
-            </Item>
-          </QuestHints>
-          <HasStarterSpeechBubble>1</HasStarterSpeechBubble>
-          <StarterSpeechBubble>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-            <Values>
-              <Condition />
-              <ConditionTutorialInteraction>
-                <HintText>4040</HintText>
-              </ConditionTutorialInteraction>
-            </Values>
-          </StarterSpeechBubble>  
-        </Quest>
-        <PreConditionList>
-          <Condition>
-            <Template>ConditionDiplomaticState</Template>
-            <Values>
-              <Condition />
-              <ConditionDiplomaticState>
-                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
-                <TargetParticipant2>Second_ai_01_Jorgensen</TargetParticipant2>
-                <DesiredState>TradeRights</DesiredState>
-              </ConditionDiplomaticState>
-              <ConditionPropsNegatable />
-            </Values>
-          </Condition>
-        </PreConditionList>
-        <Reward>
-          <RewardAssets>
-            <Item>
-              <Reward>193507</Reward>
-              <Amount>4</Amount>
-              <IsDisguised>1</IsDisguised>
-            </Item>
-          </RewardAssets>
-          <GenerateIgnoreUnlocks>0</GenerateIgnoreUnlocks>
-          <GenerateRewardsUnique>0</GenerateRewardsUnique>
-          <RewardReputation>
-            <Item>
-              <ReputationAmount>-5</ReputationAmount>
-              <ReputationParticipant>Second_ai_01_Jorgensen</ReputationParticipant>
-            </Item>
-          </RewardReputation>
-        </Reward>
         <Objectives>
           <WinConditionCompletionOrder>Linear</WinConditionCompletionOrder>
           <WinConditions>
-            <!-- showing accept notification here after 1sec sustain, so we can use AbortedAutomaticallyMessage for decline and prevent playing the accept notification on decline -->
-             <!-- and we also need to wait a second for scripts started via 1500001340 to decide, because bug: for whatever reason: The Quests aborts if we register a Trigger with ConditionUnlocked which gets unlocked shortly after registering. Thats why we try to unlock it first with lua started via 1500001340 and then 1 second later (sustain) we register the other triggers -->
             <Item>
               <Objective>
                 <Template>SustainObjective</Template>
@@ -604,24 +271,6 @@
                     <IsVisibleInQuestTracker>0</IsVisibleInQuestTracker>
                     <JumpToVisibility>Hide</JumpToVisibility>
                     <LinkAllQuestActionsToQuest>1</LinkAllQuestActionsToQuest>
-                    <ObjectiveSuccessMessage>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <CharacterNotification>
-                          <NotificationTextFemale>10151</NotificationTextFemale>
-                        </CharacterNotification>
-                        <BaseNotification>
-                          <NotificationText>10154</NotificationText>
-                          <NotificationPriority>-1</NotificationPriority>
-                          <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
-                          <DisplayTimeout>120000</DisplayTimeout>
-                        </BaseNotification>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1520505438</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                    
                     <OnSuccessActions>
                       <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                       <Values>
@@ -1000,229 +649,79 @@
                 </Values>
               </Objective>
             </Item>
-            
             <Item>
               <Objective>
-                <Template>SubQuestObjective</Template>
-                <Values>
-                  <ConditionQuestSubQuest>
-                    <Asset>1500001286</Asset>
-                  </ConditionQuestSubQuest>
-                  <ConditionQuestObjective>
-                    <JumpToVisibility>Hide</JumpToVisibility>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <Objective>
-                <Template>SelectObjectObjective</Template>
+                <Template>SustainObjective</Template>
                 <Values>
                   <ConditionQuestObjective>
-                    <TextCombinedContextValue>269944</TextCombinedContextValue>
-                    <OnSuccessActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                            <Item>
-                              <Action>
-                                <Template>ActionChangeParticipant</Template>
-                                <Values>
-                                  <Action />
-                                  <ActionChangeParticipant>
-                                    <ChangeToProcessingParticipant>1</ChangeToProcessingParticipant>
-                                  </ActionChangeParticipant>
-                                  <ObjectFilter>
-                                    <ObjectGUID>1500001290</ObjectGUID>
-                                    <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                                  </ObjectFilter>
-                                </Values>
-                              </Action>
-                            </Item>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </OnSuccessActions>
+                    <TextCombinedContextValue>1500001343</TextCombinedContextValue>
+                    <QuestTrackerIcon>data/ui/2kimages/main/3dicons/icon_time.png</QuestTrackerIcon>
+                    <JumpToVisibility>ShowOnlyFakePings</JumpToVisibility>
+                    <FakeMinimapPings>
+                      <Objects>
+                        <Item>
+                          <FakeMinimapObjects>
+                            <Template>ObjectFilter</Template>
+                            <Values>
+                              <ObjectFilter>
+                                <ObjectGUID>1500001291</ObjectGUID>
+                                <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                              </ObjectFilter>
+                            </Values>
+                          </FakeMinimapObjects>
+                        </Item>
+                        <Item>
+                          <FakeMinimapObjects>
+                            <Template>ObjectFilter</Template>
+                            <Values>
+                              <ObjectFilter>
+                                <ObjectGUID>1500001292</ObjectGUID>
+                                <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                              </ObjectFilter>
+                            </Values>
+                          </FakeMinimapObjects>
+                        </Item>
+                      </Objects>
+                    </FakeMinimapPings>
                   </ConditionQuestObjective>
-                  <ConditionQuestSelectObject>
-                    <SelectObjects>
-                      <Item>
-                        <Object>
-                          <Template>ObjectFilter</Template>
-                          <Values>
-                            <ObjectFilter>
-                              <ObjectGUID>1500001290</ObjectGUID>
-                              <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                            </ObjectFilter>
-                          </Values>
-                        </Object>
-                      </Item>
-                    </SelectObjects>
-                  </ConditionQuestSelectObject>
-                  <ConditionPropsSessionSettings />
+                  <ConditionPlayerCounter>
+                    <Context>1500003867</Context>
+                    <CounterAmount>1</CounterAmount>
+                    <ComparisonOp>AtLeast</ComparisonOp>
+                    <CounterValueType>Max</CounterValueType>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestSustain>
+                    <SustainTime>41000</SustainTime>
+                    <SustainObjectiveText>1500001343</SustainObjectiveText>
+                  </ConditionQuestSustain>
                   <ConditionPropsExecutionPlaceSettings />
-                </Values>
-              </Objective>
-            </Item>
-            <!-- to make sure the reward items are distributed to the closest ships nearby, instead the first ship who interacted with this quest -->
-            <Item>
-              <Objective>
-                <Template>FakeQuestObjective</Template>
-                <Values>
-                  <ConditionQuestObjective>
-                    <OnSuccessActions>
-                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                      <Values>
-                        <ActionList>
-                          <Actions>
-                          </Actions>
-                        </ActionList>
-                      </Values>
-                    </OnSuccessActions>
-                  </ConditionQuestObjective>>
-                  <ConditionQuestFakeObjective />
-                  <ConditionPropsExecutionPlaceSettings>
-                    <ExecutionPlace>
-                      <Template>ConditionObjectStarterObject</Template>
-                      <Values>
-                        <ConditionScanner />
-                        <ConditionObjectStarterObject />
-                        <ConditionObjectiveSignsAndFeedback />
-                      </Values>
-                    </ExecutionPlace>
-                    <ExecutionPlaceText>100230</ExecutionPlaceText>
-                    <ExecutionPlaceConfirmOnReached>0</ExecutionPlaceConfirmOnReached>
-                  </ConditionPropsExecutionPlaceSettings>
                 </Values>
               </Objective>
             </Item>
           </WinConditions>
         </Objectives>
-        <QuestOptional>
-          <HasStarterObject>Specific</HasStarterObject>
-          <StarterObject>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-            <Values>
-              <Condition />
-              <ConditionStarterObject>
-                <StarterObjectObject>
-                  <Template>ConditionObjectSpawnedObject</Template>
-                  <Values>
-                    <ConditionObjectSpawnedObject>
-                      <ExecutionObject>1500001291</ExecutionObject>
-                      <ObjectSpawnArea>
-                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                        <Values>
-                          <SpawnArea>
-                            <SpawnContext>PlayerKontor</SpawnContext>
-                            <DistanceToContext>5</DistanceToContext>
-                            <MinObjectDistance>0</MinObjectDistance>
-                            <MaxObjectDistance>20</MaxObjectDistance>
-                          </SpawnArea>
-                        </Values>
-                      </ObjectSpawnArea>
-                      <ObjectOwner>Neutral</ObjectOwner>
-                      <ObjectDespawn>Despawn</ObjectDespawn>
-                      <DoSetVisualObjectOwner>1</DoSetVisualObjectOwner>
-                      <VisualObjectOwner>Second_ai_01_Jorgensen</VisualObjectOwner>
-                    </ConditionObjectSpawnedObject>
-                    <ConditionScanner />
-                    <ConditionObjectiveSignsAndFeedback />
-                  </Values>
-                </StarterObjectObject>
-              </ConditionStarterObject>
-              <ConditionQuestObjective />
-              <ConditionPropsSessionSettings />
-            </Values>
-          </StarterObject>
-        </QuestOptional>
       </Values>
     </Asset>
     
     <Asset>
-      <BaseAssetGUID>1500001246</BaseAssetGUID>
+      <BaseAssetGUID>1500001287</BaseAssetGUID>
       <Values>
         <Standard>
-          <GUID>1500001247</GUID>
-          <Name>Request Big Fleet Bente</Name>
+          <GUID>1500001289</GUID>
+          <Name>Sub Objectives Linear Spawn Ships Big</Name>
           <IconFilename>data/graphics_serp/bigfleet.png</IconFilename>
         </Standard>
-        <Text>
-          <TextOverride>1500003902</TextOverride>
-        </Text>
-        <Quest>
-          <AbortedAutomaticallyMessage>
-            <Notification>
-              <Values>
-                <NotificationSubtitle>
-                  <SubtitleGroup>1929094510</SubtitleGroup>
-                </NotificationSubtitle>
-              </Values>
-            </Notification>
-          </AbortedAutomaticallyMessage>
-          <SuccessMessage>
-            <Notification>
-              <Values>
-                <NotificationSubtitle>
-                  <SubtitleGroup>-1805220221</SubtitleGroup>
-                </NotificationSubtitle>
-              </Values>
-            </Notification>
-          </SuccessMessage>
-          <QuestGiver>47</QuestGiver>
-          <!-- important for lua to set DescriptionText to the Quest GUID -->
-          <DescriptionText>1500001247</DescriptionText>
-          <StoryText>1500001292</StoryText>
-        </Quest>
-        <PreConditionList>
-          <Condition>
-            <Template>ConditionDiplomaticState</Template>
-            <Values>
-              <Condition />
-              <ConditionDiplomaticState>
-                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
-                <TargetParticipant2>Second_ai_01_Jorgensen</TargetParticipant2>
-                <DesiredState>Alliance</DesiredState>
-              </ConditionDiplomaticState>
-              <ConditionPropsNegatable />
-            </Values>
-          </Condition>
-        </PreConditionList>
-        <Reward>
-          <RewardAssets>
-            <Item>
-              <Reward>193507</Reward>
-              <Amount>8</Amount>
-              <IsDisguised>1</IsDisguised>
-            </Item>
-          </RewardAssets>
-          <GenerateIgnoreUnlocks>0</GenerateIgnoreUnlocks>
-          <RewardReputation>
-            <Item>
-              <ReputationAmount>-10</ReputationAmount>
-              <ReputationParticipant>Second_ai_01_Jorgensen</ReputationParticipant>
-            </Item>
-          </RewardReputation>
-        </Reward>
         <Objectives>
+          <WinConditionCompletionOrder>Linear</WinConditionCompletionOrder>
           <WinConditions>
-            <!-- showing accept notification here after 1sec sustain, so we can use AbortedAutomaticallyMessage for decline and prevent playing the accept notification on decline -->
-             <!-- and we also need to wait a second for scripts started via 1500001340 to decide, because bug: for whatever reason: The Quests aborts if we register a Trigger with ConditionUnlocked which gets unlocked shortly after registering. Thats why we try to unlock it first with lua started via 1500001340 and then 1 second later (sustain) we register the other triggers -->
             <Item>
               <VectorElement>
                 <InheritedIndex>0</InheritedIndex>
               </VectorElement>
               <Objective>
+                <Template>SustainObjective</Template>
                 <Values>
                   <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-1809440532</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
                     <OnSuccessActions>
                       <Values>
                         <ActionList>
@@ -1720,43 +1219,621 @@
                 </Values>
               </Objective>
             </Item>
-                
-            
-            
             <Item>
               <VectorElement>
                 <InheritedIndex>1</InheritedIndex>
               </VectorElement>
               <Objective>
                 <Values>
+                  <ConditionQuestSustain>
+                    <SustainTime>81000</SustainTime>
+                  </ConditionQuestSustain>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+      </Values>
+    </Asset>
+  
+  
+    <Asset>
+      <Template>A7_QuestStatusQuo</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001246</GUID>
+          <Name>Request Small Fleet Bente</Name>
+          <IconFilename>data/graphics_serp/smallfleet.png</IconFilename>
+        </Standard>
+        <Text>
+          <TextOverride>1500003901</TextOverride>
+        </Text>
+        <Quest>
+          <ResolveConfirmationMessage />
+          <StarterMessage>
+            <!-- is done in WinConditions after 1 sec instead -->
+            <!-- TODO WinConditions für alle anderen QuestGiver anpassen (InheritedIndex) -->
+             <!-- sobald diese Lösung der Ablehnung final ist -->
+            <SuppressMessage>1</SuppressMessage>
+          </StarterMessage>
+          <AbortedAutomaticallyMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <NotificationTextFemale>10152</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationText>10155</NotificationText>
+                  <NotificationPriority>-1</NotificationPriority>
+                  <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
+                  <DisplayTimeout>120000</DisplayTimeout>
+                  <NotificationAudioAsset>216801</NotificationAudioAsset>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <SubtitleGroup>1929094510</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </AbortedAutomaticallyMessage>
+          <SuccessMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <CharacterNotification>
+                  <NotificationTextFemale>17275</NotificationTextFemale>
+                </CharacterNotification>
+                <BaseNotification>
+                  <NotificationText>17279</NotificationText>
+                  <NotificationPriority>600</NotificationPriority>
+                  <NotificationMinDisplayTime>5000</NotificationMinDisplayTime>
+                  <DisplayTimeout>60000</DisplayTimeout>
+                </BaseNotification>
+                <NotificationSubtitle>
+                  <SubtitleGroup>-1805220221</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </SuccessMessage>
+          <OnQuestActive>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionRegisterTrigger</Template>
+                      <Values>
+                        <Action />
+                        <ActionRegisterTrigger>
+                          <TriggerAsset>1500001340</TriggerAsset>
+                          <InheritArea>1</InheritArea>
+                        </ActionRegisterTrigger>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestActive>
+          <OnQuestEnd>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionDeleteObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionDeleteObjects>
+                          <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                        </ActionDeleteObjects>
+                        <ObjectFilter>
+                          <ObjectGUID>1500001290</ObjectGUID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                          <CheckParticipantID>1</CheckParticipantID>
+                          <ObjectParticipantID>Neutral</ObjectParticipantID>
+                        </ObjectFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <!-- removing ships which spawned after the quest was aborted (using highest spawn delay) -->
+                  <Item>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>80000</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionDeleteObjects</Template>
+                                      <Values>
+                                        <Action />
+                                        <ActionDeleteObjects>
+                                          <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
+                                        </ActionDeleteObjects>
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500001290</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                          <CheckParticipantID>1</CheckParticipantID>
+                                          <ObjectParticipantID>Neutral</ObjectParticipantID>
+                                        </ObjectFilter>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestEnd>
+          <QuestGiver>47</QuestGiver>
+          <QuestDifficulty>Easy</QuestDifficulty>
+          <NeededProgressLevel>EarlyGame;EarlyMidGame;MidGame;LateMidGame;LateGame;EndGame</NeededProgressLevel>
+          <StoryText>1500001291</StoryText>
+          <PreActivationTimer>0</PreActivationTimer>
+          <DelayTimer>0</DelayTimer>
+          <QuestTimeLimit>7200000</QuestTimeLimit>
+          <QuestCategory>RandomQuest</QuestCategory>
+          <QuestActivation>QuestStart</QuestActivation>
+          <QuestTrackerVisibility>Session</QuestTrackerVisibility>
+          <QuestBookVisibility>SameAsQuestTracker</QuestBookVisibility>
+          <IsAbortable>1</IsAbortable>
+          <CanBeActiveForMultipleParticipants>1</CanBeActiveForMultipleParticipants>
+          <ConfirmOnReached>0</ConfirmOnReached>
+          <HasExclusiveQuestGiver>0</HasExclusiveQuestGiver>
+          <HasReminderMessage>1</HasReminderMessage>
+          <KeepCheckingPreconditionsWhenRunning>1</KeepCheckingPreconditionsWhenRunning>
+          <ResetPreconditionsAfterQuestWasTriggered>1</ResetPreconditionsAfterQuestWasTriggered>
+          <QuestBookBackground>data/ui/2kimages/main/assets16/questbackground/bg_quest_docklands.png</QuestBookBackground>
+          <QuestHints>
+            <Item>
+              <Text>1500003914</Text>
+            </Item>
+          </QuestHints>
+          <HasStarterSpeechBubble>1</HasStarterSpeechBubble>
+          <StarterSpeechBubble>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionTutorialInteraction>
+                <HintText>4040</HintText>
+              </ConditionTutorialInteraction>
+            </Values>
+          </StarterSpeechBubble>  
+        </Quest>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionDiplomaticState</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionDiplomaticState>
+                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                <TargetParticipant2>Second_ai_01_Jorgensen</TargetParticipant2>
+                <DesiredState>TradeRights</DesiredState>
+              </ConditionDiplomaticState>
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+          <!-- TODO: in theory a good idea ... -->
+           <!-- but in practice having only one of these unlocks means, that all currently active supportfleet quests -->
+            <!-- will be aborted... -->
+             <!-- so if we only want one unlock GUID for it, -->
+              <!-- we have to make sure that quests which already run like ~3 seconds, can not be aborted this way anymore... -->
+               <!-- using ConditionTimer unforuntately does not work =/ (with ResetPreconditionsAfterQuestWasTriggered it always aborts and without its makes it always true AFTER the first time this Quest GUID was executed) -->
+               <!-- Alternative: noch eine weitere SubQuest machen wo alles reinkommt, was aktuell hauptquest ist, -->
+                <!-- sodass in der Main Quest Quest dann MutuallyExclusive diese subquest oder eine -->
+                 <!-- neue winquest abgeschlossen werden kann. -->
+                  <!-- und diese neue winquest, die wird dann fürs abbrechen genutzt. -->
+                   <!-- doch wie mach ichs hier dann besser, dass nicht alle quests abgebrochen werden? :D -->
+                   
+                   <!-- wir können eine sustain quest machen, die 1sec geht,  -->
+                    <!-- und diese prüft ob man eine AbbruchRessource hat. -->
+                     <!-- wenn ja dann wird quest beendet. -->
+                      <!-- entweder darüber, dass winc. parallel ist und ausreicht und daher Win -->
+                       <!-- oder in OnSuccess dieser conition ActionEndQuest machen -->
+                   
+          <SubConditions>
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionTimer</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionTimer>
+                          <TimeLimit>10000</TimeLimit>
+                        </ConditionTimer>
+                      </Values>
+                    </Condition>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+            <Item>
+              <SubCondition>
+                <Template>PreConditionList</Template>
+                <Values>
+                  <PreConditionList>
+                    <Condition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500003904</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </Condition>
+                  </PreConditionList>
+                </Values>
+              </SubCondition>
+            </Item>
+          </SubConditions>
+        </PreConditionList>
+        <Reward>
+          <RewardAssets>
+            <Item>
+              <Reward>193507</Reward>
+              <Amount>4</Amount>
+              <IsDisguised>1</IsDisguised>
+            </Item>
+          </RewardAssets>
+          <GenerateIgnoreUnlocks>0</GenerateIgnoreUnlocks>
+          <GenerateRewardsUnique>0</GenerateRewardsUnique>
+          <RewardReputation>
+            <Item>
+              <ReputationAmount>-5</ReputationAmount>
+              <ReputationParticipant>Second_ai_01_Jorgensen</ReputationParticipant>
+            </Item>
+          </RewardReputation>
+        </Reward>
+        <Objectives>
+          <WinConditionCompletionOrder>Linear</WinConditionCompletionOrder>
+          <WinConditions>
+            <!-- showing accept notification here after 1sec sustain, so we can use AbortedAutomaticallyMessage for decline -->
+             <!-- and prevent playing the accept notification on decline -->
+            <Item>
+              <Objective>
+                <Template>SustainObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <IsVisibleInQuestTracker>0</IsVisibleInQuestTracker>
+                    <JumpToVisibility>Hide</JumpToVisibility>
+                    <LinkAllQuestActionsToQuest>1</LinkAllQuestActionsToQuest>
+                    <ObjectiveSuccessMessage>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <CharacterNotification>
+                          <NotificationTextFemale>10151</NotificationTextFemale>
+                        </CharacterNotification>
+                        <BaseNotification>
+                          <NotificationText>10154</NotificationText>
+                          <NotificationPriority>-1</NotificationPriority>
+                          <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
+                          <DisplayTimeout>120000</DisplayTimeout>
+                        </BaseNotification>
+                        <NotificationSubtitle>
+                          <SubtitleGroup>1520505438</SubtitleGroup>
+                        </NotificationSubtitle>
+                      </Values>
+                    </ObjectiveSuccessMessage>
+                    <OnSuccessActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <!-- <Item> -->
+                              <!-- <Action> -->
+                                <!-- <Template>ActionNotification</Template> -->
+                                <!-- <Values> -->
+                                  <!-- <Action /> -->
+                                  <!-- <ActionNotification> -->
+                                    <!-- <Notification> -->
+                                      <!-- <Template>CharacterNotification</Template> -->
+                                      <!-- <Values> -->
+                                        <!-- <CharacterNotification> -->
+                                          <!-- <Profile>47</Profile> -->
+                                          <!-- <NotificationTextFemale>10151</NotificationTextFemale> -->
+                                        <!-- </CharacterNotification> -->
+                                        <!-- <BaseNotification> -->
+                                          <!-- <NotificationText>10154</NotificationText> -->
+                                          <!-- <NotificationPriority>-1</NotificationPriority> -->
+                                          <!-- <NotificationMinDisplayTime>8000</NotificationMinDisplayTime> -->
+                                          <!-- <DisplayTimeout>120000</DisplayTimeout> -->
+                                        <!-- </BaseNotification> -->
+                                        <!-- <NotificationSubtitle> -->
+                                          <!-- <SubtitleGroup>1520505438</SubtitleGroup> -->
+                                        <!-- </NotificationSubtitle> -->
+                                      <!-- </Values> -->
+                                    <!-- </Notification> -->
+                                  <!-- </ActionNotification> -->
+                                <!-- </Values> -->
+                              <!-- </Action> -->
+                            <!-- </Item> -->
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </OnSuccessActions>
+                  </ConditionQuestObjective>
+                  <ConditionPlayerCounter>
+                    <Context>1500003867</Context>
+                    <CounterAmount>1</CounterAmount>
+                    <ComparisonOp>AtLeast</ComparisonOp>
+                    <CounterValueType>Max</CounterValueType>
+                  </ConditionPlayerCounter>
+                  <ConditionQuestSustain>
+                    <SustainTime>1000</SustainTime>
+                  </ConditionQuestSustain>
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            
+            <Item>
+              <Objective>
+                <Template>SubQuestObjective</Template>
+                <Values>
+                  <ConditionQuestSubQuest>
+                    <Asset>1500001286</Asset>
+                  </ConditionQuestSubQuest>
+                  <ConditionQuestObjective>
+                    <JumpToVisibility>Hide</JumpToVisibility>
+                  </ConditionQuestObjective>
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SelectObjectObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>269944</TextCombinedContextValue>
+                    <OnSuccessActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionChangeParticipant</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionChangeParticipant>
+                                    <ChangeToProcessingParticipant>1</ChangeToProcessingParticipant>
+                                  </ActionChangeParticipant>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001290</ObjectGUID>
+                                    <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </OnSuccessActions>
+                  </ConditionQuestObjective>
+                  <ConditionQuestSelectObject>
+                    <SelectObjects>
+                      <Item>
+                        <Object>
+                          <Template>ObjectFilter</Template>
+                          <Values>
+                            <ObjectFilter>
+                              <ObjectGUID>1500001290</ObjectGUID>
+                              <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                            </ObjectFilter>
+                          </Values>
+                        </Object>
+                      </Item>
+                    </SelectObjects>
+                  </ConditionQuestSelectObject>
+                  <ConditionPropsSessionSettings />
+                  <ConditionPropsExecutionPlaceSettings />
+                </Values>
+              </Objective>
+            </Item>
+            <!-- to make sure the reward items are distributed to the closest ships nearby, instead the first ship who interacted with this quest -->
+            <Item>
+              <Objective>
+                <Template>FakeQuestObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <OnSuccessActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </OnSuccessActions>
+                  </ConditionQuestObjective>>
+                  <ConditionQuestFakeObjective />
+                  <ConditionPropsExecutionPlaceSettings>
+                    <ExecutionPlace>
+                      <Template>ConditionObjectStarterObject</Template>
+                      <Values>
+                        <ConditionScanner />
+                        <ConditionObjectStarterObject />
+                        <ConditionObjectiveSignsAndFeedback />
+                      </Values>
+                    </ExecutionPlace>
+                    <ExecutionPlaceText>100230</ExecutionPlaceText>
+                    <ExecutionPlaceConfirmOnReached>0</ExecutionPlaceConfirmOnReached>
+                  </ConditionPropsExecutionPlaceSettings>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+        <QuestOptional>
+          <HasStarterObject>Specific</HasStarterObject>
+          <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionStarterObject>
+                <StarterObjectObject>
+                  <Template>ConditionObjectSpawnedObject</Template>
+                  <Values>
+                    <ConditionObjectSpawnedObject>
+                      <ExecutionObject>1500001291</ExecutionObject>
+                      <ObjectSpawnArea>
+                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                        <Values>
+                          <SpawnArea>
+                            <SpawnContext>PlayerKontor</SpawnContext>
+                            <DistanceToContext>5</DistanceToContext>
+                            <MinObjectDistance>0</MinObjectDistance>
+                            <MaxObjectDistance>20</MaxObjectDistance>
+                          </SpawnArea>
+                        </Values>
+                      </ObjectSpawnArea>
+                      <ObjectOwner>Neutral</ObjectOwner>
+                      <ObjectDespawn>Despawn</ObjectDespawn>
+                      <DoSetVisualObjectOwner>1</DoSetVisualObjectOwner>
+                      <VisualObjectOwner>Second_ai_01_Jorgensen</VisualObjectOwner>
+                    </ConditionObjectSpawnedObject>
+                    <ConditionScanner />
+                    <ConditionObjectiveSignsAndFeedback />
+                  </Values>
+                </StarterObjectObject>
+              </ConditionStarterObject>
+              <ConditionQuestObjective />
+              <ConditionPropsSessionSettings />
+            </Values>
+          </StarterObject>
+        </QuestOptional>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001246</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001247</GUID>
+          <Name>Request Big Fleet Bente</Name>
+          <IconFilename>data/graphics_serp/bigfleet.png</IconFilename>
+        </Standard>
+        <Text>
+          <TextOverride>1500003902</TextOverride>
+        </Text>
+        <Quest>
+          <StarterMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <NotificationSubtitle>
+                  <SubtitleGroup>-1809440532</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </StarterMessage>
+          <SuccessMessage>
+            <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <NotificationSubtitle>
+                  <SubtitleGroup>-1805220221</SubtitleGroup>
+                </NotificationSubtitle>
+              </Values>
+            </Notification>
+          </SuccessMessage>
+          <QuestGiver>47</QuestGiver>
+          <StoryText>1500001292</StoryText>
+        </Quest>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionDiplomaticState</Template>
+            <Values>
+              <Condition />
+              <ConditionDiplomaticState>
+                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                <TargetParticipant2>Second_ai_01_Jorgensen</TargetParticipant2>
+                <DesiredState>Alliance</DesiredState>
+              </ConditionDiplomaticState>
+              <ConditionPropsNegatable />
+            </Values>
+          </Condition>
+        </PreConditionList>
+        <Reward>
+          <RewardAssets>
+            <Item>
+              <Reward>193507</Reward>
+              <Amount>8</Amount>
+              <IsDisguised>1</IsDisguised>
+            </Item>
+          </RewardAssets>
+          <GenerateIgnoreUnlocks>0</GenerateIgnoreUnlocks>
+          <RewardReputation>
+            <Item>
+              <ReputationAmount>-10</ReputationAmount>
+              <ReputationParticipant>Second_ai_01_Jorgensen</ReputationParticipant>
+            </Item>
+          </RewardReputation>
+        </Reward>
+        <Objectives>
+          <WinConditionCompletionOrder>Linear</WinConditionCompletionOrder>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>SubQuestObjective</Template>
+                <Values>
                   <ConditionQuestSubQuest>
                     <Asset>1500001288</Asset>
                   </ConditionQuestSubQuest>
+                  <ConditionQuestObjective>
+                    <JumpToVisibility>Hide</JumpToVisibility>
+                  </ConditionQuestObjective>
                 </Values>
               </Objective>
+            </Item>
+            <Item>
+              <VectorElement>
+                <InheritedIndex>1</InheritedIndex>
+              </VectorElement>
             </Item>
             <Item>
               <VectorElement>
                 <InheritedIndex>2</InheritedIndex>
               </VectorElement>
             </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
           </WinConditions>
         </Objectives>
         <QuestOptional>
           <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
             <Values>
+              <Condition />
               <ConditionStarterObject>
                 <StarterObjectObject>
+                  <Template>ConditionObjectSpawnedObject</Template>
                   <Values>
                     <ConditionObjectSpawnedObject>
                       <ExecutionObject>1500001292</ExecutionObject>
                       <VisualObjectOwner>Second_ai_01_Jorgensen</VisualObjectOwner>
                     </ConditionObjectSpawnedObject>
+                    <ConditionScanner />
+                    <ConditionObjectiveSignsAndFeedback />
                   </Values>
                 </StarterObjectObject>
               </ConditionStarterObject>
@@ -1775,15 +1852,16 @@
           <Name>Request Small Fleet Qing</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-434492724</SubtitleGroup>
+                  <SubtitleGroup>1204866520</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -1795,7 +1873,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>79</QuestGiver>
-          <DescriptionText>1500001248</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -1827,48 +1904,14 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1204866520</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
             <Values>
+              <Condition />
               <ConditionStarterObject>
                 <StarterObjectObject>
+                  <Template>ConditionObjectSpawnedObject</Template>
                   <Values>
                     <ConditionObjectSpawnedObject>
                       <VisualObjectOwner>Second_ai_02_Qing</VisualObjectOwner>
@@ -1889,15 +1932,16 @@
           <Name>Request Big Fleet Qing</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-434492724</SubtitleGroup>
+                  <SubtitleGroup>-807363789</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -1909,7 +1953,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>79</QuestGiver>
-          <DescriptionText>1500001249</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -1941,48 +1984,14 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-807363789</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
             <Values>
+              <Condition />
               <ConditionStarterObject>
                 <StarterObjectObject>
+                  <Template>ConditionObjectSpawnedObject</Template>
                   <Values>
                     <ConditionObjectSpawnedObject>
                       <VisualObjectOwner>Second_ai_02_Qing</VisualObjectOwner>
@@ -2004,15 +2013,16 @@
           <Name>Request Small Fleet Wibblesock</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1022174312</SubtitleGroup>
+                  <SubtitleGroup>-1438664933</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2024,7 +2034,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>80</QuestGiver>
-          <DescriptionText>1500001250</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -2056,48 +2065,14 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-1438664933</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
             <Values>
+              <Condition />
               <ConditionStarterObject>
                 <StarterObjectObject>
+                  <Template>ConditionObjectSpawnedObject</Template>
                   <Values>
                     <ConditionObjectSpawnedObject>
                       <VisualObjectOwner>Second_ai_03_Wibblesock</VisualObjectOwner>
@@ -2118,15 +2093,16 @@
           <Name>Request Big Fleet Wibblesock</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1022174312</SubtitleGroup>
+                  <SubtitleGroup>-340295218</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2138,7 +2114,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>80</QuestGiver>
-          <DescriptionText>1500001251</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -2170,48 +2145,14 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-340295218</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
             <Values>
+              <Condition />
               <ConditionStarterObject>
                 <StarterObjectObject>
+                  <Template>ConditionObjectSpawnedObject</Template>
                   <Values>
                     <ConditionObjectSpawnedObject>
                       <VisualObjectOwner>Second_ai_03_Wibblesock</VisualObjectOwner>
@@ -2234,15 +2175,16 @@
           <Name>Request Small Fleet Smith</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-414759729</SubtitleGroup>
+                  <SubtitleGroup>-978161423</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2254,7 +2196,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>81</QuestGiver>
-          <DescriptionText>1500001252</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -2286,43 +2227,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-978161423</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2351,15 +2255,16 @@
           <Name>Request Big Fleet Smith</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-414759729</SubtitleGroup>
+                  <SubtitleGroup>1255098406</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2371,7 +2276,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>81</QuestGiver>
-          <DescriptionText>1500001253</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -2403,43 +2307,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1255098406</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2470,15 +2337,16 @@
           <Name>Request Small Fleet OMara</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>548224158</SubtitleGroup>
+                  <SubtitleGroup>1572384897</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2490,7 +2358,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>82</QuestGiver>
-          <DescriptionText>1500001254</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -2522,43 +2389,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1572384897</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2587,15 +2417,16 @@
           <Name>Request Big Fleet OMara</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>548224158</SubtitleGroup>
+                  <SubtitleGroup>-2140107110</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2607,7 +2438,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>82</QuestGiver>
-          <DescriptionText>1500001255</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -2639,43 +2469,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-2140107110</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2706,15 +2499,16 @@
           <Name>Request Small Fleet Gasparov</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-1412644050</SubtitleGroup>
+                  <SubtitleGroup>916512777</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2726,7 +2520,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>83</QuestGiver>
-          <DescriptionText>1500001256</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -2758,43 +2551,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>916512777</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2823,15 +2579,16 @@
           <Name>Request Big Fleet Gasparov</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-1412644050</SubtitleGroup>
+                  <SubtitleGroup>2013689988</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2843,7 +2600,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>83</QuestGiver>
-          <DescriptionText>1500001257</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -2875,43 +2631,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>2013689988</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2942,15 +2661,16 @@
           <Name>Request Small Fleet Malching</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1284367271</SubtitleGroup>
+                  <SubtitleGroup>1719025085</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -2962,7 +2682,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>11</QuestGiver>
-          <DescriptionText>1500001258</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -2994,43 +2713,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1719025085</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3059,15 +2741,16 @@
           <Name>Request Big Fleet Malching</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1284367271</SubtitleGroup>
+                  <SubtitleGroup>-698547808</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3079,7 +2762,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>11</QuestGiver>
-          <DescriptionText>1500001259</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -3111,43 +2793,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-698547808</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3178,15 +2823,16 @@
           <Name>Request Small Fleet Gravez</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>612461027</SubtitleGroup>
+                  <SubtitleGroup>1838433425</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3198,7 +2844,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>48</QuestGiver>
-          <DescriptionText>1500001260</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -3230,43 +2875,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1838433425</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3295,15 +2903,16 @@
           <Name>Request Big Fleet Gravez</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>612461027</SubtitleGroup>
+                  <SubtitleGroup>-1106333430</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3315,7 +2924,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>48</QuestGiver>
-          <DescriptionText>1500001261</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -3347,43 +2955,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-1106333430</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3414,15 +2985,16 @@
           <Name>Request Small Fleet Silva</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-947340394</SubtitleGroup>
+                  <SubtitleGroup>1229491530</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3434,7 +3006,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>84</QuestGiver>
-          <DescriptionText>1500001262</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -3466,43 +3037,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1229491530</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3531,15 +3065,16 @@
           <Name>Request Big Fleet Silva</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-947340394</SubtitleGroup>
+                  <SubtitleGroup>1599492751</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3551,7 +3086,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>84</QuestGiver>
-          <DescriptionText>1500001263</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -3583,43 +3117,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1599492751</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3650,15 +3147,16 @@
           <Name>Request Small Fleet Hunt</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1500003904</SubtitleGroup>
+                  <SubtitleGroup>-1678800608</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3670,7 +3168,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>85</QuestGiver>
-          <DescriptionText>1500001264</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -3702,43 +3199,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-1678800608</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3767,15 +3227,16 @@
           <Name>Request Big Fleet Hunt</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1500003904</SubtitleGroup>
+                  <SubtitleGroup>-1480346347</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3787,7 +3248,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>85</QuestGiver>
-          <DescriptionText>1500001265</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -3819,43 +3279,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-1480346347</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3887,15 +3310,16 @@
           <Name>Request Small Fleet Mercier</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-1821038358</SubtitleGroup>
+                  <SubtitleGroup>564581497</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -3907,7 +3331,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>220</QuestGiver>
-          <DescriptionText>1500001266</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -3939,43 +3362,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>564581497</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -4004,15 +3390,16 @@
           <Name>Request Big Fleet Mercier</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-1821038358</SubtitleGroup>
+                  <SubtitleGroup>-509869951</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -4024,7 +3411,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>220</QuestGiver>
-          <DescriptionText>1500001267</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -4056,43 +3442,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-509869951</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -4123,15 +3472,16 @@
           <Name>Request Small Fleet Harlow</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1500003905</SubtitleGroup>
+                  <SubtitleGroup>614535693</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -4150,6 +3500,11 @@
             <Values>
               <ActionList>
                 <Actions>
+                  <Item>
+                    <VectorElement>
+                      <InheritedIndex>0</InheritedIndex>
+                    </VectorElement>
+                  </Item>
                   <Item>
                     <Action>
                       <Template>ActionDelayedActions</Template>
@@ -4355,7 +3710,6 @@
             </Values>
           </OnQuestActive>
           <QuestGiver>73</QuestGiver>
-          <DescriptionText>1500001268</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -4387,43 +3741,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>614535693</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -4446,22 +3763,23 @@
     </Asset>
     
     <Asset>
-      <BaseAssetGUID>1500001268</BaseAssetGUID>
+      <BaseAssetGUID>1500001247</BaseAssetGUID>
       <Values>
         <Standard>
           <GUID>1500001269</GUID>
           <Name>Request Big Fleet Harlow</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1500003905</SubtitleGroup>
+                  <SubtitleGroup>-543567451</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -4486,19 +3804,204 @@
                     </VectorElement>
                   </Item>
                   <Item>
-                    <VectorElement>
-                      <InheritedIndex>1</InheritedIndex>
-                    </VectorElement>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>11500</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500001290</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>3</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>100440</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>10</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
                   </Item>
                   <Item>
-                    <VectorElement>
-                      <InheritedIndex>2</InheritedIndex>
-                    </VectorElement>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>21500</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500001290</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>3</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>100440</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>10</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
                   </Item>
                   <Item>
-                    <VectorElement>
-                      <InheritedIndex>3</InheritedIndex>
-                    </VectorElement>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>31500</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500001290</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>3</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>100440</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>10</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>41500</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500001290</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>3</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>100440</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>10</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
                   </Item>
                   <Item>
                     <Action>
@@ -4705,7 +4208,6 @@
             </Values>
           </OnQuestActive>
           <QuestGiver>73</QuestGiver>
-          <DescriptionText>1500001269</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -4737,43 +4239,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-543567451</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -4803,15 +4268,16 @@
           <Name>Request Small Fleet LaFortune</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1958920453</SubtitleGroup>
+                  <SubtitleGroup>-459188677</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -4830,6 +4296,11 @@
             <Values>
               <ActionList>
                 <Actions>
+                  <Item>
+                    <VectorElement>
+                      <InheritedIndex>0</InheritedIndex>
+                    </VectorElement>
+                  </Item>
                   <Item>
                     <Action>
                       <Template>ActionDelayedActions</Template>
@@ -5035,7 +4506,6 @@
             </Values>
           </OnQuestActive>
           <QuestGiver>76</QuestGiver>
-          <DescriptionText>1500001270</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -5067,43 +4537,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-459188677</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -5126,22 +4559,23 @@
     </Asset>
     
     <Asset>
-      <BaseAssetGUID>1500001270</BaseAssetGUID>
+      <BaseAssetGUID>1500001247</BaseAssetGUID>
       <Values>
         <Standard>
           <GUID>1500001271</GUID>
           <Name>Request Big Fleet LaFortune</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1958920453</SubtitleGroup>
+                  <SubtitleGroup>1603873159</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -5166,19 +4600,204 @@
                     </VectorElement>
                   </Item>
                   <Item>
-                    <VectorElement>
-                      <InheritedIndex>1</InheritedIndex>
-                    </VectorElement>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>11500</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500001290</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>3</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>100440</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>10</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
                   </Item>
                   <Item>
-                    <VectorElement>
-                      <InheritedIndex>2</InheritedIndex>
-                    </VectorElement>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>21500</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500001290</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>3</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>100440</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>10</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
                   </Item>
                   <Item>
-                    <VectorElement>
-                      <InheritedIndex>3</InheritedIndex>
-                    </VectorElement>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>31500</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500001290</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>3</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>100440</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>10</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionDelayedActions</Template>
+                      <Values>
+                        <Action />
+                        <ActionDelayedActions>
+                          <ExecutionDelay>41500</ExecutionDelay>
+                          <DelayedActions>
+                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                            <Values>
+                              <ActionList>
+                                <Actions>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>1500001290</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>3</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                  <Item>
+                                    <Action>
+                                      <Template>ActionChangeSkin</Template>
+                                      <Values>
+                                        <Action />
+                                        <ObjectFilter>
+                                          <ObjectGUID>100440</ObjectGUID>
+                                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                        </ObjectFilter>
+                                        <ActionChangeSkin>
+                                          <NewSkinIndex>10</NewSkinIndex>
+                                        </ActionChangeSkin>
+                                      </Values>
+                                    </Action>
+                                  </Item>
+                                </Actions>
+                              </ActionList>
+                            </Values>
+                          </DelayedActions>
+                        </ActionDelayedActions>
+                      </Values>
+                    </Action>
                   </Item>
                   <Item>
                     <Action>
@@ -5385,7 +5004,6 @@
             </Values>
           </OnQuestActive>
           <QuestGiver>76</QuestGiver>
-          <DescriptionText>1500001271</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -5417,43 +5035,6 @@
             </Item>
           </RewardReputation>
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1603873159</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -5484,15 +5065,16 @@
           <Name>Request Small Fleet Blake</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-1092567027</SubtitleGroup>
+                  <SubtitleGroup>-883157809</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -5504,7 +5086,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>45</QuestGiver>
-          <DescriptionText>1500001272</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -5532,43 +5113,6 @@
           </RewardAssets>
           <RewardReputation />
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>-883157809</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -5598,15 +5142,16 @@
           <Name>Request Small Fleet Nate</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>-1424151478</SubtitleGroup>
+                  <SubtitleGroup>1050032389</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -5618,7 +5163,6 @@
             </Notification>
           </SuccessMessage>
           <QuestGiver>77</QuestGiver>
-          <DescriptionText>1500001273</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -5646,43 +5190,6 @@
           </RewardAssets>
           <RewardReputation />
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>1050032389</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -5714,15 +5221,16 @@
           <Name>Request Small Fleet Queen</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1050362156</SubtitleGroup>
+                  <SubtitleGroup>2143413499</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -5741,6 +5249,11 @@
             <Values>
               <ActionList>
                 <Actions>
+                  <Item>
+                    <VectorElement>
+                      <InheritedIndex>0</InheritedIndex>
+                    </VectorElement>
+                  </Item>
                   <Item>
                     <Action>
                       <Template>ActionDelayedActions</Template>
@@ -5946,7 +5459,6 @@
             </Values>
           </OnQuestActive>
           <QuestGiver>75</QuestGiver>
-          <DescriptionText>1500001274</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -5968,43 +5480,6 @@
           </RewardAssets>
           <RewardReputation />
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>2143413499</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -6027,22 +5502,23 @@
     </Asset>
     
     <Asset>
-      <BaseAssetGUID>1500001274</BaseAssetGUID>
+      <BaseAssetGUID>1500001247</BaseAssetGUID>
       <Values>
         <Standard>
           <GUID>1500001275</GUID>
           <Name>Request Big Fleet Queen</Name>
         </Standard>
         <Quest>
-          <AbortedAutomaticallyMessage>
+          <StarterMessage>
             <Notification>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
               <Values>
                 <NotificationSubtitle>
-                  <SubtitleGroup>1050362156</SubtitleGroup>
+                  <SubtitleGroup>2143413499</SubtitleGroup>
                 </NotificationSubtitle>
               </Values>
             </Notification>
-          </AbortedAutomaticallyMessage>
+          </StarterMessage>
           <SuccessMessage>
             <Notification>
               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -6064,21 +5540,6 @@
                   <Item>
                     <VectorElement>
                       <InheritedIndex>0</InheritedIndex>
-                    </VectorElement>
-                  </Item>
-                  <Item>
-                    <VectorElement>
-                      <InheritedIndex>1</InheritedIndex>
-                    </VectorElement>
-                  </Item>
-                  <Item>
-                    <VectorElement>
-                      <InheritedIndex>2</InheritedIndex>
-                    </VectorElement>
-                  </Item>
-                  <Item>
-                    <VectorElement>
-                      <InheritedIndex>3</InheritedIndex>
                     </VectorElement>
                   </Item>
                   <Item>
@@ -6486,7 +5947,6 @@
             </Values>
           </OnQuestActive>
           <QuestGiver>75</QuestGiver>
-          <DescriptionText>1500001275</DescriptionText>
         </Quest>
         <PreConditionList>
           <Condition>
@@ -6508,43 +5968,6 @@
           </RewardAssets>
           <RewardReputation />
         </Reward>
-        <Objectives>
-          <WinConditions>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>0</InheritedIndex>
-              </VectorElement>
-              <Objective>
-                <Values>
-                  <ConditionQuestObjective>
-                    <ObjectiveSuccessMessage>
-                      <Values>
-                        <NotificationSubtitle>
-                          <SubtitleGroup>2143413499</SubtitleGroup>
-                        </NotificationSubtitle>
-                      </Values>
-                    </ObjectiveSuccessMessage>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>1</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>2</InheritedIndex>
-              </VectorElement>
-            </Item>
-            <Item>
-              <VectorElement>
-                <InheritedIndex>3</InheritedIndex>
-              </VectorElement>
-            </Item>
-          </WinConditions>
-        </Objectives>
         <QuestOptional>
           <StarterObject>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>

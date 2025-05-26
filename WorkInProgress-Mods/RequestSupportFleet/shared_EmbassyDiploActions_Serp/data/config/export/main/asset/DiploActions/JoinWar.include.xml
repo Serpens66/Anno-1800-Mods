@@ -4,53 +4,23 @@
   
   <!-- 1500005258 bis 1500005262 and 1500005266 -->
   <!-- 1500005261 wieder frei -->
-
+  
+  <!-- TODO: anstatt SetCompanyName Trick zu verwenden, hier denke ich doch 16*4 scripte mit allen Kombinationen -->
+   <!-- erstellen. Einfach weil diese Anzahl noch halbwegs im Rahmen ist und man sich diesen Trick, der nur  -->
+    <!-- limitiert oft zeitgleich eingesetzt werden kann, lieber für noch krassere kombis aufheben sollte -->
+  
   
   <!-- TODO: -->
    <!-- aktuell wird der Kriegsbeitritt Button auch nicht aktualisiert, -->
     <!-- wenn Bereits ein Charakter ausgewählt ist, sodass zb Kriegsbeitritt anfragen weiterhin möglich bleibt, -->
      <!-- auch wenn nicht mehr verbündet. Erst beim Klick auf Zurück und wieder hin, ists dann gesperrt -->
   
+  
+  <!-- TODO: -->
+   <!-- Multiplayer JoinWar testen -->
+  
 
-   <!-- An sich ists gut, dass CaseFire überschrieben wird. NonAttack muss man mal schauen, ob das gebrochen werden darf... eher nicht -->
-  <!-- .. -->
-  <!-- ich denke gegen Piraten sollte CeaseFire/NonAttack ignoriert werden, also KI sollte denen dennoch Krieg erklären können. -->
-   <!-- Gegen menschliche Spieler sollte kein Krieg erklärt werden können, wenn das läuft. UND auch nicht wenn in Allianz -->
-   <!-- Und gegen andere KI ... auch eher ignorieren, sonst werden sie einen zu selten helfen, so oft wie die das abschließen. -->
-  
-  <!-- und noch ne notifiation der ki an spieler schicken -->
-   <!-- Die PlayerInvokesAlliance Nachrichten -->
-  <!-- gibt wohl scheinbar keinen passenden vanilla Text zu dem Sound im sinne von "Bente steht ihnen bei", -->
-   <!-- entweder schreib ich das also selbst in jeder Sprache... oder wir lassens weg, oder wir nehmen iwas allgemeines -->
-    <!-- nehmen wir "... akzeptiert allianz" -->
-     <!-- (oder auf deutsch und englisch n sinnvollen Text wie "... erklärt euren Feinden den Krieg" und in den anderen sprachen 10043) -->
-  <!-- <Item> -->
-    <!-- <TriggerAction> -->
-      <!-- <Template>ActionNotification</Template> -->
-      <!-- <Values> -->
-        <!-- <Action /> -->
-        <!-- <ActionNotification> -->
-          <!-- <Notification> -->
-            <!-- <Template>CharacterNotification</Template> -->
-            <!-- <Values> -->
-              <!-- <CharacterNotification> -->
-                <!-- <NotificationTextFemale>10043</NotificationTextFemale> -->
-                <!-- <Profile>47</Profile> -->
-              <!-- </CharacterNotification> -->
-              <!-- <BaseNotification> -->
-                <!-- <NotificationText>10045</NotificationText> -->
-              <!-- </BaseNotification> -->
-              <!-- <NotificationSubtitle> -->
-                <!-- <SubtitleGroup>-1809440532</SubtitleGroup> -->
-              <!-- </NotificationSubtitle> -->
-            <!-- </Values> -->
-          <!-- </Notification> -->
-        <!-- </ActionNotification> -->
-      <!-- </Values> -->
-    <!-- </TriggerAction> -->
-  <!-- </Item> -->
-  
-  
+  <!-- important that these ObjectDummyWithOwner_BuildInShipyard are instantly finished -->
   <ModOp GUID="114166" Type="addNextSibling">
 
     <Asset>
@@ -283,7 +253,9 @@
                 <TriggerCondition>
                   <Template>ConditionAlwaysTrue</Template>
                   <Values>
-                    <Condition />
+                    <Condition>
+                      <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                    </Condition>
                     <ConditionAlwaysTrue />
                   </Values>
                 </TriggerCondition>
@@ -300,24 +272,50 @@
                           <TriggerActions>
                             <Item>
                               <TriggerAction>
-                                <Template>ActionNotification</Template>
+                                <Template>ActionAddResource</Template>
                                 <Values>
                                   <Action />
-                                  <ActionNotification>
-                                    <Notification>
-                                      <Template>CharacterNotification_DummyCommand</Template>
+                                  <ActionAddResource>
+                                    <Resource>1500005296</Resource>
+                                    <ResourceAmount>1</ResourceAmount>
+                                  </ActionAddResource>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>1000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                       <Values>
-                                        <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|0)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
-                                        </CharacterNotification>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionAddResource</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionAddResource>
+                                                    <Resource>1500005296</Resource>
+                                                    <ResourceAmount>-1</ResourceAmount>
+                                                  </ActionAddResource>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
                                       </Values>
-                                    </Notification>
-                                  </ActionNotification>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
                                 </Values>
                               </TriggerAction>
                             </Item>
                           </TriggerActions>
-                       </Trigger>
+                        </Trigger>
                       </Values>
                     </SubTrigger>
                   </Item>
@@ -333,19 +331,45 @@
                           <TriggerActions>
                             <Item>
                               <TriggerAction>
-                                <Template>ActionNotification</Template>
+                                <Template>ActionAddResource</Template>
                                 <Values>
                                   <Action />
-                                  <ActionNotification>
-                                    <Notification>
-                                      <Template>CharacterNotification_DummyCommand</Template>
+                                  <ActionAddResource>
+                                    <Resource>1500005297</Resource>
+                                    <ResourceAmount>1</ResourceAmount>
+                                  </ActionAddResource>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>1000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                       <Values>
-                                        <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|1)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
-                                        </CharacterNotification>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionAddResource</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionAddResource>
+                                                    <Resource>1500005297</Resource>
+                                                    <ResourceAmount>-1</ResourceAmount>
+                                                  </ActionAddResource>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
                                       </Values>
-                                    </Notification>
-                                  </ActionNotification>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
                                 </Values>
                               </TriggerAction>
                             </Item>
@@ -366,19 +390,45 @@
                           <TriggerActions>
                             <Item>
                               <TriggerAction>
-                                <Template>ActionNotification</Template>
+                                <Template>ActionAddResource</Template>
                                 <Values>
                                   <Action />
-                                  <ActionNotification>
-                                    <Notification>
-                                      <Template>CharacterNotification_DummyCommand</Template>
+                                  <ActionAddResource>
+                                    <Resource>1500005298</Resource>
+                                    <ResourceAmount>1</ResourceAmount>
+                                  </ActionAddResource>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>1000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                       <Values>
-                                        <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|2)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
-                                        </CharacterNotification>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionAddResource</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionAddResource>
+                                                    <Resource>1500005298</Resource>
+                                                    <ResourceAmount>-1</ResourceAmount>
+                                                  </ActionAddResource>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
                                       </Values>
-                                    </Notification>
-                                  </ActionNotification>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
                                 </Values>
                               </TriggerAction>
                             </Item>
@@ -399,19 +449,45 @@
                           <TriggerActions>
                             <Item>
                               <TriggerAction>
-                                <Template>ActionNotification</Template>
+                                <Template>ActionAddResource</Template>
                                 <Values>
                                   <Action />
-                                  <ActionNotification>
-                                    <Notification>
-                                      <Template>CharacterNotification_DummyCommand</Template>
+                                  <ActionAddResource>
+                                    <Resource>1500005299</Resource>
+                                    <ResourceAmount>1</ResourceAmount>
+                                  </ActionAddResource>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionDelayedActions</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDelayedActions>
+                                    <ExecutionDelay>1000</ExecutionDelay>
+                                    <DelayedActions>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                       <Values>
-                                        <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|3)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
-                                        </CharacterNotification>
+                                        <ActionList>
+                                          <Actions>
+                                            <Item>
+                                              <Action>
+                                                <Template>ActionAddResource</Template>
+                                                <Values>
+                                                  <Action />
+                                                  <ActionAddResource>
+                                                    <Resource>1500005299</Resource>
+                                                    <ResourceAmount>-1</ResourceAmount>
+                                                  </ActionAddResource>
+                                                </Values>
+                                              </Action>
+                                            </Item>
+                                          </Actions>
+                                        </ActionList>
                                       </Values>
-                                    </Notification>
-                                  </ActionNotification>
+                                    </DelayedActions>
+                                  </ActionDelayedActions>
                                 </Values>
                               </TriggerAction>
                             </Item>
@@ -440,7 +516,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|25)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|25)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -473,7 +549,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|26)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|26)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -506,7 +582,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|27)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|27)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -539,7 +615,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|28)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|28)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -572,7 +648,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|29)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|29)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -605,7 +681,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|30)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|30)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -638,7 +714,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|31)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|31)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -671,7 +747,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|32)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|32)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -704,7 +780,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|33)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|33)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -737,7 +813,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|34)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|34)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -770,7 +846,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|64)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|64)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -803,7 +879,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|17)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|17)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -836,7 +912,7 @@
                                       <Template>CharacterNotification_DummyCommand</Template>
                                       <Values>
                                         <CharacterNotification>
-                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|18)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                          <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|nil|18)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
                                         </CharacterNotification>
                                       </Values>
                                     </Notification>
@@ -862,7 +938,971 @@
     </Asset>
           
           
-          
+    <!-- TODO Test ob Subtitle hier wirkt, wenns ne nachricht von anderem Spieler ist -->
+     <!-- wenn zumindest Text angezeigt wird, dann evlt nen pool mit allen NpcInvokesAlliance zusammenstlelen, damit davon n zufällier satz da steht -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005321</GUID>
+          <Name>Show JoinWar Request from other Human</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human0</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005296</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005297</NotificationTextFemale>
+                                              <Profile>600069</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|1|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(0,1)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|1|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005297</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005296</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005298</NotificationTextFemale>
+                                              <Profile>600070</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|2|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(0,2)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|2|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005298</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005296</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005299</NotificationTextFemale>
+                                              <Profile>600070</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|3|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(0,3)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|3|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005299</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human1</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005297</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005296</NotificationTextFemale>
+                                              <Profile>600069</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|0|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(1,0)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|0|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005296</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005297</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005298</NotificationTextFemale>
+                                              <Profile>600070</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|2|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(2,1)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|2|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005298</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005297</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005299</NotificationTextFemale>
+                                              <Profile>600070</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|3|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(3,1)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|3|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005299</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human2</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005298</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005296</NotificationTextFemale>
+                                              <Profile>600069</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|0|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(2,0)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|0|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005296</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005298</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005297</NotificationTextFemale>
+                                              <Profile>600070</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|1|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(2,1)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|1|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005297</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005298</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human3</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005299</NotificationTextFemale>
+                                              <Profile>600070</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|3|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(2,3)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|3|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005299</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human3</Template>
+                      <Values>
+                        <Condition>
+                          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                        </Condition>
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005299</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human0</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005296</NotificationTextFemale>
+                                              <Profile>600069</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|0|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(3,0)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|0|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005296</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005299</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human1</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005297</NotificationTextFemale>
+                                              <Profile>600070</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|1|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(3,1)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|1|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005297</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionPlayerCounter</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionPlayerCounter>
+                                    <PlayerCounter>GoodsInStock</PlayerCounter>
+                                    <Context>1500005299</Context>
+                                    <CounterAmount>1</CounterAmount>
+                                    <ComparisonOp>AtLeast</ComparisonOp>
+                                    <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                                    <CheckedParticipant>Human2</CheckedParticipant>
+                                  </ConditionPlayerCounter>
+                                </Values>
+                              </TriggerCondition>
+                              <TriggerActions>
+                                <Item>
+                                  <TriggerAction>
+                                    <Template>ActionNotification</Template>
+                                    <Values>
+                                      <Action />
+                                      <ActionNotification>
+                                        <Notification>
+                                          <Template>CharacterNotification</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <NotificationTextFemale>1500005298</NotificationTextFemale>
+                                              <Profile>600070</Profile>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <Infotip>3822</Infotip>
+                                                  <Icon>3822</Icon>
+                                                  <Command>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|2|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                  <ButtonSound>216796</ButtonSound>
+                                                </Item>
+                                                <Item>
+                                                  <Infotip>3882</Infotip>
+                                                  <Icon>3882</Icon>
+                                                  <Command>[Participants CancelAlliance(3,2)]</Command>
+                                                  <ButtonSound>216801</ButtonSound>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                              <ThirdpartyDefaultCommand>[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.DeclareWarToAllMyEnemies|2|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</ThirdpartyDefaultCommand>
+                                            </CharacterNotification>
+                                            <BaseNotification>
+                                              <NotificationText>1500005298</NotificationText>
+                                              <NotificationPriority>900</NotificationPriority>
+                                              <NotificationMinDisplayTime>60000</NotificationMinDisplayTime>
+                                              <DisplayTimeout>180000</DisplayTimeout>
+                                              <NotificationBlockingTime>60000</NotificationBlockingTime>
+                                              <IsUnique>1</IsUnique>
+                                            </BaseNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>-491555413</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </Notification>
+                                      </ActionNotification>
+                                    </Values>
+                                  </TriggerAction>
+                                </Item>
+                              </TriggerActions>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>            
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <!-- 2 sec delay, because the helper ressource is removed after 1 sec -->
+                      <TimeLimit>2000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
     
 
     

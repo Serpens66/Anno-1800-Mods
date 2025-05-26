@@ -280,7 +280,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       local SharePID = g_LTL_Serp.GetPairAtIndSortedKeys(g_PeersInfo_Serp.PIDsToShareData,g_PeersInfo_Serp.PeerInt+1) -- g_PeersInfo_Serp.PIDsToShareData[g_PeersInfo_Serp.PeerInt+1]
       
       g_LTL_Serp.modlog("DoTheSharing before DoneVariableString "..tostring(ts.GameClock.CorporationTime),ModID)
-      local DoneVariable,last_key = g_LTL_Serp.myeval(task.DoneVariableString,true)
+      local DoneVariable,last_key = g_LTL_Serp.myeval(DoneVariableString,true)
 
       g_LTL_Serp.modlog("DoTheSharing after DoneVariableString "..tostring(ts.GameClock.CorporationTime),ModID)
       local PID_OID = nil

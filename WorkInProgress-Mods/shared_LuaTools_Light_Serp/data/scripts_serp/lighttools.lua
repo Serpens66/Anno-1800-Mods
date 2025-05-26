@@ -386,6 +386,12 @@ local function start_thread(threadname,ModID,fn,...)
   end,tostring(ModID)..": "..tostring(threadname))
 end
 
+-- TODO:
+-- noch eine log_error function oderso machen,
+ -- die wie start_thread pcall nutzt , aber eben ohne system.start,
+  -- was wir dann zum aufruf von Funktionen nutzen, damit jeder Fehler in unserem lua log gelogged wird
+
+
 -- wait realtime (system.waitForGameTimeDelta waits for ingame time, so is faster on fast-forward. While we want to wait for syncing stuff to happen, which usually takes the same real time)
 -- called from within a thread (coroutine)
 -- best only use to ~ max of 6 seconds (6000), because its not saved to savegame. And may continue to be executed in another savegame (wehn going to main menu and load another game)
@@ -738,6 +744,59 @@ end
   end
   
   
+  -- Quests:
+  -- RunningQuestByGUID gibt es offenbar nicht mehr (dass wir auch echt keine aktuelle textsourcelist.json von ubi bekommen nervt hart...)
+    -- auch via setDebugTextSource geht RunningQuestByGUID nicht, wurde also vermutlich wirklich komplett entfernt.
+   -- Aber wir können ts.Quests.GetQuest(i) nutzen und da einfach mit Zahlen von 0 bis x drüber loopen
+    -- und die Quest suchen die wir behandeln wollen. Gibt nur leider auf die QuestInstance keinen Check ob es eine bestimmte GUID
+     -- ist , es geht nur QuestDescriptionText und QuestStoryText, dh am besten DescriptionText gleich GUID setzen, da dies soweit ich sehen kann eh nie ingame angezeigt wird.
+   -- QuestInstance.IsActive ist immer true sobald die instance gestartet ist (und HasEnded immer true sobald beendet)
+    -- Dh. ich muss wenn ich aktive Quests will, suchen nach IsActive and not HasEnded
+  -- Die IDs der Quests scheinen bei 0 anzufangen und werden größer. Die ID wird festegelegt, sobald Quest auf Karte annehmbar ist.
+  -- returns a list of IDs. you can get the QuestInstance via ts.Quests.GetQuest(ID)
+  local function GetActiveQuestInstances(DescriptionTextGUID,firstfound,startfromID) -- we can only search for DescriptionText, not the Quest GUID...  
+    local ID = startfromID or 2 -- 0 to 1 are empty it seems. 2 always seems to be  "153179 Writers Quests Trigger"
+    local QuestIndices = {} -- returning Indices instead of QuestInstance, because such instances are broken after one use (same for GameObject)
+    while true do
+      -- g_LTL_Serp.modlog("Quest ID "..tostring(ID)..", active: "..tostring(ts.Quests.GetQuest(ID).IsActive)..", HasEnded: "..tostring(ts.Quests.GetQuest(ID).HasEnded)..", StoryText: "..tostring(ts.Quests.GetQuest(ID).QuestStoryText)..", DescriptionText: "..tostring(ts.Quests.GetQuest(ID).QuestDescriptionText)..", TimeLeft: "..tostring(ts.Quests.GetQuest(ID).TimeLeft)..", StateReachable: "..tostring(ts.Quests.GetQuest(ID).StateReachable),ModID)
+      local IsActive = ts.Quests.GetQuest(ID).IsActive
+      local HasEnded = ts.Quests.GetQuest(ID).HasEnded
+      local StoryText = ts.Quests.GetQuest(ID).QuestStoryText
+      local DescriptionText = ts.Quests.GetQuest(ID).QuestDescriptionText
+      local TimeLeft = ts.Quests.GetQuest(ID).TimeLeft
+      if not IsActive and not HasEnded and StoryText==0 and DescriptionText==0 and TimeLeft==0 then -- most likely reached the end of quests
+        break
+      end
+      if IsActive and not HasEnded and (DescriptionTextGUID==nil or DescriptionText==DescriptionTextGUID) then
+        table.insert(QuestIndices,ID)
+        if firstfound then
+          break
+        end
+      end
+      ID = ID + 1
+    end
+    return QuestIndices
+  end
+
+-- Quest ID 0, active: false, HasEnded: false, StoryText: 0, DescriptionText: 0, TimeLeft: 0, StateReachable: false
+-- Quest ID 1, active: false, HasEnded: false, StoryText: 0, DescriptionText: 0, TimeLeft: 0, StateReachable: false
+-- Quest ID 2, active: true, HasEnded: false, StoryText: 0, DescriptionText: 0, TimeLeft: 0, StateReachable: false
+-- Quest ID 3, active: true, HasEnded: true, StoryText: 1500001291, DescriptionText: 3965, TimeLeft: 5671600, StateReachable: false
+-- Quest ID 4, active: true, HasEnded: true, StoryText: 9814, DescriptionText: 3809, TimeLeft: -91900, StateReachable: false
+-- Quest ID 5, active: true, HasEnded: true, StoryText: 18355, DescriptionText: 3809, TimeLeft: -485000, StateReachable: false
+-- Quest ID 6, active: true, HasEnded: true, StoryText: 18139, DescriptionText: 3965, TimeLeft: 118400, StateReachable: false
+-- Quest ID 7, active: true, HasEnded: true, StoryText: 17300, DescriptionText: 3809, TimeLeft: 579200, StateReachable: false
+-- Quest ID 8, active: false, HasEnded: false, StoryText: 18444, DescriptionText: 3965, TimeLeft: 1800000, StateReachable: false
+-- Quest ID 9, active: true, HasEnded: false, StoryText: 1500001291, DescriptionText: 3965, TimeLeft: 6343700, StateReachable: false
+-- Quest ID 10, active: false, HasEnded: false, StoryText: 0, DescriptionText: 0, TimeLeft: 0, StateReachable: false
+-- Quest ID 11, active: false, HasEnded: false, StoryText: 0, DescriptionText: 0, TimeLeft: 0, StateReachable: false
+-- Quest ID 12, active: false, HasEnded: false, StoryText: 0, DescriptionText: 0, TimeLeft: 0, StateReachable: false
+-- Quest ID 13, active: false, HasEnded: false, StoryText: 0, DescriptionText: 0, TimeLeft: 0, StateReachable: false
+  
+  -- ts.Quests.GetQuest(8).SetAbortedNet(bool_isManually,int_QuestAbortReason)
+  
+  
+  
   -- ###################################################################################################
   -- ###################################################################################################
   -- ###################################################################################################
@@ -798,7 +857,7 @@ end
   -- tested with flagship (with other objects there may be more working ones)
   -- 310 : QuestObject,315 : Attackable,316 : Attacker,320 : Collector,321 : CommandQueue,326 : Draggable,331 : FeedbackController,334 : Infolayer,338 : Mesh,340 : MetaPersistent,344 : Nameable,347 : Pausable,354 : Rentable,357 : Selection,358 : Sellable,359 : ShipIncident,360 : ShipMaintenance,364 : PropertyTradeRouteVehicle,367 : Walking,665 : SoundEmitter,740 : ItemContainer,846 : UpgradeList
   -- if you try it on invalid userdata (or userdata from other session) getProperty retruns: "Invalid gameObject id 8589934625!" (id number can be different in your case of course)
-
+    -- or also with other session OID to get userdata: unassigned
 
   -- provide this function with either userdata or OID.
    -- and Property you want to check, can be a string or the PropertyID
@@ -825,7 +884,7 @@ end
         end
         local success, PropertyName = pcall(savecallproperty,userdata,PropertyID) -- getProperty raises an error if it does not have the property. preventing this with pcall.
         if success then
-          if not PropertyName:find("Invalid gameObject id") then -- invalid userdata eg. because no longer filled, was never valid or called in wrong session
+          if not PropertyName:find("Invalid") and not PropertyName:find("unassigned") then -- "Invalid gameObject id" userdata eg. because no longer filled, was never valid or called in wrong session. "GameObject, unassigned" if we using an OID from another session
             return true
           else
             return nil
@@ -915,7 +974,12 @@ end
 
 
 
-
+-- TODO:
+ -- userdata = game.MetaGameManager.getObjectByID(OID)
+ -- überschreiben sodass wir danach noch die userdata überprüfen, ob sie valid ist,
+  -- (zb getProperty returned invalid/unassigned , oder ine andere fkt versuchen)
+  -- und wenn sie nicht valid ist, dann direkt nil returnen,
+ -- damit man sie nicht versehentlich verwendet  
 
 
 
@@ -964,12 +1028,13 @@ g_LTL_Serp = {
   
   PIDs = {
     Human0={PID=0,GUID=41},Human1={PID=1,GUID=600069},Human2={PID=2,GUID=600070},Human3={PID=3,GUID=42},
-    General_Enemy={PID=9,GUID=44},Neutral={PID=8,GUID=34},
+    General_Enemy={PID=9,GUID=44},Neutral={PID=8,GUID=34},Third_party_01_Queen={PID=15,GUID=75},
     Second_ai_01_Jorgensen={PID=25,GUID=47},Second_ai_02_Qing={PID=26,GUID=79},Second_ai_03_Wibblesock={PID=27,GUID=80},
     Second_ai_04_Smith={PID=28,GUID=81},Second_ai_05_OMara={PID=29,GUID=82},Second_ai_06_Gasparov={PID=30,GUID=83},
     Second_ai_07_von_Malching={PID=31,GUID=11},Second_ai_08_Gravez={PID=32,GUID=48},Second_ai_09_Silva={PID=33,GUID=84},
     Second_ai_10_Hunt={PID=34,GUID=79},Second_ai_11_Mercier={PID=64,GUID=220},
     Third_party_03_Pirate_Harlow={PID=17,GUID=73},Third_party_04_Pirate_LaFortune={PID=18,GUID=76},
+    Third_party_02_Blake={PID=16,GUID=45},Third_party_06_Nate={PID=22,GUID=77},
     -- ={PID=,GUID=},={PID=,GUID=},={PID=,GUID=},
   },
   
@@ -980,6 +1045,7 @@ g_LTL_Serp = {
   GetVectorGuidsFromSessionObject = GetVectorGuidsFromSessionObject,
   GetCoopPeersAtMarker = GetCoopPeersAtMarker,
   GetGameObjectPath = GetGameObjectPath,
+  GetActiveQuestInstances = GetActiveQuestInstances,
   
   -- CheckObjectHelpers 
   HasProperty = HasProperty,

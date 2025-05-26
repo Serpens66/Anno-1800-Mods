@@ -385,6 +385,13 @@ if g_LuaScriptBlockers[ModID]==nil then
       return session100gameobjects
     end
 
+    -- TODO WICHTIG:
+      -- Aus irgendeinem Grund findet das hier die 2nd AIs nicht, auch wenn sie bereits in der Session sind.
+       -- nur alte Welt geht, neue welt nicht.
+      -- testen woran das liegt, ob evlt ID Converter falsch sind?
+      -- Oder können wir 2nd participants so garnicht finden?
+       -- (wird in IsThirdPartyTrader genutzt)
+
     -- eg. sGUID=34 -> Neutral
     -- SessionParticipants alawys gets the instance in the current session from the local player
     -- so to check/change the Nameable from the SParticipants in the current active session we can always use this.
