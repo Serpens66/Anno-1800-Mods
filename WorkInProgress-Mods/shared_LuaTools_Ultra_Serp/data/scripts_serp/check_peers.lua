@@ -413,7 +413,8 @@ if g_LuaScriptBlockers[ModID]==nil then
       local inhex = g_PeersInfo_Serp.GetSharedLuaInfo(FromPeerInt)
       local intable = g_StringTableConvertSerpNyk.HexToTable(inhex)
       if type(intable) =="table" then
-        -- g_LTL_Serp.modlog(intable.funcname,ModID)
+        -- g_LTL_Serp.modlog(g_LTL_Serp.TableToString(intable),ModID)
+        g_LTL_Serp.modlog(intable.funcname,ModID)
         local ShouldIExecute = false
         local ForPeers = intable.ForPeers
         if ForPeers==nil then

@@ -33,7 +33,8 @@ if g_LuaScriptBlockers[ModID]==nil then
   -- no need to call from within a thread, starts a thread on its own (to be able to call t_ChangeOwnerOIDToPID)
    -- note to self: do not change this function to a thread-only function, because it will be used in CharacterNotification via FnViaTextEmbed 
   local function ChangeOwnerOfSelectionToPID(To_PID,ignoreowner)
-    g_LTL_Serp.start_thread("ChangeOwnerOfSelectionToPID",ModID,function()
+    g_LTL_Serp.start_thread("ChangeOwnerOfSelectionToPID_random_",ModID,function()
+      To_PID = To_PID or ts.Participants.GetGetCurrentParticipantID()
       local continue = g_LTM_Serp.ContinueCoopCalled()
       if continue then
         g_LTL_Serp.modlog("ChangeOwnerOfSelectionToPID "..tostring(To_PID).." , "..tostring(ignoreowner),ModID)
@@ -43,7 +44,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           if success and continue=="IsFirst" then -- in theory I would credit 1 Rep per ship.. but it desyncs, so we need to register a trigger which starts data/scripts_serp/rep/rep1_gasparov_h0.lua , but we need every possible combination, so tons of scripts if we want to do it like this :D So we only do it if g_LTU_Serp is enabled (not included)
             local Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
             if Owner~=nil then -- increase opinion from To_PID towards the Owner of the gifted object
-              g_LTL_Serp.start_thread("ChangeRep1ForGiftShip",ModID,g_LTU_Serp.PeersInfo.t_ExecuteFnWithArgsForPeers,"ts.Participants.SetChangeParticipantReputationTo",nil,nil,"Everyone",To_PID,Owner,1)
+              g_LTL_Serp.start_thread("ChangeRep1ForGiftShip_random_",ModID,g_LTU_Serp.PeersInfo.t_ExecuteFnWithArgsForPeers,"ts.Participants.SetChangeParticipantReputationTo",nil,nil,"Everyone",To_PID,Owner,1)
             end
           end
         end
@@ -54,7 +55,7 @@ if g_LuaScriptBlockers[ModID]==nil then
   
   local function GetJoinWarCandidatesTargetPID(TargetPID)
     local PID = ts.Participants.GetGetCurrentParticipantID()
-    local DiplomacyState = g_DiploActions_Serp.DiplomacyState
+    local DiplomacyState = g_LTL_Serp.DiplomacyState
     local TargetPIDs = {}
     if PID~=TargetPID and g_LTL_Serp.table_contains_value(g_DiploActions_Serp.SupportedPIDs_War,TargetPID) and ts.Participants.GetTopLevelDiplomacyStateTo(PID,TargetPID)==DiplomacyState.Alliance then
       for _,CheckPID in pairs(g_DiploActions_Serp.SupportedPIDs_War) do
@@ -83,7 +84,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       PID = PID or ts.Participants.GetGetCurrentParticipantID()
       TargetPID = TargetPID or ts.Participants.GetGetCurrentParticipantID()
       g_LTL_Serp.modlog("DeclareWarToAllMyEnemies "..tostring(PID).." , "..tostring(TargetPID),ModID)
-      local DiplomacyState = g_DiploActions_Serp.DiplomacyState
+      local DiplomacyState = g_LTL_Serp.DiplomacyState
       local success = false
       local JoinWarCandidates = g_DiploActions_Serp.GetJoinWarCandidatesTargetPID(TargetPID)
       for _,CheckPID in ipairs(JoinWarCandidates) do -- no exception for humans, also they can be forced into war, if in alliance with another human
@@ -96,7 +97,8 @@ if g_LuaScriptBlockers[ModID]==nil then
         success = true -- at least one
       end
       if success then
-        g_DiploActions_Serp.UpdateOfferedDiploButtons(TargetPID) -- update buttons
+        ts.Unlock.SetRelockNet(g_DiploActions_Serp.DiploButtonsUnlocks.JoinWar) -- update buttons
+        g_DiploActions_Serp.UnhideAllDiploButtons()
         
         if continue=="IsFirst" then
           if not g_LTL_Serp.IsHuman(TargetPID) then
@@ -115,7 +117,7 @@ if g_LuaScriptBlockers[ModID]==nil then
   
   local function IsGiftShipAllowed(TargetPID)
     local PID = ts.Participants.GetGetCurrentParticipantID()
-    local DiplomacyState = g_DiploActions_Serp.DiplomacyState
+    local DiplomacyState = g_LTL_Serp.DiplomacyState
     -- return PID~=TargetPID and ts.Participants.GetCheckDiplomacyStateTo(PID,TargetPID,DiplomacyState.TradeRights)
     return PID~=TargetPID and ts.Participants.GetCheckDiplomacyStateTo(PID,TargetPID,DiplomacyState.Peace)
   end
@@ -125,6 +127,10 @@ if g_LuaScriptBlockers[ModID]==nil then
     for name,unlock in pairs(g_DiploActions_Serp.DiploButtonsUnlocks) do
       ts.Unlock.SetRelockNet(unlock)
     end
+  end
+  
+  local function UnhideAllDiploButtons()
+    ts.Conditions.RegisterTriggerForCurrentParticipant(1500005322) -- unhides, not a problem if executed multiple times at once
   end
   
   
@@ -142,7 +148,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         g_DiploActions_Serp.LockAllDiploButtons()
         if PID~=TargetPID and TargetPID~=nil then
           topdiplostate = topdiplostate or ts.Participants.GetTopLevelDiplomacyStateTo(PID,TargetPID)
-          local DiplomacyState = g_DiploActions_Serp.DiplomacyState
+          local DiplomacyState = g_LTL_Serp.DiplomacyState
           
           local JoinWarCandidates = g_DiploActions_Serp.GetJoinWarCandidatesTargetPID(TargetPID)
           if next(JoinWarCandidates) then
@@ -154,6 +160,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         elseif TargetPID==nil then -- back button was hit, so no PID is now selected
           
         end
+        g_DiploActions_Serp.UnhideAllDiploButtons()
         
     end)
   end
@@ -170,7 +177,7 @@ if g_LuaScriptBlockers[ModID]==nil then
   local function OnRelationChanged(CheckPID,oldtopstate,newtopstate)
     local PID = ts.Participants.GetGetCurrentParticipantID()
     g_LTL_Serp.modlog("OnRelationChanged: "..tostring(PID).." towards "..tostring(CheckPID).." changed from "..tostring(oldtopstate).." to "..tostring(newtopstate),ModID)
-    local DiplomacyState = g_DiploActions_Serp.DiplomacyState
+    local DiplomacyState = g_LTL_Serp.DiplomacyState
     local IsSelected = not ts.Unlock.GetIsUnlocked(g_DiploActions_Serp.SelectionUnlocks[CheckPID]) -- locked means selected. 
     if IsSelected then
       g_DiploActions_Serp.UpdateOfferedDiploButtons(CheckPID,newtopstate)
@@ -226,7 +233,6 @@ if g_LuaScriptBlockers[ModID]==nil then
       GetJoinWarCandidatesTargetPID = GetJoinWarCandidatesTargetPID,
       SupportedPIDs_War = {0,1,2,3,25,26,27,28,29,30,31,32,33,34,64,17,18}, --  all humans, second party and pirates. should match the participants which are shown in the embassy mod for War related purpose (so no third party traders, except pirates)
       SupportedPIDs_All = {0,1,2,3,25,26,27,28,29,30,31,32,33,34,64,17,18,16,19,22,23,24,80,72,15}, --  should match all participants shown in embassy diplo mod
-      DiplomacyState = {War=0,Peace=1,TradeRights=2,Alliance=3,CeaseFire=4,NonAttack=5}, -- from datasets.xml
       _OnAnyRelationChanged = _OnAnyRelationChanged, -- internal use, called by onrelationchanged_0.lua lua script if Trigger detects DiplomaticRelationChanged.
       OnRelationChanged = OnRelationChanged, --called via _OnAnyRelationChanged
       OnPIDDiploSelection = OnPIDDiploSelection, -- called via events script.
@@ -235,6 +241,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       UpdateOfferedDiploButtons = UpdateOfferedDiploButtons, -- if you need to attach your code to this, simply save the original function, overwrite this one do you stuff in it and at the end return the original function
       IsGiftShipAllowed = IsGiftShipAllowed,
       LockAllDiploButtons = LockAllDiploButtons,
+      UnhideAllDiploButtons = UnhideAllDiploButtons,
       UpdateCachedRelations = UpdateCachedRelations,
       SelectionUnlocks = { -- PID=Unlock. if locked, it is selected
         [0]=1500005244,[1]=1500005245,[2]=1500005246,[3]=1500005247, -- Humans

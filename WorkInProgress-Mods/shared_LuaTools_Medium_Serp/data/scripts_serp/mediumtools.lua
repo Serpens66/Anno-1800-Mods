@@ -161,7 +161,8 @@ if g_LuaScriptBlockers[ModID]==nil then
     
     
   -- only works for Sellable Objects! (because we use the BuyNet Feature, which is the only way to change owner without desync/forcing everyone in the same session)
-  -- When changing the owner to ThirdParty, the ship will leave map (this is what BuyNet does, so normal behaviour when selling a ship to a shiptrader). I think it is ok, since we dont want Pirates and so on to use the same ship GUID like players. So if we really want gifting ship to Pirate, we should also use changeGUID .. in rare cases it does not leave map!
+  -- When changing the owner to ThirdParty, the ship will leave map (this is what BuyNet does, so normal behaviour when selling a ship to a shiptrader). I think it is ok, since we dont want Pirates and so on to use the same ship GUID like players. So if we really want gifting ship to Pirate, we should also use changeGUID .. in rare cases it does not leave map! (and it seems the owner is not Neutral, but the pirate. maybe thats why they sometimes do not leave, because they get another command..)
+   -- I will add xml Trigger to make sure Pirates never own Playerships (will either changeGUID or change to Neutral and leave map) and player never owns pirate ships (same)
   -- We assume whichever Peer is calling this, is the owner of OID (will be checked again) and want to gift it to To_PID
    -- So make sure before calling it, only one peer is calling it (either by using UltLuaHelpers or Notification Trick or whatever. if all coop peers execute it, then the buy/sell cost compensation is credited multiple times)
   -- use CallGlobalFnBlocked with "ChangeOwnerOIDToPID_"..OID as blocknameadd with ~2 seconds blocktime when calling this to prevent the same peer from executing it multiple times for the same object (eg if done via CharacterNotification Button and the player hits the button multiple times)
@@ -172,6 +173,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     local InfluenceProduct = 1010190 -- we dont care for Influence costs. Other costs are refunded
     if GUID~=nil and GUID~=0 then
       local Local_PID = ts.Participants.GetGetCurrentParticipantID()
+      To_PID = To_PID or Local_PID
       local Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
       local with_middleman = g_LTM_Serp.NatureParticipantPID -- if they have no traderights, we will make use of a middleman (PID=158) who has traderights with everyone
       if ts.Participants.GetCheckDiplomacyStateTo(Owner,To_PID,2) then -- BuyNet only works with traderights
@@ -249,14 +251,85 @@ if g_LuaScriptBlockers[ModID]==nil then
     return true
   end
   
+  
+  -- Only call it for the one coop peer which should buy object he has currently selected!
+  -- pricefactor multiplies CurrentParticipantBuyPrice MoneyCost (usually double of the SellPrice)
+  -- currently only supports money costs
+  -- dont change into a t_ function, but call thread within this fn, because it will get called from CharacterNotification 
+  local function SimpleBuySelected(pricefactor,ignorecanbesold,allownegativemoney)
+    g_LTL_Serp.start_thread("SimpleBuySelected_random_",ModID,function()
+      PID = ts.Participants.GetGetCurrentParticipantID()
+      if ts.Selection.Object.Owner~=PID and (ignorecanbesold or ts.Selection.Object.Sellable.CanBeSoldToTrader) then
+        
+        if type(pricefactor)=="boolean" then -- use Name , (not using string "Name" as pricefactor because not sure how to forward this with FnViaTextEmbed)
+          local name = ts.Selection.Object.Nameable.Name
+          local name_parts = g_LTL_Serp.mysplit(name, "_") -- eg. "The Shipname_2300" or simply "0.5"
+          local namevalue,restname = nil, ""
+          for _,part in ipairs(name_parts) do
+            local asnumber = tonumber(part)
+            if namevalue==nil and asnumber~=nil then
+              namevalue = asnumber
+            end
+            if asnumber==nil then
+              restname = restname..part
+            end
+          end
+          if restname==nil or restname=="" then
+            restname = g_LTL_Serp.weighted_random_choices(g_LTL_Serp.ShipNameGUIDs, 1)[1] -- get a random name
+            restname = ts.GetAssetData(restname).Text
+          end
+          if pricefactor==true then -- if true we want to pay the sum in the name
+            pricefactor = 1
+            local newprice = namevalue
+            if namevalue~=nil then
+              pricefactor = namevalue / ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost
+            end
+          else -- if false, the name is the pricefactor
+            pricefactor = namevalue or 1
+          end
+          ts.Selection.Object.Nameable.SetName(tostring(restname))
+        end
+        
+        if pricefactor~=nil and pricefactor~=1 then -- credit money back/reduce more money, do this first, because it might already change if we can afford the object
+          local changemoney = g_LTL_Serp.myround((1 - pricefactor) * ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost)
+          if changemoney~=0 then
+            ts.Economy.MetaStorage.AddAmount(1010017, changemoney)
+            if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
+              g_LTL_Serp.waitForTimeDelta(1000) -- wait for changemoney to be credited
+            end
+          end
+        end
+        local loan = false
+        if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
+          if allownegativemoney then
+            coroutine.yield()
+            loan = ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost + 10000
+            ts.Economy.MetaStorage.AddAmount(1010017, loan)
+            g_LTL_Serp.waitForTimeDelta(1000) -- wait for loan to be credited
+          else
+            return
+          end
+        end
+        ts.Selection.Object.Sellable.BuyNet(PID) -- owner and PID need traderights for this to do anything and PID needs to have enough money (and possibly also influence)
+        coroutine.yield()
+        if loan then
+          ts.Economy.MetaStorage.AddAmount(1010017, -loan)
+        end
+      end
+    end)
+  end
+  
   -- function you can call within code that is executed for one Human player, but for all coop peers from it.
   -- if it returns "AllCoop", you can continue your code, but still have in mind that it gets executed multiple times (once per coop)
    -- if it returns "IsFirst" you can savely call code and be sure its only executed once
     -- if it returns false, dont execute your code (if you want it to only be executed for the first coop peer)
   local function ContinueCoopCalled()
     local continue = "AllCoop"
-    if g_LTU_Serp~=nil and g_LTU_Serp.PeersInfo~=nil and g_LTU_Serp.PeersInfo~=nil then -- only if we also have ultra tools installed we have PeersInfo and therefore can make sure code is only executed for one peer
+    if g_LTU_Serp~=nil and g_LTU_Serp.PeersInfo~=nil and g_LTU_Serp.PeersInfo.CoopFinished~=nil then -- only if we also have ultra tools installed we have PeersInfo and therefore can make sure code is only executed for one peer
       continue = g_LTU_Serp.PeersInfo.AmIFirstActiveCoopPeer() and "IsFirst" or false
+    end
+    if continue=="AllCoop" and g_CoopCountResSerp~=nil and g_CoopCountResSerp.Finished~=nil and g_CoopCountResSerp.LocalCount==1 then
+      continue = "IsFirst" -- we are alone in this coop team
     end
     return continue
   end
@@ -274,6 +347,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       IsThirdPartyTrader = IsThirdPartyTrader,
       ContinueCoopCalled = ContinueCoopCalled,
       t_ChangeOwnerOIDToPID = t_ChangeOwnerOIDToPID,
+      SimpleBuySelected = SimpleBuySelected,
       NatureParticipantPID = 158, -- has traderights with everyone (Enum: Mod10, GUID: 1500004528)
       -- Shared_Cache use your ModID or other unique identifier as key. If the UltraTools mod is enabled, this Shared_Cache 
       -- will be saved to Nameable helper to save it to a savegame and will be loaded on loading a game 

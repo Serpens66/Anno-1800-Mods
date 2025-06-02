@@ -42,7 +42,7 @@ if g_PeersInfo_Serp.CoopFinished and PID==g_PeersInfo_Serp.PID then
 
           local spy_OID = nil
           local sessioninfos = g_ObjectFinderSerp.GetCurrentSessionObjectsFromLocaleByProperty(seamineproperty)
-          for OID,objinfo in pairs(sessioninfos.Objects) do
+          for OID,objinfo in pairs(sessioninfos) do
             if LandSpyGuid==objinfo["GUID"] or WaterSpyGuid==objinfo["GUID"] then -- every human only ever owns a single spy unit because of code/trigger limitations
               spy_OID = OID -- do not use spy_object = ts.GetGameObject(spy_OID) because Object gets broken after every use. So we neeed to call GetGameObject every time we want to use it!
               break
@@ -504,7 +504,7 @@ local function DoHijack(Attacker_PID,Itemnumber)
                     -- search for our spawned ship
                     local sessioninfos = ObjectFinderSerp.GetCurrentSessionObjectsFromLocaleByProperty("Walking") -- search for all Walking in current session
                     local SpawnedObject_OID,SpawnedObject_info
-                    for OID,objectinfo in pairs(sessioninfos["Objects"]) do
+                    for OID,objectinfo in pairs(sessioninfos) do
                       -- print(objectinfo["GUID"],FakeShipHelper)
                       if objectinfo["GUID"]==FakeShipHelper then
                         SpawnedObject_OID = OID

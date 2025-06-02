@@ -119,7 +119,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     end
 
 
-    print("shared_LuaUltimateHelpers_Serp objectfinder.lua called")
+    print("shared_LuaTools_Medium_Serp objectfinder.lua called")
     g_LTL_Serp.modlog("objectfinder.lua called",ModID)
 
 
@@ -214,7 +214,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- Wenns nicht um eigenes in eigener session geht, dann am besten SpawnMaxObjIdHelpers nutzen
     local function GetHighestObIDsLocalPlayerCurrentSessionByProperty(Property)
       local ret = g_ObjectFinderSerp.GetCurrentSessionObjectsFromLocaleByProperty(Property)
-      for OID,objinfo in pairs(ret.Objects) do
+      for OID,objinfo in pairs(ret) do
         local OIDtable = g_LTL_Serp.OIDToOIDtable(OID)
         local ObjectID = OIDtable.ObjectID
         local AreaID = g_LTL_Serp.AreatableToAreaID(OIDtable.AreaID)
@@ -273,13 +273,13 @@ if g_LuaScriptBlockers[ModID]==nil then
               OID = g_LTL_Serp.get_OID(userdata)
               GUID =  ts.Objects.GetObject(OID).GUID
               if GUID~=0 then -- is not the case here, but just to be save
-                Objects[OID] = {GUID=GUID, userdata=userdata,OID=OID}
+                Objects[OID] = {GUID=GUID, userdata=userdata,OID=OID,ParticipantID=ParticipantID,SessionGuid=SessionGuid}
               end
             end
           end
         end
       end
-      return {SessionGuid=SessionGuid, ParticipantID=ParticipantID, Objects=Objects}
+      return Objects
     end
 
     -- ###################################################################################################
@@ -1078,6 +1078,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       MaxObjIdWalkableHelper = {Guid=1500005550,Unlock=1500005552}, -- IslandID = 0
       DoesMaxObjIdHelperExists = DoesMaxObjIdHelperExists,
       SpawnMaxObjIdHelpers = SpawnMaxObjIdHelpers,
+      ModID = ModID,
     }
         
     -- _RegisterEvents() -- not called anymore, since event. does crash too often. using triggers again

@@ -173,7 +173,7 @@ local function my_to_type(value,to_type)
       if value=="false" then return false end
       if value=="true" then return true end
       return value~=nil and value~=false
-    elseif to_type=="integer" then
+    elseif to_type=="integer" then -- attention: returns nil for eg 4.1 or "4.1", so "number" and/or myround may be what you want
       return math.tointeger(value)
     elseif to_type=="bint" then
       return to_bint(value)
@@ -361,29 +361,39 @@ local function modlog(text,ModID)
   local dat = tostring(os.date()) -- add date+time string
   text = dat.." "..text
   local file = io.open("logs/lualog.txt", "a")
-  io.output(file)
-  io.write(text,"\n")
-  io.close(file)
+  if file~=nil then
+    io.output(file)
+    io.write(text,"\n")
+    io.close(file)
+  end
 end
 -- empty the file on every game start
 local file = io.open("logs/lualog.txt", "w")
-io.output(file)
-io.write("")
-io.close(file)
-
+if file~=nil then
+  io.output(file)
+  io.write("")
+  io.close(file)
+end
 
 -- starts a "thread" with system.start(fn,threadname). But uses pcall to start the function and logs the error if one happens 
  -- (otherwise any lua error is just swallowed without notification)
 local function start_thread(threadname,ModID,fn,...)
   local args = {...}
   ModID = ModID or ""
+  if string.find(threadname,"_random_") then -- if you added this string into your thread name
+    g_LTL_Serp.myreplace(threadname,"_random_",tostring(math.random())) -- making sure all threads are unique and not replaced
+  end
+  local final_threadname = tostring(ModID)..": "..tostring(threadname)
+  if system.internal.coroutines[final_threadname]~=nil then -- no need to check status, because done threads are already set nil again
+    g_LTL_Serp.modlog("WARNING start_thread: A thread with the name "..tostring(final_threadname).." is currently running. Are you sure you want to overwrite it? Choose a unique threadname if you dont want this",ModID)
+  end
   return system.start(function()
     local status,err = pcall(fn,table.unpack(args))
       if status==false then
-        g_LTL_Serp.modlog("ERROR in thread '"..tostring(threadname).."': "..tostring(err),ModID)
+        g_LTL_Serp.modlog("ERROR in thread '"..tostring(final_threadname).."': "..tostring(err),ModID)
         error(err)
       end
-  end,tostring(ModID)..": "..tostring(threadname))
+  end,final_threadname)
 end
 
 -- TODO:
@@ -629,6 +639,7 @@ end
    -- ts_embed_string should be eg: "[MetaObjects SessionGameObject("..tostring(OID)..") Area CityName]"
    -- so always inlucding "[MetaObjects SessionGameObject("..tostring(OID)..") ...]" and your wanted command for the OID you enter
   -- Make sure to test if your call does what it should, because this function does not check if your ts_embed_string is valid!
+  -- Also works for things like: "[Quests Quest(QuestID) QuestObjectives MainObjectives AT(0) DeliveryObjects AT(0) Product]"
   local function DoForSessionGameObject(ts_embed_string,doreturnstring)
     if doreturnstring then -- we want to get what the textembed returns, but game.TextSourceManager.setDebugTextSource does not return anything. I only know a workarkund to get it, by setting and reading out the name of a namable helper object
         game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( "..tostring(ts_embed_string).." )]")
@@ -743,6 +754,8 @@ end
     return ret
   end
   
+  -- TODO testen im Multiplayer, ob IDs zwischen allen spielern geteilt sind (wie GameObjectID)
+   -- das wäre ziemlich fatal, weils keinerlei info dazu in QuestInstance gibt wer die Quest aktiv hat
   
   -- Quests:
   -- RunningQuestByGUID gibt es offenbar nicht mehr (dass wir auch echt keine aktuelle textsourcelist.json von ubi bekommen nervt hart...)
@@ -754,9 +767,15 @@ end
     -- Dh. ich muss wenn ich aktive Quests will, suchen nach IsActive and not HasEnded
   -- Die IDs der Quests scheinen bei 0 anzufangen und werden größer. Die ID wird festegelegt, sobald Quest auf Karte annehmbar ist.
   -- returns a list of IDs. you can get the QuestInstance via ts.Quests.GetQuest(ID)
+  -- PROBLEM:
+   -- Diese QuestIDs sind natürlich global, also jeder Spieler sieht dieselben IDs und es gibt keine Möglichkeit
+    -- rauszufinden, welche Quests für wen aktiv sind -.-
+    -- Also ist es am sichersten das lua script direkt nach dem Start der Quest zu starten und dort die neuste (letzte der liste) gefundene passenende Quest zu nehmen (sofern jetzt gerade nur für diesen Spieler gestartet wurde)!
+    -- Alternativ jede Quest 4 mal machen, eine pro Human und WhichPlayerCondition Mod nutzen um eine Quest nur für Human0 usw zu starten
   local function GetActiveQuestInstances(DescriptionTextGUID,firstfound,startfromID) -- we can only search for DescriptionText, not the Quest GUID...  
     local ID = startfromID or 2 -- 0 to 1 are empty it seems. 2 always seems to be  "153179 Writers Quests Trigger"
     local QuestIndices = {} -- returning Indices instead of QuestInstance, because such instances are broken after one use (same for GameObject)
+    local abortcount = 0 -- we loop until we reach empty quests. But unfortunately sometimes some quests may appear as empty (eg. A7_QuestSubQuest), so only abort after we hit x empty quests in a row
     while true do
       -- g_LTL_Serp.modlog("Quest ID "..tostring(ID)..", active: "..tostring(ts.Quests.GetQuest(ID).IsActive)..", HasEnded: "..tostring(ts.Quests.GetQuest(ID).HasEnded)..", StoryText: "..tostring(ts.Quests.GetQuest(ID).QuestStoryText)..", DescriptionText: "..tostring(ts.Quests.GetQuest(ID).QuestDescriptionText)..", TimeLeft: "..tostring(ts.Quests.GetQuest(ID).TimeLeft)..", StateReachable: "..tostring(ts.Quests.GetQuest(ID).StateReachable),ModID)
       local IsActive = ts.Quests.GetQuest(ID).IsActive
@@ -765,6 +784,11 @@ end
       local DescriptionText = ts.Quests.GetQuest(ID).QuestDescriptionText
       local TimeLeft = ts.Quests.GetQuest(ID).TimeLeft
       if not IsActive and not HasEnded and StoryText==0 and DescriptionText==0 and TimeLeft==0 then -- most likely reached the end of quests
+        abortcount = abortcount + 1
+      else
+        abortcount = 0
+      end
+      if abortcount >= 20 then -- only after the last 20 quests were empty we can be sure enough... (ok that much "empty" quests usually only happen on testing much, not sure exactly what causes them... I think A7_QuestSubQuest)
         break
       end
       if IsActive and not HasEnded and (DescriptionTextGUID==nil or DescriptionText==DescriptionTextGUID) then
@@ -1026,6 +1050,7 @@ g_LTL_Serp = {
   OIDToOIDtable= OIDToOIDtable,
   get_OID = get_OID,
   
+  -- Some constants
   PIDs = {
     Human0={PID=0,GUID=41},Human1={PID=1,GUID=600069},Human2={PID=2,GUID=600070},Human3={PID=3,GUID=42},
     General_Enemy={PID=9,GUID=44},Neutral={PID=8,GUID=34},Third_party_01_Queen={PID=15,GUID=75},
@@ -1037,6 +1062,27 @@ g_LTL_Serp = {
     Third_party_02_Blake={PID=16,GUID=45},Third_party_06_Nate={PID=22,GUID=77},
     -- ={PID=,GUID=},={PID=,GUID=},={PID=,GUID=},
   },
+  ShipNameGUIDs = { -- eg to choose a random name via lua g_LTL_Serp.weighted_random_choices(g_LTL_Serp.ShipNameGUIDs, 1)[1] (SetName("") does not work, although it should generate a random name...)
+    [2302]=1,[2303]=1,[2304]=1,[2305]=1,[2306]=1,[2307]=1,[2308]=1,[2309]=1,[2310]=1,[2311]=1,[2312]=1,[2313]=1,[2314]=1,
+    [2315]=1,[2316]=1,[2317]=1,[2318]=1,[2319]=1,[10715]=1,[10716]=1,[10717]=1,[10718]=1,[10719]=1,[10720]=1,[10721]=1,
+    [10722]=1,[10723]=1,[10724]=1,[10725]=1,[10726]=1,[10727]=1,[10728]=1,[10729]=1,[10730]=1,[10731]=1,[10732]=1,[10733]=1,
+    [10734]=1,[10735]=1,[10736]=1,[10737]=1,[10738]=1,[10739]=1,[10740]=1,[10741]=1,[10742]=1,[10743]=1,[10744]=1,[10745]=1,
+    [10746]=1,[10747]=1,[10748]=1,[10749]=1,[10750]=1,[10751]=1,[10752]=1,[10753]=1,[10754]=1,[10755]=1,[10756]=1,[10757]=1,
+    [10758]=1,[10759]=1,[10760]=1,[10761]=1,[10762]=1,[10763]=1,[10764]=1,[10765]=1,[10766]=1,[10767]=1,[10768]=1,[10769]=1,
+    [10770]=1,[10771]=1,[10772]=1,[10773]=1,[10774]=1,[10775]=1,[10776]=1,[10777]=1,[10778]=1,[10779]=1,[10780]=1,[10781]=1,
+    [10782]=1,[10783]=1,[10784]=1,[10785]=1,[10786]=1,[10787]=1,[10788]=1,[10789]=1,[10790]=1,[10791]=1,[10792]=1,[10793]=1,
+    [10794]=1,[10795]=1,[10796]=1,[10797]=1,[10798]=1,[10799]=1,[10800]=1,[10801]=1,[10802]=1,[10803]=1,[10804]=1,[10805]=1,
+    [10806]=1,[10807]=1,[10808]=1,[10809]=1,[10810]=1,[10811]=1,[10812]=1,[10813]=1,[10814]=1,[20495]=1,[20496]=1,[20497]=1,
+    [20498]=1,[20499]=1,[20500]=1,[20501]=1,[20502]=1,[20503]=1,[20504]=1,[20505]=1,[20506]=1,[20507]=1,[20508]=1,[20509]=1,
+    [20510]=1,[20511]=1,[20512]=1,[20513]=1,[20514]=1,[20515]=1,[20516]=1,[20517]=1,[20518]=1,[20519]=1,[20520]=1,[20521]=1,
+    [20522]=1,[20523]=1,[20524]=1,[20525]=1,[20526]=1,[20527]=1,[20528]=1,[20529]=1,[20530]=1,[20531]=1,[20532]=1,[20533]=1,
+    [20534]=1,[20535]=1,[20536]=1,[20537]=1,[20538]=1,[20539]=1,[20540]=1,[20541]=1,[20542]=1,[20543]=1,[20544]=1,[20545]=1,
+    [20546]=1,[20547]=1,[20548]=1,[20549]=1,[20550]=1,[20551]=1,[20552]=1,[20553]=1,[20554]=1,[20555]=1,[20556]=1,[20557]=1,
+    [20558]=1,[20559]=1,[20560]=1,[20561]=1,[20562]=1,[20563]=1,[20564]=1,[20565]=1,[20566]=1,[20567]=1,[20568]=1,[20569]=1,
+    [20570]=1,[20571]=1,[20572]=1,[20573]=1,[20574]=1,[20575]=1,[20576]=1,[20577]=1,[20578]=1,[20579]=1,[20580]=1,[20581]=1,
+    [20582]=1,[20583]=1,[20584]=1,[20585]=1,[20586]=1,[20587]=1,
+  },
+  DiplomacyState = {War=0,Peace=1,TradeRights=2,Alliance=3,CeaseFire=4,NonAttack=5}, -- from datasets.xml
   
   -- Trickster Anno Helpers
   FnViaTextEmbed = FnViaTextEmbed,

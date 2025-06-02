@@ -33,7 +33,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           coroutine.yield()
         end
         local Cache = sModID and g_LTM_Serp.Shared_Cache[sModID] or g_LTM_Serp.Shared_Cache
-        g_PeersInfo_Serp.t_ExecuteFnWithArgsForPeers("g_PeersInfo_Serp._ExecutingSyncSharedCache",3000,waitforfinish,"Everyone",sModID,Cache,skip_equalcheck) -- waits for it to finish
+        g_PeersInfo_Serp.t_ExecuteFnWithArgsForPeers("g_SaveLuaStuff_Serp._ExecutingSyncSharedCache",3000,waitforfinish,"Everyone",sModID,Cache,skip_equalcheck) -- waits for it to finish
       end
     end
     
@@ -80,7 +80,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     
     local function t_LoadSharedCache()
       g_LTL_Serp.modlog("t_LoadSharedCache called",ModID)
-      while g_LTM_Serp==nil or g_ObjectFinderSerp==nil or g_PeersInfo_Serp==nil or g_PeersInfo_Serp.CoopFinished~=true do
+      while g_LTM_Serp==nil or g_ObjectFinderSerp==nil or g_PeersInfo_Serp==nil or g_PeersInfo_Serp.CoopFinished~=true or g_LTM_Serp.Shared_Cache[g_ObjectFinderSerp.ModID]==nil do
         coroutine.yield()
       end
       -- this already updates the Cache SessionParticipants and also LoadedSessions

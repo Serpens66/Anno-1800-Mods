@@ -6,7 +6,7 @@
 if g_LTL_Serp==nil then
   console.startScript("data/scripts_serp/lighttools.lua")
 end
-local ModID = "shared_LuaUltimateHelpers_Serp savestuff_tableconverter.lua" -- used for logging
+local ModID = "shared_LuaTools_Ultra_Serp savestuff_tableconverter.lua" -- used for logging
 
 
 -- https://www.reddit.com/r/lua/comments/hzi7ff/print_local_variable_as_hex_string/
