@@ -119,7 +119,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     
     local function _IsShipAllowed(PID,TargetPID,shipguid,IsThirdParty,info)
       -- g_LTL_Serp.modlog("_IsShipAllowed: "..tostring(PID).." towards "..tostring(TargetPID)..", IsThirdParty "..tostring(IsThirdParty)..", shipguid "..tostring(shipguid),ModID)
-      -- g_LTL_Serp.modlog("_IsShipAllowed: info "..(type(info)=="table" and g_LTL_Serp.TableToString(info) or "nil"),ModID)
+      -- g_LTL_Serp.modlog("_IsShipAllowed: info "..(type(info)=="table" and g_LTL_Serp.TableToFormattedString(info) or "nil"),ModID)
       if info~=nil and type(info)=="table" then
         if info.OnlyFor~=nil and not g_LTL_Serp.table_contains_value(info.OnlyFor,TargetPID) then
           -- g_LTL_Serp.modlog("_IsShipAllowed: OnlyFor false",ModID)

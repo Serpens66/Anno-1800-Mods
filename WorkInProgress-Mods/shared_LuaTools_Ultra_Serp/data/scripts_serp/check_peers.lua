@@ -28,10 +28,6 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- block it directly at start of the script (to prevent ActionExecuteScript to call this multiple times per local player)
     g_LuaScriptBlockers[ModID] = true
 
-    if g_StringTableConvertSerpNyk==nil then
-      console.startScript("data/scripts_serp/h/savestuff_tableconvert.lua")
-    end
-
     print("check_peers.lua registered")
     if g_LTL_Serp==nil then
       console.startScript("data/scripts_serp/lighttools.lua")
@@ -276,37 +272,37 @@ if g_LuaScriptBlockers[ModID]==nil then
       -- end)
     -- end
     
-    local function DoTheSharing(waittime,infostring,DoneVariableString)
+    local function _DoTheSharing(waittime,infostring,DoneVariableString)
       local SharePID = g_LTL_Serp.GetPairAtIndSortedKeys(g_PeersInfo_Serp.PIDsToShareData,g_PeersInfo_Serp.PeerInt+1) -- g_PeersInfo_Serp.PIDsToShareData[g_PeersInfo_Serp.PeerInt+1]
       
-      g_LTL_Serp.modlog("DoTheSharing before DoneVariableString "..tostring(ts.GameClock.CorporationTime),ModID)
+      g_LTL_Serp.modlog("_DoTheSharing before DoneVariableString "..tostring(ts.GameClock.CorporationTime),ModID)
       local DoneVariable,last_key = g_LTL_Serp.myeval(DoneVariableString,true)
 
-      g_LTL_Serp.modlog("DoTheSharing after DoneVariableString "..tostring(ts.GameClock.CorporationTime),ModID)
+      g_LTL_Serp.modlog("_DoTheSharing after DoneVariableString "..tostring(ts.GameClock.CorporationTime),ModID)
       local PID_OID = nil
       local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session
       if status==false then
-        g_LTL_Serp.modlog("ERROR : "..tostring(sessionparticipants),ModID)
+        g_LTL_Serp.modlog("_DoTheSharing ERROR : "..tostring(sessionparticipants),ModID)
         error(sessionparticipants) 
       end
       
-      g_LTL_Serp.modlog("DoTheSharing after GetAllLoadedSessionsParticipants "..tostring(ts.GameClock.CorporationTime),ModID)
+      g_LTL_Serp.modlog("_DoTheSharing after GetAllLoadedSessionsParticipants "..tostring(ts.GameClock.CorporationTime),ModID)
       for SessionID,session_pids in pairs(sessionparticipants) do
         PID_OID = session_pids[SharePID].OID
         local status,err = pcall(g_LTL_Serp.DoForSessionGameObject,"[MetaObjects SessionGameObject("..tostring(PID_OID)..") Nameable Name("..tostring(infostring)..")]")
         if status==false then
-          g_LTL_Serp.modlog("ERROR : "..tostring(err),ModID)
+          g_LTL_Serp.modlog("_DoTheSharing2 ERROR : "..tostring(err),ModID)
           error(err) 
         end
       end
-      g_LTL_Serp.modlog("DoTheSharing after DoForSessionGameObject "..tostring(ts.GameClock.CorporationTime),ModID)
+      g_LTL_Serp.modlog("_DoTheSharing after DoForSessionGameObject "..tostring(ts.GameClock.CorporationTime),ModID)
       g_LTL_Serp.waitForTimeDelta(waittime) -- wait before we return, so after we return the caller can directly continue to GetSharedLuaInfo
       if DoneVariable[last_key]~=nil then
         DoneVariable[last_key] = infostring -- signal that we are finished setting up the Nameable
       end
       g_LTL_Serp.waitForTimeDelta(1000) -- wait another second before reusing the Nameable, so clients can do GetSharedLuaInfo
       DoneVariable[last_key] = false
-      g_LTL_Serp.modlog("DoTheSharing task done "..tostring(ts.GameClock.CorporationTime),ModID)
+      g_LTL_Serp.modlog("_DoTheSharing task done "..tostring(ts.GameClock.CorporationTime),ModID)
     end
     
     -- Better dont use t_ShareLuaInfo directly. use t_ExecuteFnWithArgsForPeers instead
@@ -324,7 +320,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         end
         
         -- TODO test if this works, if yes, remove the global ShareLoopIsRunning and so on
-        g_LTM_Serp.AddToQueue(ModID.."_ShareLuaInfo",DoTheSharing,waittime,infostring,DoneVariableString) -- blocking our personal PIDsToShareData object, so we need to do it one after the other
+        g_LTM_Serp.AddToQueue(ModID.."_ShareLuaInfo",_DoTheSharing,waittime,infostring,DoneVariableString) -- blocking our personal PIDsToShareData object, so we need to do it one after the other
         
         -- table.insert(g_PeersInfo_Serp.ShareQueue,{waittime=waittime,infostring=infostring,DoneVariableString=DoneVariableString})
         -- if not g_PeersInfo_Serp.ShareLoopIsRunning then
@@ -339,7 +335,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         local SharePID = g_LTL_Serp.GetPairAtIndSortedKeys(g_PeersInfo_Serp.PIDsToShareData,FromPeerInt+1) -- g_PeersInfo_Serp.PIDsToShareData[FromPeerInt+1]
         local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session
         if status==false then
-          g_LTL_Serp.modlog("ERROR : "..tostring(sessionparticipants),ModID)
+          g_LTL_Serp.modlog("GetSharedLuaInfo ERROR : "..tostring(sessionparticipants),ModID)
           error(sessionparticipants) 
         end
         local text = nil
@@ -355,7 +351,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- this function is called from one peer and shares the information with all other peers and makes
      -- them execute the command all at the same time. (only needed if other peers dont have the required information, eg. an OID. IF everyone has all info, then simply start a trigger with ActionExecuteScript)
     -- funcname (string) must either directly exist as global variable. or be included in a global table. Then use eg. "g_ObjectFinderSerp.MyFunc" as string
-    -- args is a table. only strings, numbers and bools are allowed as content
+    -- args is a table. only strings, numbers and bools are allowed as content!
     --  nice for commands that are not synced (cause desync) and do not require everyone to be in the relevant session. Eg. CheatItemInSlot (hm, suddenly this does not desync anymore and is synced automatically?!)
     -- and also very nice for ts.Economy.MetaStorage.AddAmount(1010017, amount) and other things only hitting the local player, while we want another player to execute it
      -- (einfach eine funktiuon aufrufen lassen, die dann zb anhand der arguments prüft welcher peer man ist)
@@ -372,8 +368,22 @@ if g_LuaScriptBlockers[ModID]==nil then
     local function t_ExecuteFnWithArgsForPeers(funcname,waittime,returnafterfinish,ForPeers,...)
         g_LTL_Serp.modlog("t_ExecuteFnWithArgsForPeers start "..tostring(funcname).." "..tostring(ts.GameClock.CorporationTime),ModID)
         local args = {...} -- does put the "..." arguments into a table
+        if not ts.GameSetup.GetIsMultiPlayerGame() then
+          if g_LTL_Serp.table_contains_value(ForPeers,g_PeersInfo_Serp.PeerInt) then
+            local func = g_LTL_Serp.myeval(funcname)
+            if returnafterfinish then -- execute in current thread and block it (return after finished)
+              return func(table.unpack(args))
+            else -- execute in new thread (and return before it is finished)
+              system.start(function()
+                func(table.unpack(args))
+              end,ModID.." DoExecuteFnWithArgsForPeers")
+            end
+            return
+          end
+        end
+        
         local intable = {funcname=funcname,args=args,ForPeers=ForPeers}
-        local inhex = g_StringTableConvertSerpNyk.TableToHex(intable)
+        local inhex = g_LTL_Serp.TableToHex(intable)
         
         while g_PeersInfo_Serp.CoopFinished~=true do
           coroutine.yield()
@@ -411,9 +421,9 @@ if g_LuaScriptBlockers[ModID]==nil then
     local function _DoTheExecutionFor(FromPeerInt)
       g_LTL_Serp.modlog("DoTheExecutionFor FromPeerInt "..tostring(FromPeerInt).." "..tostring(ts.GameClock.CorporationTime),ModID)
       local inhex = g_PeersInfo_Serp.GetSharedLuaInfo(FromPeerInt)
-      local intable = g_StringTableConvertSerpNyk.HexToTable(inhex)
+      local intable = g_LTL_Serp.HexToTable(inhex)
       if type(intable) =="table" then
-        -- g_LTL_Serp.modlog(g_LTL_Serp.TableToString(intable),ModID)
+        -- g_LTL_Serp.modlog(g_LTL_Serp.TableToFormattedString(intable),ModID)
         g_LTL_Serp.modlog(intable.funcname,ModID)
         local ShouldIExecute = false
         local ForPeers = intable.ForPeers
@@ -482,7 +492,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         -- g_LTL_Serp.modlog("DoTheExecutionFor before ShouldIExecute",ModID)
         if ShouldIExecute then
           -- g_LTL_Serp.modlog("DoTheExecutionFor yes ShouldIExecute",ModID)
-          func = g_LTL_Serp.myeval(intable.funcname)
+          local func = g_LTL_Serp.myeval(intable.funcname)
           -- g_LTL_Serp.modlog("func call "..tostring(ts.GameClock.CorporationTime),ModID)
           local success, err = pcall(func,table.unpack(intable.args))
           if success==false then

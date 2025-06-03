@@ -20,10 +20,6 @@ if g_LuaScriptBlockers[ModID]==nil then
     g_LTL_Serp.modlog("savetablestuff.lua registered",ModID)
 
 
-    if g_StringTableConvertSerpNyk==nil then
-      console.startScript("data/scripts_serp/h/savestuff_tableconvert.lua")
-    end
-
 
     -- call to sync the Shared_Cache for every human peer
     -- called from within a thread
@@ -60,7 +56,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           g_SaveLuaStuff_Serp.t_SyncSharedCacheToEveryone(nil,true)
           g_LTL_Serp.waitForTimeDelta(6000) -- problem is depending on usage t_ExecuteFnWithArgsForPeers can take between 4 and endless seconds... but we assume its max 6 seconds. and if it takes longer, it will be saved next time
           if g_PeersInfo_Serp.AmIFirstActivePeer()==true then -- only first peer is allowed to save into Nameable. sync data before if you want to include data from other peers.
-            local namestring = g_StringTableConvertSerpNyk.TableToHex(g_LTM_Serp.Shared_Cache)
+            local namestring = g_LTL_Serp.TableToHex(g_LTM_Serp.Shared_Cache)
             if type(namestring)=="string" then
               local sessionparticipants = g_ObjectFinderSerp.GetAllLoadedSessionsParticipants({g_SaveLuaStuff_Serp.PIDToSaveData},"First") -- saving it in first-found is enough, because this will alawys be the same for everyone (assuming we all start in the same session).
               for SessionID,session_pids in pairs(sessionparticipants) do
@@ -89,10 +85,10 @@ if g_LuaScriptBlockers[ModID]==nil then
       for SessionID,session_pids in pairs(sessionparticipants) do
         namestring = ts.GetGameObject(session_pids[g_SaveLuaStuff_Serp.PIDToSaveData].OID).Nameable.Name -- if Name was changed with DoForSessionGameObject, then GetGameObject works to get the name regardless of player and session
       end
-      local status,mytable = pcall(g_StringTableConvertSerpNyk.HexToTable,namestring)
+      local status,mytable = pcall(g_LTL_Serp.HexToTable,namestring)
       if status~=false and type(mytable)=="table" then -- if fail, then in most cases just the default name, which is not a table and can not be converted
         g_LTM_Serp.Shared_Cache = g_LTL_Serp.MergeMapsDeep(mytable,g_LTM_Serp.Shared_Cache) -- merging this way, because Shared_Cache might have newer info
-        -- g_LTL_Serp.modlog("t_LoadSharedCache done "..g_LTL_Serp.TableToString(g_LTM_Serp.Shared_Cache),ModID)
+        -- g_LTL_Serp.modlog("t_LoadSharedCache done "..g_LTL_Serp.TableToFormattedString(g_LTM_Serp.Shared_Cache),ModID)
       end
       g_LTL_Serp.modlog("t_LoadSharedCache done",ModID)
       g_SaveLuaStuff_Serp.LoadingDone = true -- set it true, even if there was an error, because we can not change it and data is lost

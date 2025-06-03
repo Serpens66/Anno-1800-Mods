@@ -1,7 +1,8 @@
 -- Uses CompanyName from Scenario3_Challenger3 for DoForSessionGameObject (they exist in every vanilla game in every session)
--- Uses CompanyName from Scenario3_Challenger4 for FnViaTextEmbed functionality
+-- Uses CompanyName from Scenario3_Challenger4 for t_FnViaTextEmbed functionality
 -- Scenario3_Challenger3  GUID: 100939 , PID: 120
 -- Scenario3_Challenger4  GUID: 101507 , PID: 121
+-- (I think the only Participant with Queen Template where I do not use the Nameable yet (besides Void Trader and Queen) is Scenario02_Actuary)
 
 local tools_ModID = "shared_LuaTools_Light_Serp"
 
@@ -15,10 +16,6 @@ local tools_ModID = "shared_LuaTools_Light_Serp"
 
 -- Scroll to bottom for a list of functions you can use.
 
-
-
--- info:
- -- doing a mods.reload() while a lua coroutine (thread) is running very often crashes the game.
 
 
 
@@ -44,7 +41,7 @@ end
 
 -- source: https://stackoverflow.com/questions/65482605/how-to-print-all-values-in-a-lua-table
 local sort, rep, concat = table.sort, string.rep, table.concat
-local function TableToString(var, sorted, indent)
+local function TableToFormattedString(var, sorted, indent)
     if type (var) == 'string' then
         return "'" .. var .. "'"
     elseif type (var) == 'table' then
@@ -68,9 +65,9 @@ local function TableToString(var, sorted, indent)
         for _, key in ipairs (keys) do
             strings [#strings + 1]
                 = rep ('\t', indent + 1)
-               .. TableToString(key, sorted, indent + 1)
+               .. TableToFormattedString(key, sorted, indent + 1)
                .. ' = '
-               .. TableToString(var [key], sorted, indent + 1)
+               .. TableToFormattedString(var [key], sorted, indent + 1)
         end
         return 'table (\n' .. concat (strings, '\n') .. '\n' .. rep ('\t', indent) .. ')'
     else
@@ -337,6 +334,91 @@ local function GetPairAtIndSortedKeys(t,i,f)
 end
 
 -- ##################################################################################################################
+
+-- TableToHex and HexToTable
+-- source: https://github.com/Pnski/Anno1800LuaLibs/blob/main/1800seralize.lua
+-- https://www.reddit.com/r/lua/comments/hzi7ff/print_local_variable_as_hex_string/
+local function _HexToString(hex)
+  return (hex:gsub("%x%x", function(digits) return string.char(tonumber(digits, 16)) end))
+end
+-- https://www.reddit.com/r/lua/comments/hzi7ff/print_local_variable_as_hex_string/
+--string.format(string.rep("%02x", #variable), variable:byte(1, -1)))
+local function _StringToHex(str)
+  return (str:gsub(".", function(char) return string.format("%02x", char:byte()) end))
+end
+-- Read as: substitute every character in variable with its byte value formatted as hexadecimal zero-padded to at least 2 digits
+--[[
+  returns table with pairs
+]]
+local function getkvtable(_table)
+  if _table.__index == nil then
+    return _table
+  else
+    return debug.getmetatable(_table) --using debug library, instead of getmetatable(table:table)
+  end
+end
+--There are eight basic types in Lua: nil, boolean, number, string, userdata, function, thread, and table. 
+--[[
+  table will be looped, no need to test
+  user giving functions or threads is a stupid idea
+  userdata is normally from c, no need to test
+]]
+function _ValueToString(_value)
+  if type(_value) == 'number' then
+    return _value
+  elseif type(_value) == 'string' then
+    return "\'".._value.."\'"
+  elseif type(_value) == 'boolean' then
+    if _value then
+      return 'true'
+    else
+      return 'false'
+    end
+  else --failsafe
+    g_LTL_Serp.modlog("unsupported value type for ValueToString: "..tostring(type(_value)).." "..tostring(_value),ModID)
+    return 'nil'
+  end
+end
+function _IndexToString(_index)
+  if type(_index) == 'number' then
+    return "[".._index.."]"
+  elseif type(_index) == 'string' then
+    return "[\'".._index.."\']"
+  else --failsafe
+    g_LTL_Serp.modlog("unsupported index type for IndexToString: "..tostring(type(_index)).." "..tostring(_index),ModID)
+    return 'nil'
+  end
+end
+function _TableToString(_table)
+  local _string = "{"
+  if type(_table) ~= 'table' then
+    return ""
+  end
+  -- convert every array or metatable to array (pairs might fail if C-API call is blocked)
+  for k,v in pairs(getkvtable(_table)) do --getkvtable to cycle through
+    if #_string > 1 then
+      _string = _string ..","
+    end
+    if type(_table[k]) == 'table' then -- use the original table for direct values
+      _string = _string.._IndexToString(k).."=".._TableToString(_table[k])
+    else
+      _string = _string.._IndexToString(k).."=".._ValueToString(v)
+    end
+  end
+  return _string.."}"
+end
+
+local function TableToHex(_table)
+  return _StringToHex(_TableToString(_table))
+end
+
+local function HexToTable(_string)
+  local _ioTable = load("return ".._HexToString(_string),nil,"bt",_ioTable)()
+  return _ioTable
+end
+
+
+-- ##################################################################################################################
 -- ##################################################################################################################
 -- ##################################################################################################################
 -- Anno1800 related lightweigth lua helpers
@@ -385,7 +467,7 @@ local function start_thread(threadname,ModID,fn,...)
   end
   local final_threadname = tostring(ModID)..": "..tostring(threadname)
   if system.internal.coroutines[final_threadname]~=nil then -- no need to check status, because done threads are already set nil again
-    g_LTL_Serp.modlog("WARNING start_thread: A thread with the name "..tostring(final_threadname).." is currently running. Are you sure you want to overwrite it? Choose a unique threadname if you dont want this",ModID)
+    g_LTL_Serp.modlog("WARNING start_thread: A thread with the name "..tostring(final_threadname).." is currently running. Are you sure you want to overwrite it? Choose a unique threadname if you dont want this (you can include _random_ in the threadname to add random number)",ModID)
   end
   return system.start(function()
     local status,err = pcall(fn,table.unpack(args))
@@ -596,24 +678,32 @@ end
 -- ########################################################################################################
 -- - Trickster Anno Helpers
 -- ########################################################################################################
-
-  -- FnViaTextEmbed is used to execute your custom lua code via ThirdPartyButton on CharacterNotification (which can only execute textembeds, not lua code)
+  
+  -- this t_FnViaTextEmbed is extremly powerful and helpful!
+   -- But please READ every comment I write about it, its important that you use it correctly, otherwise it may break for you and other mods using it!
+  
+  -- t_FnViaTextEmbed is used to execute your custom lua code via ThirdPartyButton on CharacterNotification (which can only execute textembeds, not lua code)
    -- it also makes sure that only the Peer who clicked the Button executes the code (by storing the CompanyName-change only for him and resetting it quite fast (its a delay of ~200 ms before the script is called))
   -- gets called via Trigger 1500005600 , which is Registered eg via CharacterNotification Buttons:
-   -- <Command>[Participants Participant(121) Profile SetCompanyName(g_ObjectFinderSerp.IsLoadedSessionByID|2|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+   -- <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_ObjectFinderSerp.IsLoadedSessionByID|2|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
    -- using unsynced CompanyName from "Scenario3_Challenger4  GUID: 101507 , PID: 121" as helper.
     -- several characters are not allowed in Names, so use "|" to seperate functionname from arguments
+  -- Executing textembeds this way roughly takes 2 ticks (200ms) or 4 ticks in Multiplayer before the result can be fetched eg from other conditions
+
     -- ProTip:
-    -- by using also CharacterNotification_DummyCommand (ObjectDummies shared mod) instead of ActionExecuteScript it saves from creating a new script and especially from creating one script per human and checking whcih human we are. -->
-     -- by using CharacterNotification_DummyCommand together with the FnViaTextEmbed system, the function is only executed for the PID who executes the trigger (for coop its still executed multiple times!)
-   -- still dont use this too often, because if more than one is using this within ~200ms all except one might be skipped
-      -- so if you can use the typical human0 to human3 scripts, then use them instead. Only use FnViaTextEmbed if you really need to provide arguments, which otherwise would result in tons of scripts
-    -- TODO: test if we somehow make this execute linear... we need to start the FnViaTextEmbed scripts within the same tick...
-      -- no not really. the execution from the Command alone is done ~200ms after the TriggerAction was done. And doing RegisterTriggerForCurrentParticipant within this command takes another 200ms, so in total 400ms after the CharacterNotification was done, it executes the FnViaTextEmbed function
-       -- Doing a ActionRegisterTrigger in the TriggerActions with 200ms delay (instead of doing it within the command) makes them execute at the same tick, but we can not be sure about the execution order and that it is always 200ms -.-
-  local function FnViaTextEmbed(PID)
+    -- by using also CharacterNotification_DummyCommand (ObjectDummies shared mod) instead of ActionExecuteScript it saves from creating a new script per function and especially from creating one script per human and checking which human we are. -->
+     -- by using CharacterNotification_DummyCommand together with the t_FnViaTextEmbed system, the function is only executed for the PID who executes the trigger (for coop its still executed multiple times!)
+    
+   -- IMPORTANT:
+   -- Before doing your <Command> in eg a xml trigger, first check if 1500005600 is unlocked ! If it is locked, this fn is currently in use and you need to wait!!
+    -- For CharacterNotification with player interaction, use <ActiveCallback>[Unlock IsUnlocked(1500005600)]</ActiveCallback> 
+    -- In addition you might want to check if 1500005606 is unlocked, because CharacterNotification do NOT WORK within the first ~3 seconds of a new game.
+     -- When waiting for 1500005606 to be unlocked, you can be sure that it will work.
+   -- (also see assets.xml 1500005600 for more details)
+  local function t_FnViaTextEmbed(PID)
     if PID==nil or PID == ts.Participants.GetGetCurrentParticipantID() then -- only the correct Participant 
       local TaskString =  ts.Participants.GetParticipant(121).Profile.CompanyName -- TaskString eg: "g_ObjectFinderSerp.IsLoadedSessionByID_2_false"
+      -- g_LTL_Serp.modlog("t_FnViaTextEmbed called with: "..tostring(TaskString),ModID)
       local oldname = ts.GetAssetData(101507).Text
       if TaskString~=oldname then -- only the correct Peer (who hit the button)
         ts.Participants.GetParticipant(121).Profile.SetCompanyName(oldname) -- name it back to original
@@ -624,17 +714,37 @@ end
           local value = tasksplit[i]
           tasksplit[i] = g_LTL_Serp.myeval(tasksplit[i])
         end
-        local success, err = pcall(func,table.unpack(tasksplit))
-        if success==false then
-          g_LTL_Serp.modlog("ERROR FnViaTextEmbed while trying to execute TaskString: "..tostring(TaskString).." , error: "..tostring(err),ModID)
-        end
-        return success, err
+        -- call the func within a new thread, to not longer block this function
+        g_LTL_Serp.start_thread("t_FnViaTextEmbed_random_ call "..tostring(funcname),ModID,function(func,funcname,tasksplit,TaskString,ModID)
+          local notstop = 0
+          while func==nil do -- in case this is executed with AlwaysTrue Trigger or so, give it a second to init all lua scripts
+            coroutine.yield() -- 100ms
+            notstop = notstop + 1
+            if notstop>20 then --2seconds
+              break
+            end
+            func = g_LTL_Serp.myeval(funcname)
+          end          
+          local success, err
+          if func==nil then
+            success, err = false,"t_FnViaTextEmbed: func does not exist (nil)" -- its a bit more clear than "attempt to call a nil value"
+          else
+            success, err = pcall(func,table.unpack(tasksplit))
+          end
+          if success==false then
+            g_LTL_Serp.modlog("ERROR t_FnViaTextEmbed while trying to execute TaskString: "..tostring(TaskString).." , error: "..tostring(err),ModID)
+          end
+        end,func,funcname,tasksplit,TaskString,ModID)
       end
     end
-    return nil,nil
+    g_LTL_Serp.start_thread("t_FnViaTextEmbed release it again",ModID,function()
+      coroutine.yield() -- one yield to make sure t_FnViaTextEmbed was ended meanwhile
+      ts.Unlock.SetUnlockNet(1500005600)
+    end)
   end
-
-
+  
+  
+  
   -- text embed helper for using MetaObjects.SessionGameObject, which is otherwise unavailable in lua...
    -- ts_embed_string should be eg: "[MetaObjects SessionGameObject("..tostring(OID)..") Area CityName]"
    -- so always inlucding "[MetaObjects SessionGameObject("..tostring(OID)..") ...]" and your wanted command for the OID you enter
@@ -1014,7 +1124,7 @@ end
 g_LTL_Serp = {
   -- general lua helpers
   replace_chars_for_Name = replace_chars_for_Name,
-  TableToString = TableToString,
+  TableToFormattedString = TableToFormattedString,
   deepcopy = deepcopy,
   table_len = table_len,
   table_contains_value = table_contains_value,
@@ -1029,6 +1139,8 @@ g_LTL_Serp = {
   myeval = myeval,
   pairsByKeys = pairsByKeys,
   GetPairAtIndSortedKeys = GetPairAtIndSortedKeys,
+  TableToHex = TableToHex,
+  HexToTable = HexToTable,
   
   -- ######################################
   -- Anno1800 related lightweigth lua helpers
@@ -1085,7 +1197,7 @@ g_LTL_Serp = {
   DiplomacyState = {War=0,Peace=1,TradeRights=2,Alliance=3,CeaseFire=4,NonAttack=5}, -- from datasets.xml
   
   -- Trickster Anno Helpers
-  FnViaTextEmbed = FnViaTextEmbed,
+  t_FnViaTextEmbed = t_FnViaTextEmbed,
   DoForSessionGameObject = DoForSessionGameObject,
   GetFertilitiesOrLodesFromArea_CurrentSession = GetFertilitiesOrLodesFromArea_CurrentSession,
   GetVectorGuidsFromSessionObject = GetVectorGuidsFromSessionObject,
@@ -1105,3 +1217,4 @@ g_LTL_Serp = {
   AffectedByStatusEffect = AffectedByStatusEffect,
   
 }
+

@@ -2,7 +2,7 @@
   
   <!-- Serp GUIDs 1500005600 -->
   <!-- -- Uses CompanyName from Scenario3_Challenger3 for DoForSessionGameObject (they exist in every vanilla game in every session) -->
-  <!-- -- Uses CompanyName from Scenario3_Challenger4 for FnViaTextEmbed functionality -->
+  <!-- -- Uses CompanyName from Scenario3_Challenger4 for t_FnViaTextEmbed functionality -->
   <!-- -- Scenario3_Challenger3  GUID: 100939 , PID: 120 -->
   <!-- -- Scenario3_Challenger4  GUID: 101507 , PID: 121 -->
 
@@ -31,15 +31,43 @@
 
   <ModOp GUID="130248" Type="AddNextSibling">
     <!-- use this eg this as CharacterNotification ThirdPartyButton Command: -->
-     <!-- <Command>[Conditions RegisterTriggerForCurrentParticipant(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_ObjectFinderSerp.IsLoadedSessionByID_2_false)]</Command> -->
+     <!-- <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_ObjectFinderSerp.IsLoadedSessionByID_2_false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)];</Command> -->
        <!-- to make the peer who clicks on the Button execute eg. lua function g_ObjectFinderSerp.IsLoadedSessionByID(2,false) -->
+    <!-- IMPORTANT -->
+    <!-- BEFORE executing the command , check as condition that 1500005600 is unlocked! -->
+     <!-- And as action the first you do is ActionLockAsset 1500005600 (which is unlocked again in my lua code after its finished) -->
+        <!-- <Item> -->
+          <!-- <TriggerAction> -->
+            <!-- <Template>ActionLockAsset</Template> -->
+            <!-- <Values> -->
+              <!-- <Action /> -->
+              <!-- <ActionLockAsset> -->
+                <!-- <LockAssets> -->
+                  <!-- <Item> -->
+                    <!-- <Asset>1500005600</Asset> -->
+                  <!-- </Item> -->
+                <!-- </LockAssets> -->
+              <!-- </ActionLockAsset> -->
+            <!-- </Values> -->
+          <!-- </TriggerAction> -->
+        <!-- </Item> -->
+    <!-- This way we can make sure its not used multiple times at the same time :) -->
+     <!-- For CharacterNotification where the player needs to click a button, you check the unlock as "ActiveCallback": -->
+      <!-- <ActiveCallback>[Unlock IsUnlocked(1500005600)]</ActiveCallback> -->
+       <!-- and add to Commands textembed  [Unlock RelockNet(1500005600)]; This will take 2-4 ticks to lock it, so its not perfect.. but better than nothing -->
+    <!-- ATTENTION: -->
+      <!-- you also might want to check if 1500005606 (shared_ObjectDummies) is unlocked, because CharacterNotification do NOT WORK within the first ~3 seconds of a new game. -->
+      <!-- When waiting for 1500005606 to be unlocked, you can be sure that it will work. -->
     <Asset>
-      <Template>Trigger</Template>
+      <Template>FeatureUnlock</Template>
       <Values>
         <Standard>
           <GUID>1500005600</GUID>
-          <Name>FnViaTextEmbed lua function</Name>
+          <Name>t_FnViaTextEmbed lua function</Name>
         </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
         <Trigger>
           <TriggerCondition>
             <Template>ConditionAlwaysTrue</Template>
@@ -59,9 +87,7 @@
                     <TriggerCondition>
                       <Template>ConditionUnlocked</Template>
                       <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
+                        <Condition />
                         <ConditionUnlocked>
                           <UnlockNeeded>1500001613</UnlockNeeded>
                         </ConditionUnlocked>
@@ -93,9 +119,7 @@
                     <TriggerCondition>
                       <Template>ConditionUnlocked</Template>
                       <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
+                        <Condition />
                         <ConditionUnlocked>
                           <UnlockNeeded>1500001614</UnlockNeeded>
                         </ConditionUnlocked>
@@ -127,9 +151,7 @@
                     <TriggerCondition>
                       <Template>ConditionUnlocked</Template>
                       <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
+                        <Condition />
                         <ConditionUnlocked>
                           <UnlockNeeded>1500001615</UnlockNeeded>
                         </ConditionUnlocked>
@@ -161,9 +183,7 @@
                     <TriggerCondition>
                       <Template>ConditionUnlocked</Template>
                       <Values>
-                        <Condition>
-                          <IsOptional>1</IsOptional>
-                        </Condition>
+                        <Condition />
                         <ConditionUnlocked>
                           <UnlockNeeded>1500001616</UnlockNeeded>
                         </ConditionUnlocked>
@@ -192,10 +212,10 @@
         <TriggerSetup>
           <AutoRegisterTrigger>0</AutoRegisterTrigger>
           <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
         </TriggerSetup>
       </Values>
     </Asset>
-    
     
   </ModOp>
     

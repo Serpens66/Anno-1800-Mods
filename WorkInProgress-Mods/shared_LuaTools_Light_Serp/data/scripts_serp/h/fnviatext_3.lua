@@ -6,6 +6,6 @@ if g_LTL_Serp==nil then
 end
 
 g_LTL_Serp.start_thread("fnviatext_.lua","shared_LuaTools_Light_Serp",function()
-  g_LTL_Serp.FnViaTextEmbed(PID)
+  g_LTL_Serp.t_FnViaTextEmbed(PID)
 end)
 

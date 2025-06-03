@@ -1,3 +1,8 @@
+-- Uses Nameable from:
+-- Scenario_Item_Trader  GUID: 4387 , PID: 139
+-- (I think the only Participant with Queen Template where I do not use the Nameable yet (besides Void Trader and Queen) is Scenario02_Actuary)
+
+
 -- Only this script gets loaded via ActionExecuteScript on GameLoaded and it starts all other lua scripts
 -- (ok, event_savegame_loaded.lua is called first via ActionExecuteScript and then starts this here via Unlock 1500004636)
 
@@ -20,7 +25,15 @@
       
 -- info:
  -- doing a mods.reload() while a lua coroutine (thread) is running very often crashes the game.
-
+ -- Assumption: It happens when new world was loaded (by AI), but never visited by the player yet?
+ -- yes seems like this is true..
+  -- TODO test if this also happens without any lua scripts. and then which lua scripts are problematic
+ -- auch ohne session crashed oft währedn schnellvorlauf
+ -- und vermutlich medium grund
+-- hm.. ist absolut beschissen reproduzierbar ... keine ahnung worans liegt...
+ -- aber ich würde schon sagen ohne lua ists sehr viel seltener, bzw. garnicht (kann auch an supportfleet lua liegen)
+ -- aber auch mit lua ists ab und zu ständig und ab und zu nur jedes 5te mal n crash..
+ 
 
 -- TODO:
  -- g_LTL_Serp.GetActiveQuestInstances evlt noch ab und zu, zb. alle 10 minuten,
@@ -255,69 +268,137 @@ if g_LuaScriptBlockers[ModID]==nil then
   -- Only call it for the one coop peer which should buy object he has currently selected!
   -- pricefactor multiplies CurrentParticipantBuyPrice MoneyCost (usually double of the SellPrice)
   -- currently only supports money costs
-  -- dont change into a t_ function, but call thread within this fn, because it will get called from CharacterNotification 
-  local function SimpleBuySelected(pricefactor,ignorecanbesold,allownegativemoney)
-    g_LTL_Serp.start_thread("SimpleBuySelected_random_",ModID,function()
-      PID = ts.Participants.GetGetCurrentParticipantID()
-      if ts.Selection.Object.Owner~=PID and (ignorecanbesold or ts.Selection.Object.Sellable.CanBeSoldToTrader) then
-        
-        if type(pricefactor)=="boolean" then -- use Name , (not using string "Name" as pricefactor because not sure how to forward this with FnViaTextEmbed)
-          local name = ts.Selection.Object.Nameable.Name
-          local name_parts = g_LTL_Serp.mysplit(name, "_") -- eg. "The Shipname_2300" or simply "0.5"
-          local namevalue,restname = nil, ""
-          for _,part in ipairs(name_parts) do
-            local asnumber = tonumber(part)
-            if namevalue==nil and asnumber~=nil then
-              namevalue = asnumber
-            end
-            if asnumber==nil then
-              restname = restname..part
-            end
+  local function t_SimpleBuySelected(pricefactor,ignorecanbesold,allownegativemoney)
+    PID = ts.Participants.GetGetCurrentParticipantID()
+    if ts.Selection.Object.Owner~=PID and (ignorecanbesold or ts.Selection.Object.Sellable.CanBeSoldToTrader) then
+      
+      if type(pricefactor)=="boolean" then -- use Name , (not using string "Name" as pricefactor because not sure how to forward this with t_FnViaTextEmbed)
+        local name = ts.Selection.Object.Nameable.Name
+        local name_parts = g_LTL_Serp.mysplit(name, "_") -- eg. "The Shipname_2300" or simply "0.5"
+        local namevalue,restname = nil, ""
+        for _,part in ipairs(name_parts) do
+          local asnumber = tonumber(part)
+          if namevalue==nil and asnumber~=nil then
+            namevalue = asnumber
           end
-          if restname==nil or restname=="" then
-            restname = g_LTL_Serp.weighted_random_choices(g_LTL_Serp.ShipNameGUIDs, 1)[1] -- get a random name
-            restname = ts.GetAssetData(restname).Text
-          end
-          if pricefactor==true then -- if true we want to pay the sum in the name
-            pricefactor = 1
-            local newprice = namevalue
-            if namevalue~=nil then
-              pricefactor = namevalue / ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost
-            end
-          else -- if false, the name is the pricefactor
-            pricefactor = namevalue or 1
-          end
-          ts.Selection.Object.Nameable.SetName(tostring(restname))
-        end
-        
-        if pricefactor~=nil and pricefactor~=1 then -- credit money back/reduce more money, do this first, because it might already change if we can afford the object
-          local changemoney = g_LTL_Serp.myround((1 - pricefactor) * ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost)
-          if changemoney~=0 then
-            ts.Economy.MetaStorage.AddAmount(1010017, changemoney)
-            if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
-              g_LTL_Serp.waitForTimeDelta(1000) -- wait for changemoney to be credited
-            end
+          if asnumber==nil then
+            restname = restname..part
           end
         end
-        local loan = false
-        if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
-          if allownegativemoney then
-            coroutine.yield()
-            loan = ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost + 10000
-            ts.Economy.MetaStorage.AddAmount(1010017, loan)
-            g_LTL_Serp.waitForTimeDelta(1000) -- wait for loan to be credited
-          else
-            return
-          end
+        if restname==nil or restname=="" then
+          restname = g_LTL_Serp.weighted_random_choices(g_LTL_Serp.ShipNameGUIDs, 1)[1] -- get a random name
+          restname = ts.GetAssetData(restname).Text
         end
-        ts.Selection.Object.Sellable.BuyNet(PID) -- owner and PID need traderights for this to do anything and PID needs to have enough money (and possibly also influence)
-        coroutine.yield()
-        if loan then
-          ts.Economy.MetaStorage.AddAmount(1010017, -loan)
+        if pricefactor==true then -- if true we want to pay the sum in the name
+          pricefactor = 1
+          local newprice = namevalue
+          if namevalue~=nil then
+            pricefactor = namevalue / ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost
+          end
+        else -- if false, the name is the pricefactor
+          pricefactor = namevalue or 1
+        end
+        ts.Selection.Object.Nameable.SetName(tostring(restname))
+      end
+      
+      if pricefactor~=nil and pricefactor~=1 then -- credit money back/reduce more money, do this first, because it might already change if we can afford the object
+        local changemoney = g_LTL_Serp.myround((1 - pricefactor) * ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost)
+        if changemoney~=0 then
+          ts.Economy.MetaStorage.AddAmount(1010017, changemoney)
+          if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
+            g_LTL_Serp.waitForTimeDelta(1000) -- wait for changemoney to be credited
+          end
         end
       end
-    end)
+      local loan = false
+      if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
+        if allownegativemoney then
+          coroutine.yield()
+          loan = ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost + 10000
+          ts.Economy.MetaStorage.AddAmount(1010017, loan)
+          g_LTL_Serp.waitForTimeDelta(1000) -- wait for loan to be credited
+        else
+          return
+        end
+      end
+      ts.Selection.Object.Sellable.BuyNet(PID) -- owner and PID need traderights for this to do anything and PID needs to have enough money (and possibly also influence)
+      coroutine.yield()
+      if loan then
+        ts.Economy.MetaStorage.AddAmount(1010017, -loan)
+      end
+    end
   end
+  
+  
+  -- Use this if you are not using UltraTools, but still want to make code executed for everyone
+   -- (UltraTools has t_ExecuteFnWithArgsForPeers)
+  -- Only call this if every peer who is calling this provides the exact same arguments (it will be written into a nameable, so overwriting each other if different information)
+    -- info will be written into a nameable and then a trigger with ActionExecuteScript will be started
+     -- the script started this way will read out the nameable and execute the content of it for everyone
+      -- (we also can make a ExecuteForPID function this way, just no ForPeer, which is done in UltraTools instead)
+   -- So all the args must be convertable to a string!
+  -- making use of Nameable from Scenario_Item_Trader  GUID: 4387 , PID: 139 to share info with other peers
+   -- we do not change the Name back to vanilla 4387 because everytime we change the name it takes ~3 seconds, and we want to save this time
+  local function SimpleExecuteForEveryone(funcname,...)
+    if not ts.GameSetup.GetIsMultiPlayerGame() then
+      local func = g_LTL_Serp.myeval(funcname)
+      return func(...)
+    end
+    local args = {...} -- does put the "..." arguments into a table
+    local intable = {funcname=funcname,args=args}
+    local inhex = g_LTL_Serp.TableToHex(intable)
+    g_LTM_Serp.AddToQueue(ModID.."_SimpleExecuteForEveryone",function(inhex) -- make every call execute one after the other
+      local SharePID = 139
+      local PID_OID = nil
+      local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session. this way we make sure everyone is using the same OID (at least as long everyone started in the same session)
+      if status==false then
+        g_LTL_Serp.modlog("SimpleExecuteForEveryone ERROR : "..tostring(sessionparticipants),ModID)
+        error(sessionparticipants) 
+      end
+      g_LTL_Serp.modlog("SimpleExecuteForEveryone after GetAllLoadedSessionsParticipants "..tostring(ts.GameClock.CorporationTime),ModID)
+      for SessionID,session_pids in pairs(sessionparticipants) do
+        PID_OID = session_pids[SharePID].OID
+        local status,err = pcall(g_LTL_Serp.DoForSessionGameObject,"[MetaObjects SessionGameObject("..tostring(PID_OID)..") Nameable Name("..tostring(infostring)..")]")
+        if status==false then
+          g_LTL_Serp.modlog("SimpleExecuteForEveryone2 ERROR : "..tostring(err),ModID)
+          error(err) 
+        end
+      end
+      g_LTL_Serp.waitForTimeDelta(3000) -- wait at least 3 seconds to make sure Nameable is synced between all players 
+      ts.Conditions.RegisterTriggerForCurrentParticipant(1500005607) -- make everyone call _DoExectionForEveryone
+      g_LTL_Serp.waitForTimeDelta(1500) -- wait a bit more until everyone read out the nameable, before releasing this Queue
+    end,inhex)
+  end
+  
+  local function _DoExectionForEveryone()
+    local SharePID = 139
+    local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session
+    if status==false then
+      g_LTL_Serp.modlog("_DoExectionForEveryone ERROR : "..tostring(sessionparticipants),ModID)
+      error(sessionparticipants) 
+    end
+    local inhex = nil
+    for SessionID,session_pids in pairs(sessionparticipants) do
+      inhex = ts.GetGameObject(session_pids[SharePID].OID).Nameable.Name -- if Name was changed with DoForSessionGameObject, then GetGameObject works to get the name regardless of player and session
+    end
+    if inhex~=nil and inhex~="" and inhex~=ts.GetAssetData(4387).Text then
+      local intable = g_LTL_Serp.HexToTable(inhex)
+      if type(intable) =="table" then
+        local func = g_LTL_Serp.myeval(intable.funcname)
+        local success, err
+        if func==nil then
+          success, err = false,"_DoExectionForEveryone: func does not exist (nil)" -- its a bit more clear than "attempt to call a nil value"
+        else
+          success, err = pcall(func,table.unpack(intable.args))
+        end
+        if success==false then
+          g_LTL_Serp.modlog("_DoExectionForEveryone ERROR while trying to call funcname "..tostring(intable.funcname).." error: "..tostring(err),ModID)
+        end
+      end
+      g_LTL_Serp.modlog("_DoExectionForEveryone ERROR info in Nameable helper is wrong",ModID)
+    end
+  end
+  
   
   -- function you can call within code that is executed for one Human player, but for all coop peers from it.
   -- if it returns "AllCoop", you can continue your code, but still have in mind that it gets executed multiple times (once per coop)
@@ -347,7 +428,9 @@ if g_LuaScriptBlockers[ModID]==nil then
       IsThirdPartyTrader = IsThirdPartyTrader,
       ContinueCoopCalled = ContinueCoopCalled,
       t_ChangeOwnerOIDToPID = t_ChangeOwnerOIDToPID,
-      SimpleBuySelected = SimpleBuySelected,
+      t_SimpleBuySelected = t_SimpleBuySelected,
+      SimpleExecuteForEveryone = SimpleExecuteForEveryone,
+      _DoExectionForEveryone = _DoExectionForEveryone,
       NatureParticipantPID = 158, -- has traderights with everyone (Enum: Mod10, GUID: 1500004528)
       -- Shared_Cache use your ModID or other unique identifier as key. If the UltraTools mod is enabled, this Shared_Cache 
       -- will be saved to Nameable helper to save it to a savegame and will be loaded on loading a game 

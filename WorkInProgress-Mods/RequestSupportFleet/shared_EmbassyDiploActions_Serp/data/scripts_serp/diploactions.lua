@@ -30,27 +30,29 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- #####################################################################################################
     
     
-  -- no need to call from within a thread, starts a thread on its own (to be able to call t_ChangeOwnerOIDToPID)
-   -- note to self: do not change this function to a thread-only function, because it will be used in CharacterNotification via FnViaTextEmbed 
-  local function ChangeOwnerOfSelectionToPID(To_PID,ignoreowner)
-    g_LTL_Serp.start_thread("ChangeOwnerOfSelectionToPID_random_",ModID,function()
-      To_PID = To_PID or ts.Participants.GetGetCurrentParticipantID()
-      local continue = g_LTM_Serp.ContinueCoopCalled()
-      if continue then
-        g_LTL_Serp.modlog("ChangeOwnerOfSelectionToPID "..tostring(To_PID).." , "..tostring(ignoreowner),ModID)
-        local OID = g_LTL_Serp.get_OID(session.getSelectedFactory())
-        if OID~=nil and OID~=0 then
-          local success = g_LTM_Serp.t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner) -- must be called from within a thread
-          if success and continue=="IsFirst" then -- in theory I would credit 1 Rep per ship.. but it desyncs, so we need to register a trigger which starts data/scripts_serp/rep/rep1_gasparov_h0.lua , but we need every possible combination, so tons of scripts if we want to do it like this :D So we only do it if g_LTU_Serp is enabled (not included)
-            local Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
-            if Owner~=nil then -- increase opinion from To_PID towards the Owner of the gifted object
+  local function t_ChangeOwnerOfSelectionToPID(To_PID,ignoreowner)
+    To_PID = To_PID or ts.Participants.GetGetCurrentParticipantID()
+    local continue = g_LTM_Serp.ContinueCoopCalled()
+    if continue then
+      g_LTL_Serp.modlog("t_ChangeOwnerOfSelectionToPID "..tostring(To_PID).." , "..tostring(ignoreowner),ModID)
+      local OID = g_LTL_Serp.get_OID(session.getSelectedFactory())
+      if OID~=nil and OID~=0 then
+        local success = g_LTM_Serp.t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner) -- must be called from within a thread
+        if success then -- in theory I would credit 1 Rep per ship.. but it desyncs, so we need to register a trigger which starts data/scripts_serp/rep/rep1_gasparov_h0.lua , but we need every possible combination, so tons of scripts if we want to do it like this :D So we only do it if g_LTU_Serp is enabled (not included)
+          local Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
+          if Owner~=nil then -- increase opinion from To_PID towards the Owner of the gifted object
+            if continue=="IsFirst" then
               g_LTL_Serp.start_thread("ChangeRep1ForGiftShip_random_",ModID,g_LTU_Serp.PeersInfo.t_ExecuteFnWithArgsForPeers,"ts.Participants.SetChangeParticipantReputationTo",nil,nil,"Everyone",To_PID,Owner,1)
+            elseif continue=="AllCoop" then
+              -- TODO: confirm that this SimpleExecuteForEveryone works in MP
+              g_LTM_Serp.SimpleExecuteForEveryone("ts.Participants.SetChangeParticipantReputationTo",To_PID,Owner,1)
             end
           end
         end
       end
-    end)
+    end
   end
+
   
   
   local function GetJoinWarCandidatesTargetPID(TargetPID)
@@ -100,10 +102,12 @@ if g_LuaScriptBlockers[ModID]==nil then
         ts.Unlock.SetRelockNet(g_DiploActions_Serp.DiploButtonsUnlocks.JoinWar) -- update buttons
         g_DiploActions_Serp.UnhideAllDiploButtons()
         
-        if continue=="IsFirst" then
-          if not g_LTL_Serp.IsHuman(TargetPID) then
-            local repmalus = #JoinWarCandidates * (-5) -- -5 rep per new war. calling it here instead in the above loop, because we should call t_ExecuteFnWithArgsForPeers as seldom as possible
+        if not g_LTL_Serp.IsHuman(TargetPID) then
+          local repmalus = #JoinWarCandidates * (-5) -- -5 rep per new war. calling it here instead in the above loop, because we should call t_ExecuteFnWithArgsForPeers as seldom as possible
+          if continue=="IsFirst" then
             g_LTL_Serp.start_thread("ChangeRep-5DeclareWarToAllMyEnemies",ModID,g_LTU_Serp.PeersInfo.t_ExecuteFnWithArgsForPeers,"ts.Participants.SetChangeParticipantReputationTo",nil,nil,"Everyone",TargetPID,PID,repmalus)
+          elseif continue=="AllCoop" then
+            g_LTM_Serp.SimpleExecuteForEveryone("ts.Participants.SetChangeParticipantReputationTo",TargetPID,PID,repmalus)
           end
         end
         
@@ -227,7 +231,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     
     -- Lua Tools Medium
     g_DiploActions_Serp = {
-      ChangeOwnerOfSelectionToPID = ChangeOwnerOfSelectionToPID,
+      t_ChangeOwnerOfSelectionToPID = t_ChangeOwnerOfSelectionToPID,
       GetJoinWarCandidates = GetJoinWarCandidates,
       DeclareWarToAllMyEnemies = DeclareWarToAllMyEnemies,
       GetJoinWarCandidatesTargetPID = GetJoinWarCandidatesTargetPID,
