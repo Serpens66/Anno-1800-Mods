@@ -29,7 +29,6 @@ if event.OnSessionEnter[ModID] == nil then -- only add it once
     local status, err = pcall(OnSessionEnter_serp) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
     if status==false then -- error
       print(ModID,"ERROR OnSessionEnter: Function OnSessionEnter_serp had an error: "..tostring(err))
-      g_LuaTools.modlog("ERROR OnSessionEnter: Function OnSessionEnter_serp had an error: "..tostring(err),ModID)
     end
   end
 end

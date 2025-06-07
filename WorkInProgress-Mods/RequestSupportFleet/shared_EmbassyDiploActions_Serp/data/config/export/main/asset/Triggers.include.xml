@@ -2850,7 +2850,7 @@
                 </Values>
               </SubTrigger>
             </Item>
-            <!-- Any button (except back) was hit, remove the object -->
+            <!-- Any other button (except back) was hit, remove the object (choose targte buttons is already handled and deleted above) -->
             <Item>
               <SubTrigger>
                 <Template>AutoCreateTrigger</Template>
@@ -2893,39 +2893,14 @@
             <Template>AutoCreateTrigger</Template>
             <Values>
               <Trigger>
+                <!-- dont wait for deletion when resetting, because the trigger needs to be ready as soon as possible again. (and with ConditionEvent its no problem if there are still objects in process of being deleted). this already solved problems we had when user its buttons to fast -->
                 <TriggerCondition>
-                  <Template>ConditionPlayerCounter</Template>
+                  <Template>ConditionAlwaysTrue</Template>
                   <Values>
                     <Condition />
-                    <ConditionPlayerCounter>
-                      <Context>1500005251</Context>
-                      <CounterAmount>0</CounterAmount>
-                      <ComparisonOp>AtMost</ComparisonOp>
-                    </ConditionPlayerCounter>
+                    <ConditionAlwaysTrue />
                   </Values>
                 </TriggerCondition>
-                <SubTriggers>
-                  <Item>
-                    <SubTrigger>
-                      <Template>AutoCreateTrigger</Template>
-                      <Values>
-                        <Trigger>
-                          <TriggerCondition>
-                            <Template>ConditionPlayerCounter</Template>
-                            <Values>
-                              <Condition />
-                              <ConditionPlayerCounter>
-                                <Context>1500005222</Context>
-                                <CounterAmount>0</CounterAmount>
-                                <ComparisonOp>AtMost</ComparisonOp>
-                              </ConditionPlayerCounter>
-                            </Values>
-                          </TriggerCondition>
-                       </Trigger>
-                      </Values>
-                    </SubTrigger>
-                  </Item>
-                </SubTriggers>
               </Trigger>
             </Values>
           </ResetTrigger>
@@ -4937,68 +4912,142 @@
         </TriggerSetup>
       </Values>
     </Asset>
-  
+    
+    <!-- the main conditoin is just there to fetch any active Session that then can be used to spawn 1500005222 successfully, without hardcoding a session GUID) -->
+    <!-- Relock 1500003907 to spawn the back button and reset  -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003907</GUID>
+          <Name>Reset Buttons to Targets</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockeState>0</DefaultLockeState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500005222</Context>
+                <CounterAmount>0</CounterAmount>
+                <ComparisonOp>AtLeast</ComparisonOp>
+                <CounterScope>Session</CounterScope>
+                <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext>
+                <CounterScopeUseActiveSession>1</CounterScopeUseActiveSession>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500003907</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSpawnObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionSpawnObjects>
+                    <SpawnGUID>1500005222</SpawnGUID>
+                    <Amount>1</Amount>
+                    <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                  </ActionSpawnObjects>
+                  <SpawnArea>
+                    <DistanceToBorder>Near</DistanceToBorder>
+                    <DistanceToIsland>Far</DistanceToIsland>
+                  </SpawnArea>
+                  <SessionFilter>
+                    <AllowProcessingSession>0</AllowProcessingSession>
+                    <AllowParentConditionSession>1</AllowParentConditionSession>
+                    <AllowQuestSession>0</AllowQuestSession>
+                    <AllowQuestArea>0</AllowQuestArea>
+                  </SessionFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <Asset>1500003907</Asset>
+                      </Item>
+                    </UnlockAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionAlwaysTrue</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
   
   </ModOp>
+  
   
   <!-- reset the AssemblyOptions-Display Buff for new sessions (by forcing the "back-button"), when we enter a new session first time since loading a save... -->
-  <ModOp Type="merge" GUID="1500004530" Path="/Values/Trigger/ResetTrigger/Values/Trigger">
-    <SubTriggers />
-  </ModOp>
-  <!-- important to use IsOptional here (although the condition is alawys true, checking for "at least 0". -->
-   <!-- the conditoin is just there to fetch any active Session that then can be used to spawn 1500005222 successfully, without hardcoding a session GUID) -->
-  <ModOp Type="add" GUID="1500004530" Path="/Values/Trigger/ResetTrigger/Values/Trigger/SubTriggers">
+   <!-- why do we do this? hm.. maybe to update for new participants? -->
+  <ModOp Type="add" GUID="1500004530" Path="Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
     <Item>
-      <SubTrigger>
-        <Template>AutoCreateTrigger</Template>
+      <TriggerAction>
+        <Template>ActionLockAsset</Template>
         <Values>
-          <Trigger>
-            <TriggerCondition>
-              <Template>ConditionPlayerCounter</Template>
-              <Values>
-                <Condition>
-                  <IsOptional>1</IsOptional>
-                </Condition>
-                <ConditionPlayerCounter>
-                  <Context>1500005222</Context>
-                  <CounterAmount>0</CounterAmount>
-                  <ComparisonOp>AtLeast</ComparisonOp>
-                  <CounterScope>Session</CounterScope>
-                  <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext>
-                  <CounterScopeUseActiveSession>1</CounterScopeUseActiveSession>
-                </ConditionPlayerCounter>
-              </Values>
-            </TriggerCondition>
-            <TriggerActions>
+          <Action />
+          <ActionLockAsset>
+            <LockAssets>
               <Item>
-                <TriggerAction>
-                  <Template>ActionSpawnObjects</Template>
-                  <Values>
-                    <Action />
-                    <ActionSpawnObjects>
-                      <SpawnGUID>1500005222</SpawnGUID>
-                      <Amount>1</Amount>
-                      <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                    </ActionSpawnObjects>
-                    <SpawnArea>
-                      <DistanceToBorder>Near</DistanceToBorder>
-                      <DistanceToIsland>Far</DistanceToIsland>
-                    </SpawnArea>
-                    <SessionFilter>
-                      <AllowProcessingSession>0</AllowProcessingSession>
-                      <AllowParentConditionSession>1</AllowParentConditionSession>
-                      <AllowQuestSession>0</AllowQuestSession>
-                      <AllowQuestArea>0</AllowQuestArea>
-                    </SessionFilter>
-                  </Values>
-                </TriggerAction>
+                <Asset>1500003907</Asset>
               </Item>
-            </TriggerActions>
-         </Trigger>
+            </LockAssets>
+          </ActionLockAsset>
         </Values>
-      </SubTrigger>
+      </TriggerAction>
     </Item>
   </ModOp>
-  
+
 
 </ModOps>

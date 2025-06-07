@@ -194,7 +194,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     end
     
     -- unless Ultra Tools are active, we dont know how many coop peers are executing this,because of ContinueWithTotalChanceCoop
-    local function t_DoSupportFleet(PID,TargetPID,IsThirdParty,last_QID,fleetname)
+    local function t_DoSupportFleet(PID,TargetPID,IsThirdParty,last_QID,fleetname,buyingships)
       g_LTL_Serp.modlog("t_DoSupportFleet (g_SupportFleet_Serp): "..tostring(PID).." towards "..tostring(TargetPID)..", IsThirdParty "..tostring(IsThirdParty)..", last_QID "..tostring(last_QID),ModID)
       local CurrentSession = session.getSessionGUID()
       local chosen = g_SupportFleet_Serp._CheckWhichShips(PID,TargetPID,IsThirdParty)
@@ -243,45 +243,64 @@ if g_LuaScriptBlockers[ModID]==nil then
           g_LTL_Serp.modlog("t_DoSupportFleet (g_SupportFleet_Serp): ERROR Player changed Session before we changed the GUID of fakeships...",ModID)
           return
         end
-        local userdata = session.getObjectByID(OID) -- better request userdata again and not use the one stored in objinfo
-        local newGUID = chosen[i]
-        userdata:changeGUID(newGUID)
-        -- falls wir irgendwann wissen wie QuestObjectives MainObjectives funktioniert und wir darüber
-         -- ans TimeLimit (aktuelle Wartezeit) kommen sollten, können wir das in lua alle 1 sec oderso ins Nameable schreiben...
-        g_SupportFleet_Serp.AdjustSkin(OID,newGUID,TargetPID)
-        -- todo test. SetOnSale ändert das UI und infolayer entsprechend, aber öffnet nicht die kauf-notification.
-         -- die müssten wir also noch selbst zufügen, aber nur für denjenigen, der die Quest hat.
-          -- dazu mal testen: dummyquest nach dem spawnen aus Quest heraus starten mit InheritObjects
-           -- darin irgendwie condition selection vom questobjects checken (wincondtion und quest started sich am Ende selbst erneut? doch wie beenden wir das?
-            -- ne wir können in xml nur auf GUID Basis Quests starten/beenden und status prüfen, was dann nicht funzt wenns mehrere request quests zeitgleich geben kann)
-             -- vllt doch mit PreCondition QuestObjects die Neutral gehören. und sobalds keine neutral mehr gibt, beendet sich loop?
-             -- Idee: 2 wins die mutuallyexclusive sind. eine ist anklicken des starters und bestätigen. Andere ist subcondition mit linear 100 mal questobject anklicken und notification
-              -- auf diese weise kannst du alle schiffe kaufen oder wenn du keins mehr willst/alle hast das starter anklciekn
-           -- und dann wenn selected ActionNotification zum Kaufen starten mit ThirdPartyButton
-        ts.Objects.GetObject(OID).Sellable.SetOnSale(true) -- no relevant effect besides visuals. shows that they are buyable and the ship-UI from it, but does not start the buy-notification (this is done in Quest ourself, so only the QuestOwner can buy them)
-        
-        
-        -- xml makes them invisible. here we make them visible one after the other, so other players also see the progress of it
-        g_LTL_Serp.start_thread("t_DoSupportFleet make visible"..tostring(PID)..tostring(TargetPID)..tostring(fleetname)..tostring(OID),ModID,function(OID,i)
-          system.waitForGameTimeDelta(10000*i) -- TODO Zeit auf 60000 anpassen sobald fertig (bzw. die Zeit wie in SustainQuest durch anzahl der Schiffe)
-          ts.GetGameObject(OID).Mesh.SetVisible(true) -- make visibile again. using GetGameObject here, because it works regardless of our session. In OnQuestEnd we will add xml code to make all visible, just in case lua was aborted
-        end,OID,i)
-        
-        g_LTL_Serp.start_thread("t_DoSupportFleet moneycost into name "..tostring(PID)..tostring(TargetPID)..tostring(fleetname)..tostring(OID),ModID,function(OID,i)
-          g_LTL_Serp.waitForTimeDelta(2000) -- wait for changeGUID to complete, otherwise we get wrong price, needs more than 1 second
-          local moneycost = ts.Objects.GetObject(OID).Sellable.CurrentParticipantBuyPrice.MoneyCost
-          local topdiplostate = ts.Participants.GetTopLevelDiplomacyStateTo(PID,TargetPID)
-          if topdiplostate == g_LTL_Serp.DiplomacyState.Alliance then -- writing the money cost into name instead of factor, because we also want to use it in text of notification
-            ts.Objects.GetObject(OID).Nameable.SetName(tostring(g_LTL_Serp.myround( moneycost / 4)))
-          else
-            ts.Objects.GetObject(OID).Nameable.SetName(tostring(g_LTL_Serp.myround( moneycost / 2)))
+        local userdata = g_LTL_Serp.IsUserdataValid(nil,OID) -- better request userdata again and not use the one stored in objinfo
+        if userdata~=nil then
+          local newGUID = chosen[i]
+          userdata:changeGUID(newGUID)
+          -- falls wir irgendwann wissen wie QuestObjectives MainObjectives funktioniert und wir darüber
+           -- ans TimeLimit (aktuelle Wartezeit) kommen sollten, können wir das in lua alle 1 sec oderso ins Nameable schreiben (damit andere Spieler wissen, wann fleet ready ist)...
+          g_SupportFleet_Serp.AdjustSkin(OID,newGUID,TargetPID)
+          
+          
+          
+          -- xml makes them invisible. here we make them visible one after the other, so other players also see the progress of it (in case lua is aborted by closing the game, they are also made visible all at once in xml after sustain)
+          g_LTL_Serp.start_thread("t_DoSupportFleet make visible"..tostring(PID)..tostring(TargetPID)..tostring(fleetname)..tostring(OID),ModID,function(OID,i)
+            system.waitForGameTimeDelta(10000*i) -- TODO Zeit auf 60000 anpassen sobald fertig (bzw. die Zeit wie in SustainQuest durch anzahl der Schiffe)
+            ts.GetGameObject(OID).Mesh.SetVisible(true) -- make visibile again. using GetGameObject here, because it works regardless of our session.
+          end,OID,i)
+          
+          if buyingships then -- currently disabled, because buying a supportfleet feels strange (needs QuestBuy.include.xml code)
+            -- SetOnSale ändert das UI und infolayer entsprechend, aber öffnet nicht die kauf-notification.
+             -- die fügen wir dann also per QuestBuy selbst hinzu
+            ts.Objects.GetObject(OID).Sellable.SetOnSale(true) -- no relevant effect besides visuals. shows that they are buyable and the ship-UI from it, but does not start the buy-notification (this is done in Quest ourself, so only the QuestOwner can buy them)
+            g_LTL_Serp.start_thread("t_DoSupportFleet moneycost into name "..tostring(PID)..tostring(TargetPID)..tostring(fleetname)..tostring(OID),ModID,function(OID,i)
+              g_LTL_Serp.waitForTimeDelta(2000) -- wait for changeGUID to complete, otherwise we get wrong price, needs more than 1 second
+              local moneycost = ts.Objects.GetObject(OID).Sellable.CurrentParticipantBuyPrice.MoneyCost
+              if IsThirdParty and not (TargetPID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID or TargetPID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID) then -- 3rd party)
+                ts.Objects.GetObject(OID).Nameable.SetName(tostring(g_LTL_Serp.myround( moneycost / 2)))
+              else -- 2nd party and pirates costs based on topdiplostate
+                local topdiplostate = ts.Participants.GetTopLevelDiplomacyStateTo(PID,TargetPID)
+                if topdiplostate == g_LTL_Serp.DiplomacyState.Alliance then -- writing the money cost into name instead of factor, because we also want to use it in text of notification
+                  ts.Objects.GetObject(OID).Nameable.SetName(tostring(g_LTL_Serp.myround( moneycost / 4)))
+                else
+                  ts.Objects.GetObject(OID).Nameable.SetName(tostring(g_LTL_Serp.myround( moneycost / 2)))
+                end
+              end
+            end,OID,i)
+          else -- make them not sellable (only true for my custom t_SimpleSellSelected function as long as the name is not changed... found no better way)
+            local name = ts.Objects.GetObject(OID).Nameable.Name
+            local newname = g_LTL_Serp.AddToNameInvisible(name,"NOSELL",true)
+            ts.Objects.GetObject(OID).Nameable.SetName(newname)
+            
+            -- in case the user renames them shortly after receiving them , add NOSELL again 10 minutes after the sustain quest is finished
+            -- not super important, so no big deal if aborted by ending the game
+            g_LTL_Serp.start_thread("t_DoSupportFleet add NOSELL again"..tostring(PID)..tostring(TargetPID)..tostring(fleetname)..tostring(OID),ModID,function(OID,i,fleetname)
+              if fleetname=="SmallFleet" then
+                system.waitForGameTimeDelta(1800000) -- TODO adjust this to the final total spawn time + 10 minutes
+              else -- BigFleet
+                system.waitForGameTimeDelta(1800000)
+              end
+              local name = ts.Objects.GetObject(OID).Nameable.Name
+              local newname = g_LTL_Serp.AddToNameInvisible(name,"NOSELL",true)
+              ts.Objects.GetObject(OID).Nameable.SetName(newname)
+            end,OID,i,fleetname)
+            
           end
-        end,OID,i)
-        
-        
-        i = i + 1 -- TODO: sobald mehr als eine fakeship guid, muss ich hier code anpassen, dass die korrekten fake schiffe umgewandelt werden 
-        -- und sie evtl. auch nacheinander mit delay sichtbar machen...
-         -- wobei wir changeGUID sofort machen müssen
+          
+          i = i + 1 -- TODO: sobald mehr als eine fakeship guid, muss ich hier code anpassen, dass die korrekten fake schiffe umgewandelt werden 
+          -- und sie evtl. auch nacheinander mit delay sichtbar machen...
+           -- wobei wir changeGUID sofort machen müssen
+        end
       end
     end
     

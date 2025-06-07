@@ -280,7 +280,7 @@ if g_LuaScriptBlockers[ModID]==nil then
 
       g_LTL_Serp.modlog("_DoTheSharing after DoneVariableString "..tostring(ts.GameClock.CorporationTime),ModID)
       local PID_OID = nil
-      local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session
+      local status,sessionparticipants = xpcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,g_LTL_Serp.log_error,{SharePID},"First") -- only first found loaded session
       if status==false then
         g_LTL_Serp.modlog("_DoTheSharing ERROR : "..tostring(sessionparticipants),ModID)
         error(sessionparticipants) 
@@ -289,7 +289,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       g_LTL_Serp.modlog("_DoTheSharing after GetAllLoadedSessionsParticipants "..tostring(ts.GameClock.CorporationTime),ModID)
       for SessionID,session_pids in pairs(sessionparticipants) do
         PID_OID = session_pids[SharePID].OID
-        local status,err = pcall(g_LTL_Serp.DoForSessionGameObject,"[MetaObjects SessionGameObject("..tostring(PID_OID)..") Nameable Name("..tostring(infostring)..")]")
+        local status,err = xpcall(g_LTL_Serp.DoForSessionGameObject,g_LTL_Serp.log_error,"[MetaObjects SessionGameObject("..tostring(PID_OID)..") Nameable Name("..tostring(infostring)..")]")
         if status==false then
           g_LTL_Serp.modlog("_DoTheSharing2 ERROR : "..tostring(err),ModID)
           error(err) 
@@ -333,7 +333,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     
     local function GetSharedLuaInfo(FromPeerInt)
         local SharePID = g_LTL_Serp.GetPairAtIndSortedKeys(g_PeersInfo_Serp.PIDsToShareData,FromPeerInt+1) -- g_PeersInfo_Serp.PIDsToShareData[FromPeerInt+1]
-        local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session
+        local status,sessionparticipants = xpcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,g_LTL_Serp.log_error,{SharePID},"First") -- only first found loaded session
         if status==false then
           g_LTL_Serp.modlog("GetSharedLuaInfo ERROR : "..tostring(sessionparticipants),ModID)
           error(sessionparticipants) 
@@ -369,7 +369,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         g_LTL_Serp.modlog("t_ExecuteFnWithArgsForPeers start "..tostring(funcname).." "..tostring(ts.GameClock.CorporationTime),ModID)
         local args = {...} -- does put the "..." arguments into a table
         if not ts.GameSetup.GetIsMultiPlayerGame() then
-          if g_LTL_Serp.table_contains_value(ForPeers,g_PeersInfo_Serp.PeerInt) then
+          if type(ForPeers)~="table" or g_LTL_Serp.table_contains_value(ForPeers,g_PeersInfo_Serp.PeerInt) then
             local func = g_LTL_Serp.myeval(funcname)
             if returnafterfinish then -- execute in current thread and block it (return after finished)
               return func(table.unpack(args))
@@ -391,7 +391,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         
         local function DoExecuteFnWithArgsForPeers(inhex,waittime)
             -- g_LTL_Serp.modlog("DoExecuteFnWithArgsForPeers before share "..tostring(ts.GameClock.CorporationTime),ModID)
-            local status,err = pcall(g_PeersInfo_Serp.t_ShareLuaInfo,inhex,waittime,"g_PeersInfo_Serp._ExecuteDone")
+            local status,err = xpcall(g_PeersInfo_Serp.t_ShareLuaInfo,g_LTL_Serp.log_error,inhex,waittime,"g_PeersInfo_Serp._ExecuteDone")
             if status==false then
               g_LTL_Serp.modlog("ERROR : "..tostring(err),ModID)
               error(err) 
@@ -494,7 +494,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           -- g_LTL_Serp.modlog("DoTheExecutionFor yes ShouldIExecute",ModID)
           local func = g_LTL_Serp.myeval(intable.funcname)
           -- g_LTL_Serp.modlog("func call "..tostring(ts.GameClock.CorporationTime),ModID)
-          local success, err = pcall(func,table.unpack(intable.args))
+          local success, err = xpcall(func,g_LTL_Serp.log_error,table.unpack(intable.args))
           if success==false then
             g_LTL_Serp.modlog("ERROR while trying to call funcname "..tostring(intable.funcname).." error: "..tostring(err),ModID)
           end
@@ -552,7 +552,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- ###################################################################################
     
     if g_PeersInfo_Serp.IsUsingPopUp then
-      console.startScript("data/scripts_serp/mp_popup.lua") -- in shared mod shared_MP_Lua_PopUps
+      console.startScript("data/scripts_serp/mp_popup.lua") -- in shared mod shared_MP_Lua_PopUps (removed from files, see WIP mods on github if you are interested in shared_PopUp mod)
     else
       console.startScript("data/scripts_serp/h/peer_tricks.lua") -- within this mod
     end

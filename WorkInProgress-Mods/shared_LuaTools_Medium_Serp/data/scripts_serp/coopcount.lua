@@ -95,7 +95,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     local function ContinueWithTotalChanceCoop(totalchance)
       if totalchance==0 then
         return false
-      elseif totalchance==1 then
+      elseif totalchance>=1 then
         return true
       end
       if g_CoopCountResSerp.Finished then

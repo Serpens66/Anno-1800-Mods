@@ -2,9 +2,8 @@
 -- (ok, event_savegame_loaded.lua is called first via ActionExecuteScript and then starts this here via Unlock 1500004636)
 
 
--- TODO:
- -- test if it works in MP and does not desync
 
+  
 
 local ModID = "shared_EmbassyDiploActions_Serp diploactions.lua" -- used for logging
 
@@ -37,7 +36,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       g_LTL_Serp.modlog("t_ChangeOwnerOfSelectionToPID "..tostring(To_PID).." , "..tostring(ignoreowner),ModID)
       local OID = g_LTL_Serp.get_OID(session.getSelectedFactory())
       if OID~=nil and OID~=0 then
-        local success = g_LTM_Serp.t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner) -- must be called from within a thread
+        local success = g_LTM_Serp.t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner,true) -- must be called from within a thread
         if success then -- in theory I would credit 1 Rep per ship.. but it desyncs, so we need to register a trigger which starts data/scripts_serp/rep/rep1_gasparov_h0.lua , but we need every possible combination, so tons of scripts if we want to do it like this :D So we only do it if g_LTU_Serp is enabled (not included)
           local Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
           if Owner~=nil then -- increase opinion from To_PID towards the Owner of the gifted object
@@ -77,18 +76,73 @@ if g_LuaScriptBlockers[ModID]==nil then
     return TargetPIDs
   end
   
-    
+  
+  -- :
+ -- Bei JoinWar bei der KI noch Reputation zum Kriegsziel prüfen und vergleichen
+ -- Und dann der KI quasi auch die Entscheidung überallen, ob sie stattdessen Allianz auflöst
+  -- Problem daran:
+   -- aktuell der einfachheit halber ja nur einen Button um ALLEN Feinden Krieg zu erklären.
+  -- wie berechne ich dafür die chance? ist ja doof, wenn ich 2 Gegner habe,
+   -- aber eig nur Hilfe bei einem davon brauche und dadurch die Chance geringer wird, dass es 2 sind.
+    -- bzw. die chance für allianz auflösung höher wird...
+  -- Für Krieg/Nein einzeln ausrechnen. Für Allianz auflösen...
+   -- hmm... vllt lieber weglassen? solange das alles in 1 ist, ists sonst zu sehr bestrafung
+  -- klappt also besser, wenn wir im UI auswählen können wem der verbündete den Krieg erklären soll.
+   -- braucht aber einiges an neuen xml code .vllt später mal zufügen
+    -- und dann auch chance in text anzeigen (CompanyName)
+  
+  
+  -- checks reputations and if the chance is good, it will exeute DeclareWarToAllMyEnemies
+  -- PID will ask TargetPID to declare war on all his enemies
+  local function TryDeclareWarToAllMyEnemies(PID,TargetPID)
+    local continue = g_LTM_Serp.ContinueCoopCalled()
+    if continue then
+      PID = PID or ts.Participants.GetGetCurrentParticipantID()
+      TargetPID = TargetPID or ts.Participants.GetGetCurrentParticipantID()
+      local action = "nothing"
+      local JoinWarCandidates = g_DiploActions_Serp.GetJoinWarCandidatesTargetPID(TargetPID)
+      local FinalJoinWarCandidates = {}
+      local RepToRequester = ts.Participants.GetParticipantReputationTo(TargetPID,PID)
+      for _,CheckPID in ipairs(JoinWarCandidates) do -- no exception for humans, also they can be forced into war, if in alliance with another human
+        local action = "nothing"
+        local RepToWarCandidate = ts.Participants.GetParticipantReputationTo(TargetPID,CheckPID)
+        local chanceforwar = ((RepToRequester - RepToWarCandidate) / 100) * 2
+        if CheckPID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID or CheckPID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID or TargetPID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID or TargetPID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID then -- if any of them is pirate, increased chance, because pirates like to declare war and everyone like to declare war on pirates
+          chanceforwar = chanceforwar * 1.25
+        end
+        if continue=="IsFirst" then -- only executed for first coop peer
+          if chanceforwar>=1 or math.random() < chanceforwar then -- should not use ContinueWithTotalChanceCoop here
+            action = "war"
+          end
+        else -- executed for all coop peers
+          if g_CoopCountResSerp.ContinueWithTotalChanceCoop(chanceforwar) then
+            action = "war"
+          end
+        end
+        if action=="war" then -- TODO notification PlayerInvokesAlliance? CompanyName Cache nutzen um Namen der beteiligten In Notification Text zu packen
+          table.insert(FinalJoinWarCandidates,CheckPID)
+        elseif action=="nothing" then -- TODO: send notification "No"
+        -- elseif action=="cancelalliance" then
+          -- ts.Participants.CancelAlliance(TargetPID,PID) -- evtl. NegativeInteraction_NPCsFriend (if at least TradeRights) -- wobei testen ob KI nicht automatisch NpcCancelsAlliance schickt
+        end
+      end
+      if next(FinalJoinWarCandidates) then
+        g_DiploActions_Serp.DeclareWarToAllMyEnemies(PID,TargetPID,FinalJoinWarCandidates)
+      end
+    end
+  end
+  
   -- should not hurt if executed multiple times in coop ...
    -- one of the PIDs can be nil. this one will be replaced by Current then
-  local function DeclareWarToAllMyEnemies(PID,TargetPID)
+   -- PID will force TargetPID to declare war on all his enemies
+  local function DeclareWarToAllMyEnemies(PID,TargetPID,JoinWarCandidates)
     local continue = g_LTM_Serp.ContinueCoopCalled()
     if continue then
       PID = PID or ts.Participants.GetGetCurrentParticipantID()
       TargetPID = TargetPID or ts.Participants.GetGetCurrentParticipantID()
       g_LTL_Serp.modlog("DeclareWarToAllMyEnemies "..tostring(PID).." , "..tostring(TargetPID),ModID)
-      local DiplomacyState = g_LTL_Serp.DiplomacyState
       local success = false
-      local JoinWarCandidates = g_DiploActions_Serp.GetJoinWarCandidatesTargetPID(TargetPID)
+      JoinWarCandidates = JoinWarCandidates or g_DiploActions_Serp.GetJoinWarCandidatesTargetPID(TargetPID)
       for _,CheckPID in ipairs(JoinWarCandidates) do -- no exception for humans, also they can be forced into war, if in alliance with another human
         g_LTL_Serp.modlog("DeclareWarToAllMyEnemies, War Declared to "..tostring(CheckPID),ModID)
         if continue=="IsFirst" then -- only execute it once
@@ -171,8 +225,10 @@ if g_LuaScriptBlockers[ModID]==nil then
   
   local function OnPIDDiploSelection(PID)
     if PID == ts.Participants.GetGetCurrentParticipantID() then -- functions called via ActionExecuteScript need this check
-      local CheckPID = g_DiploActions_Serp.GetDiploSelectedPID()
-      g_DiploActions_Serp.UpdateOfferedDiploButtons(CheckPID)
+      local CheckPID = g_DiploActions_Serp.GetDiploSelectedPID(true)
+      if CheckPID~=nil then
+        g_DiploActions_Serp.UpdateOfferedDiploButtons(CheckPID)
+      end
     end
   end
   
@@ -204,13 +260,20 @@ if g_LuaScriptBlockers[ModID]==nil then
     end
   end
   
-  local function GetDiploSelectedPID()
+  local function GetDiploSelectedPID(validate)
     local selectedPID = nil
     local PID = ts.Participants.GetGetCurrentParticipantID()
     for _,CheckPID in pairs(g_DiploActions_Serp.SupportedPIDs_All) do
       if not ts.Unlock.GetIsUnlocked(g_DiploActions_Serp.SelectionUnlocks[CheckPID]) then -- locked means selected. 
-        selectedPID = CheckPID
-        break -- only one can be selected at the same time (if triggers are working as intended)
+        if selectedPID==nil then
+          selectedPID = CheckPID
+          if not validate then
+            break
+          end
+        elseif validate then -- only one can be selected at the same time (if triggers are working as intended), but if player hits the buttons very fast, it can bug...
+          ts.Unlock.SetRelockNet(1500003907) -- reset everything
+          return nil -- should not happen anylonger, Trigger is now reset faster. But just to be sure
+        end
       end
     end
     return selectedPID -- can be nil, if nothing is selected
@@ -233,6 +296,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     g_DiploActions_Serp = {
       t_ChangeOwnerOfSelectionToPID = t_ChangeOwnerOfSelectionToPID,
       GetJoinWarCandidates = GetJoinWarCandidates,
+      TryDeclareWarToAllMyEnemies = TryDeclareWarToAllMyEnemies,
       DeclareWarToAllMyEnemies = DeclareWarToAllMyEnemies,
       GetJoinWarCandidatesTargetPID = GetJoinWarCandidatesTargetPID,
       SupportedPIDs_War = {0,1,2,3,25,26,27,28,29,30,31,32,33,34,64,17,18}, --  all humans, second party and pirates. should match the participants which are shown in the embassy mod for War related purpose (so no third party traders, except pirates)

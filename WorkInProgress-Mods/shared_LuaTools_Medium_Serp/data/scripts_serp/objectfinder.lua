@@ -600,6 +600,7 @@ if g_LuaScriptBlockers[ModID]==nil then
                             
                             -- debugging, check if our converter is correct
                             local t_userdata = SessionIsCurrent and session.getObjectByID(Kontor_OID) or nil
+                            t_userdata = g_LTL_Serp.IsUserdataValid(t_userdata)
                             if t_userdata~=nil then
                               local u_OID = g_LTL_Serp.get_OID(t_userdata,"string")
                               if tostring(u_OID) ~= tostring(Kontor_OID) then
@@ -648,6 +649,7 @@ if g_LuaScriptBlockers[ModID]==nil then
                             -- local ParticipantID = type(OID)=="number" and ts.GetGameObject(OID).Owner or g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Owner]",true)
                             local ParticipantID = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
                             local userdata = SessionIsCurrent and session.getObjectByID(OID) or nil -- no way to get userdata in foreign session... But you can use t_ExecuteFnWithArgsForPeers for a peer who is in that session and give him the OID to do what you want on that userdata (most operations on userdata desync though if not all peers do it at the same time)
+                            userdata = g_LTL_Serp.IsUserdataValid(userdata)
                             if LowestObjectID==nil then -- we increase, so the first is the lowest
                               LowestObjectID = ObjectID
                             end
@@ -987,7 +989,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             while g_ObjectFinderSerp==nil do
               coroutine.yield()
             end
-            local status, err = pcall(g_ObjectFinderSerp._OnSessionLoaded,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+            local status, err = xpcall(g_ObjectFinderSerp._OnSessionLoaded,g_LTL_Serp.log_error,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
             if status==false then -- error
               print(ModID,"ERROR OnSessionLoaded: Function OnSessionLoaded had an error: "..tostring(err))
               g_LTL_Serp.modlog("ERROR OnSessionLoaded: Function OnSessionLoaded had an error: "..tostring(err),ModID)
@@ -1003,7 +1005,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             while g_ObjectFinderSerp==nil do
               coroutine.yield()
             end
-            local status, err = pcall(g_ObjectFinderSerp._OnIslandSettledSessionEnter,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+            local status, err = xpcall(g_ObjectFinderSerp._OnIslandSettledSessionEnter,g_LTL_Serp.log_error,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
             if status==false then -- error
               print(ModID,"ERROR OnSessionEnter: Function OnIslandSettledSessionEnter had an error: "..tostring(err))
               g_LTL_Serp.modlog("ERROR OnSessionEnter: Function OnIslandSettledSessionEnter had an error: "..tostring(err),ModID)
@@ -1023,12 +1025,12 @@ if g_LuaScriptBlockers[ModID]==nil then
           while not g_LTM_Serp.Shared_Cache[ModID].Loaded do -- wait for cache to load
             coroutine.yield()
           end
-          local status, err = pcall(g_ObjectFinderSerp._OnSessionLoaded,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+          local status, err = xpcall(g_ObjectFinderSerp._OnSessionLoaded,g_LTL_Serp.log_error,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
           if status==false then -- error
             print(ModID,"ERROR OnSessionLoaded: Function OnSessionLoaded had an error: "..tostring(err))
             g_LTL_Serp.modlog("ERROR OnSessionLoaded: Function OnSessionLoaded had an error: "..tostring(err),ModID)
           end
-          local status, err = pcall(g_ObjectFinderSerp._OnIslandSettledSessionEnter,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+          local status, err = xpcall(g_ObjectFinderSerp._OnIslandSettledSessionEnter,g_LTL_Serp.log_error,ts.Participants.GetGetCurrentParticipantID()) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
           if status==false then -- error
             print(ModID,"ERROR OnSessionEnter: Function OnIslandSettledSessionEnter had an error: "..tostring(err))
             g_LTL_Serp.modlog("ERROR OnSessionEnter: Function OnIslandSettledSessionEnter had an error: "..tostring(err),ModID)

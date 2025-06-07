@@ -71,7 +71,7 @@ if event.OnLeaveUIState[ModID] == nil then -- only add it once (per anno game st
       end
       for id,fn in pairs(g_OnGameLeave_serp) do
         if fn~=nil and type(fn)=="function" then
-          local status, err = pcall(fn)
+          local status, err = xpcall(fn,g_LTL_Serp.log_error)
           if status==false then -- error
             print("ERROR OnGameLeave: Function from mod "..tostring(id).." had an error: "..tostring(err))
             g_LTL_Serp.modlog("ERROR OnGameLeave: Function from mod "..tostring(id).." had an error: "..tostring(err),ModID)
@@ -87,7 +87,7 @@ if event.OnLeaveUIState[ModID] == nil then -- only add it once (per anno game st
         g_LTL_Serp.modlog("On SessionViewLeft_ID : Changing GameSpeed to normal speed while in MP and in Menus...",ModID)
         g_LTL_Serp.start_thread("SessionViewLeft SetSetGameSpeed",ModID,g_PeersInfo_Serp.t_ExecuteFnWithArgsForPeers,"ts.GameClock.SetSetGameSpeed",nil,nil,"Everyone",3)
         ts.GameClock.SetSetGameSpeed(3) -- also call it directly for local, to minimize Menu problems, since t_ExecuteFnWithArgsForPeers takes some seconds and is a thread itself which gets problems on low speed
-        ts.Unlock.SetUnlockNet(1500004525) -- notification that speed was changed by mod
+        ts.Unlock.SetRelockNet(1500004525) -- notification that speed was changed by mod
       end
     end
   end
@@ -110,7 +110,7 @@ if event.OnLeaveUIState[ModID] == nil then -- only add it once (per anno game st
   g_LuaScriptBlockers = {}
   
   event.OnLeaveUIState[ModID] = function(UILeft_ID)
-    local status, err = pcall(Do_OnLeaveUIState,UILeft_ID) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
+    local status, err = xpcall(Do_OnLeaveUIState,g_LTL_Serp.log_error,UILeft_ID) -- use seperate function with pcall, because game crashes without lua error, if any error happens in an function called by event. !
     if status==false then -- error
       print(ModID,"ERROR OnLeaveUIState: Function Do_OnLeaveUIState had an error: "..tostring(err))
       g_LTL_Serp.modlog("ERROR OnLeaveUIState: Function Do_OnLeaveUIState had an error: "..tostring(err),ModID)

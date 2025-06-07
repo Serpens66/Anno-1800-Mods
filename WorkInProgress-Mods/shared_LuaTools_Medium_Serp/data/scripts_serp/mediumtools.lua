@@ -7,6 +7,36 @@
 -- (ok, event_savegame_loaded.lua is called first via ActionExecuteScript and then starts this here via Unlock 1500004636)
 
 
+
+-- general infor for lua and multiplayer:
+  -- Code with ActionExecuteScript is started for all humans, regardless who executed this Action.
+  -- If you only want to execute code for a specific human, you can use my WhichPlayerCondition mod (included as shared mod)
+   -- to check within the Trigger where you do ActionExecuteScript which human the executing player is and then start
+    -- a different script for each of them, eg called myscript_0.lua for Human0 and so on.
+   -- In that script you know its ment to be only executed for Human0, you can check "GetGetCurrentParticipantID" to make
+    -- sure only the correct participant is executing the code.
+  -- But your code still will be executed for all human peers in that Coop team, so if 2 people are in the team, lua commands
+   -- which are synced will still be executed 2 times.
+   -- To complete solve the coop problem, you will need my UltraTools shared mod. But even without it there are several workarounds
+    -- for specific situations. The MediumTools includes a few more workarounds.
+   -- But eg. instead of using "RegisterTriggerForCurrentParticipant", which will register the trigger 2 times with 2 coop players,
+    -- you can instead make your Trigger a FeatureUnlock (AutoSelfUnlock=0, AutoRegister=1), which has the main Condition UnlockNeeded of itself.
+    -- Then you can use ts.Unlock.SetUnlockNet(YOUR_FEATUREUNLOCK) instead, to make this Trigger start. It does not matter if the unlocking is executed 
+     -- multiple times in coop, because unlock is unlock.
+   -- IMPORTANT:
+    -- But by using Condition UnlockNeeded we get another problem:
+     -- Registered Triggers are saved to the samegame and Assets which do not exist are always counted as unlocked.
+     -- That means if a user deactivates your mod, the Trigger Code will still be there, but the asset he checks for being unlocked
+      -- does not exist anymore, which defaults to "unlocked" and make your Trigger execute its actions.
+     -- Depending on the actions this might cause problems, since the mod is no longer active.
+    -- Therefore its best to reverse the unlock for Triggers/FeatureUnlocks like this:
+     -- Use DefaultLockedState=0 for it and use NegateCondition in your UnlockNeeded Condition, to check if it is "locked".
+      -- And in lua you use instead ts.Unlock.SetRelockNet(YOUR_FEATUREUNLOCK)
+    -- I think for Quests PreConditionList this problem does not exist, at least not if Quest and Pool is removed (maybe if pool stays)
+      -- (so not needed for SpawnHelpers.include.xml from mediumtools)
+
+
+
 -- info:
   -- this is how we can properly add our code to the functions of another mod:
       -- local Orig_UpdateOfferedDiploButtons = g_DiploActions_Serp.UpdateOfferedDiploButtons
@@ -26,14 +56,19 @@
 -- info:
  -- doing a mods.reload() while a lua coroutine (thread) is running very often crashes the game.
  -- Assumption: It happens when new world was loaded (by AI), but never visited by the player yet?
- -- yes seems like this is true..
+ -- yes seems like this is true.. (at least chance very high and chance for crash very low when session visited)
   -- TODO test if this also happens without any lua scripts. and then which lua scripts are problematic
  -- auch ohne session crashed oft währedn schnellvorlauf
- -- und vermutlich medium grund
+ -- und vermutlich medium grund .. wobei es mit ultra schon häufiger zu sein scheint...
 -- hm.. ist absolut beschissen reproduzierbar ... keine ahnung worans liegt...
  -- aber ich würde schon sagen ohne lua ists sehr viel seltener, bzw. garnicht (kann auch an supportfleet lua liegen)
  -- aber auch mit lua ists ab und zu ständig und ab und zu nur jedes 5te mal n crash..
- 
+-- oder es liegt wirklich doch dran, wenn man reload macht während threads laufen...
+  -- hm ne, wenn ich im testscript einfach n thread mit waitForTimeDelta oder waitForGameTimeDelta oder nur coroutine.yield im while loop laufen lasse
+    -- und dann mod reloade, dann crasht es nicht...
+
+
+
 
 -- TODO:
  -- g_LTL_Serp.GetActiveQuestInstances evlt noch ab und zu, zb. alle 10 minuten,
@@ -102,7 +137,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         g_LTL_Serp.start_thread("AddToQueue "..ID,ModID,function(ID)
           local task = table.remove(ThreadQueue[ID],1)
           while task~=nil do
-            status,err = pcall(task.fn,table.unpack(task.args))
+            status,err = xpcall(task.fn,g_LTL_Serp.log_error,table.unpack(task.args))
             if status==false then
               g_LTL_Serp.modlog("ERROR calling AddToQueue function from "..ID..", err: "..tostring(err),ModID)
             end
@@ -170,7 +205,8 @@ if g_LuaScriptBlockers[ModID]==nil then
 
   -- Minor Problem: No Lua command I tried, neither on GameObject Walking nor on userdata (DebugStop/SetDebugGoto/SetMove/MoveTo) does abort the current task/command of the ship (traderoute/escort)
   -- Luckily the AI does give the ships a new command after receiving it. But the humans should make sure to manually stop doing what they did before.
-    -- TODO: Trigger test with ActionStopObjectMovement? but we can not properly target there, only all ships owned by eg. Nature... at least using a Pool of ships owned by 1st/2nd party, so no Quest/helper ships are hit
+    -- maybe ActionStopObjectMovement? but we can not properly target there, only all ships owned by eg. Nature... at least using a Pool of ships owned by 1st/2nd party, so no Quest/helper ships are hit
+     -- not that important. AI gives them new task and human can simply give it new command manually
     
     
   -- only works for Sellable Objects! (because we use the BuyNet Feature, which is the only way to change owner without desync/forcing everyone in the same session)
@@ -180,7 +216,9 @@ if g_LuaScriptBlockers[ModID]==nil then
    -- So make sure before calling it, only one peer is calling it (either by using UltLuaHelpers or Notification Trick or whatever. if all coop peers execute it, then the buy/sell cost compensation is credited multiple times)
   -- use CallGlobalFnBlocked with "ChangeOwnerOIDToPID_"..OID as blocknameadd with ~2 seconds blocktime when calling this to prevent the same peer from executing it multiple times for the same object (eg if done via CharacterNotification Button and the player hits the button multiple times)
    -- set ignoreowner to true if you want to allow gifting the ship, even if Local Player is not the Owner from it
-  local function t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner)
+   -- if notifyonfail is true, it will send a notification to the Local_PID if a ship owner change failed
+    -- sth like "can not change owner of ships which are not sellable"
+  local function t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner,notifyonfail)
     local GUID = g_LTL_Serp.GetGameObjectPath(OID,"GUID")
     g_LTL_Serp.modlog("ChangeOwnerOIDToPID called. OID:"..tostring(OID).." GUID: "..tostring(GUID).." To_PID: "..tostring(To_PID),ModID)
     local InfluenceProduct = 1010190 -- we dont care for Influence costs. Other costs are refunded
@@ -191,11 +229,9 @@ if g_LuaScriptBlockers[ModID]==nil then
       local with_middleman = g_LTM_Serp.NatureParticipantPID -- if they have no traderights, we will make use of a middleman (PID=158) who has traderights with everyone
       if ts.Participants.GetCheckDiplomacyStateTo(Owner,To_PID,2) then -- BuyNet only works with traderights
         with_middleman = false
-      else
-        if not (ts.Participants.GetCheckDiplomacyStateTo(with_middleman,To_PID,2) and ts.Participants.GetCheckDiplomacyStateTo(Owner,with_middleman,2)) then
-          g_LTL_Serp.modlog("ChangeOwnerOIDToPID FAILED, because either To_PID or Owner does not even have traderights with my Nature-Helper-Participant (most likely a mod participant with DefaultTreaties War ... it will work if my submod_NatureParticipant mod loads after that mod)",ModID)
-          return false
-        end
+      elseif not (ts.Participants.GetCheckDiplomacyStateTo(with_middleman,To_PID,2) and ts.Participants.GetCheckDiplomacyStateTo(Owner,with_middleman,2)) then
+        g_LTL_Serp.modlog("ChangeOwnerOIDToPID FAILED, because either To_PID or Owner does not even have traderights with my Nature-Helper-Participant (most likely a mod participant with DefaultTreaties War ... it will work if my submod_NatureParticipant mod loads after that mod)",ModID)
+        return false
       end
       local To_IsHuman = g_LTL_Serp.IsHuman(To_PID) -- AI does cheat anyway, cant go bancrupt and AddAmount does not do anything for them anyways (also BuyNet does not change their money). So we can skip this for them
       local Owner_IsHuman = g_LTL_Serp.IsHuman(Owner)
@@ -251,84 +287,25 @@ if g_LuaScriptBlockers[ModID]==nil then
                   end
                 end
               end
-          else -- TODO: evtl eine notification senden, dass man zum verschenken eine insel des spielers in diesem savegame-run gesehen haben muss (also zb einmal session wechel durchfüren)
+          else 
             g_LTL_Serp.modlog("ChangeOwnerOIDToPID FAILED, because GetAnyValidKontorOIDFrom did not succeed to find a valid Kontor from owner/receiver.",ModID)
+            if notifyonfail then
+              -- TODO: evtl eine notification senden, dass man zum verschenken eine insel des spielers in diesem savegame-run gesehen haben muss (also zb einmal session wechel durchfüren)
+            end
             return false
           end
-        else -- can not be sold. TODO Notification machen
+        else 
           g_LTL_Serp.modlog("ChangeOwnerOIDToPID FAILED, because this Object can not be sold, GUID "..tostring(GUID),ModID)
+          if notifyonfail then
+            -- -- can not be sold. TODO Notification machen
+          end
           return false
         end
       end
     end
     return true
   end
-  
-  
-  -- Only call it for the one coop peer which should buy object he has currently selected!
-  -- pricefactor multiplies CurrentParticipantBuyPrice MoneyCost (usually double of the SellPrice)
-  -- currently only supports money costs
-  local function t_SimpleBuySelected(pricefactor,ignorecanbesold,allownegativemoney)
-    PID = ts.Participants.GetGetCurrentParticipantID()
-    if ts.Selection.Object.Owner~=PID and (ignorecanbesold or ts.Selection.Object.Sellable.CanBeSoldToTrader) then
-      
-      if type(pricefactor)=="boolean" then -- use Name , (not using string "Name" as pricefactor because not sure how to forward this with t_FnViaTextEmbed)
-        local name = ts.Selection.Object.Nameable.Name
-        local name_parts = g_LTL_Serp.mysplit(name, "_") -- eg. "The Shipname_2300" or simply "0.5"
-        local namevalue,restname = nil, ""
-        for _,part in ipairs(name_parts) do
-          local asnumber = tonumber(part)
-          if namevalue==nil and asnumber~=nil then
-            namevalue = asnumber
-          end
-          if asnumber==nil then
-            restname = restname..part
-          end
-        end
-        if restname==nil or restname=="" then
-          restname = g_LTL_Serp.weighted_random_choices(g_LTL_Serp.ShipNameGUIDs, 1)[1] -- get a random name
-          restname = ts.GetAssetData(restname).Text
-        end
-        if pricefactor==true then -- if true we want to pay the sum in the name
-          pricefactor = 1
-          local newprice = namevalue
-          if namevalue~=nil then
-            pricefactor = namevalue / ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost
-          end
-        else -- if false, the name is the pricefactor
-          pricefactor = namevalue or 1
-        end
-        ts.Selection.Object.Nameable.SetName(tostring(restname))
-      end
-      
-      if pricefactor~=nil and pricefactor~=1 then -- credit money back/reduce more money, do this first, because it might already change if we can afford the object
-        local changemoney = g_LTL_Serp.myround((1 - pricefactor) * ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost)
-        if changemoney~=0 then
-          ts.Economy.MetaStorage.AddAmount(1010017, changemoney)
-          if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
-            g_LTL_Serp.waitForTimeDelta(1000) -- wait for changemoney to be credited
-          end
-        end
-      end
-      local loan = false
-      if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
-        if allownegativemoney then
-          coroutine.yield()
-          loan = ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost + 10000
-          ts.Economy.MetaStorage.AddAmount(1010017, loan)
-          g_LTL_Serp.waitForTimeDelta(1000) -- wait for loan to be credited
-        else
-          return
-        end
-      end
-      ts.Selection.Object.Sellable.BuyNet(PID) -- owner and PID need traderights for this to do anything and PID needs to have enough money (and possibly also influence)
-      coroutine.yield()
-      if loan then
-        ts.Economy.MetaStorage.AddAmount(1010017, -loan)
-      end
-    end
-  end
-  
+
   
   -- Use this if you are not using UltraTools, but still want to make code executed for everyone
    -- (UltraTools has t_ExecuteFnWithArgsForPeers)
@@ -350,7 +327,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     g_LTM_Serp.AddToQueue(ModID.."_SimpleExecuteForEveryone",function(inhex) -- make every call execute one after the other
       local SharePID = 139
       local PID_OID = nil
-      local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session. this way we make sure everyone is using the same OID (at least as long everyone started in the same session)
+      local status,sessionparticipants = xpcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,g_LTL_Serp.log_error,{SharePID},"First") -- only first found loaded session. this way we make sure everyone is using the same OID (at least as long everyone started in the same session)
       if status==false then
         g_LTL_Serp.modlog("SimpleExecuteForEveryone ERROR : "..tostring(sessionparticipants),ModID)
         error(sessionparticipants) 
@@ -358,7 +335,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       g_LTL_Serp.modlog("SimpleExecuteForEveryone after GetAllLoadedSessionsParticipants "..tostring(ts.GameClock.CorporationTime),ModID)
       for SessionID,session_pids in pairs(sessionparticipants) do
         PID_OID = session_pids[SharePID].OID
-        local status,err = pcall(g_LTL_Serp.DoForSessionGameObject,"[MetaObjects SessionGameObject("..tostring(PID_OID)..") Nameable Name("..tostring(infostring)..")]")
+        local status,err = xpcall(g_LTL_Serp.DoForSessionGameObject,g_LTL_Serp.log_error,"[MetaObjects SessionGameObject("..tostring(PID_OID)..") Nameable Name("..tostring(infostring)..")]")
         if status==false then
           g_LTL_Serp.modlog("SimpleExecuteForEveryone2 ERROR : "..tostring(err),ModID)
           error(err) 
@@ -372,7 +349,7 @@ if g_LuaScriptBlockers[ModID]==nil then
   
   local function _DoExectionForEveryone()
     local SharePID = 139
-    local status,sessionparticipants = pcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,{SharePID},"First") -- only first found loaded session
+    local status,sessionparticipants = xpcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,g_LTL_Serp.log_error,{SharePID},"First") -- only first found loaded session
     if status==false then
       g_LTL_Serp.modlog("_DoExectionForEveryone ERROR : "..tostring(sessionparticipants),ModID)
       error(sessionparticipants) 
@@ -389,7 +366,7 @@ if g_LuaScriptBlockers[ModID]==nil then
         if func==nil then
           success, err = false,"_DoExectionForEveryone: func does not exist (nil)" -- its a bit more clear than "attempt to call a nil value"
         else
-          success, err = pcall(func,table.unpack(intable.args))
+          success, err = xpcall(func,g_LTL_Serp.log_error,table.unpack(intable.args))
         end
         if success==false then
           g_LTL_Serp.modlog("_DoExectionForEveryone ERROR while trying to call funcname "..tostring(intable.funcname).." error: "..tostring(err),ModID)
@@ -428,7 +405,6 @@ if g_LuaScriptBlockers[ModID]==nil then
       IsThirdPartyTrader = IsThirdPartyTrader,
       ContinueCoopCalled = ContinueCoopCalled,
       t_ChangeOwnerOIDToPID = t_ChangeOwnerOIDToPID,
-      t_SimpleBuySelected = t_SimpleBuySelected,
       SimpleExecuteForEveryone = SimpleExecuteForEveryone,
       _DoExectionForEveryone = _DoExectionForEveryone,
       NatureParticipantPID = 158, -- has traderights with everyone (Enum: Mod10, GUID: 1500004528)
@@ -455,5 +431,6 @@ if g_LuaScriptBlockers[ModID]==nil then
       g_LTL_Serp.waitForTimeDelta(1000) -- unblock it again, so it can be executed the next time we load a game
       g_LuaScriptBlockers[ModID] = nil
     end)
+
     
 end

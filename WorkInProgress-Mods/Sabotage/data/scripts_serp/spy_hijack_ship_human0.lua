@@ -4,6 +4,9 @@ print("execute spy hijack script ..",ts.GameClock.CorporationTime)
 -- Basiert auf altem code. noch an neue lua helper anpassen
  -- und auf spy (wobeis auch allgemein gehalten werden kann ,statt nach spy eben nach item suchen)
 
+-- TODO:
+ -- dran denken evlt. SetRelockNet statt SetUnlockNet für FeatureUnlocks zu verwenden,
+  -- wenns nicht ausgeführt werden soll, wenn mod deaktiviert wurde
 
  
 local PID = 0

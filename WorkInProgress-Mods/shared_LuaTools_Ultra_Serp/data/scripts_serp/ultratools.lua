@@ -2,6 +2,13 @@
 -- (ok, event_savegame_loaded.lua is called first via ActionExecuteScript and then starts this here via Unlock 1500004636)
 
 
+-- TODO:
+  -- the helper session from peer_tricks.lua is loaded also in singleplayer when the game is started
+   -- with this mod and then this  mod is disabled ?! 
+   -- Maybe a Trigger that is still registered and fired after removing, because non existing Unlocks are always true?
+   -- Check all unlockneeded triggers to be more compatible to removing the mod...
+
+
 local ModID = "shared_LuaTools_Ultra_Serp ultratools.lua" -- used for logging
 
 if g_LuaScriptBlockers[ModID]==nil then

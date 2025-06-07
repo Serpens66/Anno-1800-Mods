@@ -84,6 +84,7 @@
   
   <!-- EmptyQuest eg for usage in QuestPools to add a bit of randomness. if this Quest is started nothing happens and is instantly solved but the PoolCooldown starts again. (so add this to a pool if you want a chance that nothing is chosen) -->
    <!-- Beware on where to put your Quest with AddNextSibling to not accidently add it to a WuastGroup and therefore to a Questpool. 152264 should be save to add next to. -->
+     <!-- .. I think ConditionQuestFakeObjective is instantly solved if one does not add QuestTrackerEntries to it. And it never solves itself if you add these entries -->
   <ModOp Type="AddNextSibling" GUID="152264">
     <Asset>
       <Template>A7_QuestDummyQuest</Template>
@@ -94,7 +95,6 @@
         </Standard>
         <Quest>
           <!-- FakeObjective already makes this quest instantly be won, but just in case (or maybe we want to prevent to count "won" quests?) -->
-            <!-- but not sure why the quest is even without ActionEndQuest solved, because FakeQuestObjective should not autosolve it (it is used by many vanilla quests) -->
           <OnQuestStart>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
             <Values>
@@ -155,6 +155,79 @@
           <IsTopLevel>0</IsTopLevel>
           <QuestLimit>1</QuestLimit>
         </QuestPool>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <!-- On the start of new games, there is a time of up to ~3 seconds where no CharacterNotification can be sent for unknown reason. -->
+    <!-- It works fine for loading a game. -->
+   <!-- So we will use this FeatureUnlock to show when CharacterNotification/CharacterNotification_DummyCommand are safe to use -->
+    <!-- only relevant if you might want start one within the first ~3 seconds of a new game. -->
+   <!-- But still its best to check first if this FeatureUnlock is unlocked, before doing CharacterNotifications. -->
+  <!-- Executing textembeds this way roughly takes 2 ticks (200ms) or 4 ticks in Multiplayer before the result can be fetched eg from other conditions -->
+  <ModOp GUID="130248" Type="AddNextSibling">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005606</GUID>
+          <Name>Check when CharacterNotification is working</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005606</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>CharacterNotification_DummyCommand</Template>
+                      <Values>
+                        <CharacterNotification>
+                          <ThirdpartyDefaultCommand>[Unlock RelockNet(1500005606)]</ThirdpartyDefaultCommand>
+                        </CharacterNotification>
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionAlwaysTrue</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
       </Values>
     </Asset>
   </ModOp>

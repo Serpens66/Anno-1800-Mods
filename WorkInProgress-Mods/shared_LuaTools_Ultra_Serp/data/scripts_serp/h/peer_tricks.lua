@@ -220,7 +220,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           OtherSessionGuid = HelpSessionGuid
           if not game.isSessionLoadingDone(OtherSessionGuid) then
             g_LTL_Serp.modlog("Start Loading empty Helper Session "..tostring(ts.GameClock.CorporationTime),ModID)
-            ts.Unlock.SetUnlockNet(1500005541) -- load empty session
+            ts.Unlock.SetRelockNet(1500005541) -- load empty session
             local notstop = 0
             while true do
               g_LTL_Serp.waitForTimeDelta(500)

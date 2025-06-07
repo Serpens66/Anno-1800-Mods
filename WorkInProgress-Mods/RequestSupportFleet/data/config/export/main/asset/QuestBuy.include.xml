@@ -1,7 +1,126 @@
 <ModOps>
-
+  
+  <!-- put in sperate file because: -->
+  <!-- 1) its alot of code -->
+  <!-- 2) because I'm unsure if I want to use this Buy mechanic or just change owner for free. -->
     
   <ModOp Type="addNextSibling" GUID="130248">
+    
+    <Asset>
+      <Template>A7_QuestSubQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001287</GUID>
+          <Name>Allow Buying Ships or end Quest</Name>
+        </Standard>
+        <Objectives>
+          <WinConditionCompletionOrder>MutuallyExclusive</WinConditionCompletionOrder>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>SubQuestObjective</Template>
+                <Values>
+                  <ConditionQuestSubQuest>
+                    <Asset>1500001289</Asset>
+                  </ConditionQuestSubQuest>
+                  <ConditionQuestObjective>
+                    <JumpToVisibility>Hide</JumpToVisibility>
+                  </ConditionQuestObjective>
+                </Values>
+              </Objective>
+            </Item>
+            <!-- to make sure the reward items are distributed to the closest ships nearby ConditionObjectStarterObject, instead the first ship who interacted with this quest -->
+             <!-- and using ExecutionPlaceConfirmOnReached to make sure you have to confirm to end the Quest -->
+            <Item>
+              <Objective>
+                <Template>SelectObjectObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>1500003903</TextCombinedContextValue>
+                  </ConditionQuestObjective>
+                  <ConditionQuestSelectObject>
+                    <SelectObjects>
+                      <Item>
+                        <Object>
+                          <Template>ObjectFilter</Template>
+                          <Values>
+                            <ObjectFilter>
+                              <ObjectGUID>1500001294</ObjectGUID>
+                              <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                            </ObjectFilter>
+                          </Values>
+                        </Object>
+                      </Item>
+                    </SelectObjects>
+                  </ConditionQuestSelectObject>
+                  <ConditionPropsSessionSettings />
+                  <ConditionPropsExecutionPlaceSettings>
+                    <ExecutionPlace>
+                      <Template>ConditionObjectStarterObject</Template>
+                      <Values>
+                        <ConditionScanner />
+                        <ConditionObjectStarterObject />
+                        <ConditionObjectiveSignsAndFeedback />
+                      </Values>
+                    </ExecutionPlace>
+                    <ExecutionPlaceText>1500003903</ExecutionPlaceText>
+                    <ExecutionPlaceConfirmOnReached>1</ExecutionPlaceConfirmOnReached>
+                  </ConditionPropsExecutionPlaceSettings>
+                </Values>
+              </Objective>
+            </Item>
+             <!-- really would like to add another MutuallyExclusive WinConditions here to solve the quest after you bought all offered ships. -->
+              <!-- but statusquo/sustain can not limit to quest objects. ConditionInStorage is no Objective and DestroyObjective does not work, because of game bug that PrebuiltObjectLimitToQuestObjects does not work in there... -->
+            <!-- And I also can not even check for Starter 1500001291 even without any extra filters for whatever reason -.- -->
+              <!-- wanted to do: at least make a ConditionQuestDestroy for the starter ship, if it is destroyed, you cant buy more ships -->
+              <!-- Again PrebuiltObjectLimitToQuestObjects does not work, but it might be seldom enough that the player waits for multiple requestfleets at once.  -->
+             <!-- ok, instead putting the starter into the sustain quest... -->
+            <!-- <Item> -->
+              <!-- <Objective> -->
+                <!-- <Template>DestroyObjective</Template> -->
+                <!-- <Values> -->
+                  <!-- <ConditionQuestObjective> -->
+                  <!-- </ConditionQuestObjective> -->
+                  <!-- <ConditionQuestDestroy> -->
+                    <!-- <DestroyObjectsPrebuilt> -->
+                      <!-- <Item> -->
+                        <!-- <DestroyObject> -->
+                          <!-- <Template>ConditionObjectPrebuiltObject</Template> -->
+                          <!-- <Values> -->
+                            <!-- <ConditionObjectPrebuiltObject> -->
+                              <!-- <PrebuiltObject>1500001294</PrebuiltObject> -->
+                              <!-- <PrebuiltObjectCheckOwner>1</PrebuiltObjectCheckOwner> -->
+                              <!-- <PrebuiltUseProcessingParticipant>1</PrebuiltUseProcessingParticipant> -->
+                            <!-- </ConditionObjectPrebuiltObject> -->
+                            <!-- <ConditionScanner /> -->
+                            <!-- <ConditionObjectiveSignsAndFeedback> -->
+                              <!-- <ShowMinimapToken>0</ShowMinimapToken> -->
+                            <!-- </ConditionObjectiveSignsAndFeedback> -->
+                          <!-- </Values> -->
+                        <!-- </DestroyObject> -->
+                      <!-- </Item> -->
+                    <!-- </DestroyObjectsPrebuilt> -->
+                    <!-- <ObjectsBehaviour>StandStill</ObjectsBehaviour> -->
+                  <!-- </ConditionQuestDestroy> -->
+                  <!-- <SpawnArea /> -->
+                  <!-- <ConditionPropsSessionSettings /> -->
+                  <!-- <ConditionPropsExecutionPlaceSettings> -->
+                    <!-- <ExecutionPlace> -->
+                      <!-- <Template>ConditionObjectAnywhere</Template> -->
+                      <!-- <Values> -->
+                        <!-- <ConditionObjectAnywhere /> -->
+                      <!-- </Values> -->
+                    <!-- </ExecutionPlace> -->
+                    <!-- <ExecutionPlaceConfirmOnReached>0</ExecutionPlaceConfirmOnReached> -->
+                  <!-- </ConditionPropsExecutionPlaceSettings> -->
+                <!-- </Values> -->
+              <!-- </Objective> -->
+            <!-- </Item> -->
+          </WinConditions>
+        </Objectives>
+      </Values>
+    </Asset>
+    
     <!-- Objective has hardcoded templates in AllowedTemplates, so we can not make our own SelectObjectObjective template to save code lines -.- -->
       <!-- so we have to repeat this huge WinCondition again and again, to make it basically unlimited -->
     <!-- and no way to prevent the ship last time bought from not being shown as on sale, because the SelectObjectObjective starts again already after selection, not after buying. But does not hurt, does nothing if you already own it -->

@@ -158,5 +158,78 @@
       </Values>
     </Asset>
   </ModOp>
+  
+  
+  <!-- On the start of new games, there is a time of up to ~3 seconds where no CharacterNotification can be sent for unknown reason. -->
+    <!-- It works fine for loading a game. -->
+   <!-- So we will use this FeatureUnlock to show when CharacterNotification/CharacterNotification_DummyCommand are safe to use -->
+    <!-- only relevant if you might want start one within the first ~3 seconds of a new game. -->
+   <!-- But still its best to check first if this FeatureUnlock is unlocked, before doing CharacterNotifications. -->
+  <!-- Executing textembeds this way roughly takes 2 ticks (200ms) or 4 ticks in Multiplayer before the result can be fetched eg from other conditions -->
+  <ModOp GUID="130248" Type="AddNextSibling">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005606</GUID>
+          <Name>Check when CharacterNotification is working</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005606</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>CharacterNotification_DummyCommand</Template>
+                      <Values>
+                        <CharacterNotification>
+                          <ThirdpartyDefaultCommand>[Unlock RelockNet(1500005606)]</ThirdpartyDefaultCommand>
+                        </CharacterNotification>
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionAlwaysTrue</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
 
 </ModOps>

@@ -42,6 +42,10 @@
    
    <!-- bug: PrebuiltObjectLimitToQuestObjects does not work within DestroyObjectsPrebuilt. On all other locations this and also ObjectRestrictToQuestObjects does work... -->
             
+   <!-- bug: Quest rewards do not drop in the ocean if not enough storage in range (but are deleted). If I use UseCurrentSession=1 in ActionStartQuest it works, -->
+    <!-- while everything else Session related also works without UseCurrentSession. -->
+    <!-- Downside of using UseCurrentSession=1: It will only choose the Session from the coop-leader -->
+            
    <!-- Quest bricht auch ab, wenn man in OnSucess WinConditions ActionSpawnObject zu machen, bei einem Ziel das es in der Session nicht gibt. -->
    
     <!-- the StarterObject can only be owned by Neutral, other ObjectOwner does not work. But we can do ActionChangeParticipant eg. within OnQuestActive -->
@@ -91,8 +95,40 @@
    <!-- weiß nicht ob dieser aufwand lohnt.. -->
     
     
-  <!-- 1500001289 put in extra file because its long -->
-  <Include File="/data/config/export/main/asset/QuestBuy.include.xml" />
+    <!-- Idee um Verkauf von schiffen zu verhinden: -->
+     <!-- In die Notification der Händler ActiveCallback einbauen, der verhindert dass bestimmte schiffe verkauft werden können. -->
+     <!-- (nach allen mods, auch NH+update laden und automatisiert finden) -->
+    <!-- Theoretisch sehr gut wäre: GetIsPartOfActiveStatusEffectChain -->
+     <!-- müssten nur den gewünschten Schiffen irgendwie einen StatusEffect (durch Projektile verursacht) geben... -->
+      <!-- aber wie... -->
+    <!-- Oder mit GetItemAlreadyEquipped , dafür müsste man einen socket slot opfern... aber item kann unsocket werden! -->
+     <!-- Oder ItemContainer.SetCheatItemInSlot(1500001568, 1) und CommandQueue.UI_IsHoldingQuestObject -->
+      <!-- mit einem Item der Category Quest. Blockiert dann einen Slot (was bei schiffen mit nur einem Slot echt scheiße ist) -->
+    <!-- Wäre aber sinnoll UI_IsHoldingQuestObject  -->
+    <!-- .. -->
+    <!-- Problem: -->
+     <!-- all das returned true, wenn ich NICHT will dass es verkauft werden kann, -->
+      <!-- währen ActiveCallback bei true den Verkauf erlaubt... -->
+    <!-- Also im Endeffekt wohl den Command überschreiben mit lualighttools -->
+     <!-- und wenn wir schon dabei sind, daraus einen shared mod machen. -->
+     <!-- und dabei auch neuen infotip machen, der als notification text genutzt wird, -->
+      <!-- damit wir variabel alle Kosten anzeigen können, auch wenn mods noch welche zufügen -->
+        <!-- (vorher testen ob notification überhaupt infotips anzeigen kann) -->
+    <!-- Testen ob wir irgendwie einen StatusEffect auf ein Schiff unserer Wahl bekommen... -->
+    
+   <!-- Vanilla prevented bereits Verkauf von UI_IsHoldingQuestObject! (aber erkennt sie auch nicht in socket, nur in slot) -->
+    <!-- aber dennoch doof dass slot dadurch blockiert wird, also keine echte option -->
+    
+  <!-- in shared mod packen? -->
+    <!-- auch testen ob infotip mit allen kosten möglich -->
+  <ModOp Type="merge" GUID='500312' Path="/Values/Notification/NotificationType/Values/CharacterNotification/ThirdpartyNotificationButtons/Item">
+    <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_LTL_Serp.t_SimpleSellSelected|16|nil|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+    <ActiveCallback>[Unlock IsUnlocked(1500005600)]</ActiveCallback>
+  </ModOp>
+    
+    
+  <!-- 1500001289 put in extra file because its long and not sure if I want to use it -->
+  <!-- <Include File="/data/config/export/main/asset/QuestBuy.include.xml" /> -->
     
   <ModOp Type="addNextSibling" GUID="130248">
     
@@ -176,22 +212,22 @@
                   <ConditionQuestObjective>
                     <TextCombinedContextValue>1500001343</TextCombinedContextValue>
                     <QuestTrackerIcon>data/ui/2kimages/main/3dicons/icon_time.png</QuestTrackerIcon>
-                    <!-- <JumpToVisibility>ShowOnlyFakePings</JumpToVisibility> -->
-                    <!-- <FakeMinimapPings> -->
-                      <!-- <Objects> -->
-                        <!-- <Item> -->
-                          <!-- <FakeMinimapObjects> -->
-                            <!-- <Template>ObjectFilter</Template> -->
-                            <!-- <Values> -->
-                              <!-- <ObjectFilter> -->
-                                <!-- <ObjectGUID>1500001294</ObjectGUID> -->
-                                <!-- <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects> -->
-                              <!-- </ObjectFilter> -->
-                            <!-- </Values> -->
-                          <!-- </FakeMinimapObjects> -->
-                        <!-- </Item> -->
-                      <!-- </Objects> -->
-                    <!-- </FakeMinimapPings> -->
+                    <JumpToVisibility>ShowOnlyFakePings</JumpToVisibility>
+                    <FakeMinimapPings>
+                      <Objects>
+                        <Item>
+                          <FakeMinimapObjects>
+                            <Template>ObjectFilter</Template>
+                            <Values>
+                              <ObjectFilter>
+                                <ObjectGUID>1500001294</ObjectGUID>
+                                <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                              </ObjectFilter>
+                            </Values>
+                          </FakeMinimapObjects>
+                        </Item>
+                      </Objects>
+                    </FakeMinimapPings>
                   </ConditionQuestObjective>
                   <ConditionPlayerCounter>
                     <Context>1500001291</Context>
@@ -258,120 +294,7 @@
       </Values>
     </Asset>
     
-    <Asset>
-      <Template>A7_QuestSubQuest</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001287</GUID>
-          <Name>Allow Buying Ships or end Quest</Name>
-        </Standard>
-        <Objectives>
-          <WinConditionCompletionOrder>MutuallyExclusive</WinConditionCompletionOrder>
-          <WinConditions>
-            <Item>
-              <Objective>
-                <Template>SubQuestObjective</Template>
-                <Values>
-                  <ConditionQuestSubQuest>
-                    <Asset>1500001289</Asset>
-                  </ConditionQuestSubQuest>
-                  <ConditionQuestObjective>
-                    <JumpToVisibility>Hide</JumpToVisibility>
-                  </ConditionQuestObjective>
-                </Values>
-              </Objective>
-            </Item>
-            <!-- to make sure the reward items are distributed to the closest ships nearby ConditionObjectStarterObject, instead the first ship who interacted with this quest -->
-             <!-- and using ExecutionPlaceConfirmOnReached to make sure you have to confirm to end the Quest -->
-            <Item>
-              <Objective>
-                <Template>SelectObjectObjective</Template>
-                <Values>
-                  <ConditionQuestObjective>
-                    <TextCombinedContextValue>1500003903</TextCombinedContextValue>
-                  </ConditionQuestObjective>
-                  <ConditionQuestSelectObject>
-                    <SelectObjects>
-                      <Item>
-                        <Object>
-                          <Template>ObjectFilter</Template>
-                          <Values>
-                            <ObjectFilter>
-                              <ObjectGUID>1500001294</ObjectGUID>
-                              <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                            </ObjectFilter>
-                          </Values>
-                        </Object>
-                      </Item>
-                    </SelectObjects>
-                  </ConditionQuestSelectObject>
-                  <ConditionPropsSessionSettings />
-                  <ConditionPropsExecutionPlaceSettings>
-                    <ExecutionPlace>
-                      <Template>ConditionObjectStarterObject</Template>
-                      <Values>
-                        <ConditionScanner />
-                        <ConditionObjectStarterObject />
-                        <ConditionObjectiveSignsAndFeedback />
-                      </Values>
-                    </ExecutionPlace>
-                    <ExecutionPlaceText>1500003903</ExecutionPlaceText>
-                    <ExecutionPlaceConfirmOnReached>1</ExecutionPlaceConfirmOnReached>
-                  </ConditionPropsExecutionPlaceSettings>
-                </Values>
-              </Objective>
-            </Item>
-             <!-- really would like to add another MutuallyExclusive WinConditions here to solve the quest after you bought all offered ships. -->
-              <!-- but statusquo/sustain can not limit to quest objects. ConditionInStorage is no Objective and DestroyObjective does not work, because of game bug that PrebuiltObjectLimitToQuestObjects does not work in there... -->
-            <!-- And I also can not even check for Starter 1500001291 even without any extra filters for whatever reason -.- -->
-              <!-- wanted to do: at least make a ConditionQuestDestroy for the starter ship, if it is destroyed, you cant buy more ships -->
-              <!-- Again PrebuiltObjectLimitToQuestObjects does not work, but it might be seldom enough that the player waits for multiple requestfleets at once.  -->
-             <!-- ok, instead putting the starter into the sustain quest... -->
-            <!-- <Item> -->
-              <!-- <Objective> -->
-                <!-- <Template>DestroyObjective</Template> -->
-                <!-- <Values> -->
-                  <!-- <ConditionQuestObjective> -->
-                  <!-- </ConditionQuestObjective> -->
-                  <!-- <ConditionQuestDestroy> -->
-                    <!-- <DestroyObjectsPrebuilt> -->
-                      <!-- <Item> -->
-                        <!-- <DestroyObject> -->
-                          <!-- <Template>ConditionObjectPrebuiltObject</Template> -->
-                          <!-- <Values> -->
-                            <!-- <ConditionObjectPrebuiltObject> -->
-                              <!-- <PrebuiltObject>1500001294</PrebuiltObject> -->
-                              <!-- <PrebuiltObjectCheckOwner>1</PrebuiltObjectCheckOwner> -->
-                              <!-- <PrebuiltUseProcessingParticipant>1</PrebuiltUseProcessingParticipant> -->
-                            <!-- </ConditionObjectPrebuiltObject> -->
-                            <!-- <ConditionScanner /> -->
-                            <!-- <ConditionObjectiveSignsAndFeedback> -->
-                              <!-- <ShowMinimapToken>0</ShowMinimapToken> -->
-                            <!-- </ConditionObjectiveSignsAndFeedback> -->
-                          <!-- </Values> -->
-                        <!-- </DestroyObject> -->
-                      <!-- </Item> -->
-                    <!-- </DestroyObjectsPrebuilt> -->
-                    <!-- <ObjectsBehaviour>StandStill</ObjectsBehaviour> -->
-                  <!-- </ConditionQuestDestroy> -->
-                  <!-- <SpawnArea /> -->
-                  <!-- <ConditionPropsSessionSettings /> -->
-                  <!-- <ConditionPropsExecutionPlaceSettings> -->
-                    <!-- <ExecutionPlace> -->
-                      <!-- <Template>ConditionObjectAnywhere</Template> -->
-                      <!-- <Values> -->
-                        <!-- <ConditionObjectAnywhere /> -->
-                      <!-- </Values> -->
-                    <!-- </ExecutionPlace> -->
-                    <!-- <ExecutionPlaceConfirmOnReached>0</ExecutionPlaceConfirmOnReached> -->
-                  <!-- </ConditionPropsExecutionPlaceSettings> -->
-                <!-- </Values> -->
-              <!-- </Objective> -->
-            <!-- </Item> -->
-          </WinConditions>
-        </Objectives>
-      </Values>
-    </Asset>
+    
 
 
   
@@ -480,31 +403,6 @@
               </ActionList>
             </Values>
           </OnQuestActive>
-          <OnQuestSucceeded>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-            <Values>
-              <ActionList>
-                <Actions>
-                  <Item>
-                    <Action>
-                      <Template>ActionSetObjectVisibility</Template>
-                      <Values>
-                        <Action />
-                        <ActionSetObjectVisibility>
-                          <Visibility>1</Visibility>
-                          <ShowEffect>0</ShowEffect>
-                        </ActionSetObjectVisibility>
-                        <ObjectFilter>
-                          <ObjectGUID>1500001290</ObjectGUID>
-                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                        </ObjectFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                </Actions>
-              </ActionList>
-            </Values>
-          </OnQuestSucceeded>
           <OnQuestEnd>
             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
             <Values>
@@ -623,9 +521,6 @@
             <Item>
               <Text>1500001286</Text>
             </Item>
-            <Item>
-              <Text>1500001288</Text>
-            </Item>
           </QuestHints>
           <HasStarterSpeechBubble>1</HasStarterSpeechBubble>
           <StarterSpeechBubble>
@@ -705,12 +600,14 @@
                                 </Values>
                               </Action>
                             </Item>
+                            
                             <Item>
                               <Action>
                                 <Template>ActionDelayedActions</Template>
                                 <Values>
                                   <Action />
                                   <ActionDelayedActions>
+                                    <!-- wait for lua to find the ships and changeguid (which makes them visible again) -->
                                     <ExecutionDelay>1200</ExecutionDelay>
                                     <DelayedActions>
                                       <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
@@ -743,6 +640,7 @@
                                                   <ActionSetObjectVisibility>
                                                     <Visibility>0</Visibility>
                                                     <ShowEffect>0</ShowEffect>
+                                                    <AlsoSetGameLogic>1</AlsoSetGameLogic>
                                                   </ActionSetObjectVisibility>
                                                   <ObjectFilter>
                                                     <ObjectGUID>1500001290</ObjectGUID>
@@ -817,7 +715,6 @@
                 </Values>
               </Objective>
             </Item>
-            
             <Item>
               <Objective>
                 <Template>SubQuestObjective</Template>
@@ -827,23 +724,123 @@
                   </ConditionQuestSubQuest>
                   <ConditionQuestObjective>
                     <JumpToVisibility>Hide</JumpToVisibility>
+                    <OnSuccessActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionSetObjectVisibility</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionSetObjectVisibility>
+                                    <Visibility>1</Visibility>
+                                    <ShowEffect>0</ShowEffect>
+                                    <AlsoSetGameLogic>1</AlsoSetGameLogic>
+                                  </ActionSetObjectVisibility>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001290</ObjectGUID>
+                                    <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </OnSuccessActions>
                   </ConditionQuestObjective>
                 </Values>
               </Objective>
             </Item>
+            
             <Item>
               <Objective>
-                <Template>SubQuestObjective</Template>
+                <Template>SelectObjectObjective</Template>
                 <Values>
-                  <ConditionQuestSubQuest>
-                    <Asset>1500001287</Asset>
-                  </ConditionQuestSubQuest>
                   <ConditionQuestObjective>
-                    <JumpToVisibility>Hide</JumpToVisibility>
+                    <TextCombinedContextValue>1500003903</TextCombinedContextValue>
+                    <OnSuccessActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionChangeParticipant</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionChangeParticipant>
+                                    <ChangeToProcessingParticipant>1</ChangeToProcessingParticipant>
+                                  </ActionChangeParticipant>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001290</ObjectGUID>
+                                    <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </OnSuccessActions>
                   </ConditionQuestObjective>
+                  <ConditionQuestSelectObject>
+                    <SelectObjects>
+                      <Item>
+                        <Object>
+                          <Template>ObjectFilter</Template>
+                          <Values>
+                            <ObjectFilter>
+                              <ObjectGUID>1500001294</ObjectGUID>
+                              <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                            </ObjectFilter>
+                          </Values>
+                        </Object>
+                      </Item>
+                    </SelectObjects>
+                  </ConditionQuestSelectObject>
+                  <ConditionPropsSessionSettings />
+                  <ConditionPropsExecutionPlaceSettings />
                 </Values>
               </Objective>
             </Item>
+            <!-- to make sure the reward items are distributed to the closest ships nearby ConditionObjectStarterObject, instead the first ship who interacted with this quest -->
+            <Item>
+              <Objective>
+                <Template>FakeQuestObjective</Template>
+                <Values>
+                  <ConditionQuestObjective />
+                  <ConditionQuestFakeObjective />
+                  <ConditionPropsExecutionPlaceSettings>
+                    <ExecutionPlace>
+                      <Template>ConditionObjectStarterObject</Template>
+                      <Values>
+                        <ConditionScanner />
+                        <ConditionObjectStarterObject />
+                        <ConditionObjectiveSignsAndFeedback />
+                      </Values>
+                    </ExecutionPlace>
+                    <ExecutionPlaceText>1500003903</ExecutionPlaceText>
+                    <ExecutionPlaceConfirmOnReached>0</ExecutionPlaceConfirmOnReached>
+                  </ConditionPropsExecutionPlaceSettings>
+                </Values>
+              </Objective>
+            </Item>
+            <!-- <Item> -->
+              <!-- <Objective> -->
+                <!-- <Template>SubQuestObjective</Template> -->
+                <!-- <Values> -->
+                  <!-- <ConditionQuestSubQuest> -->
+                    <!-- <Asset>1500001287</Asset> -->
+                  <!-- </ConditionQuestSubQuest> -->
+                  <!-- <ConditionQuestObjective> -->
+                    <!-- <JumpToVisibility>Hide</JumpToVisibility> -->
+                  <!-- </ConditionQuestObjective> -->
+                <!-- </Values> -->
+              <!-- </Objective> -->
+            <!-- </Item> -->
           </WinConditions>
         </Objectives>
         <QuestOptional>
@@ -862,11 +859,11 @@
                         <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                         <Values>
                           <SpawnArea>
-                            <!-- DistanceToContext gering halten, maximal 15, damit schiffe die auch beim lighthouse spawnen möglichst nah -->
+                            <!-- DistanceToContext gering halten, maximal 15 (aber minimal 10 sonst spawned starter nicht immer), damit schiffe die auch beim lighthouse spawnen möglichst nah -->
                             <!-- am Starter Object sind, weil das die Rewards verteilt -->
                             <SpawnContext>ClientObject</SpawnContext>
-                            <DistanceToContext>5</DistanceToContext>
-                            <MinObjectDistance>0</MinObjectDistance>
+                            <DistanceToContext>10</DistanceToContext>
+                            <MinObjectDistance>5</MinObjectDistance>
                             <MaxObjectDistance>15</MaxObjectDistance>
                             <DistanceToBorder>Near</DistanceToBorder>
                             <DistanceToIsland>Far</DistanceToIsland>
@@ -4959,9 +4956,7 @@
           <Condition>
             <Template>ConditionDiplomaticState</Template>
             <Values>
-              <Condition>
-                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
-              </Condition>
+              <Condition />
               <ConditionDiplomaticState>
                 <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
                 <TargetParticipant2>Third_party_02_Blake</TargetParticipant2>

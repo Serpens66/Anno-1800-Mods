@@ -4,7 +4,7 @@
 -- Scenario3_Challenger4  GUID: 101507 , PID: 121
 -- (I think the only Participant with Queen Template where I do not use the Nameable yet (besides Void Trader and Queen) is Scenario02_Actuary)
 
-local tools_ModID = "shared_LuaTools_Light_Serp"
+local ModID = "shared_LuaTools_Light_Serp"
 
 
 -- usage:
@@ -16,6 +16,43 @@ local tools_ModID = "shared_LuaTools_Light_Serp"
 
 -- Scroll to bottom for a list of functions you can use.
 
+
+
+-- general infor for lua and multiplayer:
+  -- Code with ActionExecuteScript is started for all humans, regardless who executed this Action.
+  -- If you only want to execute code for a specific human, you can use my WhichPlayerCondition mod (included as shared mod)
+   -- to check within the Trigger where you do ActionExecuteScript which human the executing player is and then start
+    -- a different script for each of them, eg called myscript_0.lua for Human0 and so on.
+   -- In that script you know its ment to be only executed for Human0, you can check "GetGetCurrentParticipantID" to make
+    -- sure only the correct participant is executing the code.
+  -- But your code still will be executed for all human peers in that Coop team, so if 2 people are in the team, lua commands
+   -- which are synced will still be executed 2 times.
+   -- To complete solve the coop problem, you will need my UltraTools shared mod. But even without it there are several workarounds
+    -- for specific situations. The MediumTools includes a few more workarounds.
+   -- But eg. instead of using "RegisterTriggerForCurrentParticipant", which will register the trigger 2 times with 2 coop players,
+    -- you can instead make your Trigger a FeatureUnlock (AutoSelfUnlock=0, AutoRegister=1), which has the main Condition UnlockNeeded of itself.
+    -- Then you can use ts.Unlock.SetUnlockNet(YOUR_FEATUREUNLOCK) instead, to make this Trigger start. It does not matter if the unlocking is executed 
+     -- multiple times in coop, because unlock is unlock.
+   -- IMPORTANT:
+    -- But by using Condition UnlockNeeded we get another problem:
+     -- Registered Triggers are saved to the samegame and Assets which do not exist are always counted as unlocked.
+     -- That means if a user deactivates your mod, the Trigger Code will still be there, but the asset he checks for being unlocked
+      -- does not exist anymore, which defaults to "unlocked" and make your Trigger execute its actions.
+     -- Depending on the actions this might cause problems, since the mod is no longer active.
+    -- Therefore its best to reverse the unlock for Triggers/FeatureUnlocks like this:
+     -- Use DefaultLockedState=0 for it and use NegateCondition in your UnlockNeeded Condition, to check if it is "locked".
+      -- And in lua you use instead ts.Unlock.SetRelockNet(YOUR_FEATUREUNLOCK)
+    -- I think for Quests PreConditionList this problem does not exist, at least not if Quest and Pool is removed (maybe if pool stays)
+
+
+
+-- TODO:
+-- Testlauf für ID Converter machen:
+-- in testscript current areaid abfragen
+ -- und dann diese für GetAny aufruf nutzen um in rekord spielstand alle objekte einer GUID (zb Haus) zählen.
+  -- dies dann mit ProfilCounter Ergebnis vergleich
+   -- um zu sehen ob selbes Ergebnis.
+  -- Am besten für mehrere Inseln und auch schiffe machen.
 
 
 
@@ -431,14 +468,14 @@ end
 
 
 -- \Ubisoft\Ubisoft Game Launcher\games\Anno 1800\logs\lualog.txt
- -- ModID is optional added at begin of text so its easy to tell from which mod the text entry is
-local function modlog(text,ModID)
+ -- _ModID is optional added at begin of text so its easy to tell from which mod the text entry is
+local function modlog(text,_ModID)
   if type(text)~="string" then
     text = tostring(text)
   end
-  if ModID~=nil then
-    ModID = tostring(ModID)
-    text = ModID..": "..text
+  if _ModID~=nil then
+    _ModID = tostring(_ModID)
+    text = _ModID..": "..text
   end
   local dat = tostring(os.date()) -- add date+time string
   text = dat.." "..text
@@ -457,32 +494,35 @@ if file~=nil then
   io.close(file)
 end
 
+-- can be used as error_handler for xpcall. only within xpcall error_handler we can access the full traceback
+-- xpcall(fn,error_handler,...)
+local function log_error(err)
+  local traceback = debug.traceback~=nil and debug.traceback() or "nil"
+  local fullerr = tostring(err)..", traceback:\n"..traceback
+  g_LTL_Serp.modlog("ERROR : "..fullerr,ModID)
+  return fullerr
+end
+
 -- starts a "thread" with system.start(fn,threadname). But uses pcall to start the function and logs the error if one happens 
  -- (otherwise any lua error is just swallowed without notification)
-local function start_thread(threadname,ModID,fn,...)
+local function start_thread(threadname,_ModID,fn,...)
   local args = {...}
-  ModID = ModID or ""
+  _ModID = _ModID or ""
   if string.find(threadname,"_random_") then -- if you added this string into your thread name
     g_LTL_Serp.myreplace(threadname,"_random_",tostring(math.random())) -- making sure all threads are unique and not replaced
   end
-  local final_threadname = tostring(ModID)..": "..tostring(threadname)
+  local final_threadname = tostring(_ModID)..": "..tostring(threadname)
   if system.internal.coroutines[final_threadname]~=nil then -- no need to check status, because done threads are already set nil again
-    g_LTL_Serp.modlog("WARNING start_thread: A thread with the name "..tostring(final_threadname).." is currently running. Are you sure you want to overwrite it? Choose a unique threadname if you dont want this (you can include _random_ in the threadname to add random number)",ModID)
+    g_LTL_Serp.modlog("WARNING start_thread: A thread with the name "..tostring(final_threadname).." is currently running. Are you sure you want to overwrite it? Choose a unique threadname if you dont want this (you can include _random_ in the threadname to add random number)",_ModID)
   end
   return system.start(function()
-    local status,err = pcall(fn,table.unpack(args))
-      if status==false then
-        g_LTL_Serp.modlog("ERROR in thread '"..tostring(final_threadname).."': "..tostring(err),ModID)
-        error(err)
-      end
+    local status,err = xpcall(fn,g_LTL_Serp.log_error,table.unpack(args))
+    if status==false then
+      g_LTL_Serp.modlog("ERROR in thread '"..tostring(final_threadname).."': "..tostring(err),_ModID)
+      error(err)
+    end
   end,final_threadname)
 end
-
--- TODO:
--- noch eine log_error function oderso machen,
- -- die wie start_thread pcall nutzt , aber eben ohne system.start,
-  -- was wir dann zum aufruf von Funktionen nutzen, damit jeder Fehler in unserem lua log gelogged wird
-
 
 -- wait realtime (system.waitForGameTimeDelta waits for ingame time, so is faster on fast-forward. While we want to wait for syncing stuff to happen, which usually takes the same real time)
 -- called from within a thread (coroutine)
@@ -509,8 +549,8 @@ local function StopAllThreads()
   for _,name in ipairs(threadstostop) do
     if system.internal.coroutines[name]~=nil then
       if coroutine.status(system.internal.coroutines[name])=="suspended" then -- seems to be ok to still close them, but just in case log it
-        print("stopthreads, stopping thread although its still busy: "..tostring(name),tools_ModID)
-        g_LTL_Serp.modlog("stopthreads, stopping thread although its still busy: "..tostring(name),tools_ModID)
+        print("stopthreads, stopping thread although its still busy: "..tostring(name),ModID)
+        g_LTL_Serp.modlog("stopthreads, stopping thread although its still busy: "..tostring(name),ModID)
       end
       system.internal.coroutines[name] = nil
     end
@@ -539,6 +579,51 @@ local function ToTextembed(path)
     path_textemb = path_textemb.." "..path_part
   end
   return path_textemb
+end
+
+local function SplitNumberFromName(name)
+  local name_parts = g_LTL_Serp.mysplit(name, "_") -- eg. "The Shipname_2300" or simply "0.5"
+  local namevalue,restname = nil, ""
+  for _,part in ipairs(name_parts) do
+    local asnumber = tonumber(part)
+    if namevalue==nil and asnumber~=nil then
+      namevalue = asnumber
+    end
+    if asnumber==nil then
+      restname = restname..part
+    end
+  end
+  return restname,namevalue
+end
+
+local maxdisplayedlength = 16 -- this is the max for Anno1800
+local function GetNameInvisible(name)
+  local splits = g_LTL_Serp.mysplit(name,"‎")
+  local result = {}
+  for _,v in ipairs(splits) do
+    if v~="" then
+      table.insert(result,v)
+    end
+  end
+  return result[2],result[1] -- first the invisible part (expect it containing # as seperator), because this is what we are most liklely interested in
+end
+-- to support adding multiple invisible strings to the name, it adds "#" as seperator
+local function AddToNameInvisible(origname,addstring,onlifnotaddedyet)
+  local new_name = origname
+  if not onlifnotaddedyet or not string.find(origname,addstring) then
+    local invis,name = g_LTL_Serp.GetNameInvisible(origname)
+    if invis==nil or invis=="" then
+      new_name = name
+      for i=name:len() ,maxdisplayedlength-1,2 do -- can not add spaces, because the game handles them very strange...
+        new_name = "‎" .. new_name .. "‎" -- -- add spaces front and back until we reached the max displayed length (so the position of the displayed text does not change)
+      end
+      new_name = new_name .. "‎" -- add one at the end, so even if it is already 16 chars, we have one to use the split on in GetNameInvisible
+    else
+      new_name = origname
+    end
+    new_name = new_name .. addstring .. "#" -- # used as seperator
+  end
+  return new_name
 end
 
 
@@ -729,7 +814,7 @@ end
           if func==nil then
             success, err = false,"t_FnViaTextEmbed: func does not exist (nil)" -- its a bit more clear than "attempt to call a nil value"
           else
-            success, err = pcall(func,table.unpack(tasksplit))
+            success,err = xpcall(func,g_LTL_Serp.log_error,table.unpack(tasksplit))
           end
           if success==false then
             g_LTL_Serp.modlog("ERROR t_FnViaTextEmbed while trying to execute TaskString: "..tostring(TaskString).." , error: "..tostring(err),ModID)
@@ -853,9 +938,9 @@ end
         end
       else -- string or bint. we can only return strings, not any tabeles/gameobjects this way
         local path_textemb = g_LTL_Serp.ToTextembed(path)
-        -- g_LTL_Serp.modlog("GetGameObjectPath : [MetaObjects SessionGameObject("..tostring(OID)..")"..path_textemb.."]",tools_ModID)
+        -- g_LTL_Serp.modlog("GetGameObjectPath : [MetaObjects SessionGameObject("..tostring(OID)..")"..path_textemb.."]",ModID)
         ret = g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..")"..path_textemb.."]",true)
-        local status,err = pcall(g_LTL_Serp.myeval,ret) -- to make "1" 1 or "true" true
+        local status,err = xpcall(g_LTL_Serp.myeval,g_LTL_Serp.log_error,ret) -- to make "1" 1 or "true" true
         if status==true then -- otherwise we keep it as string (eg. "Feld Besteller" Name causes an error with myeval)
           ret = err
         end
@@ -863,9 +948,6 @@ end
     end
     return ret
   end
-  
-  -- TODO testen im Multiplayer, ob IDs zwischen allen spielern geteilt sind (wie GameObjectID)
-   -- das wäre ziemlich fatal, weils keinerlei info dazu in QuestInstance gibt wer die Quest aktiv hat
   
   -- Quests:
   -- RunningQuestByGUID gibt es offenbar nicht mehr (dass wir auch echt keine aktuelle textsourcelist.json von ubi bekommen nervt hart...)
@@ -929,6 +1011,129 @@ end
   
   -- ts.Quests.GetQuest(8).SetAbortedNet(bool_isManually,int_QuestAbortReason)
   
+  -- #######################################################################################
+  
+  -- you can overwrte this function (same for BuySelectedAllowed) in your mod like this to add more "false" conditions
+  -- local Orig_SellSelectedAllowed = g_LTL_Serp.SellSelectedAllowed
+  -- g_LTL_Serp.SellSelectedAllowed = function(PID,Owner,buyerPID,Name,ignorecanbesold,...)
+    -- local ret = Orig_SellSelectedAllowed(PID,Owner,buyerPID,Name,ignorecanbesold,...) -- execute original first (so it locks everything first)
+    -- if ret==true then
+      -- ret = IsMyCondition()
+    -- end
+    -- return ret
+  -- end
+  local function SellSelectedAllowed(PID,Owner,buyerPID,Name,ignorecanbesold)
+    if not string.find(Name,"NOSELL") and Owner==PID and Owner~=buyerPID and not g_LTL_Serp.IsHuman(buyerPID) and (ignorecanbesold or ts.Selection.Object.Sellable.CanBeSoldToTrader) then
+      return true
+    end
+    return false
+  end
+  -- Only call it for the one coop peer which should sell object he has currently selected!
+  -- Its ment to sell objects from human to AI (for other way round use t_SimpleBuySelected), so it does not check if anyone has enough money, since AI does not care for money
+  -- pricefactor multiplies CurrentParticipantBuyPrice MoneyCost (usually double of the SellPrice)
+    -- To also display the new price as text ingame, set the name of the ship as the new price (and display that) und set pricefactor=true
+  -- currently only supports money costs
+  -- BuyNet only works if participants have at least TradeRights
+  -- TODO: statt pricefactor hier neue meta ress zufügen und nutzen 
+   -- (evlt. fn auch in shared mod verschieben)
+  -- wenn man 100 der metaress hat, was standardmäßig jeder hat,
+   -- bekommt man 100% des SellPrices (kann auch so in notification 100% * 6250 Münzen)
+   -- und dann kann man die menge der ressource ändern, wenn man für ne zeit
+    -- für jeden Verkauf mehr/weniger bekommen soll
+  local function t_SimpleSellSelected(buyerPID,pricefactor,ignorecanbesold)
+    local PID = ts.Participants.GetGetCurrentParticipantID()
+    local Owner = ts.Selection.Object.Owner
+    local Name = ts.Selection.Object.Nameable.Name
+    if g_LTL_Serp.SellSelectedAllowed(PID,Owner,buyerPID,Name,ignorecanbesold) then
+      if type(pricefactor)=="boolean" then -- use Name , (not using string "Name" as pricefactor because not sure how to forward this with t_FnViaTextEmbed)
+        local restname,namevalue = g_LTL_Serp.SplitNumberFromName(Name)
+        if restname==nil or restname=="" then
+          restname = g_LTL_Serp.weighted_random_choices(g_LTL_Serp.ShipNameGUIDs, 1)[1] -- get a random name
+          restname = ts.GetAssetData(restname).Text
+        end
+        if pricefactor==true then -- if true we want to pay the sum in the name (should be positive)
+          pricefactor = 1
+          if namevalue~=nil then
+            pricefactor = namevalue / (ts.Selection.Object.Sellable.SellPrice.MoneyCost *(-1)) -- SellPrice is negative
+          end
+        else -- if false, the name is the pricefactor
+          pricefactor = namevalue or 1
+        end
+        ts.Selection.Object.Nameable.SetName(tostring(restname))
+      end
+      if pricefactor~=nil and pricefactor~=1 then -- credit more money/reduce more money
+        local changemoney = g_LTL_Serp.myround((1 - pricefactor) * ts.Selection.Object.Sellable.SellPrice.MoneyCost) -- SellPrice is negative
+        if changemoney~=0 then
+          ts.Economy.MetaStorage.AddAmount(1010017, changemoney)
+        end
+      end
+      ts.Selection.Object.Sellable.BuyNet(buyerPID)
+    -- else
+      -- TODO notification? SideNotification <GUID>17511</GUID> <Text>Dieser Schiffstyp kann nicht verkauft werden.</Text>
+    end
+  end
+  
+  
+  local function BuySelectedAllowed(PID,Owner,ignorecanbesold,onlyfromownerPID)
+    if Owner~=PID and (ignorecanbesold or ts.Selection.Object.Sellable.CanBeSoldToTrader) and (onlyfromownerPID==nil or Owner==onlyfromownerPID) then
+      return true
+    end
+    return false
+  end
+  -- Only call it for the one coop peer which should buy object he has currently selected!
+  -- pricefactor multiplies CurrentParticipantBuyPrice MoneyCost (usually double of the SellPrice)
+    -- To also display the new price as text ingame, set the name of the ship as the new price (and display that) und set pricefactor=true
+  -- currently only supports money costs
+  -- BuyNet only works if participants have at least TradeRights
+  local function t_SimpleBuySelected(pricefactor,ignorecanbesold,allownegativemoney,onlyfromownerPID)
+    local PID = ts.Participants.GetGetCurrentParticipantID()
+    local Owner = ts.Selection.Object.Owner
+    if g_LTL_Serp.BuySelectedAllowed(PID,Owner,ignorecanbesold,onlyfromownerPID) then
+      if type(pricefactor)=="boolean" then -- use Name , (not using string "Name" as pricefactor because not sure how to forward this with t_FnViaTextEmbed)
+        local restname,namevalue = g_LTL_Serp.SplitNumberFromName(ts.Selection.Object.Nameable.Name)
+        if restname==nil or restname=="" then
+          restname = g_LTL_Serp.weighted_random_choices(g_LTL_Serp.ShipNameGUIDs, 1)[1] -- get a random name
+          restname = ts.GetAssetData(restname).Text
+        end
+        if pricefactor==true then -- if true we want to pay the sum in the name
+          pricefactor = 1
+          if namevalue~=nil then
+            pricefactor = namevalue / ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost
+          end
+        else -- if false, the name is the pricefactor
+          pricefactor = namevalue or 1
+        end
+        ts.Selection.Object.Nameable.SetName(tostring(restname))
+      end
+      
+      if pricefactor~=nil and pricefactor~=1 then -- credit money back/reduce more money, do this first, because it might already change if we can afford the object
+        local changemoney = g_LTL_Serp.myround((1 - pricefactor) * ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost)
+        if changemoney~=0 then
+          ts.Economy.MetaStorage.AddAmount(1010017, changemoney)
+          if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
+            g_LTL_Serp.waitForTimeDelta(1000) -- wait for changemoney to be credited
+          end
+        end
+      end
+      local loan = false
+      if not ts.Selection.Object.Sellable.AffordableByCurrentParticipant then
+        if allownegativemoney then
+          coroutine.yield()
+          loan = ts.Selection.Object.Sellable.CurrentParticipantBuyPrice.MoneyCost + 10000
+          ts.Economy.MetaStorage.AddAmount(1010017, loan)
+          g_LTL_Serp.waitForTimeDelta(1000) -- wait for loan to be credited
+        else
+          return
+        end
+      end
+      ts.Selection.Object.Sellable.BuyNet(PID) -- owner and PID need traderights for this to do anything and PID needs to have enough money (and possibly also influence)
+      coroutine.yield()
+      if loan then
+        ts.Economy.MetaStorage.AddAmount(1010017, -loan)
+      end
+    end
+  end
+  
   
   
   -- ###################################################################################################
@@ -936,6 +1141,23 @@ end
   -- ###################################################################################################
 
   -- CheckObjectHelpers
+  
+  
+  -- userdata is only valid if the object still exists and if the local player is in the same session like the object
+  -- this function will return userdata if valid, and nil if invalid
+  local function IsUserdataValid(userdata,OID)
+    userdata = userdata or game.MetaGameManager.getObjectByID(OID)
+    local function savecallproperty(userdata,PropertyID)
+      return userdata:getProperty(PropertyID) -- for valid userdata it throws an error if it does not have the property (caught (...) exception), thats why the savecallproperty fn
+    end
+    local success, PropertyName = pcall(savecallproperty,userdata,123456789) -- a random invalid PropertyID number.
+    if success then -- since this property does not exist, it can not be a success for valid objects
+      return nil -- PropertyName will contain sth like: "GameObject unassigned" or "Invalid gameObject id"
+    end
+    return userdata
+  end
+  
+  
   
   local PropertiesStringToID = {AudioTextPool=0,DevTestProp=1,Position=2,Standard=3,Text=4,TextPool=5,ObjectFilter=6,ObjectiveScaling=7,ObjectList=8,ObjectTargetFilter=9,ParticipantRelation=10,SessionFilter=11,SpawnArea=12,TradingStation=13,ConditionObjectAnywhere=14,ConditionObjectClientQuestObject=15,ConditionObjectiveSignsAndFeedback=16,ConditionObjectPlayerKontor=17,ConditionObjectPrebuiltObject=18,ConditionObjectSpawnedObject=19,ConditionObjectStarterObject=20,
     ConditionObjectUseDefaultSettings=21,ConditionScanner=22,ConditionActiveRegion=23,ConditionActiveSession=24,ConditionAlwaysFalse=25,ConditionAlwaysTrue=26,ConditionAreaClaimed=27,ConditionAttractiveness=28,ConditionBuildingsInBlueprintmode=29,ConditionBurningObject=30,ConditionBusActivationNeedSaturation=31,ConditionCameraMovement=32,ConditionCorporationDifficulty=33,ConditionDecision=34,ConditionDecisionOption=35,ConditionDiplomaticState=36,ConditionDiplomaticStateChanged=37,
@@ -1016,9 +1238,11 @@ end
         local function savecallproperty(userdata,PropertyID)
           return userdata:getProperty(PropertyID)
         end
-        local success, PropertyName = pcall(savecallproperty,userdata,PropertyID) -- getProperty raises an error if it does not have the property. preventing this with pcall.
+        local success, PropertyName = pcall(savecallproperty,userdata,PropertyID) -- getProperty raises an error if it does not have the property. preventing this with pcall. you will still see an error in the documents logfile from anno: caught (...) exception
         if success then
-          if not PropertyName:find("Invalid") and not PropertyName:find("unassigned") then -- "Invalid gameObject id" userdata eg. because no longer filled, was never valid or called in wrong session. "GameObject, unassigned" if we using an OID from another session
+          if PropertyName==nil then
+            return nil
+          elseif not PropertyName:find("Invalid") and not PropertyName:find("unassigned") then -- "Invalid gameObject id" userdata eg. because no longer filled, was never valid or called in wrong session. "GameObject, unassigned" if we using an OID from another session
             return true
           else
             return nil
@@ -1107,16 +1331,6 @@ end
 
 
 
-
--- TODO:
- -- userdata = game.MetaGameManager.getObjectByID(OID)
- -- überschreiben sodass wir danach noch die userdata überprüfen, ob sie valid ist,
-  -- (zb getProperty returned invalid/unassigned , oder ine andere fkt versuchen)
-  -- und wenn sie nicht valid ist, dann direkt nil returnen,
- -- damit man sie nicht versehentlich verwendet  
-
-
-
 -- ##################################################################################################################
 -- ##################################################################################################################
 
@@ -1147,6 +1361,7 @@ g_LTL_Serp = {
   
   -- technical Anno1800 helpers
   modlog = modlog,
+  log_error = log_error,
   start_thread = start_thread,
   waitForTimeDelta = waitForTimeDelta,
   CallGlobalFnBlocked = CallGlobalFnBlocked,
@@ -1154,6 +1369,9 @@ g_LTL_Serp = {
   WasNewGameJustStarted = WasNewGameJustStarted,
   IsHuman = IsHuman,
   ToTextembed = ToTextembed,
+  SplitNumberFromName = SplitNumberFromName,
+  AddToNameInvisible = AddToNameInvisible,
+  GetNameInvisible = GetNameInvisible,
   
   -- ID Converter
   AreatableToAreaID = AreatableToAreaID,
@@ -1204,8 +1422,13 @@ g_LTL_Serp = {
   GetCoopPeersAtMarker = GetCoopPeersAtMarker,
   GetGameObjectPath = GetGameObjectPath,
   GetActiveQuestInstances = GetActiveQuestInstances,
+  SellSelectedAllowed = SellSelectedAllowed,
+  t_SimpleSellSelected = t_SimpleSellSelected,
+  BuySelectedAllowed = BuySelectedAllowed,
+  t_SimpleBuySelected = t_SimpleBuySelected,
   
   -- CheckObjectHelpers 
+  IsUserdataValid = IsUserdataValid,
   HasProperty = HasProperty,
   PropertiesStringToID = PropertiesStringToID,
   HasWalking = HasWalking,

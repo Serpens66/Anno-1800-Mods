@@ -911,18 +911,26 @@
   
   
   <!-- use this CharacterNotification_DummyCommand eg in ActionNotification to not show a notification, but simply excute -->
-   <!-- this ThirdpartyDefaultCommand textsource command for the player. -->
+   <!-- this ThirdpartyDefaultCommand textsource command for the player (ThirdpartyDefaultCommand in the template is just example, replace it with your command). -->
   <!-- Important: Will be executed for every coop player once. So 2 times executed for a 2 player-coop-team. -->
   
   <!-- A coop-save alternative might be to instead show the notification with Buttons and as soon as one coop chooses  -->
   <!-- "yes" the button gets greyed out for the others (ActiveCallback).  -->
   <!-- Example Campaign in Coop Mod Serp: https://github.com/Serpens66/Anno-1800-Mods/blob/45ee71d0da559adb2091a71e887e6b94c7c8c406/WorkInProgress-Mods/Campaign%20in%20Coop%20(Serp)/data/config/export/main/asset/AntiDesync/-AntiDesync_ALLINONE.include.xml#L82  -->
+  
+  <!-- Loading a MP game and waiting in the loading screen (while the game is already running in the background) seems to be no problem, the ThirdpartyDefaultCommand is executed fine -->
+  <!-- Executing textembeds this way roughly takes 2 ticks (200ms) or 4 ticks in Multiplayer before the result can be fetched eg from other conditions -->
+  <!-- ATTENTION: -->
+    <!-- On the start of new games, there is a time of up to ~3 seconds where no CharacterNotification can be sent for unknown reason -->
+      <!-- Therefore its best to use a Condition with ConditionUnlocked 1500005606 , which is my FeatureUnlock in assets.xml that checks when CharacterNotifications are working -->
+    <!-- (only really relevant if your CharacterNotification might be started within the first ~3 seconds of a new game, but does not hurt to check it always) -->
   <ModOp Type="addNextSibling" Template="CharacterNotification">
     <Template>
       <Name>CharacterNotification_DummyCommand</Name>
       <Properties>
         <CharacterNotification>
           <ThirdpartyDefaultCommand>[Unlock UnlockNet(120244)][Research AddGodlikeCheat(124839)]</ThirdpartyDefaultCommand>
+          <ShowDuringCameraSequence>1</ShowDuringCameraSequence>
         </CharacterNotification>
         <BaseNotification>
           <DisplayTimeout>0</DisplayTimeout>
@@ -932,6 +940,7 @@
         </BaseNotification>
         <NotificationSubtitle>
           <SubtitleGroup />
+          <Subtitle />
         </NotificationSubtitle>
       </Properties>
     </Template>    
