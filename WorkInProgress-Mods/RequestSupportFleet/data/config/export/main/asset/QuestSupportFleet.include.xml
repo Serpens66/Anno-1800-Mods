@@ -86,45 +86,16 @@
   
   
   <!-- Dass die schiffe "gekauft" werden müssen, mache ich hauptsächlich, damit man nicht easy super viel Geld dadurch bekommt, -->
-   <!-- dass man Schiffe geschenkt bekommt und diese dann einfach verkauft. -->
-   <!-- Aber dafür ists deutlich mehr nerviges Geklicke ... -->
-   <!-- und der Teil mit dass das Auftragsscchiff zerstört wird, dass das die Quest unmöglich macht, -->
-    <!-- klappt so aktuell auch nicht mehr.. -->
-  <!-- Alternative wäre die Schiffe nicht verkaufbar zu machen, doch das geht nur wenn mans direkt ins Asset schreibt, -->
-   <!-- bräuchte also eigene GUIDs für alle Schiffe, die dann auch in alle Pools der original Schiffe müssen usw... -->
-   <!-- weiß nicht ob dieser aufwand lohnt.. -->
+     <!-- dass man Schiffe geschenkt bekommt und diese dann einfach verkauft. -->
+     <!-- Aber dafür ists deutlich mehr nerviges Geklicke ... -->
+     <!-- und der Teil mit dass das Auftragsscchiff zerstört wird, dass das die Quest unmöglich macht, -->
+      <!-- klappt so aktuell auch nicht mehr.. -->
+    <!-- Alternative wäre die Schiffe nicht verkaufbar zu machen, doch das geht nur wenn mans direkt ins Asset schreibt, -->
+     <!-- bräuchte also eigene GUIDs für alle Schiffe, die dann auch in alle Pools der original Schiffe müssen usw... -->
+     <!-- weiß nicht ob dieser aufwand lohnt.. -->
+  <!-- Hab jetzt den BuyNet Command in CharacterNotification überschrieben, um Verkauf zu verhindern -->
     
-    
-    <!-- Idee um Verkauf von schiffen zu verhinden: -->
-     <!-- In die Notification der Händler ActiveCallback einbauen, der verhindert dass bestimmte schiffe verkauft werden können. -->
-     <!-- (nach allen mods, auch NH+update laden und automatisiert finden) -->
-    <!-- Theoretisch sehr gut wäre: GetIsPartOfActiveStatusEffectChain -->
-     <!-- müssten nur den gewünschten Schiffen irgendwie einen StatusEffect (durch Projektile verursacht) geben... -->
-      <!-- aber wie... -->
-    <!-- Oder mit GetItemAlreadyEquipped , dafür müsste man einen socket slot opfern... aber item kann unsocket werden! -->
-     <!-- Oder ItemContainer.SetCheatItemInSlot(1500001568, 1) und CommandQueue.UI_IsHoldingQuestObject -->
-      <!-- mit einem Item der Category Quest. Blockiert dann einen Slot (was bei schiffen mit nur einem Slot echt scheiße ist) -->
-    <!-- Wäre aber sinnoll UI_IsHoldingQuestObject  -->
-    <!-- .. -->
-    <!-- Problem: -->
-     <!-- all das returned true, wenn ich NICHT will dass es verkauft werden kann, -->
-      <!-- währen ActiveCallback bei true den Verkauf erlaubt... -->
-    <!-- Also im Endeffekt wohl den Command überschreiben mit lualighttools -->
-     <!-- und wenn wir schon dabei sind, daraus einen shared mod machen. -->
-     <!-- und dabei auch neuen infotip machen, der als notification text genutzt wird, -->
-      <!-- damit wir variabel alle Kosten anzeigen können, auch wenn mods noch welche zufügen -->
-        <!-- (vorher testen ob notification überhaupt infotips anzeigen kann) -->
-    <!-- Testen ob wir irgendwie einen StatusEffect auf ein Schiff unserer Wahl bekommen... -->
-    
-   <!-- Vanilla prevented bereits Verkauf von UI_IsHoldingQuestObject! (aber erkennt sie auch nicht in socket, nur in slot) -->
-    <!-- aber dennoch doof dass slot dadurch blockiert wird, also keine echte option -->
-    
-  <!-- in shared mod packen? -->
-    <!-- auch testen ob infotip mit allen kosten möglich -->
-  <ModOp Type="merge" GUID='500312' Path="/Values/Notification/NotificationType/Values/CharacterNotification/ThirdpartyNotificationButtons/Item">
-    <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_LTL_Serp.t_SimpleSellSelected|16|nil|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
-    <ActiveCallback>[Unlock IsUnlocked(1500005600)]</ActiveCallback>
-  </ModOp>
+
     
     
   <!-- 1500001289 put in extra file because its long and not sure if I want to use it -->

@@ -1,0 +1,92 @@
+<ModOps>
+  
+  <!-- Serp GUIDs 1500005546 to 1500005555 in SpawnHelpers.include.xml -->
+   <!-- 1500005601 -->
+
+   <!-- -- And adds+uses Nameable for these Participants (for saving info) -->
+   <!-- -- Scenario3_Queen  GUID: 101523 , PID: 130          this is used in savetablestuff.lua to save information into the savegame (others are used for sharing) -->
+   
+
+  
+  <!-- call our register scripts on savegame load -->
+  <ModOp Type="add" GUID="1500004636" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/ultratools.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  
+    
+
+  
+  <ModOp Type="addNextSibling" GUID="130248">
+
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005601</GUID>
+          <Name>Save Lua Cache every 10 minutes</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionTimer</Template>
+            <Values>
+              <Condition />
+              <ConditionTimer>
+                <TimeLimit>600000</TimeLimit>
+              </ConditionTimer>
+            </Values>
+          </TriggerCondition>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionExecuteScript</Template>
+                      <Values>
+                        <Action />
+                        <ActionExecuteScript>
+                          <ScriptFileName>data/scripts_serp/events/ticksavecache.lua</ScriptFileName>
+                        </ActionExecuteScript>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+
+    
+  </ModOp>
+  
+    
+  <Include File="./CheckPeer.include.xml" />
+  
+
+</ModOps>
