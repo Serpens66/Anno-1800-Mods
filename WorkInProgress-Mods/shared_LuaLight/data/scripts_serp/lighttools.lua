@@ -56,6 +56,17 @@ local ModID = "shared_LuaTools_Light_Serp"
   -- Am besten für mehrere Inseln und auch schiffe machen.
 
 
+-- TODO:
+-- hilfskonstrukt/anleitung für GetPosition eines Objekts machen.
+-- Das Spiel hat kein GetPosition oder ähnliches in lua -.-
+-- Einzige Idee die ich habe: SetDebugGoto(x,y) eine Hilfsobjekts nutzen und mithilfe von ConditionObjectPosition in xml
+ -- checken ob das Hilfsobjekt in der Nähe des gesuchten Objektes ist. Sobald es in der Nähe ist, wissen wir dass das gesuchte objekt
+  -- an der x,y Position steht. Einschränkung dabei ist natürlihc, dass das gesuchte Objekt in der Session/von dem Owner einmalig sein muss.
+   -- und wir die GUID des gesuchten Objekts in xml hardcoden müssen, also kein allgemeingültiger code möglich.
+ -- Vermutlich ist es mathematisch irgenwie möglich relativ schnell auf die koordinaten zu kommen. 
+ -- Wir machen FeatureUnlocks mit ConditionObjectPosition in 100-er abstand radius oderso (bis 4000) und schicken hilfsobjekt
+  -- dann zb auf pos 100/100. dann sehen wir welche der Unlocks true sind und erkennen dadurch, dass zb 2000er radius in nhähe ist, aber 1900 nicht.
+   -- dann schieben wir helper nach 200/200 und werten die unlocks wieder aus und kommen dadurch vllt auch die richtige richtung
 
 -- #########################################################################################
 -- General Lua helper functions
@@ -1305,8 +1316,13 @@ g_LTL_Serp = {
     Second_ai_10_Hunt={PID=34,GUID=85},Second_ai_11_Mercier={PID=64,GUID=220},
     Third_party_03_Pirate_Harlow={PID=17,GUID=73},Third_party_04_Pirate_LaFortune={PID=18,GUID=76},
     Third_party_02_Blake={PID=16,GUID=45},Third_party_06_Nate={PID=22,GUID=77},Third_party_05_Sarmento={PID=19,GUID=29},
-    Third_party_07_Jailor_Bleakworth={PID=23,GUID=46},Third_party_08_Kahina={PID=24,GUID=78},Africa_Ketema={PID=80,GUID=119051},
-    Arctic_Inuit={PID=72,GUID=237},
+    Third_party_07_Jailor_Bleakworth={PID=23,GUID=46},Third_party_08_Kahina={PID=24,GUID=78},Africa_Ketema={PID=80,GUID=119051},Arctic_Inuit={PID=72,GUID=237},
+    Scenario3_Editor={GUID=100131,PID=117},Scenario3_Challenger1={GUID=100132,PID=118},Scenario3_Challenger2={GUID=100938,PID=119},
+    Scenario3_Challenger3={GUID=100939,PID=120},Scenario3_Challenger4={GUID=101507,PID=121},Scenario3_Challenger5={GUID=101508,PID=122},
+    Scenario3_Challenger6={GUID=101509,PID=123},Scenario3_Challenger7={GUID=101517,PID=124},Scenario3_Challenger8={GUID=101518,PID=125},
+    Scenario3_Challenger9={GUID=101519,PID=126},Scenario3_Challenger10={GUID=101520,PID=127},Scenario3_Challenger11={GUID=101521,PID=128},
+    Scenario3_Challenger12={GUID=101522,PID=129},Scenario3_Eli={GUID=103130,PID=136},Scenario3_Ketema={GUID=103129,PID=137},
+    Scenario3_Archie={GUID=103131,PID=138},Scenario_Item_Trader={GUID=4387,PID=139},Scenario3_Queen={GUID=101523,PID=130},
     
     -- ={PID=,GUID=},={PID=,GUID=},={PID=,GUID=},
   },

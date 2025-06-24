@@ -1,6 +1,8 @@
 -- Uses Nameable from:
 -- Scenario_Item_Trader  GUID: 4387 , PID: 139
 -- (I think the only Participant with Queen Template where I do not use the Nameable yet (besides Void Trader and Queen) is Scenario02_Actuary)
+-- And using Scenario3_Challenger1  GUID: 100132 , PID: 118
+ -- as Helper-Owner for ships gifted to the pirate within t_ChangeOwnerOIDToPID
 
 
 -- Only this script gets loaded via ActionExecuteScript on GameLoaded and it starts all other lua scripts
@@ -218,7 +220,13 @@ if g_LuaScriptBlockers[ModID]==nil then
    -- set ignoreowner to true if you want to allow gifting the ship, even if Local Player is not the Owner from it
    -- if notifyonfail is true, it will send a notification to the Local_PID if a ship owner change failed
     -- sth like "can not change owner of ships which are not sellable"
-  local function t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner,notifyonfail)
+  -- with forbidpiratenewowner and the To_PID is Harlow/LaFortune: BuyNet makes the ships neutral and leaves map.
+   -- so the code instead will change owner to a helper participant and then start a xml Trigger instead
+    -- (we have to hardcode the Trigger content, so currently only the 2 vanilla pirates are supported)
+     -- that trigger will use ActionChangeParticipant to change the owner of all ships owned by the helper to Pirate
+      -- And (before the ownerchange!) it will make sure to convert the playership to a pirate variant to make sure pirate never owns a non-pirate ship
+     -- (changing the GUID could also be done here in lua, BUT it requires userdata which is only available if we are in the same session. to support the most cases we will use trigger to change guid so it works regardless of the session)
+  local function t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner,notifyonfail,forbidpiratenewowner)
     local GUID = g_LTL_Serp.GetGameObjectPath(OID,"GUID")
     g_LTL_Serp.modlog("ChangeOwnerOIDToPID called. OID:"..tostring(OID).." GUID: "..tostring(GUID).." To_PID: "..tostring(To_PID),ModID)
     local InfluenceProduct = 1010190 -- we dont care for Influence costs. Other costs are refunded
@@ -260,17 +268,35 @@ if g_LuaScriptBlockers[ModID]==nil then
                 g_LTL_Serp.waitForTimeDelta(1000) -- keep it simple, 1s should be enough (eg buyer could have negative money and stuff like this we dont want to deal with code..)
               end
               
-              if not To_IsThirdPartyTrader then -- if it is trader, we dont want to stop, because it gets the command to leave map (and if we do DebugStop it instantly disappears instead)
-                g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Walking DebugStop()]") -- revoke all current commands, especially traderoutes
+              if not forbidpiratenewowner and g_LTM_Serp._supportedShipsOwnerToPirate[GUID]~=nil and (To_PID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID or To_PID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID) then
+                -- changing owner to a helper participant which will only be used for this function!
+                 -- that means all ships owned by this participant are ment to be changed by xml triggers (except the 2 scenario ships, but they are in no vanilla pool)
+                -- Pirates dont use spawned/gifted ships 100% correctly, similar to comebackfleet. So sometimes they will stand there doing nothing and sometimes roaming around. Not really a way to fix this except changing owner back and forth every 5 minutes, which interrupts their current action, if there is any
+                helper_PID = g_LTL_Serp.PIDs.Scenario3_Challenger1.PID
+                g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(helper_PID)..")]")
+                if To_PID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID then
+                  ts.Conditions.RegisterTriggerForCurrentParticipant(1500005617)
+                elseif To_PID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID then
+                  ts.Conditions.RegisterTriggerForCurrentParticipant(1500005618)
+                end
+              else
+                if not To_IsThirdPartyTrader then -- if it is trader, we dont want to stop, because it gets the command to leave map (and if we do DebugStop it instantly disappears instead)
+                  g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Walking DebugStop()]") -- revoke all current commands, especially traderoutes
+                end
+                if with_middleman~=false then
+                  g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(with_middleman)..")]")
+                end -- no yield needed it seems
+                g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(To_PID)..")]")
+               
+                if not To_IsThirdPartyTrader then
+                  g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Walking DebugStop()]") -- revoke all current commands, especially traderoutes
+                end
               end
-              if with_middleman~=false then
-                g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(with_middleman)..")]")
-              end -- no yield needed it seems
-              g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(To_PID)..")]")
-             
               g_LTL_Serp.waitForTimeDelta(1000) -- wait for the money reach the Owner before to substract it again, keep it simple
-              if not To_IsThirdPartyTrader then
-                g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Walking DebugStop()]") -- revoke all current commands, especially traderoutes
+              local name = ts.GetGameObject(OID).Nameable.Name
+              local newname = g_LTL_Serp.myreplace(name,"NOSELL","") -- remove "NOSELL" from the name if it was spawned via supportfleet (gifting is allowed even with NOSELL)
+              if newname~=name then
+                ts.GetGameObject(OID).Nameable.SetName(newname)
               end
               if Owner_IsHuman then
                 local SellPrices = g_LTL_Serp.GetVectorGuidsFromSessionObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable SellPrice Costs Count]",{ProductGUID="number",Amount="number"})
@@ -418,6 +444,10 @@ if g_LuaScriptBlockers[ModID]==nil then
       SimpleExecuteForEveryone = SimpleExecuteForEveryone,
       _DoExectionForEveryone = _DoExectionForEveryone,
       NatureParticipantPID = 158, -- has traderights with everyone (Enum: Mod10, GUID: 1500004528)
+      _supportedShipsOwnerToPirate = { -- when adding ships here, also add them to xml Trigger 1500005619 !
+        [102420]=102429,[102421]=102430,[102419]=102431,[102422]=102432,  -- vanilla sale pirate ships
+        [100437]=102429,[100439]=102430,[100440]=102431,[100443]=102432, -- vanilla playerships (with pirate version)
+      },
       -- Shared_Cache use your ModID or other unique identifier as key. If the UltraTools mod is enabled, this Shared_Cache 
       -- will be saved to Nameable helper to save it to a savegame and will be loaded on loading a game 
           -- (so at best only put important information in here)
