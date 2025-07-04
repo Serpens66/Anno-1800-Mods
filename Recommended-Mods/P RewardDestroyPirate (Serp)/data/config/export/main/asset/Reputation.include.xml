@@ -1,5 +1,6 @@
 <ModOps>
    
+   
    <!-- We want AIs to react on the destroy of the pirates.  -->
     <!-- If they liked the pirates you will get negative Reputation and so on. -->
     <!-- We want to show a notification that includes the reputation change, which is not as simple as it sounds. Only locations where I saw this happen are Reactions and Quest rewards. -->
@@ -10,641 +11,792 @@
      <!-- To Trigger this Reaction one ship needs to destroy another ship with our custom GUIDs. So we will spawn invisible Attacker and Victim Airships with low range and attack/hitpoints which should destroy eachother instantly and remove the left over within 3 seconds. -->
       <!-- It should not be noteable by the user, but is indeed a quite heavy workaround, but still the best option I found. -->
     
-    <ModOp GUID="114166" Type="AddNextSibling">
-      <Asset>
-        <Template>ObjectDummyWithOwner_Victim</Template>
-        <Values>
-          <Standard>
-            <GUID>1500001051</GUID>
-            <Name>Helper Victim +-10</Name>
-          </Standard>
-          <!-- <Mesh /> -->
-        </Values>
-      </Asset>
-      <Asset>
-        <Template>ObjectDummyWithOwner_Attacker</Template>
-        <Values>
-          <Standard>
-            <GUID>1500001052</GUID>
-            <Name>Helper Attacker</Name>
-          </Standard>
-          <!-- <Mesh /> -->
-        </Values>
-      </Asset>
-      <Asset>
-        <Template>ObjectDummyWithOwner_Victim</Template>
-        <Values>
-          <Standard>
-            <GUID>1500001054</GUID>
-            <Name>Helper Victim +-5</Name>
-          </Standard>
-          <!-- <Mesh /> -->
-        </Values>
-      </Asset>
-    </ModOp>
-   
+    <!-- we are using lua now to destroy the victim, that also means we can use AttackableType=[NONE] to prevent anyone else from accidently destryoing it -->
     
-  <ModOp Type="addNextSibling" GUID="153189">
+  <ModOp GUID="114166" Type="AddNextSibling">
     <Asset>
-      <Template>Matcher</Template>
+      <Template>ObjectDummyWithOwner_Victim</Template>
       <Values>
         <Standard>
-          <GUID>1500001053</GUID>
-          <Name>Attacker_processing_matcher</Name>
+          <GUID>1500001051</GUID>
+          <Name>Helper Victim +-10</Name>
         </Standard>
-        <Matcher>
-          <Criterion>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-            <Values>
-              <MatcherCriterion />
-              <MatcherCriterionAnd>
-                <CriterionOperandListAnd>
-                  <Item>
-                    <CriterionOperand>
-                      <Template>MatcherCriterionOwner</Template>
-                      <Values>
-                        <MatcherCriterion />
-                        <MatcherCriterionOwner>
-                          <UseProcessingParticipant>1</UseProcessingParticipant>
-                        </MatcherCriterionOwner>
-                      </Values>
-                    </CriterionOperand>
-                  </Item>
-                  <Item>
-                    <CriterionOperand>
-                      <Template>MatcherCriterionGUID</Template>
-                      <Values>
-                        <MatcherCriterion />
-                        <MatcherCriterionGUID>
-                          <ObjectMatched>1500001052</ObjectMatched>
-                        </MatcherCriterionGUID>
-                      </Values>
-                    </CriterionOperand>
-                  </Item>
-                </CriterionOperandListAnd>
-              </MatcherCriterionAnd>
-            </Values>
-          </Criterion>
-        </Matcher>
+        <!-- <Mesh /> -->
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+        </Attackable>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>ObjectDummyWithOwner_Victim</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001054</GUID>
+          <Name>Helper Victim +-5</Name>
+        </Standard>
+        <!-- <Mesh /> -->
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+        </Attackable>
       </Values>
     </Asset>
   </ModOp>
+   
     
     
-  <ModOp GUID="153271" Type="AddNextSibling">
-      
-      <!-- As soon as we discover the pirate, also make all AIs discover it. Is important on fog-maps where AI takes years to discover the pirates for some reason, which makes reactions not work properly -->
-      <Asset>
-        <Template>Trigger</Template>
-        <Values>
-          <Standard>
-            <GUID>1500001041</GUID>
-            <Name>On Harlow Discovered</Name>
-          </Standard>
-          <Trigger>
-            <TriggerCondition>
-              <Template>ConditionIsDiscovered</Template>
-              <Values>
-                <Condition />
-                <ParticipantRelation>
-                  <SourceIsOwner>1</SourceIsOwner>
-                  <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
-                </ParticipantRelation>
-                <ConditionIsDiscovered />
-                <ConditionPropsNegatable />
-              </Values>
-            </TriggerCondition>
-            <TriggerActions>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_01_Jorgensen</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_02_Qing</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_03_Wibblesock</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_04_Smith</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_05_OMara</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_06_Gasparov</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_07_von_Malching</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_08_Gravez</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_09_Silva</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_10_Hunt</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_11_Mercier</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-            </TriggerActions>
-          </Trigger>
-          <TriggerSetup>
-            <AutoRegisterTrigger>1</AutoRegisterTrigger>
-            <UsedBySecondParties>0</UsedBySecondParties>
-          </TriggerSetup>
-        </Values>
-      </Asset>
-      
-      <Asset>
-        <Template>Trigger</Template>
-        <Values>
-          <Standard>
-            <GUID>1500001081</GUID>
-            <Name>On LaFortune Discovered</Name>
-          </Standard>
-          <Trigger>
-            <TriggerCondition>
-              <Template>ConditionIsDiscovered</Template>
-              <Values>
-                <Condition />
-                <ParticipantRelation>
-                  <SourceIsOwner>1</SourceIsOwner>
-                  <TargetParticipant>Third_party_04_Pirate_LaFortune</TargetParticipant>
-                </ParticipantRelation>
-                <ConditionIsDiscovered />
-                <ConditionPropsNegatable />
-              </Values>
-            </TriggerCondition>
-            <TriggerActions>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_01_Jorgensen</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_02_Qing</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_03_Wibblesock</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_04_Smith</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_05_OMara</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_06_Gasparov</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_07_von_Malching</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_08_Gravez</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_09_Silva</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_10_Hunt</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDiscoverParticipant</Template>
-                  <Values>
-                    <Action />
-                    <ActionDiscoverParticipant>
-                      <DiscoverSourceParticipant>Second_ai_11_Mercier</DiscoverSourceParticipant>
-                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
-                    </ActionDiscoverParticipant>
-                  </Values>
-                </TriggerAction>
-              </Item>
-            </TriggerActions>
-          </Trigger>
-          <TriggerSetup>
-            <AutoRegisterTrigger>1</AutoRegisterTrigger>
-            <UsedBySecondParties>0</UsedBySecondParties>
-          </TriggerSetup>
-        </Values>
-      </Asset>
-      
-      
-      <Asset>
-        <Template>Trigger</Template>
-        <Values>
-          <Standard>
-            <GUID>1500001047</GUID>
-            <Name>On Harlow Harbour Destroyed</Name>
-          </Standard>
-          <Trigger>
-            <!-- <TriggerCondition> -->
-              <!-- <Template>ConditionEvent</Template> -->
-              <!-- <Values> -->
-                <!-- <Condition /> -->
-                <!-- <ConditionEvent> -->
-                  <!-- <ConditionEvent>QuestSuccessfullyResolved</ConditionEvent> -->
-                  <!-- <ContextAsset>1500001136</ContextAsset> -->
-                <!-- </ConditionEvent> -->
-                <!-- <ConditionPropsNegatable /> -->
-              <!-- </Values> -->
-            <!-- </TriggerCondition> -->
-            <TriggerCondition>
-              <Template>ConditionPlayerCounter</Template>
-              <Values>
-                <Condition />
-                <ConditionPlayerCounter>
-                  <PlayerCounter>QuestSolved</PlayerCounter>
-                  <Context>1500001136</Context>
-                  <CounterAmount>1</CounterAmount>
-                  <RelativeToQuestStart>1</RelativeToQuestStart>
-                </ConditionPlayerCounter>
-              </Values>
-            </TriggerCondition>
-            <TriggerActions>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionSpawnObjects</Template>
-                  <Values>
-                    <Action />
-                    <ActionSpawnObjects>
-                      <SpawnGUID>1500001052</SpawnGUID>
-                      <Amount>1</Amount>
-                      <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
-                    </ActionSpawnObjects>
-                    <SpawnArea>
-                      <SpawnContext>Random</SpawnContext>
-                      <DistanceToBorder>Near</DistanceToBorder>
-                      <DistanceToIsland>Far</DistanceToIsland>
-                    </SpawnArea>
-                    <SessionFilter>
-                      <Sessions>
-                        <Item>
-                          <Session>180023</Session>
-                        </Item>
-                      </Sessions>
-                    </SessionFilter>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              <Item>
-                <TriggerAction>
-                  <Template>ActionSpawnObjects</Template>
-                  <Values>
-                    <Action />
-                    <ActionSpawnObjects>
-                      <SpawnGUID>1500001051</SpawnGUID>
-                      <Amount>1</Amount>
-                      <Owner>Third_party_03_Pirate_Harlow</Owner>
-                    </ActionSpawnObjects>
-                    <SpawnArea>
-                      <SpawnContext>ForceContextPosition</SpawnContext>
-                      <MatcherGUID>1500001053</MatcherGUID>
-                    </SpawnArea>
-                    <SessionFilter>
-                      <Sessions>
-                        <Item>
-                          <Session>180023</Session>
-                        </Item>
-                      </Sessions>
-                    </SessionFilter>
-                  </Values>
-                </TriggerAction>
-              </Item>
-              
-              <Item>
-                <TriggerAction>
-                  <Template>ActionDelayedActions</Template>
-                  <Values>
-                    <Action />
-                    <ActionDelayedActions>
-                      <ExecutionDelay>3000</ExecutionDelay>
-                      <DelayedActions>
-                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                        <Values>
-                          <ActionList>
-                            <Actions>
-                              <Item>
-                                <Action>
-                                  <Template>ActionDeleteObjects</Template>
-                                  <Values>
-                                    <Action />
-                                    <ActionDeleteObjects />
-                                    <ObjectFilter>
-                                      <ObjectGUID>1500001052</ObjectGUID>
-                                      <CheckParticipantID>1</CheckParticipantID>
-                                      <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                                    </ObjectFilter>
-                                  </Values>
-                                </Action>
-                              </Item>
-                              <Item>
-                                <Action>
-                                  <Template>ActionDeleteObjects</Template>
-                                  <Values>
-                                    <Action />
-                                    <ActionDeleteObjects />
-                                    <ObjectFilter>
-                                      <ObjectGUID>1500001051</ObjectGUID>
-                                    </ObjectFilter>
-                                  </Values>
-                                </Action>
-                              </Item>
-                              <Item>
-                                <Action>
-                                  <Template>ActionDeleteObjects</Template>
-                                  <Values>
-                                    <Action />
-                                    <ActionDeleteObjects />
-                                    <ObjectFilter>
-                                      <ObjectGUID>1500001054</ObjectGUID>
-                                    </ObjectFilter>
-                                  </Values>
-                                </Action>
-                              </Item>
-                            </Actions>
-                          </ActionList>
-                        </Values>
-                      </DelayedActions>
-                    </ActionDelayedActions>
-                  </Values>
-                </TriggerAction>
-              </Item>
-            </TriggerActions>
-            <ResetTrigger>
-              <Template>AutoCreateTrigger</Template>
-              <Values>
-                <Trigger>
-                  <TriggerCondition>
-                    <Template>ConditionTimer</Template>
-                    <Values>
-                      <Condition />
-                      <ConditionTimer>
-                        <TimeLimit>10000</TimeLimit>
-                      </ConditionTimer>
-                    </Values>
-                  </TriggerCondition>
-                </Trigger>
-              </Values>
-            </ResetTrigger>
-          </Trigger>
-          <TriggerSetup>
-            <AutoRegisterTrigger>1</AutoRegisterTrigger>
-            <UsedBySecondParties>0</UsedBySecondParties>
-          </TriggerSetup>
-        </Values>
-      </Asset>
-      
-      
-
-      <Asset>
-        <BaseAssetGUID>1500001047</BaseAssetGUID>
-        <Values>
-          <Standard>
-            <GUID>1500001048</GUID>
-            <Name>On LaFortune Harbour Destroyed</Name>
-          </Standard>
-          <Trigger/>
-        </Values>
-      </Asset>
-      <Asset>
-        <BaseAssetGUID>1500001047</BaseAssetGUID>
-        <Values>
-          <Standard>
-            <GUID>1500001049</GUID>
-            <Name>On Harlow ComeBackFleet Destroyed</Name>
-          </Standard>
-          <Trigger/>
-        </Values>
-      </Asset>
-      <Asset>
-        <BaseAssetGUID>1500001047</BaseAssetGUID>
-        <Values>
-          <Standard>
-            <GUID>1500001050</GUID>
-            <Name>On LaFortune ComeBackFleet Destroyed</Name>
-          </Standard>
-          <Trigger/>
-        </Values>
-      </Asset>
-    </ModOp>
-    <ModOp Type="replace" GUID="1500001048,1500001049,1500001050" Path="/Values/Trigger"
-      Content="//Values[Standard/GUID='1500001047']/Trigger">
-    </ModOp>
+  <ModOp GUID="130248" Type="AddNextSibling">
     
-    <!-- <ModOp Type="replace" GUID="1500001048" Path="/Values/Trigger/TriggerCondition/Values/ConditionEvent/ContextAsset"> -->
-        <!-- <ContextAsset>1500001137</ContextAsset> -->
-    <!-- </ModOp> -->
-    <!-- <ModOp Type="replace" GUID="1500001049" Path="/Values/Trigger/TriggerCondition/Values/ConditionEvent/ContextAsset"> -->
-        <!-- <ContextAsset>1500001138</ContextAsset> -->
-    <!-- </ModOp> -->
-    <!-- <ModOp Type="replace" GUID="1500001050" Path="/Values/Trigger/TriggerCondition/Values/ConditionEvent/ContextAsset"> -->
-        <!-- <ContextAsset>1500001139</ContextAsset> -->
-    <!-- </ModOp> -->
-    <ModOp Type="replace" GUID="1500001048" Path="/Values/Trigger/TriggerCondition/Values/ConditionPlayerCounter/Context">
-        <Context>1500001137</Context>
-    </ModOp>
-    <ModOp Type="replace" GUID="1500001049" Path="/Values/Trigger/TriggerCondition/Values/ConditionPlayerCounter/Context">
-        <Context>1500001138</Context>
-    </ModOp>
-    <ModOp Type="replace" GUID="1500001050" Path="/Values/Trigger/TriggerCondition/Values/ConditionPlayerCounter/Context">
-        <Context>1500001139</Context>
-    </ModOp>
-    <ModOp Type="replace" GUID="1500001049,1500001050" Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='1500001051']/SpawnGUID">
-        <SpawnGUID>1500001054</SpawnGUID>
-    </ModOp>
-    <ModOp Type="replace" GUID="1500001048,1500001050" Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionSpawnObjects[SpawnGUID='1500001051' or SpawnGUID='1500001054']/Owner">
-        <Owner>Third_party_04_Pirate_LaFortune</Owner>
-    </ModOp>
+    <!-- As soon as we discover the pirate, also make all AIs discover it. Is important on fog-maps where AI takes years to discover the pirates for some reason, which makes reactions not work properly -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001041</GUID>
+          <Name>On Harlow Discovered</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_01_Jorgensen</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_02_Qing</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_03_Wibblesock</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_04_Smith</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_05_OMara</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_06_Gasparov</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_07_von_Malching</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_08_Gravez</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_09_Silva</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_10_Hunt</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_11_Mercier</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001081</GUID>
+          <Name>On LaFortune Discovered</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsDiscovered</Template>
+            <Values>
+              <Condition />
+              <ParticipantRelation>
+                <SourceIsOwner>1</SourceIsOwner>
+                <TargetParticipant>Third_party_04_Pirate_LaFortune</TargetParticipant>
+              </ParticipantRelation>
+              <ConditionIsDiscovered />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_01_Jorgensen</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_02_Qing</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_03_Wibblesock</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_04_Smith</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_05_OMara</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_06_Gasparov</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_07_von_Malching</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_08_Gravez</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_09_Silva</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_10_Hunt</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <DiscoverSourceParticipant>Second_ai_11_Mercier</DiscoverSourceParticipant>
+                    <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001082</GUID>
+          <Name>Helper Trigger, registered eg. via 1500001047 and so on, starts lua</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human0</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/repdestroypirate_0.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human1</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/repdestroypirate_1.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human2</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/repdestroypirate_3.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human3</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/repdestroypirate_3.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup>
+            <AutoRegisterTrigger>0</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- ConditionPlayerCounter only used here to fetch the current session to be used for AllowParentConditionSession -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001047</GUID>
+          <Name>On Harlow Harbour Destroyed</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500001051</Context>
+                <CounterAmount>0</CounterAmount>
+                <ComparisonOp>AtLeast</ComparisonOp>
+                <CounterScope>Session</CounterScope>
+                <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext>
+                <CounterScopeUseActiveSession>1</CounterScopeUseActiveSession>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionPlayerCounter</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionPlayerCounter>
+                          <PlayerCounter>QuestSolved</PlayerCounter>
+                          <Context>1500001136</Context>
+                          <CounterAmount>1</CounterAmount>
+                          <RelativeToQuestStart>1</RelativeToQuestStart>
+                        </ConditionPlayerCounter>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionStartQuest</Template>
+                <Values>
+                  <Action />
+                  <ActionStartQuest>
+                    <Quest>1500001052</Quest>
+                    <UseCurrentSession>1</UseCurrentSession>
+                  </ActionStartQuest>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500001082</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionChangeParticipant</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionChangeParticipant>
+                                    <NewParticipantID>Third_party_03_Pirate_Harlow</NewParticipantID>
+                                  </ActionChangeParticipant>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001051</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionChangeParticipant</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionChangeParticipant>
+                                    <NewParticipantID>Third_party_03_Pirate_Harlow</NewParticipantID>
+                                  </ActionChangeParticipant>
+                                  <ObjectFilter>
+                                    <ObjectGUID>1500001054</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>10000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <BaseAssetGUID>1500001047</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001048</GUID>
+          <Name>On LaFortune Harbour Destroyed</Name>
+        </Standard>
+        <Trigger/>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001047</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001049</GUID>
+          <Name>On Harlow ComeBackFleet Destroyed</Name>
+        </Standard>
+        <Trigger/>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001047</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001050</GUID>
+          <Name>On LaFortune ComeBackFleet Destroyed</Name>
+        </Standard>
+        <Trigger/>
+      </Values>
+    </Asset>
+  </ModOp>
+  <ModOp Type="replace" GUID="1500001048,1500001049,1500001050" Path="/Values/Trigger"
+    Content="//Values[Standard/GUID='1500001047']/Trigger">
+  </ModOp>
+  
+  <ModOp Type="replace" GUID="1500001048" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition/Values/ConditionPlayerCounter/Context">
+      <Context>1500001137</Context>
+  </ModOp>
+  <ModOp Type="replace" GUID="1500001049" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition/Values/ConditionPlayerCounter/Context">
+      <Context>1500001138</Context>
+  </ModOp>
+  <ModOp Type="replace" GUID="1500001050" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition/Values/ConditionPlayerCounter/Context">
+      <Context>1500001139</Context>
+  </ModOp>
+  <ModOp Type="replace" GUID="1500001049,1500001050" Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionStartQuest/Quest">
+      <Quest>1500001053</Quest>
+  </ModOp>
+  <ModOp Type="replace" GUID="1500001048,1500001050" Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionDelayedActions/DelayedActions/Values/ActionList/Actions/Item/Action/Values/ActionChangeParticipant/NewParticipantID">
+      <NewParticipantID>Third_party_04_Pirate_LaFortune</NewParticipantID>
+  </ModOp>
+  
+  
+ <!-- eine Quest zusätzlich Trigger verwenden 1500001052,1500001053 und mit ActionStartQuest UseCurrentSession -->
+  <!-- starten und in der Quest dann ActionSpawn mit QuestSession machen. -->
+   <!-- Ist notwendig, damit wir sicher in der Session spawnen in ein processing spieler gerade ist , damit lua -->
+    <!-- code funktionieren kann. dont ask me why AllowQuestSession=1 does not work, but AllowProcessingSession=1 works -->
+  <ModOp Type="AddNextSibling" GUID="152264">
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001052</GUID>
+          <Name>Spawn 1500001051</Name>
+        </Standard>
+        <Quest>
+          <OnQuestStart>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionSpawnObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionSpawnObjects>
+                          <SpawnGUID>1500001051</SpawnGUID>
+                          <Amount>1</Amount>
+                          <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                        </ActionSpawnObjects>
+                        <SpawnArea>
+                          <SpawnContext>Random</SpawnContext>
+                          <DistanceToBorder>Near</DistanceToBorder>
+                          <DistanceToIsland>Far</DistanceToIsland>
+                        </SpawnArea>
+                        <SessionFilter>
+                          <AllowProcessingSession>1</AllowProcessingSession>
+                          <AllowParentConditionSession>0</AllowParentConditionSession>
+                          <AllowQuestSession>0</AllowQuestSession>
+                          <AllowQuestArea>0</AllowQuestArea>
+                        </SessionFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestStart>
+        </Quest>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001053</GUID>
+          <Name>Spawn 1500001054</Name>
+        </Standard>
+        <Quest>
+          <OnQuestStart>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionSpawnObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionSpawnObjects>
+                          <SpawnGUID>1500001054</SpawnGUID>
+                          <Amount>1</Amount>
+                          <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                        </ActionSpawnObjects>
+                        <SpawnArea>
+                          <SpawnContext>Random</SpawnContext>
+                          <DistanceToBorder>Near</DistanceToBorder>
+                          <DistanceToIsland>Far</DistanceToIsland>
+                        </SpawnArea>
+                        <SessionFilter>
+                          <AllowProcessingSession>1</AllowProcessingSession>
+                          <AllowParentConditionSession>0</AllowParentConditionSession>
+                          <AllowQuestSession>0</AllowQuestSession>
+                          <AllowQuestArea>0</AllowQuestArea>
+                        </SessionFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestStart>
+        </Quest>
+      </Values>
+    </Asset>
+  </ModOp>
+  
     
    
   <ModOp Type="AddPrevSibling" GUID='125,130,131,132,133,134,135,136,137,138,219' Path="/Values/ParticipantMessages/MessageTriggers/MilitaryShipDestroyed/Reactions/Item[1]">

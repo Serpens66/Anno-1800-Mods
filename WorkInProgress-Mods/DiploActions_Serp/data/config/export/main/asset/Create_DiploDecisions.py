@@ -9,22 +9,15 @@ from copy import deepcopy
    # <!-- 1500005370 bis einschl. 1500005499 wird jetzt erstmal für decision verwendet, später evlt umbauen, je nach dem ob decisns oder buttons genutzt werden -->
     # <!-- aktuell bis einschl. 1500005487 belegt  -->
   
-# <!-- neuer Plan: -->
-  # <!-- Das Ziel der Diplo Aktion wird über das shipyrad building gewählt. -->
-   # <!-- und das startet dann je nach KI eine andere DecisionQuest, aber mit fast identischem Inhalt. -->
-  # <!-- Dadurch entfällt die Größte Decisionebene und machts deutlich einfacher. -->
-  # DENNOCH lassen wir den fertigen Teil mit Shipyard so drin und Mods können sich dann aussuchen ob und wo sie was zufügen.
-   # Gibt sicherlich auch Dinge, die in Decision nicht gut machbar sind
+
   
-  
-  # TODO:
     # ts.Interface.ToggleStateVisibility("DecisionQuest")
     # öffnet die zuletzt geöffnete DecisonQuest (bzw. schließt die die grad offen ist)
      # wenn keine aktiv ist, passiert nichts.
       # wenn eine andere aktiv ist, versucht es vergeblich die zuvor angezegite zu öffnen
-  # man könnte versuchen wie gut es klappt,
-   # wenn man AutoShowDecisionScreen an macht und dann sofort für alle anderen humans das aufruft,
-    # wie lange das nervt, oder ob AutoShowDecisionScreen weiterhin im MP aus sein sollte
+   # theoretisch könnte man im MP dann AutoShowDecisionScreen nutzen und es für die falschen so automatisch schließen,
+    # aber selbst die 100ms die es dann angezeigt wird bei jedem Spieler, nervt das schon, also weiterhin AutoShowDecisionScreen im MP weglassen
+    
 
   # <!--  DecisionNotification vs ActionNotification -->
    # <!-- vorteil ist dass man kein Profile übergeben muss, ist QuestGiver -->
@@ -32,8 +25,7 @@ from copy import deepcopy
      # <!-- keine Kosten der Optionen haben -->
   
   
-  # <!-- DecisionOptionInfotip muss ein infotip sein -->
-   # <!-- ist aber nicht unbedingt nötig, da ich als "Buff" n Icon nehme was auch n text tooltip anzeigen kann -->
+  # <!-- DecisionOptionInfotip Asset muss Text und InfoTip als Property haben -->
   
   # <!-- Weder Questname noch DecisionFluffText supperten textembeds -.- -->
   # <!-- In DecisionOptionText gehts, aber je mehr Zeichen, desto mieser ist der text formatiert -->
@@ -41,14 +33,20 @@ from copy import deepcopy
    # <!-- kann man Human1 als QuestGiver eintragen (damit sein portrait zb automatisch bei der quest ist?) -->
    # Ja Humans können QuestGiver sein. Icon neben der Quest ist falsch, aber in der Quest ist Portrait korrekt (Decision kann aber nicht automaitsch korrektes Portrait nehmen..)
     # <!-- ...unkonwn nehmen: 116746 -->
-  # TODO
-    # wenn Humans QuestGiver sein können, dann evlt. sogar für Multiplayer ermöglichen,
-     # dass man einem anderen Spieler eine Quest vorschlägt?
-    # Ich vermute nur der Reward wird dann dennoch aus dem Nichts generiert :D
-    # und was für Quests sollten das sein..
-    # Einziges was Sinn macht vllt DestroyQuest von vorhandenen Objekten
-     # und am Ende QuestGiver zwingen Geld zu bezahlen
+
     
+    # auf 6 Aktione runterbrechen und die 7te ist dann "weitere"
+     # wo ich zur Not dann weniger genutzte Aktionen die ich vllt doch noch zufügen will hinpacke
+    
+  # 1) Join War
+  # 2) (AI) SupportFleet kann ein Button sein, der dann doch weiterführend ist größe/art der Flotte führt.
+  # 2) (Human) Share Island Goods
+  # 3) Gift Ship
+  # 4) (AI) Spionage unterlassen
+  # 5) (AI) Command Ally
+   
+  # Weitere:
+    # - Pirate Demand: Quest anfragen um Pirate beim Aufbau zu helfen (mit cooldown), wo am ende pirate neues schiff für ihre flotte spawned
     
   
   # <!-- Kategorien: -->
@@ -67,26 +65,12 @@ from copy import deepcopy
    # <!-- - Quests -->
     # <!-- - Questcooldown resetten? -->
     # <!-- - Pirate DemandMoney: Quest anfragen um Pirate beim Aufbau zu helfen (mit cooldown), wo am ende pirate neues schiff für ihre flotte spawned  -->
-    # Quests an andere Humans übergeben (zb.Destroy Quest von Prebuild Object) ?
-     # Problem wird da eher das Zielen auf ein bestimmtes objekt... geht dann eben nur nach GUID und Owner sortiert...
-      # aber selbst da müsste ich ja alles hardcoden in xml, damits als Quest laufen kann...
-        # also geht bestenfalls sowas wie in PirateDemand Mod wie "zerstöre x Schiffe egal von wem bzw. von Pirat"
-      # Oder ich machen eine Fake WinCondition und Quest wird dann durch lua/einen unlock in lua gelöst,
-        # wenn lua bemerkt, dass Aufgabe erfüllt ist...
-      # Müssten dazu aber Infos teilen können... weiß nicht ob SimpleExecuteForEveryone dafür ausreicht..
-    # Wie würde Belohnung angezeigt/bezahlt?
-      # Können nicht Reward System nutzen, weil dann aus dem Nichts generiert (evtl. mal testen ob auch bei Geld so, aber ist bestimmt so)
-      # Am Besten müsste Auftraggeber Belohnugsbetrag eintippen können und das wird dann auch in Quest angezeigt
-        # und bei Questabschluss dann per lua übertragen.
-       # Könnte man in QuestStarter Object speichern die Summe...
-         # nur dann müsste man es spawnen bevor die Quest losgeht, wie machen wir das? oder vorhandenes schiff/Gebäude nehmen?
-      
-   
    # <!-- Geld/Ressource -->
     # <!-- - Kredit erbitten über BuyShares umsetzen? ne, gibts ja schon indem man an Queen verkauft und ist echt miese Rate  -->
-            # lieber ein besseres Kreditsystem machen 
+            # lieber ein besseres Kreditsystem machen, wobei nicht wirklich wichtig.. 
           # Insel Shares verschenken? Ne auch nicht nötig, nur für MP relevant und da kann man share auch kaufen und das Geld zurücküberweisen
-   # <!-- 13107 Empty Slot -->
+    # Insellager freigeben (share goods, nur zwischen humans) 
+
     
   # Schutz versprechen (man wird automatisch in Kriege reingezogen) ?
   # Drohen ? Erhöht/Verringert Chance auf Erfolg bei anderen Aktionen, basierend auf Militärstärke?
@@ -94,14 +78,14 @@ from copy import deepcopy
       # könnte höchstes Ruf durch Drohung erhöhen
     
   
-  # <!-- andere mods die options zufügen: -->
-   # <!-- am besten mit modop Condition prüfen obs bereits ein Item[7] in einer Kategorie gibt, und wenn ja, dann neue Kategorie anfangen -->
-  
+
+
+
   # <!-- UnlockRequirements der options aktualisieren sich life während man in der decision ist -->
   
   
-  # <!-- costs to choose the option (but we dont want costs) -->
-  # <!-- <HasDecisionCostBehavior>0</HasDecisionCostBehavior> -->
+  # <!-- costs to choose the option (but we dont want costs for most) -->
+  # <!-- <HasDecisionCostBehavior>1</HasDecisionCostBehavior> -->
       # <!-- <Item> -->
         # <!-- <Action> -->
           # <!-- <Template>ActionAddGoodsToItemContainer</Template> -->
@@ -130,10 +114,6 @@ from copy import deepcopy
       # Erstaunlicherweise klappts scheinbar doch? 
        
        
-  # <!-- TODO: -->
-    # <!-- hier nur das grundgerüst erstellen. Die Actions werden in anderen Mods/Dateien dann in die Quests eingefügt! -->
-   # weiß noch nicht wie ich das sinnvoll ermöglichen will .. :D
-
 
 GeneralDecision = """<ModOps>
   <ModOp Type="AddNextSibling" GUID="152264">
@@ -203,6 +183,16 @@ GeneralDecision = """<ModOps>
           <StartFollowShipMessage>
             <SuppressMessage>1</SuppressMessage>
           </StartFollowShipMessage>
+          <OnQuestActive>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestActive>
           <QuestGiver>{HEREQUESTGIVER}</QuestGiver>
           <!-- important for lua to set DescriptionText to the Quest GUID -->
           <DescriptionText>{HEREAssetGUID}</DescriptionText>
@@ -280,484 +270,83 @@ GeneralDecision = """<ModOps>
                               <DecisionFluffText>1500005267</DecisionFluffText>
                               <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait>
                               <DecisionOptionList>
-                                
-                                <!-- ## Category 10821 Diplomatic Relations ## -->
-                                <Item>
-                                  <DecisionOption>
-                                    <Template>ConditionDecisionOption</Template>
-                                    <Values>
-                                      <Condition />
-                                      <ConditionDecisionOption>
-                                        <DecisionOptionText>10821</DecisionOptionText>
-                                        <!-- TODO: noch passende Infotips zufügen, braucht InfoTip Property aber keinen eintrag in export_bin Datei -->
-                                        <DecisionOptionInfotip>0</DecisionOptionInfotip>
-                                        <ActionList>
-                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                          <Values>
-                                            <ActionList>
-                                              <Actions>
-                                                <Item>
-                                                  <Action>
-                                                    <Template>ActionBuff</Template>
-                                                    <Values>
-                                                      <Action />
-                                                      <ActionBuff>
-                                                        <BuffAsset>500673</BuffAsset>
-                                                        <AddBuff>0</AddBuff>
-                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                                      </ActionBuff>
-                                                    </Values>
-                                                  </Action>
-                                                </Item>
-                                              </Actions>
-                                            </ActionList>
-                                          </Values>
-                                        </ActionList>
-                                        <FollowUpDecisionList>
-                                          <Item>
-                                            <FollowUpDecision>
-                                              <Template>ConditionDecision</Template>
-                                              <Values>
-                                                <Condition />
-                                                <ConditionDecision>
-                                                  <DecisionFluffText>1500005267</DecisionFluffText>
-                                                  <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait>
-                                                  <DecisionOptionList>
-                                                    {HERE_JOINWAR_XML}
-                                                    <!-- Add new options  -->
-                                                    <Item>
-                                                      <DecisionOption>
-                                                        <Template>ConditionDecisionOption</Template>
-                                                        <Values>
-                                                          <Condition>
-                                                            <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
-                                                          </Condition>
-                                                          <ConditionDecisionOption>
-                                                            <DecisionOptionText>6428</DecisionOptionText>
-                                                            <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
-                                                          </ConditionDecisionOption>
-                                                        </Values>
-                                                      </DecisionOption>
-                                                    </Item>
-                                                  </DecisionOptionList>
-                                                </ConditionDecision>
-                                              </Values>
-                                            </FollowUpDecision>
-                                          </Item>
-                                        </FollowUpDecisionList>
-                                      </ConditionDecisionOption>
-                                    </Values>
-                                  </DecisionOption>
-                                </Item>
-
-                                <!-- ## Category 2342 Ship ## -->
-                                <Item>
-                                  <DecisionOption>
-                                    <Template>ConditionDecisionOption</Template>
-                                    <Values>
-                                      <Condition />
-                                      <ConditionDecisionOption>
-                                        <DecisionOptionText>2342</DecisionOptionText>
-                                        <DecisionOptionInfotip>0</DecisionOptionInfotip>
-                                        <ActionList>
-                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                          <Values>
-                                            <ActionList>
-                                              <Actions>
-                                                <!-- Remove a buff that was never granted globally and is not even a buff. This is just to display an icon for this option -->
-                                                <Item>
-                                                  <Action>
-                                                    <Template>ActionBuff</Template>
-                                                    <Values>
-                                                      <Action />
-                                                      <ActionBuff>
-                                                        <BuffAsset>2342</BuffAsset>
-                                                        <AddBuff>0</AddBuff>
-                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                                      </ActionBuff>
-                                                    </Values>
-                                                  </Action>
-                                                </Item>
-                                              </Actions>
-                                            </ActionList>
-                                          </Values>
-                                        </ActionList>
-                                        <FollowUpDecisionList>
-                                          <Item>
-                                            <FollowUpDecision>
-                                              <Template>ConditionDecision</Template>
-                                              <Values>
-                                                <Condition />
-                                                <ConditionDecision>
-                                                  <DecisionFluffText>1500005267</DecisionFluffText>
-                                                  <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait>
-                                                  <DecisionOptionList>
-                                                    {HERE_GIFTSHIP_XML}
-                                                    {HERE_SMALLFLEET_XML}
-                                                    {HERE_BIGFLEET_XML}
-
-                                                    <Item>
-                                                      <DecisionOption>
-                                                        <Template>ConditionDecisionOption</Template>
-                                                        <Values>
-                                                          <Condition>
-                                                            <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
-                                                          </Condition>
-                                                          <ConditionDecisionOption>
-                                                            <DecisionOptionText>6428</DecisionOptionText>
-                                                            <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
-                                                          </ConditionDecisionOption>
-                                                        </Values>
-                                                      </DecisionOption>
-                                                    </Item>
-                                                  </DecisionOptionList>
-                                                </ConditionDecision>
-                                              </Values>
-                                            </FollowUpDecision>
-                                          </Item>
-                                        </FollowUpDecisionList>
-                                      </ConditionDecisionOption>
-                                    </Values>
-                                  </DecisionOption>
-                                </Item>
-                      
-                                <!-- ## Category 5449 Quests ## -->
-                                <Item>
-                                  <DecisionOption>
-                                    <Template>ConditionDecisionOption</Template>
-                                    <Values>
-                                      <Condition />
-                                      <ConditionDecisionOption>
-                                        <DecisionOptionText>5449</DecisionOptionText>
-                                        <DecisionOptionInfotip>0</DecisionOptionInfotip>
-                                        <ActionList>
-                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                          <Values>
-                                            <ActionList>
-                                              <Actions>
-                                                <Item>
-                                                  <Action>
-                                                    <Template>ActionBuff</Template>
-                                                    <Values>
-                                                      <Action />
-                                                      <ActionBuff>
-                                                        <BuffAsset>8764</BuffAsset>
-                                                        <AddBuff>0</AddBuff>
-                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                                      </ActionBuff>
-                                                    </Values>
-                                                  </Action>
-                                                </Item>
-                                              </Actions>
-                                            </ActionList>
-                                          </Values>
-                                        </ActionList>
-                                        <FollowUpDecisionList>
-                                          <Item>
-                                            <FollowUpDecision>
-                                              <Template>ConditionDecision</Template>
-                                              <Values>
-                                                <Condition />
-                                                <ConditionDecision>
-                                                  <DecisionFluffText>1500005267</DecisionFluffText>
-                                                  <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait>
-                                                  <DecisionOptionList>
-                                                    <!-- Add new options -->
-                                                    <Item>
-                                                      <DecisionOption>
-                                                        <Template>ConditionDecisionOption</Template>
-                                                        <Values>
-                                                          <Condition>
-                                                            <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
-                                                          </Condition>
-                                                          <ConditionDecisionOption>
-                                                            <DecisionOptionText>6428</DecisionOptionText>
-                                                            <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
-                                                          </ConditionDecisionOption>
-                                                        </Values>
-                                                      </DecisionOption>
-                                                    </Item>
-                                                  </DecisionOptionList>
-                                                </ConditionDecision>
-                                              </Values>
-                                            </FollowUpDecision>
-                                          </Item>
-                                        </FollowUpDecisionList>
-                                      </ConditionDecisionOption>
-                                    </Values>
-                                  </DecisionOption>
-                                </Item>
-                      
-                                <!-- ## Category 500943 Money/Ressources ## -->
-                                <Item>
-                                  <DecisionOption>
-                                    <Template>ConditionDecisionOption</Template>
-                                    <Values>
-                                      <Condition />
-                                      <ConditionDecisionOption>
-                                        <DecisionOptionText>500943</DecisionOptionText>
-                                        <DecisionOptionInfotip>0</DecisionOptionInfotip>
-                                        <ActionList>
-                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                          <Values>
-                                            <ActionList>
-                                              <Actions>
-                                                <Item>
-                                                  <Action>
-                                                    <Template>ActionBuff</Template>
-                                                    <Values>
-                                                      <Action />
-                                                      <ActionBuff>
-                                                        <BuffAsset>500358</BuffAsset>
-                                                        <AddBuff>0</AddBuff>
-                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                                      </ActionBuff>
-                                                    </Values>
-                                                  </Action>
-                                                </Item>
-                                              </Actions>
-                                            </ActionList>
-                                          </Values>
-                                        </ActionList>
-                                        <FollowUpDecisionList>
-                                          <Item>
-                                            <FollowUpDecision>
-                                              <Template>ConditionDecision</Template>
-                                              <Values>
-                                                <Condition />
-                                                <ConditionDecision>
-                                                  <DecisionFluffText>1500005267</DecisionFluffText>
-                                                  <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait>
-                                                  <DecisionOptionList>
-                                                    <!-- Add new options to this category -->
-                                                    <Item>
-                                                      <DecisionOption>
-                                                        <Template>ConditionDecisionOption</Template>
-                                                        <Values>
-                                                          <Condition>
-                                                            <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
-                                                          </Condition>
-                                                          <ConditionDecisionOption>
-                                                            <DecisionOptionText>6428</DecisionOptionText>
-                                                            <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
-                                                          </ConditionDecisionOption>
-                                                        </Values>
-                                                      </DecisionOption>
-                                                    </Item>
-                                                  </DecisionOptionList>
-                                                </ConditionDecision>
-                                              </Values>
-                                            </FollowUpDecision>
-                                          </Item>
-                                        </FollowUpDecisionList>
-                                      </ConditionDecisionOption>
-                                    </Values>
-                                  </DecisionOption>
-                                </Item>
-                                
-                                <!-- Other mods can add up to 3 more categories (total of 7 options is possible) -->
+                                <!-- Join War (AI/Human) -->
+                                {HERE_JOINWAR_XML}
+                                <!-- Support Fleet (AI) -->
+                                {HERE_SUPPORTFLEET_XML}
+                                <!-- Share Goods Access (Human) -->
+                                {HERE_SHAREGOODS_XML}
+                                <!-- Gift Ship (AI/Human) -->
+                                {HERE_GIFTSHIP_XML}   
+                                <!-- Command Ally (AI/Human) -->
+                                {HERE_COMMANDALLY_XML}
+                                <!-- if even more wanted, add them new category category below -->
                                 <!-- ## Category 13107 Empty (mods can fill it and replace text) ## -->
-                                <Item>
-                                  <DecisionOption>
-                                    <Template>ConditionDecisionOption</Template>
-                                    <Values>
-                                      <Condition />
-                                      <ConditionDecisionOption>
-                                        <DecisionOptionText>13107</DecisionOptionText>
-                                        <DecisionOptionInfotip>0</DecisionOptionInfotip>
-                                        <ActionList>
-                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                          <Values>
-                                            <ActionList>
-                                              <Actions>
-                                                <Item>
-                                                  <Action>
-                                                    <Template>ActionBuff</Template>
-                                                    <Values>
-                                                      <Action />
-                                                      <ActionBuff>
-                                                        <BuffAsset>501777</BuffAsset>
-                                                        <AddBuff>0</AddBuff>
-                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                                      </ActionBuff>
-                                                    </Values>
-                                                  </Action>
-                                                </Item>
-                                              </Actions>
-                                            </ActionList>
-                                          </Values>
-                                        </ActionList>
-                                        <FollowUpDecisionList>
-                                          <Item>
-                                            <FollowUpDecision>
-                                              <Template>ConditionDecision</Template>
-                                              <Values>
-                                                <Condition />
-                                                <ConditionDecision>
-                                                  <DecisionFluffText>1500005267</DecisionFluffText>
-                                                  <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait>
-                                                  <DecisionOptionList>
-                                                    <!-- Add new options to this category -->
-                                                    <Item>
-                                                      <DecisionOption>
-                                                        <Template>ConditionDecisionOption</Template>
-                                                        <Values>
-                                                          <Condition>
-                                                            <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
-                                                          </Condition>
-                                                          <ConditionDecisionOption>
-                                                            <DecisionOptionText>6428</DecisionOptionText>
-                                                            <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
-                                                          </ConditionDecisionOption>
-                                                        </Values>
-                                                      </DecisionOption>
-                                                    </Item>
-                                                  </DecisionOptionList>
-                                                </ConditionDecision>
-                                              </Values>
-                                            </FollowUpDecision>
-                                          </Item>
-                                        </FollowUpDecisionList>
-                                      </ConditionDecisionOption>
-                                    </Values>
-                                  </DecisionOption>
-                                </Item>
-                                
-                                
-                                <!-- ## Category 13107 Empty (mods can fill it and replace text) ## -->
-                                <Item>
-                                  <DecisionOption>
-                                    <Template>ConditionDecisionOption</Template>
-                                    <Values>
-                                      <Condition />
-                                      <ConditionDecisionOption>
-                                        <DecisionOptionText>13107</DecisionOptionText>
-                                        <DecisionOptionInfotip>0</DecisionOptionInfotip>
-                                        <ActionList>
-                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                          <Values>
-                                            <ActionList>
-                                              <Actions>
-                                                <Item>
-                                                  <Action>
-                                                    <Template>ActionBuff</Template>
-                                                    <Values>
-                                                      <Action />
-                                                      <ActionBuff>
-                                                        <BuffAsset>501777</BuffAsset>
-                                                        <AddBuff>0</AddBuff>
-                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                                      </ActionBuff>
-                                                    </Values>
-                                                  </Action>
-                                                </Item>
-                                              </Actions>
-                                            </ActionList>
-                                          </Values>
-                                        </ActionList>
-                                        <FollowUpDecisionList>
-                                          <Item>
-                                            <FollowUpDecision>
-                                              <Template>ConditionDecision</Template>
-                                              <Values>
-                                                <Condition />
-                                                <ConditionDecision>
-                                                  <DecisionFluffText>1500005267</DecisionFluffText>
-                                                  <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait>
-                                                  <DecisionOptionList>
-                                                    <!-- Add new options to this category -->
-                                                    <Item>
-                                                      <DecisionOption>
-                                                        <Template>ConditionDecisionOption</Template>
-                                                        <Values>
-                                                          <Condition>
-                                                            <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
-                                                          </Condition>
-                                                          <ConditionDecisionOption>
-                                                            <DecisionOptionText>6428</DecisionOptionText>
-                                                            <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
-                                                          </ConditionDecisionOption>
-                                                        </Values>
-                                                      </DecisionOption>
-                                                    </Item>
-                                                  </DecisionOptionList>
-                                                </ConditionDecision>
-                                              </Values>
-                                            </FollowUpDecision>
-                                          </Item>
-                                        </FollowUpDecisionList>
-                                      </ConditionDecisionOption>
-                                    </Values>
-                                  </DecisionOption>
-                                </Item>
-                                
-                                
-                                <!-- ## Category 13107 Empty (mods can fill it and replace text) ## -->
-                                <Item>
-                                  <DecisionOption>
-                                    <Template>ConditionDecisionOption</Template>
-                                    <Values>
-                                      <Condition />
-                                      <ConditionDecisionOption>
-                                        <DecisionOptionText>13107</DecisionOptionText>
-                                        <DecisionOptionInfotip>0</DecisionOptionInfotip>
-                                        <ActionList>
-                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                          <Values>
-                                            <ActionList>
-                                              <Actions>
-                                                <Item>
-                                                  <Action>
-                                                    <Template>ActionBuff</Template>
-                                                    <Values>
-                                                      <Action />
-                                                      <ActionBuff>
-                                                        <BuffAsset>501777</BuffAsset>
-                                                        <AddBuff>0</AddBuff>
-                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                                      </ActionBuff>
-                                                    </Values>
-                                                  </Action>
-                                                </Item>
-                                              </Actions>
-                                            </ActionList>
-                                          </Values>
-                                        </ActionList>
-                                        <FollowUpDecisionList>
-                                          <Item>
-                                            <FollowUpDecision>
-                                              <Template>ConditionDecision</Template>
-                                              <Values>
-                                                <Condition />
-                                                <ConditionDecision>
-                                                  <DecisionFluffText>1500005267</DecisionFluffText>
-                                                  <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait>
-                                                  <DecisionOptionList>
-                                                    <!-- Add new options to this category -->
-                                                    <Item>
-                                                      <DecisionOption>
-                                                        <Template>ConditionDecisionOption</Template>
-                                                        <Values>
-                                                          <Condition>
-                                                            <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
-                                                          </Condition>
-                                                          <ConditionDecisionOption>
-                                                            <DecisionOptionText>6428</DecisionOptionText>
-                                                            <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
-                                                          </ConditionDecisionOption>
-                                                        </Values>
-                                                      </DecisionOption>
-                                                    </Item>
-                                                  </DecisionOptionList>
-                                                </ConditionDecision>
-                                              </Values>
-                                            </FollowUpDecision>
-                                          </Item>
-                                        </FollowUpDecisionList>
-                                      </ConditionDecisionOption>
-                                    </Values>
-                                  </DecisionOption>
-                                </Item>
+                                <!-- <Item> -->
+                                  <!-- <DecisionOption> -->
+                                    <!-- <Template>ConditionDecisionOption</Template> -->
+                                    <!-- <Values> -->
+                                      <!-- <Condition /> -->
+                                      <!-- <ConditionDecisionOption> -->
+                                        <!-- <DecisionOptionText>13107</DecisionOptionText> -->
+                                        <!-- <DecisionOptionInfotip>0</DecisionOptionInfotip> -->
+                                        <!-- <ActionList> -->
+                                          <!-- <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset> -->
+                                          <!-- <Values> -->
+                                            <!-- <ActionList> -->
+                                              <!-- <Actions> -->
+                                                <!-- <Item> -->
+                                                  <!-- <Action> -->
+                                                    <!-- <Template>ActionBuff</Template> -->
+                                                    <!-- <Values> -->
+                                                      <!-- <Action /> -->
+                                                      <!-- <ActionBuff> -->
+                                                        <!-- <BuffAsset>501777</BuffAsset> -->
+                                                        <!-- <AddBuff>0</AddBuff> -->
+                                                        <!-- <BuffProcessingParticipant>1</BuffProcessingParticipant> -->
+                                                      <!-- </ActionBuff> -->
+                                                    <!-- </Values> -->
+                                                  <!-- </Action> -->
+                                                <!-- </Item> -->
+                                              <!-- </Actions> -->
+                                            <!-- </ActionList> -->
+                                          <!-- </Values> -->
+                                        <!-- </ActionList> -->
+                                        <!-- <FollowUpDecisionList> -->
+                                          <!-- <Item> -->
+                                            <!-- <FollowUpDecision> -->
+                                              <!-- <Template>ConditionDecision</Template> -->
+                                              <!-- <Values> -->
+                                                <!-- <Condition /> -->
+                                                <!-- <ConditionDecision> -->
+                                                  <!-- <DecisionFluffText>1500005267</DecisionFluffText> -->
+                                                  <!-- <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait> -->
+                                                  <!-- <DecisionOptionList> -->
+                                                    
+                                                    <!-- <Item> -->
+                                                      <!-- <DecisionOption> -->
+                                                        <!-- <Template>ConditionDecisionOption</Template> -->
+                                                        <!-- <Values> -->
+                                                          <!-- <Condition> -->
+                                                            <!-- <LinkAllActionsToQuest>1</LinkAllActionsToQuest> -->
+                                                          <!-- </Condition> -->
+                                                          <!-- <ConditionDecisionOption> -->
+                                                            <!-- <DecisionOptionText>6428</DecisionOptionText> -->
+                                                            <!-- <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice> -->
+                                                          <!-- </ConditionDecisionOption> -->
+                                                        <!-- </Values> -->
+                                                      <!-- </DecisionOption> -->
+                                                    <!-- </Item> -->
+                                                  <!-- </DecisionOptionList> -->
+                                                <!-- </ConditionDecision> -->
+                                              <!-- </Values> -->
+                                            <!-- </FollowUpDecision> -->
+                                          <!-- </Item> -->
+                                        <!-- </FollowUpDecisionList> -->
+                                      <!-- </ConditionDecisionOption> -->
+                                    <!-- </Values> -->
+                                  <!-- </DecisionOption> -->
+                                <!-- </Item> -->
                               </DecisionOptionList>
                             </ConditionDecision>
                           </Values>
@@ -778,10 +367,56 @@ GeneralDecision = """<ModOps>
     
   </ModOp>
   
+  {HERE_ModOpSabotage}
+  
 </ModOps>
 """
 
-GiftShipxml = """<Item>
+# HERE_SUPPORTFLEET_XML
+SupportFleet_xml = """<Item>
+                                  <DecisionOption>
+                                    <Template>ConditionDecisionOption</Template>
+                                    <Values>
+                                      <Condition />
+                                      <ConditionDecisionOption>
+                                        <DecisionOptionText>1500001288</DecisionOptionText>
+                                        <DecisionOptionInfotip>1500003870</DecisionOptionInfotip>
+                                        <ActionList>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionBuff</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionBuff>
+                                                        <BuffAsset>1500001288</BuffAsset>
+                                                        <AddBuff>0</AddBuff>
+                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                                                      </ActionBuff>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionList>
+                                        <FollowUpDecisionList>
+                                          <Item>
+                                            <FollowUpDecision>
+                                              <Template>ConditionDecision</Template>
+                                              <Values>
+                                                <Condition />
+                                                <ConditionDecision>
+                                                  <DecisionFluffText>1500005331</DecisionFluffText>
+                                                  <DecisionPortrait>{HEREPORTRAIT}</DecisionPortrait>
+                                                  <DecisionOptionList>
+                                                    {HERE_SMALLFLEET_XML}
+                                                    {HERE_BIGFLEET_XML}
+                                                    <!-- Add new supportfleet options to this -->
+                                                    <Item>
                                                       <DecisionOption>
                                                         <Template>ConditionDecisionOption</Template>
                                                         <Values>
@@ -789,144 +424,244 @@ GiftShipxml = """<Item>
                                                             <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
                                                           </Condition>
                                                           <ConditionDecisionOption>
-                                                            <DecisionOptionText>1500005300</DecisionOptionText>
-                                                            <DecisionOptionInfotip>1500005303</DecisionOptionInfotip>
-                                                            <ActionList>
-                                                              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                                              <Values>
-                                                                <ActionList>
-                                                                  <Actions>
-                                                                    <Item>
-                                                                      <Action>
-                                                                        <Template>ActionBuff</Template>
-                                                                        <Values>
-                                                                          <Action />
-                                                                          <ActionBuff>
-                                                                            <BuffAsset>1500005300</BuffAsset>
-                                                                            <AddBuff>0</AddBuff>
-                                                                            <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                                                          </ActionBuff>
-                                                                        </Values>
-                                                                      </Action>
-                                                                    </Item>
-                                                                  </Actions>
-                                                                </ActionList>
-                                                              </Values>
-                                                            </ActionList>
-                                                            <HasNotification>1</HasNotification>
-                                                            <DecisionNotification>
-                                                              <Template>CharacterNotification_GiftShip_Serp</Template>
-                                                              <Values>
-                                                                <CharacterNotification>
-                                                                  <ThirdpartyNotificationButtons>
-                                                                    <Item>
-                                                                      <VectorElement>
-                                                                        <InheritedIndex>0</InheritedIndex>
-                                                                      </VectorElement>
-                                                                      <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.t_ChangeOwnerOfSelectionToPID|{HEREGIVERPID}|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
-                                                                    </Item>
-                                                                    <Item>
-                                                                      <VectorElement>
-                                                                        <InheritedIndex>1</InheritedIndex>
-                                                                      </VectorElement>
-                                                                    </Item>
-                                                                  </ThirdpartyNotificationButtons>
-                                                                </CharacterNotification>
-                                                                <NotificationSubtitle>
-                                                                  <SubtitleGroup>{HERESUBTITLEGROUPPlyrGivesGift}</SubtitleGroup>
-                                                                </NotificationSubtitle>
-                                                              </Values>
-                                                            </DecisionNotification>
-                                                            <UnlockRequirements>
-                                                              <Item>
-                                                                <RequiredUnlock>1500005300</RequiredUnlock>
-                                                              </Item>
-                                                            </UnlockRequirements>
-                                                            <UnlockInfotipDescription>25415</UnlockInfotipDescription>
-                                                            <HasDecisionCostBehavior>0</HasDecisionCostBehavior>
+                                                            <DecisionOptionText>6428</DecisionOptionText>
                                                             <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
                                                           </ConditionDecisionOption>
                                                         </Values>
                                                       </DecisionOption>
-                                                    </Item>"""
+                                                    </Item>
+                                                  </DecisionOptionList>
+                                                </ConditionDecision>
+                                              </Values>
+                                            </FollowUpDecision>
+                                          </Item>
+                                        </FollowUpDecisionList>
+                                      </ConditionDecisionOption>
+                                    </Values>
+                                  </DecisionOption>
+                                </Item>"""
 
+# HERE_GIFTSHIP_XML
+GiftShipxml = """<Item>
+                                  <DecisionOption>
+                                    <Template>ConditionDecisionOption</Template>
+                                    <Values>
+                                      <Condition>
+                                        <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                                      </Condition>
+                                      <ConditionDecisionOption>
+                                        <DecisionOptionText>1500005300</DecisionOptionText>
+                                        <DecisionOptionInfotip>1500005303</DecisionOptionInfotip>
+                                        <ActionList>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionBuff</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionBuff>
+                                                        <BuffAsset>1500005300</BuffAsset>
+                                                        <AddBuff>0</AddBuff>
+                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                                                      </ActionBuff>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionList>
+                                        <HasNotification>1</HasNotification>
+                                        <DecisionNotification>
+                                          <Template>CharacterNotification_GiftShip_Serp</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <VectorElement>
+                                                    <InheritedIndex>0</InheritedIndex>
+                                                  </VectorElement>
+                                                  <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.t_ChangeOwnerOfSelectionToPID|{HEREGIVERPID}|false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                </Item>
+                                                <Item>
+                                                  <VectorElement>
+                                                    <InheritedIndex>1</InheritedIndex>
+                                                  </VectorElement>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                            </CharacterNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup>{HERESUBTITLEGROUPPlyrGivesGift}</SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </DecisionNotification>
+                                        <UnlockRequirements>
+                                          <Item>
+                                            <RequiredUnlock>1500005300</RequiredUnlock>
+                                          </Item>
+                                        </UnlockRequirements>
+                                        <UnlockInfotipDescription>25415</UnlockInfotipDescription>
+                                        <HasDecisionCostBehavior>0</HasDecisionCostBehavior>
+                                        <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                                      </ConditionDecisionOption>
+                                    </Values>
+                                  </DecisionOption>
+                                </Item>"""
+# HERE_JOINWAR_XML
 JoinWarxml = """<Item>
-                                                      <DecisionOption>
-                                                        <Template>ConditionDecisionOption</Template>
-                                                        <Values>
-                                                          <Condition>
-                                                            <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
-                                                          </Condition>
-                                                          <ConditionDecisionOption>
-                                                            <DecisionOptionText>1500005259</DecisionOptionText>
-                                                            <DecisionOptionInfotip>1500005260</DecisionOptionInfotip>
-                                                            <ActionList>
-                                                              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                                              <Values>
-                                                                <ActionList>
-                                                                  <Actions>
-                                                                    <Item>
-                                                                      <Action>
-                                                                        <Template>ActionBuff</Template>
-                                                                        <Values>
-                                                                          <Action />
-                                                                          <ActionBuff>
-                                                                            <BuffAsset>1500005259</BuffAsset>
-                                                                            <AddBuff>0</AddBuff>
-                                                                            <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                                                          </ActionBuff>
-                                                                        </Values>
-                                                                      </Action>
-                                                                    </Item>
-                                                                    <Item>
-                                                                      <Action>
-                                                                        <Template>ActionExecuteScript</Template>
-                                                                        <Values>
-                                                                          <Action />
-                                                                          <ActionExecuteScript>
-                                                                            <ScriptFileName>data/scripts_serp/events/onjoinwarrequest_{HEREHUMANPID}.lua</ScriptFileName>
-                                                                          </ActionExecuteScript>
-                                                                        </Values>
-                                                                      </Action>
-                                                                    </Item>
-                                                                  </Actions>
-                                                                </ActionList>
-                                                              </Values>
-                                                            </ActionList>
-                                                            <HasNotification>1</HasNotification>
-                                                            <DecisionNotification>
-                                                              <Template>CharacterNotification_DemandWarTo_Serp</Template>
-                                                              <Values>
-                                                                <CharacterNotification>
-                                                                  <ThirdpartyNotificationButtons>
-                                                                    <Item>
-                                                                      <VectorElement>
-                                                                        <InheritedIndex>0</InheritedIndex>
-                                                                      </VectorElement>
-                                                                      <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.RequestJoinWarAgainstSelected|nil|{HEREGIVERPID}|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
-                                                                    </Item>
-                                                                    <Item>
-                                                                      <VectorElement>
-                                                                        <InheritedIndex>1</InheritedIndex>
-                                                                      </VectorElement>
-                                                                    </Item>
-                                                                  </ThirdpartyNotificationButtons>
-                                                                </CharacterNotification>
-                                                                <NotificationSubtitle />
-                                                              </Values>
-                                                            </DecisionNotification>
-                                                            <UnlockRequirements>
-                                                              <Item>
-                                                                <RequiredUnlock>1500005259</RequiredUnlock>
-                                                              </Item>
-                                                            </UnlockRequirements>
-                                                            <UnlockInfotipDescription>1500005326</UnlockInfotipDescription>
-                                                            <HasDecisionCostBehavior>0</HasDecisionCostBehavior>
-                                                            <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
-                                                          </ConditionDecisionOption>
-                                                        </Values>
-                                                      </DecisionOption>
-                                                    </Item>"""
+                                  <DecisionOption>
+                                    <Template>ConditionDecisionOption</Template>
+                                    <Values>
+                                      <Condition>
+                                        <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                                      </Condition>
+                                      <ConditionDecisionOption>
+                                        <DecisionOptionText>1500005259</DecisionOptionText>
+                                        <DecisionOptionInfotip>1500005260</DecisionOptionInfotip>
+                                        <ActionList>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionBuff</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionBuff>
+                                                        <BuffAsset>1500005259</BuffAsset>
+                                                        <AddBuff>0</AddBuff>
+                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                                                      </ActionBuff>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionExecuteScript</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionExecuteScript>
+                                                        <ScriptFileName>data/scripts_serp/events/onjoinwarrequest_{HEREHUMANPID}.lua</ScriptFileName>
+                                                      </ActionExecuteScript>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionList>
+                                        <HasNotification>1</HasNotification>
+                                        <DecisionNotification>
+                                          <Template>CharacterNotification_DemandWarTo_Serp</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <VectorElement>
+                                                    <InheritedIndex>0</InheritedIndex>
+                                                  </VectorElement>
+                                                  <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.RequestJoinWarAgainstSelected|nil|{HEREGIVERPID}|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                </Item>
+                                                <Item>
+                                                  <VectorElement>
+                                                    <InheritedIndex>1</InheritedIndex>
+                                                  </VectorElement>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                            </CharacterNotification>
+                                            <NotificationSubtitle />
+                                          </Values>
+                                        </DecisionNotification>
+                                        <UnlockRequirements>
+                                          <Item>
+                                            <RequiredUnlock>1500005259</RequiredUnlock>
+                                          </Item>
+                                        </UnlockRequirements>
+                                        <UnlockInfotipDescription>1500005326</UnlockInfotipDescription>
+                                        <HasDecisionCostBehavior>0</HasDecisionCostBehavior>
+                                        <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                                      </ConditionDecisionOption>
+                                    </Values>
+                                  </DecisionOption>
+                                </Item>"""
+                                
+# HERE_COMMANDALLY_XML
+CommandAllyxml = """<Item>
+                                  <DecisionOption>
+                                    <Template>ConditionDecisionOption</Template>
+                                    <Values>
+                                      <Condition>
+                                        <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                                      </Condition>
+                                      <ConditionDecisionOption>
+                                        <DecisionOptionText>1500004014</DecisionOptionText>
+                                        <DecisionOptionInfotip>1500004015</DecisionOptionInfotip>
+                                        <ActionList>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionBuff</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionBuff>
+                                                        <BuffAsset>1500004014</BuffAsset>
+                                                        <AddBuff>0</AddBuff>
+                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                                                      </ActionBuff>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionList>
+                                        <HasNotification>1</HasNotification>
+                                        <DecisionNotification>
+                                          <Template>CharacterNotification_CreateSelectGroup_Serp</Template>
+                                          <Values>
+                                            <CharacterNotification>
+                                              <ThirdpartyNotificationButtons>
+                                                <Item>
+                                                  <VectorElement>
+                                                    <InheritedIndex>0</InheritedIndex>
+                                                  </VectorElement>
+                                                  <Command>[Unlock RelockNet(1500005600)][Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.CreateSelectGroup|1|{HEREGIVERPID})];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                </Item>
+                                                <Item>
+                                                  <VectorElement>
+                                                    <InheritedIndex>1</InheritedIndex>
+                                                  </VectorElement>
+                                                  <Command>[Unlock RelockNet(1500005600)][Participants Participant(121) Profile SetCompanyName(g_DiploActions_Serp.CreateSelectGroup|2|{HEREGIVERPID})];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+                                                </Item>
+                                              </ThirdpartyNotificationButtons>
+                                            </CharacterNotification>
+                                            <NotificationSubtitle>
+                                              <SubtitleGroup></SubtitleGroup>
+                                            </NotificationSubtitle>
+                                          </Values>
+                                        </DecisionNotification>
+                                        <UnlockRequirements>
+                                          <Item>
+                                            <RequiredUnlock>1500004014</RequiredUnlock>
+                                          </Item>
+                                        </UnlockRequirements>
+                                        <UnlockInfotipDescription>1500005307</UnlockInfotipDescription>
+                                        <HasDecisionCostBehavior>0</HasDecisionCostBehavior>
+                                        <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                                      </ConditionDecisionOption>
+                                    </Values>
+                                  </DecisionOption>
+                                </Item>"""
+                                
+                                
+# HERE_SMALLFLEET_XML
 SmallFleetxml = """<Item>
                                                       <DecisionOption>
                                                         <Template>ConditionDecisionOption</Template>
@@ -936,7 +671,7 @@ SmallFleetxml = """<Item>
                                                           </Condition>
                                                           <ConditionDecisionOption>
                                                             <DecisionOptionText>1500003901</DecisionOptionText>
-                                                            <DecisionOptionInfotip>0</DecisionOptionInfotip>
+                                                            <DecisionOptionInfotip>1500003911</DecisionOptionInfotip>
                                                             <ActionList>
                                                               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                                               <Values>
@@ -1005,7 +740,7 @@ BigFleetxml = """<Item>
                                                           </Condition>
                                                           <ConditionDecisionOption>
                                                             <DecisionOptionText>1500003902</DecisionOptionText>
-                                                            <DecisionOptionInfotip>0</DecisionOptionInfotip>
+                                                            <DecisionOptionInfotip>1500003916</DecisionOptionInfotip>
                                                             <ActionList>
                                                               <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                                               <Values>
@@ -1065,6 +800,168 @@ BigFleetxml = """<Item>
                                                         </Values>
                                                       </DecisionOption>
                                                     </Item>"""
+                                                    
+# HERE_SHAREGOODS_XML                        
+ShareGoodsxml = """<Item>
+                                  <DecisionOption>
+                                    <Template>ConditionDecisionOption</Template>
+                                    <Values>
+                                      <Condition>
+                                        <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+                                      </Condition>
+                                      <ConditionDecisionOption>
+                                        <DecisionOptionText>1500005356</DecisionOptionText>
+                                        <DecisionOptionInfotip>1500005357</DecisionOptionInfotip>
+                                        <ActionList>
+                                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                          <Values>
+                                            <ActionList>
+                                              <Actions>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionBuff</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionBuff>
+                                                        <BuffAsset>1500005356</BuffAsset>
+                                                        <AddBuff>0</AddBuff>
+                                                        <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                                                      </ActionBuff>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                                <Item>
+                                                  <Action>
+                                                    <Template>ActionRegisterTrigger</Template>
+                                                    <Values>
+                                                      <Action />
+                                                      <ActionRegisterTrigger>
+                                                        <TriggerAsset>1500005355</TriggerAsset>
+                                                      </ActionRegisterTrigger>
+                                                    </Values>
+                                                  </Action>
+                                                </Item>
+                                              </Actions>
+                                            </ActionList>
+                                          </Values>
+                                        </ActionList>
+                                        <HasDecisionCostBehavior>0</HasDecisionCostBehavior>
+                                        <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+                                      </ConditionDecisionOption>
+                                    </Values>
+                                  </DecisionOption>
+                                </Item>"""
+
+
+# HERE_ModOpSabotage  HERESUBTITLEGROUPNoSpiesAccept
+ModOpSabotage="""<!-- No Spies Agreement -->
+  <ModOp GUID="{HEREAssetGUID}" Type="add" Condition="#Sabotage_Serp" Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestDecision/DecisionList/Item/Decision/Values/ConditionDecision/DecisionOptionList">
+    <Item>
+      <DecisionOption>
+        <Template>ConditionDecisionOption</Template>
+        <Values>
+          <Condition>
+            <LinkAllActionsToQuest>1</LinkAllActionsToQuest>
+          </Condition>
+          <ConditionDecisionOption>
+            <DecisionOptionText>1500004020</DecisionOptionText>
+            <DecisionOptionInfotip>1500004022</DecisionOptionInfotip>
+            <ActionList>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionStartQuest</Template>
+                        <Values>
+                          <Action />
+                          <ActionStartQuest>
+                            <Quest>1500004035</Quest>
+                            <UseCurrentSession>1</UseCurrentSession>
+                          </ActionStartQuest>
+                        </Values>
+                      </Action>
+                    </Item>
+                    <!-- <Item> -->
+                      <!-- <Action> -->
+                        <!-- <Template>ActionAddResource</Template> -->
+                        <!-- <Values> -->
+                          <!-- <Action /> -->
+                          <!-- <ActionAddResource> -->
+                            <!-- <Resource>{HERE_NoSpiesProduct}</Resource> -->
+                            <!-- <ResourceAmount>60</ResourceAmount> -->
+                          <!-- </ActionAddResource> -->
+                        <!-- </Values> -->
+                      <!-- </Action> -->
+                    <!-- </Item> -->
+                    <Item>
+                      <Action>
+                        <Template>ActionBuff</Template>
+                        <Values>
+                          <Action />
+                          <ActionBuff>
+                            <BuffAsset>1500004020</BuffAsset>
+                            <AddBuff>0</AddBuff>
+                            <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                          </ActionBuff>
+                        </Values>
+                      </Action>
+                    </Item>
+                    <!-- <Item> -->
+                      <!-- <Action> -->
+                        <!-- <Template>ActionAddGoodsToItemContainer</Template> -->
+                        <!-- <Values> -->
+                          <!-- <Action /> -->
+                          <!-- <ActionAddGoodsToItemContainer> -->
+                            <!-- <Goods> -->
+                              <!-- <Item> -->
+                                <!-- <Good>1010017</Good> -->
+                                <!-- <Amount>-10000</Amount> -->
+                              <!-- </Item> -->
+                            <!-- </Goods> -->
+                          <!-- </ActionAddGoodsToItemContainer> -->
+                        <!-- </Values> -->
+                      <!-- </Action> -->
+                    <!-- </Item> -->
+                  </Actions>
+                </ActionList>
+              </Values>
+            </ActionList>
+            <!-- <HasNotification>1</HasNotification> -->
+            <!-- <DecisionNotification> -->
+              <!-- <Template>CharacterNotification</Template> -->
+              <!-- <Values> -->
+                <!-- <CharacterNotification> -->
+                  <!-- <NotificationTextFemale>1500004022</NotificationTextFemale> -->
+                <!-- </CharacterNotification> -->
+                <!-- <BaseNotification> -->
+                  <!-- <NotificationText>1500004022</NotificationText> -->
+                  <!-- <NotificationAudioAsset>239732</NotificationAudioAsset> -->
+                  <!-- <NotificationPriority>700</NotificationPriority> -->
+                  <!-- <NotificationMinDisplayTime>120000</NotificationMinDisplayTime> -->
+                  <!-- <DisplayTimeout>60000</DisplayTimeout> -->
+                  <!-- <IsUnique>1</IsUnique> -->
+                <!-- </BaseNotification> -->
+                <!-- <NotificationSubtitle> -->
+                  <!-- <SubtitleGroup>{HERESUBTITLEGROUPNoSpiesAccept}</SubtitleGroup> -->
+                <!-- </NotificationSubtitle> -->
+              <!-- </Values> -->
+            <!-- </DecisionNotification> -->
+            <UnlockRequirements>
+              <Item>
+                <RequiredUnlock>1500004020</RequiredUnlock>
+              </Item>
+            </UnlockRequirements>
+            <UnlockInfotipDescription>1500004023</UnlockInfotipDescription>
+            <!-- <HasDecisionCostBehavior>1</HasDecisionCostBehavior> -->
+            <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+          </ConditionDecisionOption>
+        </Values>
+      </DecisionOption>
+    </Item>
+  </ModOp>"""
+                                                    
 ########################################################################################################
 ########################################################################################################
 ########################################################################################################
@@ -1221,7 +1118,6 @@ Trigger_SubTriggerCondition = """                      <Item>
 
 
 
-
 PIDs = {
     "Human0":{"PID":0,"GUID":41},"Human1":{"PID":1,"GUID":600069},"Human2":{"PID":2,"GUID":600070},"Human3":{"PID":3,"GUID":42},
     "General_Enemy":{"PID":9,"GUID":44},"Neutral":{"PID":8,"GUID":34},"Third_party_01_Queen":{"PID":15,"GUID":75},
@@ -1236,6 +1132,7 @@ PIDs = {
 }
 SupportedPIDs_All = [0,1,2,3,25,26,27,28,29,30,31,32,33,34,64,17,18,16,19,22,23,24,80,72,15]
 SupportedPIDs_WarAndGiftShip = [0,1,2,3,25,26,27,28,29,30,31,32,33,34,64,17,18]
+SupportedPIDs_2ndParty = [25,26,27,28,29,30,31,32,33,34,64]
 SupportedPIDs_SmallFleet = [25,26,27,28,29,30,31,32,33,34,64,17,18,16,15,22]
 SupportedPIDs_BigFleet = [25,26,27,28,29,30,31,32,33,34,64,17,18,15]
 # HERESMALLFLEETQUEST
@@ -1265,6 +1162,13 @@ SelectionUnlocks = {
   25:1500005223,26:1500005224,27:1500005225,28:1500005226,29:1500005227,30:1500005228,31:1500005229,32:1500005230,33:1500005231,34:1500005232,64:1500005233,
   17:1500005234,18:1500005235,16:1500005236,19:1500005237,22:1500005238,23:1500005239,24:1500005240,80:1500005241,72:1500005242,15:1500005243,
 }
+SubtitleGAccepts = {
+  25:244727316,26:-2005155339,27:-1567964067,28:-1933351358,29:1062778986,30:-577843668,31:996335328,32:21475824,33:-584564999,34:1416899689,64:-1743732589,
+  17:-2135361874,18:2095539530,
+}
+NoSpiesProducts = {
+  25:1500004024,26:1500004025,27:1500004026,28:1500004027,29:1500004028,30:1500004029,31:1500004030,32:1500004031,33:1500004032,34:1500004033,64:1500004034,
+}
 
 # <!-- Portrait GUIDs der KIs (für DecisionPortrait), die GUID des Participants zu nehmen geht leider nicht, also keins für Humans nehmen -->
   # <!-- siehe auch Anno1800 RDA unpacked\dataAlle\data\ui\2kimages\main\profiles -->
@@ -1292,7 +1196,7 @@ for TargetPID in SupportedPIDs_All:
   for s,info in PIDs.items():
     if info["PID"] == TargetPID:
       PIDToGUID[TargetPID] = info["GUID"]
-print(PIDToGUID)
+# print(PIDToGUID)
 
 finalTrigger_MPWhichPlayer = ""
 for HumanPID in range(5): # HumanPIDs
@@ -1311,13 +1215,21 @@ for HumanPID in range(5): # HumanPIDs
         break       # .format() sucks, because it requires you to mention ALL {x} entries in the string -.-  so use replace() instead in most cases
       finalresultfilename = resultfilename.format(HumanPID=isSP and "SP" or HumanPID,TargetPID=TargetPID)
       finalGeneralDecision = GeneralDecision
+      
+      if TargetPID not in [0,1,2,3]: ## not human
+        finalGeneralDecision = finalGeneralDecision.replace("{HERE_SUPPORTFLEET_XML}",SupportFleet_xml)
       if TargetPID in SupportedPIDs_WarAndGiftShip:
         finalGeneralDecision = finalGeneralDecision.replace("{HERE_GIFTSHIP_XML}",GiftShipxml)
         finalGeneralDecision = finalGeneralDecision.replace("{HERE_JOINWAR_XML}",JoinWarxml)
+        finalGeneralDecision = finalGeneralDecision.replace("{HERE_COMMANDALLY_XML}",CommandAllyxml)
+      if TargetPID in SupportedPIDs_2ndParty:
+        finalGeneralDecision = finalGeneralDecision.replace("{HERE_ModOpSabotage}",ModOpSabotage)
       if TargetPID in SupportedPIDs_SmallFleet:
         finalGeneralDecision = finalGeneralDecision.replace("{HERE_SMALLFLEET_XML}",SmallFleetxml)
       if TargetPID in SupportedPIDs_BigFleet:
         finalGeneralDecision = finalGeneralDecision.replace("{HERE_BIGFLEET_XML}",BigFleetxml)
+      if TargetPID in [0,1,2,3]: # only other humans
+        finalGeneralDecision = finalGeneralDecision.replace("{HERE_SHAREGOODS_XML}",ShareGoodsxml)
       
       finalGeneralDecision = finalGeneralDecision.format(
         HEREAssetGUID=CurrentGUID,HEREGIVERPID=TargetPID,HEREHUMANPID=HumanPID,
@@ -1325,11 +1237,15 @@ for HumanPID in range(5): # HumanPIDs
         HERESELECTEDGUID=SelectionUnlocks[TargetPID],HEREPORTRAIT=Portraits[TargetPID],
         HEREQUESTGIVER=PIDToGUID[TargetPID],HERESUBTITLEGROUPPlyrGivesGift=SubtitleGPlyrGivesGift.get(TargetPID,0),
         HERESMALLFLEETQUEST=SmallFleetQuest.get(TargetPID,"ERROR"),HEREBIGFLEETQUEST=BigFleetQuest.get(TargetPID,"ERROR"),
-        HERE_GIFTSHIP_XML="",HERE_JOINWAR_XML="",HERE_SMALLFLEET_XML="",HERE_BIGFLEET_XML="", # if it was not replaced yet, use empty text
+        HERE_NoSpiesProduct=NoSpiesProducts.get(TargetPID,0),
+        HERE_SUPPORTFLEET_XML="",HERE_COMMANDALLY_XML="",HERESUBTITLEGROUPNoSpiesAccept=SubtitleGAccepts.get(TargetPID,0),
+        HERE_GIFTSHIP_XML="",HERE_JOINWAR_XML="",HERE_SMALLFLEET_XML="",HERE_BIGFLEET_XML="",HERE_SHAREGOODS_XML="",
+        HERE_ModOpSabotage="",        # if it was not replaced yet, use empty text
         HEREAutoShowDecisionScreen=isSP and "<AutoShowDecisionScreen>1</AutoShowDecisionScreen>" or "",
       )
       
       print(r'<Include File="/data/config/export/main/asset/Decisions/{finalresultfilename}" />'.format(finalresultfilename=finalresultfilename))
+      
       
       with open(f"{Path}/{finalresultfilename}", "w") as f:
         f.write(finalGeneralDecision)

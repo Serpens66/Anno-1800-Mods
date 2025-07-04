@@ -59,6 +59,7 @@
  -- doing a mods.reload() while a lua coroutine (thread) is running very often crashes the game.
  -- Assumption: It happens when new world was loaded (by AI), but never visited by the player yet?
  -- yes seems like this is true.. (at least chance very high and chance for crash very low when session visited)
+   -- ohne AI aber mit session loaded crashed es nicht (sooft)
   -- TODO test if this also happens without any lua scripts. and then which lua scripts are problematic
  -- auch ohne session crashed oft währedn schnellvorlauf
  -- und vermutlich medium grund .. wobei es mit ultra schon häufiger zu sein scheint...
@@ -68,7 +69,9 @@
 -- oder es liegt wirklich doch dran, wenn man reload macht während threads laufen...
   -- hm ne, wenn ich im testscript einfach n thread mit waitForTimeDelta oder waitForGameTimeDelta oder nur coroutine.yield im while loop laufen lasse
     -- und dann mod reloade, dann crasht es nicht...
-
+-- Crashed auch ohne KI (wenn ich newworld geladen aber nicht besucht hab) und auch ohne startkontor und immer mitselben seed
+-- liegt sehr sicher an MediumTools (oder kombination), wenn mediumtools raus, crasht es nicht
+ -- aber mit mediumtools (ohne ultra) auch nicht sooo oft ~20% der gamestarts oderso
 
 
 
@@ -109,17 +112,33 @@ if g_LuaScriptBlockers[ModID]==nil then
       -- blocktime still should be less than ~6 seconds (6000), because coroutines should not be used too long (not preserved over savegames)
     local function CallGlobalFnBlocked(fn_name,blocknameadd,blocktime,...)
       blocknameadd = blocknameadd and tostring(blocknameadd) or ""
-      local blockername = "Fn_Blocker_"..fn_name..blocknameadd
+      local blockername = "Fn_GlobalBlocker_"..fn_name..blocknameadd
       if Fn_Blocker[blockername] then
         return
       end
       Fn_Blocker[blockername] = true
       blocktime = blocktime or 1000
-      g_LTL_Serp.start_thread(blockername,tools_ModID,function()
+      g_LTL_Serp.start_thread(blockername,ModID,function()
         g_LTL_Serp.waitForTimeDelta(blocktime) -- unblock it again, so it can be executed the next time we load a game
         Fn_Blocker[blockername] = nil
       end)
       fn = g_LTL_Serp.myeval(fn_name)
+      return fn(...)
+    end
+    -- similar to CallGlobalFnBlocked, but you directly provide the function, not a string. so also works with local functions
+     -- since blockername in CallGlobalFnBlocked is merged with fn_name, which is not possible here, both Blocked-Functions do not block the same
+    local function CallFnBlocked(fn,blocknameadd,blocktime,...)
+      blocknameadd = blocknameadd and tostring(blocknameadd) or ""
+      local blockername = "Fn_Blocker_"..blocknameadd
+      if Fn_Blocker[blockername] then
+        return
+      end
+      Fn_Blocker[blockername] = true
+      blocktime = blocktime or 1000
+      g_LTL_Serp.start_thread(blockername,ModID,function()
+        g_LTL_Serp.waitForTimeDelta(blocktime) -- unblock it again, so it can be executed the next time we load a game
+        Fn_Blocker[blockername] = nil
+      end)
       return fn(...)
     end
     
@@ -333,6 +352,9 @@ if g_LuaScriptBlockers[ModID]==nil then
   end
 
   
+
+    -- #####################################################################################################
+
   -- Use this if you are not using UltraTools, but still want to make code executed for everyone
    -- (UltraTools has t_ExecuteFnWithArgsForPeers)
   -- Only call this if every peer who is calling this provides the exact same arguments (it will be written into a nameable, so overwriting each other if different information)
@@ -412,6 +434,7 @@ if g_LuaScriptBlockers[ModID]==nil then
     g_LTL_Serp.modlog("_DoExectionForEveryone done",ModID)
   end
   
+    -- #####################################################################################################
   
   -- function you can call within code that is executed for one Human player, but for all coop peers from it.
   -- if it returns "AllCoop", you can continue your code, but still have in mind that it gets executed multiple times (once per coop)
@@ -437,6 +460,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       ObjectFinder = g_ObjectFinderSerp,
       CoopCountRes = g_CoopCountResSerp,
       CallGlobalFnBlocked = CallGlobalFnBlocked,
+      CallFnBlocked = CallFnBlocked,
       AddToQueue = AddToQueue,
       IsThirdPartyTrader = IsThirdPartyTrader,
       ContinueCoopCalled = ContinueCoopCalled,

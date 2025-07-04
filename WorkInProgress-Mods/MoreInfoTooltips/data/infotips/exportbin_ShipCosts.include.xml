@@ -21,13 +21,15 @@
   <!-- remove the condition "needs no permit or you have a permit" to display the influence costs/construction time and so on -->
   <ModOp Type="remove" Path="//InfoTipData[Guid='500057']/InfoElement/InfoElement/VisibilityElement/VisibilityElement[VisibilityElement[Condition='[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]' and ExpectedValueBool='False'] and VisibilityElement[Condition='[BuildPermits BuildPermits([RefGuid])]' and CompareOperator/CompareOperator='5']]" />
 
-
+  <!-- TODO: besser ModOpContent nutzen um den "is not unlocked" code nach unten zu kopieren, bevor wir ihn löschen, -->
+   <!-- um änderungen anderer mods auch zu übernehmen (siehe community patch mod ein mod von taludas wo ich "siblbing" in path nutze) -->
+  
   <!-- move the warning that the ship is not unlocked to the bottom (above the warning that you dont have enough permits) -->
     <!-- because this is near the buildcosts and usually the first place to look at when hovering over a ship -->
     <!-- remove the one at first position -->
   <ModOp Type="remove" Path="//InfoTipData[Guid='500057']/InfoElement[VisibilityElement/VisibilityElement[Condition='[Unlock IsUnlocked([RefGuid])]' and ExpectedValueBool='False'] and InfoElement/Text/TextGUID='1092']" />
   <!-- then add it to the bottom again. the vanilla code did put the unlock requirement of great eastern to the very bottom, so we will add it directly aboe, so it always makes sense -->
-  <ModOp Type="AddPrevSibling" Path="//InfoTipData[Guid='500057']//InfoElement[InfoElement/Text/TextGUID='270045']">
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='500057']/InfoElement[InfoElement/InfoElement/Text/TextGUID='270045']">
     <InfoElement>
       <ElementType>8</ElementType>
       <ChildCount>4</ChildCount>

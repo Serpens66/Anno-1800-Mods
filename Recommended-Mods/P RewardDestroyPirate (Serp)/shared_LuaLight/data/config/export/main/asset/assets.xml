@@ -1,0 +1,263 @@
+<ModOps>
+  
+  <!-- Serp GUIDs 1500005600 -->
+  <!-- Uses CompanyName from Scenario3_Challenger3 for DoForSessionGameObject (they exist in every vanilla game in every session) -->
+  <!-- Uses CompanyName from Scenario3_Challenger4 for t_FnViaTextEmbed functionality -->
+  <!-- Scenario3_Challenger3  GUID: 100939 , PID: 120 -->
+  <!-- Scenario3_Challenger4  GUID: 101507 , PID: 121 -->
+  <!-- Scenario3_Challenger5  GUID: 101508 , PID: 122 -->
+
+
+
+  <!-- general infor for lua and multiplayer:  -->
+  <!-- Code with ActionExecuteScript is started for all humans, regardless who executed this Action. -->
+  <!-- If you only want to execute code for a specific human, you can use my WhichPlayerCondition mod (included as shared mod) -->
+   <!-- to check within the Trigger where you do ActionExecuteScript which human the executing player is and then start -->
+    <!-- a different script for each of them, eg called myscript_0.lua for Human0 and so on. -->
+   <!-- In that script you know its ment to be only executed for Human0, you can check "GetGetCurrentParticipantID" to make -->
+    <!-- sure only the correct participant is executing the code. -->
+  <!-- But your code still will be executed for all human peers in that Coop team, so if 2 people are in the team, lua commands -->
+   <!-- which are synced will still be executed 2 times. -->
+   <!-- To complete solve the coop problem, you will need my UltraTools shared mod. But even without it there are several workarounds -->
+    <!-- for specific situations. The MediumTools includes a few more workarounds. -->
+   <!-- But eg. instead of using "RegisterTriggerForCurrentParticipant", which will register the trigger 2 times with 2 coop players, -->
+    <!-- you can instead make your Trigger a FeatureUnlock (AutoSelfUnlock=0, AutoRegister=1), which has the main Condition UnlockNeeded of itself. -->
+    <!-- Then you can use ts.Unlock.SetUnlockNet(YOUR_FEATUREUNLOCK) instead, to make this Trigger start. It does not matter if the unlocking is executed  -->
+     <!-- multiple times in coop, because unlock is unlock. (if you want to exeucte it multiple times, reset your trigger after ~500 ms) -->
+   <!-- IMPORTANT: -->
+    <!-- But by using Condition UnlockNeeded we get another problem: -->
+     <!-- Registered Triggers are saved to the samegame and Assets which do not exist are always counted as unlocked. -->
+     <!-- That means if a user deactivates your mod, the Trigger Code will still be there, but the asset he checks for being unlocked -->
+      <!-- does not exist anymore, which defaults to "unlocked" and make your Trigger execute its actions. -->
+     <!-- Depending on the actions this might cause problems, since the mod is no longer active. -->
+    <!-- Therefore its best to reverse the unlock for Triggers/FeatureUnlocks like this: -->
+     <!-- Use DefaultLockedState=0 for it and use NegateCondition in your UnlockNeeded Condition, to check if it is "locked". -->
+      <!-- And in lua you use instead ts.Unlock.SetRelockNet(YOUR_FEATUREUNLOCK) -->
+    <!-- I think for Quests PreConditionList this problem does not exist, at least not if Quest and Pool is removed (maybe if pool stays) -->
+  
+  
+  <!-- ####################################################################################################### -->
+  
+  
+  <!-- Add Nameable to these SessionParticipants (they exist in every session in vanilla, although they are scenario participants good/bad work Ubi :D) -->
+
+  <!-- Scenario3_Editor  GUID: 100131 , PID: 117 -->
+  <!-- Scenario3_Challenger1  GUID: 100132 , PID: 118 -->
+  <!-- Scenario3_Challenger2  GUID: 100938 , PID: 119 -->
+  <!-- Scenario3_Challenger3  GUID: 100939 , PID: 120 -->
+  <!-- Scenario3_Challenger4  GUID: 101507 , PID: 121 -->
+  <!-- Scenario3_Challenger5  GUID: 101508 , PID: 122 -->
+  <!-- Scenario3_Challenger6  GUID: 101509 , PID: 123 -->
+  <!-- Scenario3_Challenger7  GUID: 101517 , PID: 124 -->
+  <!-- Scenario3_Challenger8  GUID: 101518 , PID: 125 -->
+  <!-- Scenario3_Challenger9  GUID: 101519 , PID: 126 -->
+  <!-- Scenario3_Challenger10  GUID: 101520 , PID: 127 -->
+  <!-- Scenario3_Challenger11  GUID: 101521 , PID: 128 -->
+  <!-- Scenario3_Challenger12  GUID: 101522 , PID: 129 -->
+  <!-- Scenario3_Eli  GUID: 103130 , PID: 136 -->
+  <!-- Scenario3_Ketema  GUID: 103129 , PID: 137 -->
+  <!-- Scenario3_Archie  GUID: 103131 , PID: 138 -->
+  <!-- Scenario_Item_Trader  GUID: 4387 , PID: 139 -->
+  <!-- Scenario3_Queen  GUID: 101523 , PID: 130 -->
+  <!-- (I think the only Participant with Queen Template where I do not use the Nameable yet (besides Void Trader and Queen) is Scenario02_Actuary) -->
+  <!-- Nameable will be used in lua to store and share information -->
+  <ModOp Type="merge" GUID='100131,100939,101507,101508,100132,100938,101509,101517,101518,101519,101520,101521,101522,103130,103129,103131,4387,101523' Path="/Values">
+    <Nameable>
+      <OverwriteNameWithTextAsset>11156</OverwriteNameWithTextAsset>
+    </Nameable>
+  </ModOp>
+  
+
+  <ModOp GUID="130248" Type="AddNextSibling">
+    <!-- use this eg this as CharacterNotification ThirdPartyButton Command: -->
+     <!-- <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_ObjectFinderSerp.IsLoadedSessionByID_2_false)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)];</Command> -->
+       <!-- to make the peer who clicks on the Button execute eg. lua function g_ObjectFinderSerp.IsLoadedSessionByID(2,false) -->
+    <!-- IMPORTANT -->
+    <!-- BEFORE executing the command , check as condition that 1500005600 is unlocked! -->
+     <!-- And as action the first you do is ActionLockAsset 1500005600 (which is unlocked again in my lua code after its finished) -->
+        <!-- <Item> -->
+          <!-- <TriggerAction> -->
+            <!-- <Template>ActionLockAsset</Template> -->
+            <!-- <Values> -->
+              <!-- <Action /> -->
+              <!-- <ActionLockAsset> -->
+                <!-- <LockAssets> -->
+                  <!-- <Item> -->
+                    <!-- <Asset>1500005600</Asset> -->
+                  <!-- </Item> -->
+                <!-- </LockAssets> -->
+              <!-- </ActionLockAsset> -->
+            <!-- </Values> -->
+          <!-- </TriggerAction> -->
+        <!-- </Item> -->
+    <!-- This way we can make sure its not used multiple times at the same time :) -->
+     <!-- For CharacterNotification where the player needs to click a button, you check the unlock as "ActiveCallback": -->
+      <!-- <ActiveCallback>[Unlock IsUnlocked(1500005600)]</ActiveCallback> -->
+       <!-- and add to Commands textembed  [Unlock RelockNet(1500005600)]; This will take 2-4 ticks to lock it, so its not perfect.. but better than nothing -->
+    <!-- ATTENTION: -->
+      <!-- you also might want to check if 1500005606 (shared_ObjectDummies) is unlocked, because CharacterNotification do NOT WORK within the first ~3 seconds of a new game. -->
+      <!-- When waiting for 1500005606 to be unlocked, you can be sure that it will work. -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005600</GUID>
+          <Name>t_FnViaTextEmbed lua function</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001613</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/h/fnviatext_0.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001614</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/h/fnviatext_1.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001615</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/h/fnviatext_2.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500001616</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/h/fnviatext_3.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+    
+  
+
+</ModOps>

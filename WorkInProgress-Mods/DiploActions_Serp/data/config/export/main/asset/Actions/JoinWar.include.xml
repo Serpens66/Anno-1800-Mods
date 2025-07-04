@@ -7,8 +7,8 @@
   
 
   
-  <!-- TODO: -->
-   <!-- Cooldowns zufügen, zb. alle 15 Minuten, auch in lua -->
+  <!-- I think we dont need cooldown for this action since it costs Reputation -->
+   <!-- and forcing an allied human into war is also always fine -->
   
 
   <!-- important that these ObjectDummyWithOwner_BuildInShipyard are instantly finished -->
@@ -29,7 +29,7 @@
         <ItemEffect>
           <EffectTargets>
             <Item>
-              <GUID>1500005221</GUID>
+              <GUID>930078</GUID>
             </Item>
           </EffectTargets>
         </ItemEffect>
@@ -82,7 +82,7 @@
         <ItemEffect>
           <EffectTargets>
             <Item>
-              <GUID>1500005221</GUID>
+              <GUID>930078</GUID>
             </Item>
           </EffectTargets>
         </ItemEffect>
@@ -95,7 +95,7 @@
   <!-- Trigger -->
   <!-- Hide the mod-specific settings again, if the "back"-button (1500005222) was hit -->
    <!-- and lock the "Join War option" (will only be unlocked if allied Target was chosen) -->
-  <ModOp Type="add" GUID="1500005250" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger[TriggerCondition/Values/ConditionEvent/ContextAsset='1500005222']/TriggerActions">
+  <ModOp Type="add" GUID="1500005250" Path="/Values/Trigger/TriggerActions">
     <Item>
       <TriggerAction>
         <Template>ActionBuff</Template>
@@ -209,6 +209,51 @@
               </Trigger>
             </Values>
           </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- just for showing unlock text, is never executed, because unlock is done via lua -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001298</GUID>
+          <Name>Unlock Text (trigger with lowest GUID will be used for unlock condition display)</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <PlayerCounter>ObjectBuilt</PlayerCounter>
+                <Context>1500005326</Context>
+                <CounterAmount>1</CounterAmount>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <Asset>1500005259</Asset>
+                      </Item>
+                    </UnlockAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
         </Trigger>
         <TriggerSetup>
           <AutoRegisterTrigger>1</AutoRegisterTrigger>

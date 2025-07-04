@@ -4,21 +4,27 @@
   <!-- verbraucht bis einschl. 1500005299 -->
    <!-- nutze 1500005300 bis einschl. 1500005320 für GiftShips, danach kann für allgemeines weiter verwendet werden -->
   
-  <!-- frei: ab 1500005350 bis 1500005369 -->
    <!-- 1500005400 bis einschl. 1500005499 wird für decision verwendet,  -->
 
-  <!-- noch frei: 1500004013 bis 1500004199 -->
+  <!-- noch frei: 1500004041 bis 1500004199 -->
+  <!-- noch frei: 1500005363 bis 1500005369 -->
   
-  <!-- GUIDs wieder frei: 1500005296,1500005297,1500005298,1500005299,1500005321   -->
+  <!-- GUIDs wieder frei: 1500005297,1500005296,1500005299,1500005298,1500005321   -->
+
+  <!-- Evtl. AI Shipyard auf github ein wenig verbessern. -->
+   <!-- zb FakeQuest ist absolut nicht nötig und spamt nur die Quests voll -->
 
 
-    <!-- TODO: -->
-  <!-- Und dabei auch Shipyard-Like in eigene Dateien auslagern, sodass ich diese theoretisch, falls nicht mehr gebraucht, -->
-   <!-- einfach löschen kann. Zumindest für neue Aktionen spar ich mir die Arbeit die buttons zuzufügen. -->
-    <!-- sollte aber prinzipiell weiterhin supportet sein da buttons zuzufügen -->
-  
-  
 
+  <!-- TODO:  -->
+    <!-- verbündete KIs/Piraten können einem ne Quest geben, dass man ihnen eine Hilfsflotte schicken soll -->
+    <!-- (also man selbst bekommt die Quest und soll der KI Schiffe schenken. Wird für Piraten in PirateDemandMoney mod gemacht) -->
+    <!-- <GUID>10153</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] bittet Sie, eine Hilfsflotte zu schicken.</Text> -->
+    <!-- <GUID>10149</GUID> <Text>[AssetData([NotificationContext CharacterGUID]) Text] bittet Sie, eine Hilfsflotte zu schicken.</Text> -->
+    <!-- und wenns faile dann bündnis auflösen -->
+    <!-- schwierig wirds nur das als wincondition zu tracken (schiffe schenken)... -->
+      <!-- vermutlich also fakeziel und zb über lua zählen oderso -->
+  
   
   <!-- Das System funktioniert so, dass wir ein Shipyrad-like Building haben,  -->
    <!-- bei dem wir untersch. Optionen anzeigen. -->
@@ -29,84 +35,79 @@
   
   
   <!-- TODO Diplo Mod Packet: -->
-   <!-- PirateDemandMoney, Sabotage, RequestFleet (evtl. auch Pirate Reward Destroy mit rein) -->
+   <!-- PirateDemandMoney, Sabotage, RequestFleet (evtl. auch Pirate Reward Destroy mit rein und evtl Quest instead Preferred) -->
     <!-- und evlt noch Honor Mods und Honor auch als Kosten zufügen. -->
+     <!-- und evlt sogar shorter CeaseFire/NonAttack, free ask ceasefire usw. (bzw. für ceasefire/frieden anfragen neues System, dass sie nur fragen, wenn du ihnen wirklich geschadet hast) -->
       <!-- TODO: Bei Honor (und Research) beim Zufügen zu allen Quests drauf achten, dass es nicht zu TrackerVisibility=Never zugefügt wird! (damit nicht zu fakequests) -->
         <!-- und am besten auch nicht, wenn Reward leer ist -->
     
-  <!-- TODO: -->
-   <!-- dann auch Spion-Waffenstillstand vereinbaren können. -->
-    <!-- wobei wir da einfach hohe Kosten und 100% Erfolgchance machen können, für user die das nervt. -->
-     <!-- wird aber gebrochen, wenn man selbst einen spion auf ihre insel setzt oder spätestens wenn entdeckt -->
     
-  <!-- TODO test: -->
-   <!-- kompatibilität zu AI shipyard testen, ob neu gespawnde gegner angezeigt werden. -->
-    <!-- Ja funzt einwandfrei -->
-   <!-- TODO: wenn Mod "Spice_AIShipyard" geladen, dann die Botschaft aus dem Mod nutzen und anpassen. -->
-    <!-- und viel früher/günstiger baubar machen. -->
-     <!-- Dazu evlt selbe GUID nutzen, damit automatisch alles sonst klappt: 930078 (drei GUIDs davor sind Bauphasen, diese -->
-     <!--  natürlich auch günstiger/früher verfügbar machen) -->
-    <!-- ai shipyard lua wird zwar mehrfach ausgeführt, schadet aber nicht, gibt keine probleme im mp -->
-    
-    
-    <!-- TODO -->
-    <!-- und evlt. auch lua objectfinder event on sessionparticipantcreated zufügen? -->
+  <!-- theoretisch könnte man auch alle optionen aus dem Diplo Menü für 2nd/pirate zufügen -->
+    <!-- und diese dann über ActionExecuteDiplomaticAction ausführen lassen. -->
+  <!-- kann sinnvoll sein für games mit mehr als 4 aktiven Spielern, wenn man modifizierte AI Shipyard verwendet. -->
+   <!-- (und ne karte mit mehr als 4 starter inseln) -->
     
     
     
-  <!-- TODO: -->
-   <!-- evlt ein Spy-Gebäude bei Allianz auf allierter Insel baubar machen -->
-    <!-- Was halt GUIType Warehouse hat, also das wo man alles einsehen kann und auch Kauf/Verkauf Anfragen ändern kann. -->
-    <!-- Dann könnte man zumindest Waren vorbeibringen ohne dass Empfänger es in Einkauf stellen muss, -->
-     <!-- indem der vorbeibringer es kurz einstellt -->
-    <!-- Und man kann mehr zusammen spielen, ohne Coop haben zu müssen. -->
-   <!-- Falls irgendwie möglich testen, ob man auch Waren abladen ohne zu traden kann, aber ich glaub das ging nicht, oder? -->
+  <!--  Request new Quest, which will reset all Pool Cooldowns from all Random-Quest QuestPools of this AI -->
+     <!-- Quest anfordern könnte man auch machen,  -->
+    <!-- indem man per lua ts.Quests.CheatEndPoolCooldownNet macht... -->
+     <!-- aber weiß nicht ob das so gut ist, wenn man dadurch häufiger Quests bekommen kann.. -->
+    <!-- falls es klappt, dann am besten Kosten haben, die man durch Quests erledigen wieder einbekommt (zb honor) -->
+     <!-- sodass man immer eine quest anfordern kann und erst wenn diese erledigtist, die nächste anfordern kann, -->
+      <!-- bzw. wenn man sie abbricht und nicht erledigt halt einen verlust hat -->
+  <!-- nicht so einfach... -->
+   <!-- pools enthalten quests von mehreren, also zb. oberpool mit nur alle 5 minuten ne neue quest -->
+    <!-- und selbst wenn wir jetzt von spezifischen PID was machen, gibts ja auch noch den QuestCooldown. -->
+     <!-- dass eine bestimmte quest nur in zeit x kommen kann... -->
+
     
     
-    
-  <!-- Schicke selected AI ship zu Marker. Dazu marker object schießbar machen mit Item das weltweit über die Karte schießt, rote rauchschwaden markierung. -->
-   <!-- Am besten einen Marker pro KI (wenns geht sogar in deren default Farbe und anklickbar mit Name der KI) -->
-  <!-- Mit Trigger der letzten Marker entfernt, wenn neuer Marker platziert wird. -->
-  <!-- Am besten move befehl alle ~10 sekunden wiederholen, damit KI den nicht überschreibt. -->
-  <!-- Und eventuell nur bei schiffen erlauben, die gerade sonst nichts zu tun haben, oder zumindest nicht escort machen? -->
-  <!-- Problem: Move To Object geht nur mit xml, denn lua hat nur ts.Selection.Object.Walking.SetDebugGoto(x,y), während es kein GetPosition gibt -.- -->
-   <!-- aber xml hat kein "bewege nur selected object" ... daher bestes mit xml wäre bewege alle steam/sailing Kriegschiffe in der session von der KI (alle militärschiffe: 119965 (all saild ships: 191455), weiß nicht ob wir das mit modopcontent kombinieren können) -->
-    <!-- um Marker zu platzieren brauchen wir ein Schuss Item mit SpawnImpactObject und großer Reichweite. -->
-     <!-- wäre am leichtesten, wenn wir der Botschaft SecondGUI geben, welches dann eben mit einer Diplo-Option umgeschaltet werden kann. -->
-      <!-- und botschaft hat dann InitItem so ein schuss item pro KI (oder via lua credited beim guiwechsel um nur die aktiven KIs zu haben) -->
-   <!-- ALTERNATIV: -->
-    <!-- fremde schiffe direkt steuern: Geht zb durch mein Spy-Patrol Item. Wenn ich darüber Patrol ActionID starte, -->
-     <!-- und dann zb über die strg-group ein fremdes schiff anwähle, dann kann ich dem fremden schiff patrol befehl geben. -->
-     <!-- dasselbe geht auch mit WALK ActionID usw. -->
-     <!-- Problem: Wie schränke ich das ein auf allierte/bestimmte spieler. Offensichtlich funktionieren die "Target" Objekte ja nicht richtig, -->
-      <!-- denn eigentlich sollten diese sicherstellen, dass sie nur bei OwnedByPlayer Objekten gehen. Dh. es darüber zb auf allied zu beschränken ist genauso nutzlos. -->
+   <!-- weitere Diplo Action (nur AI):  Geld leihen (mit Zinsen)  ?-->
+    <!-- Geld direkt gutschreiben. und für Zinsen dann ein unsichtbares schiff mit maintenance spawnen, was nach zeit X das älteste gelöscht wird -->
+      <!-- IncomeCategory LostShares -->
   
   
-  <!-- TODO: put in load last Copy-mod to also catch mod ships -->
-  <!-- see here for a bit faster but more complicated code: https://discord.com/channels/578443209940926465/976856421536768050/1386630960262545468 -->
-  <ModOp Type="addNextSibling" GUID="119965" Content="@119965/PlayerCounterContextPool">
-    <Asset>
-      <Template>PlayerCounterContextPool</Template>
-      <Values>
-        <Standard>
-          <GUID>1500005620</GUID>
-          <Name>Sailing Military Ships 119965 ∩ 191455</Name>
-        </Standard>
-        <ModOpContent />
-      </Values>
-    </Asset>
-  </ModOp>
-  <!-- mark to keep and remove the rest -->
-   <!-- using the full xml path (starting at AssetList) for better performance -->
-  <ModOp Type="add" Path="@1500005620/PlayerCounterContextPool/Contexts/Item[Asset=/AssetList/Groups/Group/Groups/Group/Groups/Group/Assets/Asset/Values[Standard/GUID='191455']/ItemEffectTargetPool/EffectTargetGUIDs/Item/GUID]">
-    <Marked />
-  </ModOp>
-  <ModOp Type="remove" GUID="1500005620" Path="/Values/PlayerCounterContextPool/Contexts/Item[not(Marked)]" />
-  <!-- clean up (removing Marked keyword) -->
-  <ModOp Type="remove" Path="@1500005620/PlayerCounterContextPool/Contexts/Item/Marked" />
+
+  <!-- Mit lua Object.Shipyard.CurrentConstructionGUID könnte man theoretisch an das kommen was gerade gebaut wird, -->
+   <!-- und so ein event auslösen, ohne dass es fertig gebaut werden muss (nervige "schiff fertiggestellt" notifiction) -->
+  <!-- Allerdings brauchen wir ja dennoch ein event was dafür sorgt, dass wir im shipyard nachgucken... -->
+   <!-- und davon gibts nicht wirklich was... höchstens OnSelection unseres "shipyards" und dann -->
+    <!-- jeden Tick bis was andres selected wird prüfen? (while selectionguid==) -->
+  <!-- ABER: wir können Auftrag nicht abbrechen, also wirds so oder so iwann zu der notification kommen.. lohnt also nicht  -->
+
+  
+  <!-- Evlt nochmal umstrukturieren!? ne -->
+   <!-- Keine Buffs für die Anzeige verwenden, sondern einfach nur Lock/Unlock/unhide -->
+    <!-- Wobei Lock dann eben dafür sorgt, dass es nicht angezeigt wird. -->
+     <!-- und als Marker welche KI gewählt wurde, könnte man noch ein FeatureUnlock jeweils machen (kann man die Buff GUIDs direkt für wiederverwenden), welches -->
+      <!-- prüft wann Asset gebaut wurde, bzw. wann Back button gedrückt wurde. -->
+    <!-- Dadurch wäre der code deutlich weniger kompliziert und kürzer. Vorteil wäre auch, dass reihenfolge basierend auf AssemblyOptions fix ist und wir nicht mit delays arbeiten müssen -->
+     <!-- die Buffs hatte ich nur aus dem DifficultyMod übernommen, da sind sie notwendig, weil ich mit locked+unhide zeigen will, was gerade aktiv ist, -->
+       <!-- während das hier nicht notwendig ist. -->
+  <!-- WOBEI: wir wollen ja auch zb. JoinWar locken, um zu zeigen, dass es da ist, aber nicht gewählt werden kann, soalnge man nicht in allianz ist -->
+   <!-- Also erstmal nachdenken, ob das so auch noch ohne das Buff-System funktionieren würde!! -->
+    <!-- bleiben erstmal bei buffs. und wenns fertig ist, kann mans immernoch ändern, ist denke ich kein so großer untersch. vom code her -->
   
   
+
+
+  <!-- TODO -->
+  <!-- wenn viel zeit evlt sogar noch mehr Diplomatie zufügen, im Sinne von: -->
+   <!-- KI fragt nicht mehr random nach Waffenstillstand/frieden, sondern nur zb nach verlieren einer Insel, oder  -->
+    <!-- wenn militaryshipscore zu niedrig gegenüber dem spieler ist (dennoch mit cooldown oderso) -->
+    <!-- und sie bietet für waffenstillstand/Frieden dann Belohnung an, am besten in Form von Quest -->
+     <!-- (wenns angenommen wird dann Frieden+Nichtangriffspakt oderso) -->
+     
+    
   
+  <!-- trivia: -->
+   <!-- - First I tried to add more diplo options to the Diplo Menu itself (by anabling unsued buttons), but they cause desync in multiplayer. -->
+   <!-- - then I tried to achieve it with help of a Decision Quest, but also they suck in muliplayer and are a beast to maintain, the more options/paths you have. -->
+  <!-- So now it will be down via a shipyard-like building (without building sth, but its the same UI), where you can choose the AI and action. -->
+  
+  
+
   
   
     
@@ -144,237 +145,10 @@
     </Profile>
   </ModOp>
   
-  <!-- TODO: -->
-   <!-- weitere Diplo Action (nur AI):  Geld leihen (mit Zinsen) -->
-    <!-- Geld direkt gutschreiben. und für Zinsen dann ein unsichtbares schiff mit maintenance spawnen, was nach zeit X das älteste gelöscht wird -->
-      <!-- IncomeCategory LostShares -->
-  
-  <!-- Und Verkaufen von Schiff zu selbst festgelegtem Preis?  -->
-    <!-- Ist an sich ähnlich wie verschenken, aber im MP vllt interessant? -->
-   <!-- Wie bei Giften ein schiff auswählen. -->
-    <!-- Jeder ders anklickt muss dann die Kaufoptionsnachricht bekommen (Preis kann spieler im name festlegen) -->
-     <!-- Um die Kaufnachricht zu machen ... geht vermutlich am besten nur OnSelection, oder? -->
-      <!-- Dadrin dann auch festlegen OnlySelectableForOwnerAndAllianceMembers ?  -->
-      <!-- Oder TradeRights dann beim aufruf von lua testen. -->
-     <!-- Falls wir nur OnSelection haben, müssen wir dafür Fake Schiffe erstellen, die das haben... -->
-      <!-- (habs sonst schon mit Quest gemacht, aber das klappt hier nicht) -->
-   <!-- nicht zuviel aufwand reinstekcen, weil mit Schiff verschenken haben wir das feature ja quasi schon -->
-    <!-- (und KI kauft schiffe eh nicht) -->
-  
-  
-  <!-- TODO TEST: -->
-  <!-- es kann im MP passieren, dass Whichplayer  -->
-<!-- ts.Unlock.GetIsUnlocked(1500001613) -->
-<!-- nicht wahr für human0 ist ?!! -->
-<!-- nochmal testen ob ich das reproduzieren kann.. -->
- <!-- wenn ja evlt SessionEnter als condiiton nehmen? -->
-  <!-- vllt wenn man bei spielstart zu lange/kurz im ladebildschirm wartet? -->
- <!-- NE, das passiert teilweise wenn man das erste Autosave läd!! -->
-  <!-- Da funktioniert dann auch PlayerInGame Check für KIs nicht! -->
- <!-- WICHTIG! -->
-  <!-- das noch iwie gefixt bekommen... -->
-   <!-- Whichplayer scheint zu gehen, aber PlayerInGame nicht... -->
-    <!-- liegt daran, dass der PlayerCounter der prüft ob man irgendein Kontor/Schiff -->
-     <!-- besitzt in diesem Save nicht funktioniert. -->
-    <!-- Erst wenn man einen weiteren Kontor baut, wird dieser gezählt. -->
-   <!-- mal versuchen mit CounterValueType=Max.. -->
-  
-
-
-  <!-- Mit lua Object.Shipyard.CurrentConstructionGUID könnte man theoretisch an das kommen was gerade gebaut wird, -->
-   <!-- und so ein event auslösen, ohne dass es fertig gebaut werden muss (nervige "schiff fertiggestellt" notifiction) -->
-  <!-- Allerdings brauchen wir ja dennoch ein event was dafür sorgt, dass wir im shipyard nachgucken... -->
-   <!-- und davon gibts nicht wirklich was... höchstens OnSelection unseres "shipyards" und dann -->
-    <!-- jeden Tick bis was andres selected wird prüfen? (while selectionguid==) -->
-  <!-- ABER: wir können Auftrag nicht abbrechen, also wirds so oder so iwann zu der notification kommen.. lohnt also nicht  -->
-
-    
-  <!-- Anstatt Humans direkt in Krieg zu zwingen, -->
-   <!-- für sie eine characternotifications anzeigen lassen und dabei text NpcInvokesAlliance nutzen. -->
-    <!-- Ist für das (vermutlich deaktivierte) allianz system, dass man bei Krieg gefragt wird, ob man nun in allianz -->
-     <!-- hilft und dem ziel den krieg erklärt, oder ob man die Allianz bricht. -->
-    <!-- Dies als Buttons ermöglichen. -->
-    <!-- <Text> -->
-      <!-- <GUID>256075</GUID> -->
-      <!-- <Text>Es würde mich nicht wundern, wenn auch du das Haus Harlow verraten würdest.</Text> -->
-    <!-- </Text> -->
-    <!-- <Text> -->
-      <!-- <GUID>261514</GUID> -->
-      <!-- <Text>Ich kämpf auch alleine, aber eigentlich haben wir zwei ja n Abkommen.</Text> -->
-    <!-- </Text> -->
-    <!-- <Text> -->
-      <!-- <GUID>261513</GUID> -->
-      <!-- <Text>Du musst entscheiden, wo du stehst. Bei deinen falschen Freunden oder bei mir.</Text> -->
-  
-  
-  <!-- Evlt nochmal umstrukturieren!? ne -->
-   <!-- Keine Buffs für die Anzeige verwenden, sondern einfach nur Lock/Unlock/unhide -->
-    <!-- Wobei Lock dann eben dafür sorgt, dass es nicht angezeigt wird. -->
-     <!-- und als Marker welche KI gewählt wurde, könnte man noch ein FeatureUnlock jeweils machen (kann man die Buff GUIDs direkt für wiederverwenden), welches -->
-      <!-- prüft wann Asset gebaut wurde, bzw. wann Back button gedrückt wurde. -->
-    <!-- Dadurch wäre der code deutlich weniger kompliziert und kürzer. Vorteil wäre auch, dass reihenfolge basierend auf AssemblyOptions fix ist und wir nicht mit delays arbeiten müssen -->
-     <!-- die Buffs hatte ich nur aus dem DifficultyMod übernommen, da sind sie notwendig, weil ich mit locked+unhide zeigen will, was gerade aktiv ist, -->
-       <!-- während das hier nicht notwendig ist. -->
-  <!-- WOBEI: wir wollen ja auch zb. JoinWar locken, um zu zeigen, dass es da ist, aber nicht gewählt werden kann, soalnge man nicht in allianz ist -->
-   <!-- Also erstmal nachdenken, ob das so auch noch ohne das Buff-System funktionieren würde!! -->
-    <!-- bleiben erstmal bei buffs. und wenns fertig ist, kann mans immernoch ändern, ist denke ich kein so großer untersch. vom code her -->
-  
-  
-
-
-
-  <!-- TODO -->
-  <!-- wenn viel zeit evlt sogar noch mehr Diplomatie zufügen, im Sinne von: -->
-   <!-- KI fragt nicht mehr random nach Waffenstillstand/frieden, sondern nur zb nach verlieren einer Insel, oder  -->
-    <!-- wenn militaryshipscore zu niedrig gegenüber dem spieler ist (dennoch mit cooldown oderso) -->
-    <!-- und sie bietet für waffenstillstand/Frieden dann Belohnung an, am besten in Form von Quest -->
-     <!-- (wenns angenommen wird dann Frieden+Nichtangriffspakt oderso) -->
-     
-  <!-- und man könnte Spy und Diplo als einen Mod releasen, weils thematisch zusammenpasst (und mit difficultysetting kann man KI Spies ausschalten) -->
-   <!-- Problem wäre nur, dass für spy noch sehr viel grafikarbeit noetig ist, die ich nicht machen kann.. -->
-  
-  <!-- evlt doch noch ne andere gebäudegrafik nehmen, eines was zu jedem fortschritt passt? -->
-  
-  <!-- Eventuell Honor in Diplomatische Gunst (oder kürzer) umbenennen und dies dann eine Ressource für Diplomatische Aktionen machen? -->
-   
-
-  
-  <!-- im AI Shipyard sind auch ein paar interessante characternotifications, die man nutzen könnte, damit die KI bei ihrer auwahl evlt auch was sagt usw -->
-  
-  <!-- nachdem rest fertig, dann text_english usw machen -->
-  
-  <!-- trivia: -->
-   <!-- - First I tried to add more diplo options to the Diplo Menu itself (by anabling unsued buttons), but they cause desync in multiplayer. -->
-   <!-- - then I tried to achieve it with help of a Decision Quest, but also they suck in muliplayer and are a beast to maintain, the more options/paths you have. -->
-  <!-- So now it will be down via a shipyard-like building (without building sth, but its the same UI), where you can choose the AI and action. -->
-  
-  
-  
-  <!-- der großteil ist aktuell vom difficultysettings mod kopiert -->
-  
-  
-  
-  <!-- TODO: evtl mehr properties zu Embassy zufügen, soll ja schon ein richtige Gebäude sein, nicht nur mindestmaß -->
-  <ModOp Type="addNextSibling" GUID="153189">
-    <Asset>
-      <Template>Min_Shipyard_Serp</Template>
-      <Values>
-        <Standard>
-          <GUID>1500005221</GUID>
-          <Name>Embassy</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/campaign/icon_court_of_justice.png</IconFilename>
-          <InfoDescription>1500005250</InfoDescription>
-        </Standard>
-        <Selection />
-        <Building>
-          <BuildModeRandomRotation>180</BuildModeRandomRotation>
-          <AssociatedRegions>Moderate;Colony01;Africa;Arctic</AssociatedRegions>
-          <TerrainType>Terrain</TerrainType>
-          <SecondPartyRelevant>0</SecondPartyRelevant>
-          <BuildingCategoryName>14539</BuildingCategoryName>
-          <BuildModeStartVariation>0</BuildModeStartVariation>
-          <AllowChangeVariation>1</AllowChangeVariation>
-        </Building>
-        <Object>
-          <Variations>
-            <Item>
-							<Filename>data/graphics_serp/modbuildings/embassy/embassy_04.cfg</Filename>
-            </Item>
-          </Variations>
-        </Object>
-        <Shipyard>
-          <AssemblyOptions />
-        </Shipyard>
-        <Locked>
-          <DefaultLockedState>0</DefaultLockedState>
-        </Locked>
-        <Attackable>
-          <AttackableType>[NONE]</AttackableType>
-          <MoralePower>0</MoralePower>
-        </Attackable>
-        <SoundEmitter>
-          <ActiveSounds>
-            <Item>
-              <Sound>200896</Sound>
-            </Item>
-          </ActiveSounds>
-          <IncidentSounds>
-            <InfectedFire>
-              <Item>
-                <Sound>214659</Sound>
-              </Item>
-            </InfectedFire>
-          </IncidentSounds>
-          <BuildingRuined>
-            <Item>
-              <Sound>203848</Sound>
-            </Item>
-          </BuildingRuined>
-          <BuildingRepaired>
-            <Item>
-              <Sound>203866</Sound>
-            </Item>
-          </BuildingRepaired>
-        </SoundEmitter>
-      </Values>
-    </Asset>
-  </ModOp>
-    
-  <!-- scholar buildmenu -->
-  <ModOp Type="add" GUID="502107" Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-      <Building>1500005221</Building>
-    </Item>
-  </ModOp>
-  <!-- culture buildmenu -->
-  <ModOp Type="add" GUID="500116" Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-      <Building>1500005221</Building>
-    </Item>
-  </ModOp>
-  
-  
-  <!-- sa construction menu 1 (tier) -->
-  <ModOp Type="add" GUID='25000193' Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-        <Building>1500005221</Building>
-    </Item>
-  </ModOp>
-  <!-- sa construction menu city (category) -->
-  <ModOp Type="add" GUID='500137' Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-        <Building>1500005221</Building>
-    </Item>
-  </ModOp>
-  <!-- africa construction menu 1 (tier) -->
-  <ModOp Type="add" GUID='114553' Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-        <Building>1500005221</Building>
-    </Item>
-  </ModOp>
-  <!-- africa construction menu city (category) -->
-  <ModOp Type="add" GUID='119012' Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-        <Building>1500005221</Building>
-    </Item>
-  </ModOp>
-  <!-- arctic construction menu 1 (tier) -->
-  <ModOp Type="add" GUID='112790' Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-        <Building>1500005221</Building>
-    </Item>
-  </ModOp>
-  <!-- arctic construction menu city (category) -->
-  <ModOp Type="add" GUID='116343' Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-        <Building>1500005221</Building>
-    </Item>
-  </ModOp>
-  
   
   <!-- adding EffectTargets to this asset, because this way my shared mod shared_ShipyardForBuffsTooltip will hide all the ship-details you normally see in a shipyard and instead displays the InfoDescription (and Buff-effects, if there are any) -->
   <ModOp GUID="114166" Type="addNextSibling">
-    <!-- VisibleWhenLocked=1 to always show it (so no need to do UnideAsset) does not work... -->
+    <!-- VisibleWhenLocked=1 to always show it (so no need to do UnhideAsset) does not work... -->
     <Asset>
       <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
       <Values>
@@ -393,7 +167,7 @@
         <ItemEffect>
           <EffectTargets>
             <Item>
-              <GUID>1500005221</GUID>
+              <GUID>930078</GUID>
             </Item>
           </EffectTargets>
         </ItemEffect>
@@ -405,9 +179,9 @@
         <Standard>
           <GUID>1500005295</GUID>
           <Name>Placeholder - now also DecisionQuest Starter</Name>
-          <!-- <IconFilename>data/graphics_serp/icon_empty.png</IconFilename> -->
           <IconFilename>data/graphics_serp/icon_diplomacy_brown.png</IconFilename>
           <!-- <IconFilename>data/ui/2kimages/main/icons/icon_diplomacy_tendency_good.png</IconFilename> -->
+          <InfoDescription>1500005295</InfoDescription>
         </Standard>
         <Locked>
           <DefaultLockedState>0</DefaultLockedState>
@@ -415,7 +189,7 @@
         <ItemEffect>
           <EffectTargets>
             <Item>
-              <GUID>1500005221</GUID>
+              <GUID>930078</GUID>
             </Item>
           </EffectTargets>
         </ItemEffect>
@@ -440,7 +214,7 @@
         <ItemEffect>
           <EffectTargets>
             <Item>
-              <GUID>1500005221</GUID>
+              <GUID>930078</GUID>
             </Item>
           </EffectTargets>
         </ItemEffect>
@@ -950,23 +724,20 @@
     </Item>
   </ModOp>
   
-  <!-- 3 Fake Ressources to signal other human players to show the JoinWar notification to them -->
-  <!-- 100000 (100.000) amount is the max allowed amount for all products it seems. dont know where money has an exception, maybe hardcoded -->
-  
 
-  
   <ModOp Type="AddNextSibling" GUID="1010017">
     <!-- Helper Meta Products to display success chance for join war. we need one per participant, because we calculate it -->
      <!-- when the join war option was choosen and then the player can select objects from different participants (while we can not start a new calculation) -->
       <!-- and wants to see the chance for joining war against the selected participant -->
     <!-- Many of them are also used for unrelated Text in the text_language.xml file to save GUIDs -->
-      <!-- ab 1500005330 kann noch für Text verwendet werden -->
+      <!-- ab 1500005332 kann noch für Text verwendet werden -->
     <Asset>
       <Template>Product</Template>
       <Values>
         <Standard>
           <GUID>1500005326</GUID>
           <Name>Success Chance Join War Against Jorgensen</Name>
+          <IconFilename>data/graphics_serp/icon_achievement_diplomacy_gold.png</IconFilename>
         </Standard>
         <Locked>
           <DefaultLockedState>0</DefaultLockedState>
@@ -1122,19 +893,20 @@
         </Standard>
       </Values>
     </Asset>
-    
+    <!-- (currently selected participant in embassy), needed because we can not access NotificationContext in infotips -.- -->
+     <!-- only use for text, since its not super reliable and needs ValueAssetMap to get correct PID -->
     <Asset>
       <BaseAssetGUID>1500005326</BaseAssetGUID>
       <Values>
         <Standard>
           <GUID>1500005349</GUID>
-          <Name>SELECTED TargetPID (currently selected participant in embassy), needed because we can not access NotificationContext in infotips -.-</Name>
+          <Name>SELECTED TargetPID</Name>
         </Standard>
       </Values>
     </Asset>
   </ModOp>
   <!-- to be able to assign the Ressources to a Participant within an infotip, we need an ValueAssetMap -->
-   <!-- it has to be ordered from lowest PID to highest -->
+   <!-- it has to be ordered from lowest PID to highest. -->
   <ModOp Type="AddNextSibling" GUID="500424">
     <Asset>
       <Template>ValueAssetMap</Template>
@@ -1442,9 +1214,826 @@
         </ValueAssetMap>
       </Values>
     </Asset>
+    <Asset>
+      <Template>ValueAssetMap</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005361</GUID>
+          <Name>Convert PID*100-+4 to PID (PID saved as ressource coop save)</Name>
+        </Standard>
+        <ValueAssetMap>
+          <ValueAssetMap>
+            <Item>
+              <ValidFrom>0</ValidFrom>
+              <Asset>0</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>50</ValidFrom>
+              <Asset>1</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>150</ValidFrom>
+              <Asset>2</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>250</ValidFrom>
+              <Asset>3</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>350</ValidFrom>
+              <Asset>4</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>450</ValidFrom>
+              <Asset>5</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>550</ValidFrom>
+              <Asset>6</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>650</ValidFrom>
+              <Asset>7</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>750</ValidFrom>
+              <Asset>8</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>850</ValidFrom>
+              <Asset>9</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>950</ValidFrom>
+              <Asset>10</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1050</ValidFrom>
+              <Asset>11</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1150</ValidFrom>
+              <Asset>12</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1250</ValidFrom>
+              <Asset>13</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1350</ValidFrom>
+              <Asset>14</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1450</ValidFrom>
+              <Asset>15</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1550</ValidFrom>
+              <Asset>16</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1650</ValidFrom>
+              <Asset>17</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1750</ValidFrom>
+              <Asset>18</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1850</ValidFrom>
+              <Asset>19</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1950</ValidFrom>
+              <Asset>20</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2050</ValidFrom>
+              <Asset>21</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2150</ValidFrom>
+              <Asset>22</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2250</ValidFrom>
+              <Asset>23</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2350</ValidFrom>
+              <Asset>24</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2450</ValidFrom>
+              <Asset>25</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2550</ValidFrom>
+              <Asset>26</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2650</ValidFrom>
+              <Asset>27</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2750</ValidFrom>
+              <Asset>28</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2850</ValidFrom>
+              <Asset>29</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>2950</ValidFrom>
+              <Asset>30</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3050</ValidFrom>
+              <Asset>31</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3150</ValidFrom>
+              <Asset>32</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3250</ValidFrom>
+              <Asset>33</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3350</ValidFrom>
+              <Asset>34</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3450</ValidFrom>
+              <Asset>35</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3550</ValidFrom>
+              <Asset>36</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3650</ValidFrom>
+              <Asset>37</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3750</ValidFrom>
+              <Asset>38</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3850</ValidFrom>
+              <Asset>39</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>3950</ValidFrom>
+              <Asset>40</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4050</ValidFrom>
+              <Asset>41</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4150</ValidFrom>
+              <Asset>42</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4250</ValidFrom>
+              <Asset>43</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4350</ValidFrom>
+              <Asset>44</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4450</ValidFrom>
+              <Asset>45</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4550</ValidFrom>
+              <Asset>46</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4650</ValidFrom>
+              <Asset>47</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4750</ValidFrom>
+              <Asset>48</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4850</ValidFrom>
+              <Asset>49</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>4950</ValidFrom>
+              <Asset>50</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5050</ValidFrom>
+              <Asset>51</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5150</ValidFrom>
+              <Asset>52</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5250</ValidFrom>
+              <Asset>53</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5350</ValidFrom>
+              <Asset>54</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5450</ValidFrom>
+              <Asset>55</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5550</ValidFrom>
+              <Asset>56</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5650</ValidFrom>
+              <Asset>57</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5750</ValidFrom>
+              <Asset>58</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5850</ValidFrom>
+              <Asset>59</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>5950</ValidFrom>
+              <Asset>60</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6050</ValidFrom>
+              <Asset>61</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6150</ValidFrom>
+              <Asset>62</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6250</ValidFrom>
+              <Asset>63</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6350</ValidFrom>
+              <Asset>64</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6450</ValidFrom>
+              <Asset>65</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6550</ValidFrom>
+              <Asset>66</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6650</ValidFrom>
+              <Asset>67</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6750</ValidFrom>
+              <Asset>68</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6850</ValidFrom>
+              <Asset>69</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>6950</ValidFrom>
+              <Asset>70</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7050</ValidFrom>
+              <Asset>71</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7150</ValidFrom>
+              <Asset>72</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7250</ValidFrom>
+              <Asset>73</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7350</ValidFrom>
+              <Asset>74</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7450</ValidFrom>
+              <Asset>75</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7550</ValidFrom>
+              <Asset>76</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7650</ValidFrom>
+              <Asset>77</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7750</ValidFrom>
+              <Asset>78</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7850</ValidFrom>
+              <Asset>79</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>7950</ValidFrom>
+              <Asset>80</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8050</ValidFrom>
+              <Asset>81</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8150</ValidFrom>
+              <Asset>82</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8250</ValidFrom>
+              <Asset>83</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8350</ValidFrom>
+              <Asset>84</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8450</ValidFrom>
+              <Asset>85</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8550</ValidFrom>
+              <Asset>86</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8650</ValidFrom>
+              <Asset>87</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8750</ValidFrom>
+              <Asset>88</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8850</ValidFrom>
+              <Asset>89</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>8950</ValidFrom>
+              <Asset>90</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9050</ValidFrom>
+              <Asset>91</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9150</ValidFrom>
+              <Asset>92</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9250</ValidFrom>
+              <Asset>93</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9350</ValidFrom>
+              <Asset>94</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9450</ValidFrom>
+              <Asset>95</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9550</ValidFrom>
+              <Asset>96</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9650</ValidFrom>
+              <Asset>97</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9750</ValidFrom>
+              <Asset>98</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9850</ValidFrom>
+              <Asset>99</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>9950</ValidFrom>
+              <Asset>100</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10050</ValidFrom>
+              <Asset>101</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10150</ValidFrom>
+              <Asset>102</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10250</ValidFrom>
+              <Asset>103</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10350</ValidFrom>
+              <Asset>104</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10450</ValidFrom>
+              <Asset>105</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10550</ValidFrom>
+              <Asset>106</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10650</ValidFrom>
+              <Asset>107</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10750</ValidFrom>
+              <Asset>108</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10850</ValidFrom>
+              <Asset>109</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>10950</ValidFrom>
+              <Asset>110</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11050</ValidFrom>
+              <Asset>111</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11150</ValidFrom>
+              <Asset>112</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11250</ValidFrom>
+              <Asset>113</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11350</ValidFrom>
+              <Asset>114</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11450</ValidFrom>
+              <Asset>115</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11550</ValidFrom>
+              <Asset>116</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11650</ValidFrom>
+              <Asset>117</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11750</ValidFrom>
+              <Asset>118</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11850</ValidFrom>
+              <Asset>119</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>11950</ValidFrom>
+              <Asset>120</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12050</ValidFrom>
+              <Asset>121</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12150</ValidFrom>
+              <Asset>122</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12250</ValidFrom>
+              <Asset>123</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12350</ValidFrom>
+              <Asset>124</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12450</ValidFrom>
+              <Asset>125</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12550</ValidFrom>
+              <Asset>126</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12650</ValidFrom>
+              <Asset>127</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12750</ValidFrom>
+              <Asset>128</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12850</ValidFrom>
+              <Asset>129</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>12950</ValidFrom>
+              <Asset>130</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13050</ValidFrom>
+              <Asset>131</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13150</ValidFrom>
+              <Asset>132</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13250</ValidFrom>
+              <Asset>133</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13350</ValidFrom>
+              <Asset>134</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13450</ValidFrom>
+              <Asset>135</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13550</ValidFrom>
+              <Asset>136</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13650</ValidFrom>
+              <Asset>137</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13750</ValidFrom>
+              <Asset>138</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13850</ValidFrom>
+              <Asset>139</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>13950</ValidFrom>
+              <Asset>140</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14050</ValidFrom>
+              <Asset>141</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14150</ValidFrom>
+              <Asset>142</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14250</ValidFrom>
+              <Asset>143</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14350</ValidFrom>
+              <Asset>144</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14450</ValidFrom>
+              <Asset>145</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14550</ValidFrom>
+              <Asset>146</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14650</ValidFrom>
+              <Asset>147</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14750</ValidFrom>
+              <Asset>148</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14850</ValidFrom>
+              <Asset>149</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>14950</ValidFrom>
+              <Asset>150</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15050</ValidFrom>
+              <Asset>151</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15150</ValidFrom>
+              <Asset>152</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15250</ValidFrom>
+              <Asset>153</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15350</ValidFrom>
+              <Asset>154</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15450</ValidFrom>
+              <Asset>155</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15550</ValidFrom>
+              <Asset>156</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15650</ValidFrom>
+              <Asset>157</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15750</ValidFrom>
+              <Asset>158</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15850</ValidFrom>
+              <Asset>159</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>15950</ValidFrom>
+              <Asset>160</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16050</ValidFrom>
+              <Asset>161</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16150</ValidFrom>
+              <Asset>162</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16250</ValidFrom>
+              <Asset>163</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16350</ValidFrom>
+              <Asset>164</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16450</ValidFrom>
+              <Asset>165</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16550</ValidFrom>
+              <Asset>166</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16650</ValidFrom>
+              <Asset>167</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16750</ValidFrom>
+              <Asset>168</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16850</ValidFrom>
+              <Asset>169</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>16950</ValidFrom>
+              <Asset>170</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17050</ValidFrom>
+              <Asset>171</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17150</ValidFrom>
+              <Asset>172</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17250</ValidFrom>
+              <Asset>173</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17350</ValidFrom>
+              <Asset>174</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17450</ValidFrom>
+              <Asset>175</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17550</ValidFrom>
+              <Asset>176</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17650</ValidFrom>
+              <Asset>177</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17750</ValidFrom>
+              <Asset>178</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17850</ValidFrom>
+              <Asset>179</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>17950</ValidFrom>
+              <Asset>180</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18050</ValidFrom>
+              <Asset>181</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18150</ValidFrom>
+              <Asset>182</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18250</ValidFrom>
+              <Asset>183</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18350</ValidFrom>
+              <Asset>184</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18450</ValidFrom>
+              <Asset>185</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18550</ValidFrom>
+              <Asset>186</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18650</ValidFrom>
+              <Asset>187</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18750</ValidFrom>
+              <Asset>188</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18850</ValidFrom>
+              <Asset>189</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>18950</ValidFrom>
+              <Asset>190</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19050</ValidFrom>
+              <Asset>191</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19150</ValidFrom>
+              <Asset>192</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19250</ValidFrom>
+              <Asset>193</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19350</ValidFrom>
+              <Asset>194</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19450</ValidFrom>
+              <Asset>195</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19550</ValidFrom>
+              <Asset>196</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19650</ValidFrom>
+              <Asset>197</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19750</ValidFrom>
+              <Asset>198</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19850</ValidFrom>
+              <Asset>199</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>19950</ValidFrom>
+              <Asset>200</Asset>
+            </Item>
+          </ValueAssetMap>
+        </ValueAssetMap>
+      </Values>
+    </Asset>
   </ModOp>
   
-  <!-- TODO diese GUIDs können auch noch für Trigger oderso verwendet werden, klappt soweit ich weiß solange -->
+  <!-- diese GUIDs können auch noch für Trigger oderso verwendet werden, klappt soweit ich weiß solange -->
    <!-- sie dennoch weiterhin das InfoTip Property haben -->
   <ModOp Type="AddNextSibling" GUID="3512">
     <Asset>
@@ -1472,6 +2061,7 @@
   
   
   
+  <Include File="/data/config/export/main/asset/Building.include.xml" />
   <Include File="/data/config/export/main/asset/Triggers.include.xml" />
   <Include File="/data/config/export/main/asset/Pools.include.xml" />
   <Include File="/data/config/export/main/asset/Buffs.include.xml" />
@@ -1598,8 +2188,10 @@
   <Include File="/data/config/export/main/asset/Decisions/TriggerDecision.include.xml" />
   <!-- add diplo actions -->
   <Include File="/data/config/export/main/asset/Actions/JoinWar.include.xml" />
-  <Include File="/data/config/export/main/asset/Actions/RequestQuest.include.xml" />
   <Include File="/data/config/export/main/asset/Actions/GiftShip.include.xml" />
+  <Include File="/data/config/export/main/asset/Actions/ShareGoods.include.xml" />
+  <Include File="/data/config/export/main/asset/Actions/CommandAlly.include.xml" />
+  <Include File="/data/config/export/main/asset/Actions/NoSpies.include.xml" />
   <!-- supportfleet, loads the other include files from within -->
   <Include File="/data/config/export/main/asset/Actions/SFleet/assets.include.xml" />
   
@@ -1620,6 +2212,9 @@
       </TriggerAction>
     </Item>
   </ModOp>
+  
+
+  
   
   
 

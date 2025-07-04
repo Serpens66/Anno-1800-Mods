@@ -2,7 +2,7 @@
 
   <!-- GUIDs 1500001245 bis 1500001289 -->
   
-  <!-- frei ab 1500001276 frei bis einschl. 1500001285 -->
+  <!-- frei ab 1500001276 frei bis einschl. 1500001285  -->
   
   <!-- As RewardAssets we will use  -->
    <!-- - for 3rd party: EndGame Trader ItemOffer (without unlock, so the more you progress the better items you get) -->
@@ -74,7 +74,7 @@
         <!-- (wenn quest abgebrochen wird und 1500001290 noch da sind, dann lässt sich korrekt auch keine quest starten. Aber die alte wird halt einfach nicht abgebrochen, trotz KeepCheckingPreconditionsWhenRunning and ResetPreconditionsAfterQuestWasTriggered) -->
   
 
-     <!-- -- Items verteilen von der Quest klappt zu oft nicht... -->
+     <!--  Items verteilen von der Quest klappt zu oft nicht... -->
      <!-- liegt daran, dass rewards verteilt werden, sobald ein schiff in der nähe. -->
       <!-- und wenn alle schiffe in nähe zu wenig slots für die rewards hat, dann wird rest nicht verteilt -->
     <!-- Das einfach in mod description schreiben, dann geht das schon.. -->
@@ -101,7 +101,7 @@
   <!-- 1500001289 put in extra file because its long and not sure if I want to use it -->
   <!-- <Include File="/data/config/export/main/asset/QuestBuy.include.xml" /> -->
     
-  <ModOp Type="addNextSibling" GUID="130248">
+  <ModOp Type="addNextSibling" GUID="152264">
     
     <Asset>
       <Template>A7_QuestSubQuest</Template>
@@ -130,12 +130,12 @@
                     <AllowKontorsToDeliver>1</AllowKontorsToDeliver>
                     <ConfirmOnReach>1</ConfirmOnReach>
                     <AllowedDeliveryObjectLayers>Water;Air</AllowedDeliveryObjectLayers>
-                    <!-- Geldkosten werden zukünftig durch den Kauf jedes Schiffs selbst abgezogen -->
-                    <!-- Kosten automatisch abziehen. evtl für skalierende Ruhmkosten? -->
+                    <!-- Geldkosten werden zukünftig durch den Kauf jedes Schiffs selbst abgezogen (doch nicht mit kauf arbeiten) -->
+                    <!-- Kosten automatisch abziehen. evtl für skalierende Ruhmkosten? TODO -->
                      <!-- oder Ruhmkosten auch in Sellable von allen Schiffen mit aufnehmen -->
                     <!-- <DeliveryType>Meta</DeliveryType> -->
-                    <!-- <AllowKontorsToDeliver>1</AllowKontorsToDeliver> -->
-                    <!-- <ConfirmOnReach>0</ConfirmOnReach> -->
+                    <!-- Dadurch dass Starter dem Spieler gehört, kann er direkt bezahlen ohne mit eigenem Schiff hinzufahren, aber ist ok (wobei das nicht immer klappt?!) -->
+                    <!-- Wir lassen es dennoch auf ConditionObjectStarterObject, damit man die Notification erneut Triggern kann und man hinjumpen kann -->
                     <DeliveryExecutionPlace>
                       <Template>ConditionObjectStarterObject</Template>
                       <Values>
@@ -201,7 +201,7 @@
                     </FakeMinimapPings>
                   </ConditionQuestObjective>
                   <ConditionPlayerCounter>
-                    <Context>1500001291</Context>
+                    <Context>1500001294</Context>
                     <CounterAmount>1</CounterAmount>
                     <ComparisonOp>AtLeast</ComparisonOp>
                   </ConditionPlayerCounter>
@@ -224,7 +224,9 @@
           <GUID>1500001288</GUID>
           <Name>Sub Objectives Parallel Pay and Spawn Big</Name>
           <IconFilename>data/graphics_serp/bigfleet.png</IconFilename>
+          <InfoDescription>1500003870</InfoDescription>
         </Standard>
+        <InfoTip />
         <Objectives>
           <WinConditions>
             <Item>
@@ -252,7 +254,7 @@
               <Objective>
                 <Values>
                   <ConditionPlayerCounter>
-                    <Context>1500001292</Context>
+                    <Context>1500001294</Context>
                   </ConditionPlayerCounter>
                   <ConditionQuestSustain>
                     <SustainTime>81000</SustainTime>
@@ -319,7 +321,7 @@
                 <BaseNotification>
                   <NotificationText>10155</NotificationText>
                   <NotificationPriority>-1</NotificationPriority>
-                  <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
+                  <NotificationMinDisplayTime>5000</NotificationMinDisplayTime>
                   <DisplayTimeout>120000</DisplayTimeout>
                   <NotificationAudioAsset>216801</NotificationAudioAsset>
                 </BaseNotification>
@@ -381,42 +383,11 @@
                 <Actions>
                   <Item>
                     <Action>
-                      <Template>ActionDeleteObjects</Template>
-                      <Values>
-                        <Action />
-                        <ActionDeleteObjects />
-                        <ObjectFilter>
-                          <ObjectGUID>1500001293</ObjectGUID>
-                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                        </ObjectFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <Item>
-                    <Action>
-                      <Template>ActionDeleteObjects</Template>
-                      <Values>
-                        <Action />
-                        <ActionDeleteObjects>
-                          <ShipsLeaveMapFirst>1</ShipsLeaveMapFirst>
-                        </ActionDeleteObjects>
-                        <ObjectFilter>
-                          <ObjectGUID>1500001290</ObjectGUID>
-                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
-                          <CheckParticipantID>1</CheckParticipantID>
-                          <ObjectParticipantID>Neutral</ObjectParticipantID>
-                        </ObjectFilter>
-                      </Values>
-                    </Action>
-                  </Item>
-                  <!-- removing ships which spawned after the quest was aborted (using highest spawn delay) -->
-                  <Item>
-                    <Action>
                       <Template>ActionDelayedActions</Template>
                       <Values>
                         <Action />
                         <ActionDelayedActions>
-                          <ExecutionDelay>80000</ExecutionDelay>
+                          <ExecutionDelay>2000</ExecutionDelay>
                           <DelayedActions>
                             <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                             <Values>
@@ -526,7 +497,8 @@
           <RewardAssets>
             <Item>
               <Reward>193507</Reward>
-              <Amount>4</Amount>
+              <!-- <Amount>4</Amount> -->
+              <Amount>0</Amount>
               <IsDisguised>1</IsDisguised>
             </Item>
           </RewardAssets>
@@ -564,6 +536,21 @@
                                   <Action />
                                   <ActionSpawnObjects>
                                     <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100549</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionSpawnObjects_FakeWarship_Serp</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                    <SpawnGUID>1500001331</SpawnGUID>
                                   </ActionSpawnObjects>
                                   <SpawnArea>
                                     <ContextGUID>100549</ContextGUID>
@@ -611,7 +598,7 @@
                                                   <ActionSetObjectVisibility>
                                                     <Visibility>0</Visibility>
                                                     <ShowEffect>0</ShowEffect>
-                                                    <AlsoSetGameLogic>1</AlsoSetGameLogic>
+                                                    <AlsoSetGameLogic>0</AlsoSetGameLogic>
                                                   </ActionSetObjectVisibility>
                                                   <ObjectFilter>
                                                     <ObjectGUID>1500001290</ObjectGUID>
@@ -664,7 +651,7 @@
                         <BaseNotification>
                           <NotificationText>10154</NotificationText>
                           <NotificationPriority>-1</NotificationPriority>
-                          <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
+                          <NotificationMinDisplayTime>5000</NotificationMinDisplayTime>
                           <DisplayTimeout>120000</DisplayTimeout>
                         </BaseNotification>
                         <NotificationSubtitle>
@@ -708,7 +695,7 @@
                                   <ActionSetObjectVisibility>
                                     <Visibility>1</Visibility>
                                     <ShowEffect>0</ShowEffect>
-                                    <AlsoSetGameLogic>1</AlsoSetGameLogic>
+                                    <AlsoSetGameLogic>0</AlsoSetGameLogic>
                                   </ActionSetObjectVisibility>
                                   <ObjectFilter>
                                     <ObjectGUID>1500001290</ObjectGUID>
@@ -912,7 +899,8 @@
           <RewardAssets>
             <Item>
               <Reward>193507</Reward>
-              <Amount>8</Amount>
+              <!-- <Amount>8</Amount> -->
+              <Amount>0</Amount>
               <IsDisguised>1</IsDisguised>
             </Item>
           </RewardAssets>
@@ -952,6 +940,19 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                    <SpawnGUID>1500001331</SpawnGUID>
+                                  </ActionSpawnObjects>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -995,6 +996,18 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -1141,6 +1154,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100700</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -1297,6 +1325,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100700</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -1461,6 +1504,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100701</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -1616,6 +1674,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100701</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -1781,6 +1854,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100702</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -1936,6 +2024,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100702</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -2101,6 +2204,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100703</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -2256,6 +2374,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100703</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -2421,6 +2554,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100704</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -2576,6 +2724,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100704</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -2741,6 +2904,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100518</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -2896,6 +3074,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100518</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -3061,6 +3254,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100550</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -3216,6 +3424,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100550</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -3381,6 +3604,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100705</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -3536,6 +3774,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100705</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -3701,6 +3954,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100706</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -3856,6 +4124,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100706</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -4022,6 +4305,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>110669</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -4177,6 +4475,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>110669</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -4342,6 +4655,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100707</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -4498,6 +4826,21 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100707</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -4662,6 +5005,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100708</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -4819,6 +5177,21 @@
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
                               </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <ContextGUID>100708</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
+                              </VectorElement>
                             </Item>
                           </Actions>
                         </ActionList>
@@ -4943,7 +5316,8 @@
               <VectorElement>
                 <InheritedIndex>0</InheritedIndex>
               </VectorElement>
-              <Amount>4</Amount>
+              <!-- <Amount>4</Amount> -->
+              <Amount>0</Amount>
               <Reward>192069</Reward>
             </Item>
           </RewardAssets>
@@ -4981,6 +5355,22 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <SpawnContext>PlayerKontor</SpawnContext>
+                                    <ContextGUID>0</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -5058,8 +5448,11 @@
       <Values>
         <Standard>
           <GUID>1500001273</GUID>
-          <Name>Request Small Fleet Nate</Name>
+          <Name>Request Small Fleet Nate (2 Airships)</Name>
         </Standard>
+        <Text>
+          <TextOverride>1500001339</TextOverride>
+        </Text>
         <Quest>
           <AbortedAutomaticallyMessage>
             <Notification>
@@ -5103,7 +5496,8 @@
               <VectorElement>
                 <InheritedIndex>0</InheritedIndex>
               </VectorElement>
-              <Amount>2</Amount>
+              <!-- <Amount>2</Amount> -->
+              <Amount>0</Amount>
               <Reward>193452</Reward>
             </Item>
           </RewardAssets>
@@ -5122,6 +5516,7 @@
                       <Values>
                         <ActionList>
                           <Actions>
+                            <!-- still spawn one Warship Fakeship GUID 1500001330, because this is the one we check in lua to find out if spawn worked (can not check a pool there and checking every fakeship one by one is too much work) -->
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>0</InheritedIndex>
@@ -5129,7 +5524,25 @@
                               <Action>
                                 <Values>
                                   <ActionSpawnObjects>
-                                    <Amount>4</Amount>
+                                    <Amount>1</Amount>
+                                    <SpawnGUID>1500001330</SpawnGUID>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <SpawnContext>PlayerKontor</SpawnContext>
+                                    <ContextGUID>0</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>0</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>2</Amount>
+                                    <SpawnGUID>1500001332</SpawnGUID>
                                   </ActionSpawnObjects>
                                   <SpawnArea>
                                     <SpawnContext>PlayerKontor</SpawnContext>
@@ -5141,6 +5554,23 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>2</Amount>
+                                    <SpawnGUID>1500001333</SpawnGUID>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <SpawnContext>PlayerKontor</SpawnContext>
+                                    <ContextGUID>0</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -5193,7 +5623,7 @@
                 <StarterObjectObject>
                   <Values>
                     <ConditionObjectSpawnedObject>
-                      <ExecutionObject>1500001291</ExecutionObject>
+                      <ExecutionObject>1500001339</ExecutionObject>
                       <ObjectSpawnArea>
                         <Values>
                           <SpawnArea>
@@ -5297,6 +5727,22 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>4</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <SpawnContext>PlayerKontor</SpawnContext>
+                                    <ContextGUID>0</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>
@@ -5452,6 +5898,22 @@
                             <Item>
                               <VectorElement>
                                 <InheritedIndex>1</InheritedIndex>
+                              </VectorElement>
+                              <Action>
+                                <Values>
+                                  <ActionSpawnObjects>
+                                    <Amount>8</Amount>
+                                  </ActionSpawnObjects>
+                                  <SpawnArea>
+                                    <SpawnContext>PlayerKontor</SpawnContext>
+                                    <ContextGUID>0</ContextGUID>
+                                  </SpawnArea>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <VectorElement>
+                                <InheritedIndex>2</InheritedIndex>
                               </VectorElement>
                             </Item>
                           </Actions>

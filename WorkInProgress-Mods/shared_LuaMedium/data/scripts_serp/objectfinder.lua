@@ -30,12 +30,13 @@
 -- crashed auch ohne mods die es verursachen können und das leider komplett random
  -- kommt auch vor dass es garnicht crashed oder bis zu 10 min dauert...
  -- wobei es mit allen mods schon deutlich schneller crashed.. komisch..
+  -- aber crashed auch komplett ohne mods
 -- also ist irgendwie im savegame drin das problem... 
 -- vllt nochmal n coop game ohne hilftssession und ohne das session template starten.
  -- und gucken ob das auch iwann crashed
   -- hab session events über event. erstmal wieder rausgenommen, auch so nochmal coop testen in neuem game
-
-
+-- TODO ne passiert immernoch (ohne vanilla event. system und ohne ultra mod)
+-- ÖHM ... auch ein neues MP Spiel alleine gestartet crashed im Ladebildschirm beim erstmaligen Starten!
 
 
 -- #######################################
@@ -254,32 +255,8 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- or use a string as property, the function will convert it for you
     -- It only finds buildings on your own islands! (eg if buildings are spawned via trigger at unowned/foreign islands, they wont be found with this nor with ConditionPlayerCounter)
         -- (ProfileCounter can find buildings on foreign islands)
-    local function GetCurrentSessionObjectsFromLocaleByProperty(Property)
-      local PropertyID
-      if type(Property)=="number" then
-        PropertyID = Property
-      elseif type(Property)=="string" then
-        PropertyID = g_LTL_Serp.PropertiesStringToID[Property]
-      end
-      local GUID,OID
-      local Objects = {}
-      local SessionGuid = session.getSessionGUID() -- only current session is found by getObjectGroupByProperty
-      local ParticipantID = ts.Participants.GetGetCurrentParticipantID() -- finds only objects from local player
-      if PropertyID~=nil then
-        local userdatas = session.getObjectGroupByProperty(PropertyID) -- game.MetaGameManager finds the same like session...
-        if type(userdatas)=="table" and #userdatas>0 then
-          for k,userdata in ipairs(userdatas) do
-            if userdata~=nil then -- is never nil, but nullpointer if not assigned. but here it should always be assigned
-              OID = g_LTL_Serp.get_OID(userdata)
-              GUID =  ts.Objects.GetObject(OID).GUID
-              if GUID~=0 then -- is not the case here, but just to be save
-                Objects[OID] = {GUID=GUID, userdata=userdata,OID=OID,ParticipantID=ParticipantID,SessionGuid=SessionGuid}
-              end
-            end
-          end
-        end
-      end
-      return Objects
+    local function GetCurrentSessionObjectsFromLocaleByProperty(Property,...)
+      return g_LTL_Serp.GetCurrentSessionObjectsFromLocaleByProperty(Property,...)
     end
 
     -- ###################################################################################################
@@ -896,6 +873,9 @@ if g_LuaScriptBlockers[ModID]==nil then
           
           g_LTL_Serp.start_thread("OnIslandSettledSessionEnter",ModID,function()
             while g_LTM_Serp==nil or g_ObjectFinderSerp==nil do
+              coroutine.yield()
+            end
+            while g_LTM_Serp.Shared_Cache==nil or g_LTM_Serp.Shared_Cache[ModID]==nil do
               coroutine.yield()
             end
             
