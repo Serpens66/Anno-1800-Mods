@@ -352,51 +352,51 @@ if g_LuaScriptBlockers[ModID]==nil then
   end
 
   
-
     -- #####################################################################################################
-
+    
+  -- Make sure to only call this with either a single peer, or at least a single participant (only with his coop peers)
+   -- And make sure all coop peers executing it, are executing it with the exact same arguments (it will be written into a nameable, so overwriting each other if different information)
   -- Use this if you are not using UltraTools, but still want to make code executed for everyone
    -- (UltraTools has t_ExecuteFnWithArgsForPeers)
-  -- Only call this if every peer who is calling this provides the exact same arguments (it will be written into a nameable, so overwriting each other if different information)
-    -- info will be written into a nameable and then a trigger with ActionExecuteScript will be started
      -- the script started this way will read out the nameable and execute the content of it for everyone
-      -- (we also can make a ExecuteForPID function this way, just no ForPeer, which is done in UltraTools instead)
    -- So all the args must be convertable to a string!
   -- making use of Nameable from Scenario_Item_Trader  GUID: 4387 , PID: 139 to share info with other peers
    -- we do not change the Name back to vanilla 4387 because everytime we change the name it takes ~3 seconds, and we want to save this time
-  local function SimpleExecuteForEveryone(funcname,...)
-    g_LTL_Serp.modlog("SimpleExecuteForEveryone "..tostring(funcname),ModID)
-    if not ts.GameSetup.GetIsMultiPlayerGame() or (g_CoopCountResSerp~=nil and g_CoopCountResSerp.Finished==true and g_CoopCountResSerp.TotalCount==1) then
-      local func = g_LTL_Serp.myeval(funcname)
-      return func(...)
-    end
-    g_LTL_Serp.modlog("SimpleExecuteForEveryone is multiplayer",ModID)
-    local args = {...} -- does put the "..." arguments into a table
-    local intable = {funcname=funcname,args=args}
-    local inhex = g_LTL_Serp.TableToHex(intable)
-    g_LTM_Serp.AddToQueue(ModID.."_SimpleExecuteForEveryone",function(inhex) -- make every call execute one after the other
-      local SharePID = 139
-      local PID_OID = nil
-      local status,sessionparticipants = xpcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,g_LTL_Serp.log_error,{SharePID},"First") -- only first found loaded session. this way we make sure everyone is using the same OID (at least as long everyone started in the same session)
-      if status==false or next(sessionparticipants)==nil then
-        g_LTL_Serp.modlog("SimpleExecuteForEveryone ERROR : "..tostring(sessionparticipants),ModID)
-        error(sessionparticipants) 
+  local function SimpleExecuteForEveryone(PID,funcname,...)
+    if PID == ts.Participants.GetGetCurrentParticipantID() then -- only a single PID should call this
+      g_LTL_Serp.modlog("SimpleExecuteForEveryone "..tostring(funcname),ModID)
+      if not ts.GameSetup.GetIsMultiPlayerGame() or (g_CoopCountResSerp~=nil and g_CoopCountResSerp.Finished==true and g_CoopCountResSerp.TotalCount==1) then
+        local func = g_LTL_Serp.myeval(funcname)
+        return func(...)
       end
-      g_LTL_Serp.modlog("SimpleExecuteForEveryone after GetAllLoadedSessionsParticipants "..tostring(ts.GameClock.CorporationTime),ModID)
-      for SessionID,session_pids in pairs(sessionparticipants) do
-        PID_OID = session_pids[SharePID].OID
-        g_LTL_Serp.modlog("SimpleExecuteForEveryone writing into PID_OID "..tostring(PID_OID).." :"..tostring(inhex),ModID)
-        local status,err = xpcall(g_LTL_Serp.DoForSessionGameObject,g_LTL_Serp.log_error,"[MetaObjects SessionGameObject("..tostring(PID_OID)..") Nameable Name("..tostring(inhex)..")]")
-        if status==false then
-          g_LTL_Serp.modlog("SimpleExecuteForEveryone2 ERROR : "..tostring(err),ModID)
-          error(err) 
+      g_LTL_Serp.modlog("SimpleExecuteForEveryone is multiplayer",ModID)
+      local args = {...} -- does put the "..." arguments into a table
+      local intable = {funcname=funcname,args=args}
+      local inhex = g_LTL_Serp.TableToHex(intable)
+      g_LTM_Serp.AddToQueue(ModID.."_SimpleExecuteForEveryone",function(inhex) -- make every call execute one after the other
+        local SharePID = 139
+        local PID_OID = nil
+        local status,sessionparticipants = xpcall(g_ObjectFinderSerp.GetAllLoadedSessionsParticipants,g_LTL_Serp.log_error,{SharePID},"First") -- only first found loaded session. this way we make sure everyone is using the same OID (at least as long everyone started in the same session)
+        if status==false or next(sessionparticipants)==nil then
+          g_LTL_Serp.modlog("SimpleExecuteForEveryone ERROR : "..tostring(sessionparticipants),ModID)
+          error(sessionparticipants) 
         end
-      end
-      g_LTL_Serp.waitForTimeDelta(3000) -- wait at least 3 seconds to make sure Nameable is synced between all players 
-      ts.Conditions.RegisterTriggerForCurrentParticipant(1500005607) -- make everyone call _DoExectionForEveryone
-      g_LTL_Serp.waitForTimeDelta(1500) -- wait a bit more until everyone read out the nameable, before releasing this Queue
-      g_LTL_Serp.modlog("SimpleExecuteForEveryone done "..tostring(funcname),ModID)
-    end,inhex)
+        g_LTL_Serp.modlog("SimpleExecuteForEveryone after GetAllLoadedSessionsParticipants "..tostring(ts.GameClock.CorporationTime),ModID)
+        for SessionID,session_pids in pairs(sessionparticipants) do
+          PID_OID = session_pids[SharePID].OID
+          g_LTL_Serp.modlog("SimpleExecuteForEveryone writing into PID_OID "..tostring(PID_OID).." :"..tostring(inhex),ModID)
+          local status,err = xpcall(g_LTL_Serp.DoForSessionGameObject,g_LTL_Serp.log_error,"[MetaObjects SessionGameObject("..tostring(PID_OID)..") Nameable Name("..tostring(inhex)..")]")
+          if status==false then
+            g_LTL_Serp.modlog("SimpleExecuteForEveryone2 ERROR : "..tostring(err),ModID)
+            error(err) 
+          end
+        end
+        g_LTL_Serp.waitForTimeDelta(3000) -- wait at least 3 seconds to make sure Nameable is synced between all players 
+        ts.Unlock.SetRelockNet(1500005607) -- make everyone call _DoExectionForEveryone. using a FeatureUnlock to only execute the xml code once even if multiple coop peers are executing this lua code
+        g_LTL_Serp.waitForTimeDelta(1500) -- wait a bit more until everyone read out the nameable, before releasing this Queue
+        g_LTL_Serp.modlog("SimpleExecuteForEveryone done "..tostring(funcname),ModID)
+      end,inhex)
+    end
   end
   
   local function _DoExectionForEveryone()

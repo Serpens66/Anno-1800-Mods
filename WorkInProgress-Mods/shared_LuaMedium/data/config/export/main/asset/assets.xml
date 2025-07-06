@@ -691,19 +691,31 @@
     </Asset>
     
     
+    <!-- Using FeatureUnlock for lua Coop compatiblity. And using DefaultLockedState=0  -->
+     <!-- and NegateCondition UnlockNeeded to make sure its not executed after the mod was deactivated  -->
+      <!-- (because trigger code is saved to savegame, but assets which no longer exist default to "unlocked" -->
+       <!-- which makes the trigger code start its actions after its removed) -->
     <Asset>
-      <Template>Trigger</Template>
+      <Template>FeatureUnlock</Template>
       <Values>
         <Standard>
           <GUID>1500005607</GUID>
           <Name>ExecuteForEveryone lua function</Name>
         </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
         <Trigger>
           <TriggerCondition>
-            <Template>ConditionAlwaysTrue</Template>
+            <Template>ConditionUnlocked</Template>
             <Values>
               <Condition />
-              <ConditionAlwaysTrue />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005607</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
             </Values>
           </TriggerCondition>
           <TriggerActions>
@@ -718,14 +730,68 @@
                 </Values>
               </TriggerAction>
             </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>500</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionUnlockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionUnlockAsset>
+                                    <UnlockAssets>
+                                      <Item>
+                                        <Asset>1500005607</Asset>
+                                      </Item>
+                                    </UnlockAssets>
+                                  </ActionUnlockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
           </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>1000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
         </Trigger>
         <TriggerSetup>
-          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
           <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
         </TriggerSetup>
       </Values>
     </Asset>
+    
     
     <!-- Using Challenger as helpers (Challanger1 as helper to change owner from human to pirate) -->
     <!-- TradeRights are needed to have BuyNet in lua working -->

@@ -24,8 +24,10 @@
    -- aber da dem pirat auch die sale version gehört, darf ich diese schiffe natürlich nicht vom pirat entfernen.
    -- evlt diese in einen eigenen neuen pool packen?
   -- sale version kommt in playerships
-  
-  
+
+
+
+
 
 local ModID = "shared_EmbassyDiploActions_Serp diploactions.lua" -- used for logging
 
@@ -213,7 +215,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             if continue=="IsFirst" and g_LTU_Serp~=nil then
               g_LTL_Serp.start_thread("ChangeRep-RequestJoinWarAgainstSelected",ModID,g_LTU_Serp.PeersInfo.t_ExecuteFnWithArgsForPeers,"ts.Participants.SetChangeParticipantReputationTo",nil,nil,"Everyone",TargetPID,PID,repmalus)
             elseif continue=="AllCoop" or g_LTU_Serp==nil then
-              g_LTM_Serp.SimpleExecuteForEveryone("ts.Participants.SetChangeParticipantReputationTo",TargetPID,PID,repmalus)
+              g_LTM_Serp.SimpleExecuteForEveryone(PID,"ts.Participants.SetChangeParticipantReputationTo",TargetPID,PID,repmalus)
             end
           end
         else
@@ -239,7 +241,9 @@ if g_LuaScriptBlockers[ModID]==nil then
       return PID~=TargetPID and ts.Participants.GetCheckDiplomacyStateTo(PID,TargetPID,DiplomacyState.Peace)
     end
   end
-    
+  
+  -- only call it from perspective of one human, not all.
+   -- multiple coop peers executing this should be ok, but will change owner of selection!
   local function t_ChangeOwnerOfSelectionToPID(To_PID,ignoreowner,withoutRep,forbidpiratenewowner)
     To_PID = To_PID or ts.Participants.GetGetCurrentParticipantID()
     local continue = g_LTM_Serp.ContinueCoopCalled()
@@ -275,7 +279,7 @@ if g_LuaScriptBlockers[ModID]==nil then
                 if continue=="IsFirst" and g_LTU_Serp~=nil then
                   g_LTL_Serp.start_thread("ChangeRep1ForGiftShip_random_",ModID,g_LTU_Serp.PeersInfo.t_ExecuteFnWithArgsForPeers,"ts.Participants.SetChangeParticipantReputationTo",nil,nil,"Everyone",To_PID,POwner,rep)
                 elseif continue=="AllCoop" or g_LTU_Serp==nil then
-                  g_LTM_Serp.SimpleExecuteForEveryone("ts.Participants.SetChangeParticipantReputationTo",To_PID,POwner,rep)
+                  g_LTM_Serp.SimpleExecuteForEveryone(PID,"ts.Participants.SetChangeParticipantReputationTo",To_PID,POwner,rep)
                 end
               end
             end
@@ -381,6 +385,10 @@ if g_LuaScriptBlockers[ModID]==nil then
   local function ShouldShowNoSpies(PID,TargetPID,topdiplostate,isfrequentcheck,actionname)
     return (not g_LTL_Serp.IsHuman(TargetPID) and g_LTL_Serp.table_contains_value(g_DiploActions_Serp.DiploButtonsUnlocks[actionname].AllowedFor,TargetPID) )
   end
+
+  -- ####################################################################################################################
+
+  
 
   -- ####################################################################################################################
   -- ####################################################################################################################
