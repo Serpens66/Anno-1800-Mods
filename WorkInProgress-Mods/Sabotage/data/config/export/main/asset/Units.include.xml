@@ -37,6 +37,10 @@
    <!-- KI Spion hinterlässt Reibgut nach töten mit polizist? vermutlich KI shiprewardpool, den wir nicht abschaltenk können -->
   
   
+  <!-- TODO test: KI Police hat aufeinmal keine fahne mehr und schießt extrem schnell? -->
+  
+  
+  
    <!-- das automatische "fliehen" wenn eine unit angegriffen wird ist ein problem... -->
     <!-- denn das unterbricht sogar das geforcde stehenbelbein wenn man x sekunden lang ein item einsetzen muss, -->
      <!-- bei dem man sich nicht bewegen kann. Dann flieht unit trotzdem und trifft am Ende dennoch das Ziel -->
@@ -550,10 +554,10 @@
               <!-- <Item>1500001463</Item> -->
               <!-- <StackSize>1</StackSize> -->
             <!-- </Item> -->
-            <!-- <Item> -->
-              <!-- <Item>1500001489</Item> -->
-              <!-- <StackSize>1</StackSize> -->
-            <!-- </Item> -->
+            <Item>
+              <Item>1500001489</Item>
+              <StackSize>1</StackSize>
+            </Item>
           </InitSlotItems>
           <!-- nur maximal 3 direkt sockeln, damit man erkennt, dass man draufklicken kann um große auswahl zu öffnen -->
           <InitSocketItems>
@@ -1878,36 +1882,116 @@
 			</Values>
 		</Asset>
     
+    <!-- Spy-Post Actions  -->
     <Asset>
-      <Template>ObjectDummyWithOwner_Victim</Template>
+      <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
       <Values>
         <Standard>
-          <GUID>1500001829</GUID>
-          <Name>Helper Victim AI -5</Name>
+          <GUID>1500001833</GUID>
+          <Name>Display Spy Report (switch UI to Kontor to see Storage and do passive buy/sell offers)</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/narative_item/icon_blueprint_pump.png</IconFilename>
+          <InfoDescription>1500001842</InfoDescription>
         </Standard>
-        <Mesh />
+        <Cost>
+          <Costs />
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500001547</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
       </Values>
     </Asset>
+    <!-- Dont add a way to counter this (eg. buy your own shares this way on your own island), because we want you to catch the spy -->
     <Asset>
-      <Template>ObjectDummyWithOwner_Attacker</Template>
+      <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
       <Values>
         <Standard>
-          <GUID>1500001830</GUID>
-          <Name>Helper Attacker</Name>
+          <GUID>1500001879</GUID>
+          <Name>Buy Share (evenn if blocked)</Name>
+          <!-- <IconFilename>data/ui/2kimages/main/icons/icon_shares_buy.png</IconFilename> -->
+          <IconFilename>data/sabotage_graphics_serp/icons/icon_shares_buy_brown.png</IconFilename>
+          <InfoDescription>1500001880</InfoDescription>
         </Standard>
-        <Mesh />
+        <Cost>
+          <Costs />
+        </Cost>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500001547</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
       </Values>
     </Asset>
-    <Asset>
-      <Template>ObjectDummyWithOwner_Victim</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001831</GUID>
-          <Name>Helper Victim Pirates -5</Name>
-        </Standard>
-        <Mesh />
-      </Values>
-    </Asset>
+    <!-- Steal Money as Building Action (instead of Item), because this way we can use lua to fetch the Area the building is standing -->
+     <!-- and have much more options and easier way to reduce/add money. Eg. using as Amount the costs of 1 islandshare -->
+     <!-- ok doch über item machen, weil dadurch targetting nur kontor es einfacher macht den spy zu spotten -->
+      <!-- und KI mit Gebäude eh nicht so gut klarkommt (es zu finden) usw -->
+        <!-- Thoughts: -->
+        <!-- For lua to properly identify the executing player, we need CharacterNotification Buttons -->
+        <!-- wobei wenn wir eh notification nutzen, kann mans auch weiter über n Item machen, -->
+         <!-- was die notificaton spawnt sobald ausgeführt. -->
+          <!-- und sobald button einmal gedrückt für cooldown Zeit button sperren , damit im coop nicht mehrfach geklickt werden kann -->
+            <!-- (kann bei gleichzeitig Klicken exploitet werden, wobei wir auch hier selection gegenchecken können) -->
+        <!-- Damit Notification weniger nervig: -->
+         <!-- evlt stattdessen eine Quest starten mit selecte Kontor auf insel wo spy ist (hat dann auch jump to) -->
+         <!-- Dann kann man das machen wenn man Zeit hat und notification kann nicht durch ne andere notifiaction verschwinden -->
+          <!-- wobei die frage wäre wie wir Quest mit richtiger Area starten, da es ja KI insel ist und aus deren sicht können wir keine Quest für human starten.. -->
+        
+        <!-- Falls weiter über Gebäude: -->
+         <!-- Dann können wir hier direkt scipt ausführen und das selected Gebäude und sein Area abfragen. -->
+          <!-- und wenn Posten dann prüfen ob auf Insel auch Spy-Helper-Gebäude (ProfileCounter). -->
+          <!-- Wenn ja, dann Action ausführen. -->
+         <!-- Einziger Fall der Probleme macht: Wenn beide Coop Spieler einen Posten auf der richtigen Insel angegklickt haben. -->
+          <!-- Dann würde Action doppelt ausgeführt, ohne dass wir das verhindern können -->
+        
+        <!-- Für Item spricht aufjedenfall dass Spy dafür beim Kontor stehen muss -->
+         <!-- und KI und evlt auch Spieler es schwerer haben die Gebäude zu zerstören -->
+       <!-- Solche Gebäude Aktionen, die sofort starten, sind auch zu exploitable im Sinne von: -->
+        <!-- Spion ist nur 10 sek auf Insel um Aktion zu starten und dann wieder weg, sodass er nicht leicht erwischt werden kann. -->
+        <!-- Dh. wenn Gebäude Aktionen, dann dürfen die nur laufen wenn Spion währendessen weiter auf Insel ist -->
+        
+        <!-- Alternativ: -->
+        <!-- Mit Item. -->
+         <!-- Und es startet Trigger, welcher aber auch prüft ob Spieler in derselben Session ist (geht das?) -->
+          <!-- wenn das geht, dann startet lua script erst wenn ein coop spieler in derselben Session ist -->
+           <!-- und dann kann Spy Insel shcnell gefunden werden -->
+         <!-- ne funzt nicht: 1)Verzögerung ist schon schwer und 2) ist dann auch unbekannt wieviele coop peers den lua code dann ausführen (nur die die aktuell in session sind, was wir ohne ultra nicht prüfen können wegen potentiell inaktiver peer) -->
+        
+    <!-- <Asset> -->
+      <!-- <Template>ObjectDummyWithOwner_BuildInShipyard</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001489</GUID> -->
+          <!-- <Name>Steal Money </Name> -->
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/consumables/icon_moneybag_rare.png</IconFilename> -->
+          <!-- <InfoDescription>1500001491</InfoDescription> -->
+        <!-- </Standard> -->
+        <!-- <Cost> -->
+          <!-- <Costs /> -->
+        <!-- </Cost> -->
+        <!-- <Locked> -->
+          <!-- <DefaultLockedState>0</DefaultLockedState> -->
+        <!-- </Locked> -->
+        <!-- <ItemEffect> -->
+          <!-- <EffectTargets> -->
+            <!-- <Item> -->
+              <!-- <GUID>1500001547</GUID> -->
+            <!-- </Item> -->
+          <!-- </EffectTargets> -->
+        <!-- </ItemEffect> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
     
   </ModOp>
   

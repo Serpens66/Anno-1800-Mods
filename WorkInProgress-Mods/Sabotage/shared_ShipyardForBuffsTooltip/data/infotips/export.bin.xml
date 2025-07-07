@@ -12,9 +12,7 @@
   <!-- <ExpectedValueInt>118718</ExpectedValueInt> -->
   <!-- <Condition>[RefGuid]</Condition> -->
   
-  <!-- TODO: noch kompatibel mit meinen MoreInfoTooltips mod machen, denn da entferne ich eine unlock anzeige condition -->
-    <!-- weshalb der erste modop hier failed. -->
-    <!-- am besten mit modop condition mod-active check arbeiten -->
+
   <!-- make the vanilla unlocked tooltip only visible if the object has no EffectTargets defined -->
   <ModOp Type="add" Path="//InfoTipData[Guid='500057']/InfoElement[VisibilityElement/VisibilityElement[Condition='[Unlock IsUnlocked([RefGuid])]' and not(ExpectedValueBool)] and VisibilityElement/VisibilityElement[Condition='[IsGamepadModeActive]' and ExpectedValueBool='False']]/VisibilityElement">
     <VisibilityElement>
@@ -34,7 +32,8 @@
   
   
   <!-- custom tooltip to display the buffs and EffectTargets in addtion to buiildcosts if it has some -->
-  <ModOp Type="add" Path="//InfoTipData[Guid='500057']">
+   <!-- (also if not unlocked and directly at the start (after name+icon, but before unlock condition and costs and so on)) -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='500057']/InfoElement[1]">
     <InfoElement>
       <ElementType>8</ElementType>
       <ChildCount>15</ChildCount>
@@ -43,14 +42,14 @@
           <ElementType>2</ElementType>
         </ElementType>
         <ChildCount>2</ChildCount>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>1</ElementType>
-          </ElementType>
-          <CompareOperator />
-          <ResultType />
-          <Condition>[Unlock IsUnlocked([RefGuid])]</Condition>
-        </VisibilityElement>
+        <!-- <VisibilityElement> -->
+          <!-- <ElementType> -->
+            <!-- <ElementType>1</ElementType> -->
+          <!-- </ElementType> -->
+          <!-- <CompareOperator /> -->
+          <!-- <ResultType /> -->
+          <!-- <Condition>[Unlock IsUnlocked([RefGuid])]</Condition> -->
+        <!-- </VisibilityElement> -->
         <VisibilityElement>
           <ElementType>
             <ElementType>1</ElementType>
@@ -324,7 +323,17 @@
             <ElementType>
               <ElementType>2</ElementType>
             </ElementType>
-            <ChildCount>2</ChildCount>
+            <ChildCount>3</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs Count]</Condition>
+            </VisibilityElement>
             <VisibilityElement>
               <ElementType>
                 <ElementType>1</ElementType>
@@ -804,90 +813,6 @@
           <WarningType>
             <WarningType>2</WarningType>
           </WarningType>
-          <BackgroundType />
-        </InfoElement>
-      </InfoElement>
-      <InfoElement>
-        <ElementType>8</ElementType>
-        <ChildCount>3</ChildCount>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <ChildCount>1</ChildCount>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>1</ElementType>
-            </ElementType>
-            <CompareOperator />
-            <ResultType />
-            <ExpectedValueBool>False</ExpectedValueBool>
-            <Condition>[IsGamepadModeActive]</Condition>
-          </VisibilityElement>
-          <OperatorType />
-        </VisibilityElement>
-        <InfoElement>
-          <ElementType>6</ElementType>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <OperatorType />
-          </VisibilityElement>
-          <Text>
-            <Style />
-          </Text>
-        </InfoElement>
-        <InfoElement>
-          <ElementType>5</ElementType>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator />
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <Condition>[Selection Object Shipyard CurrentConstructionGUID]</Condition>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <Text>
-            <TextGUID>10611</TextGUID>
-            <Style />
-          </Text>
-          <BackgroundType />
-        </InfoElement>
-        <InfoElement>
-          <ElementType>5</ElementType>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator>
-                <CompareOperator>1</CompareOperator>
-              </CompareOperator>
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <Condition>[Selection Object Shipyard CurrentConstructionGUID]</Condition>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <Text>
-            <TextGUID>10612</TextGUID>
-            <Style />
-          </Text>
           <BackgroundType />
         </InfoElement>
       </InfoElement>

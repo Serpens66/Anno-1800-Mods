@@ -3,7 +3,8 @@
 
   <!-- GUIDs from 1500001170 to 1500001220 and more starting from 1500001400 to 1500001599 and from 1500001700 bis 1500002989 freigehalten -->
   <!-- frei ,  bis  -->
-   <!-- ,1500001553,1500001508,1500001509, 1500001862 bis 1500001899 -->
+   <!--  ,1500001881 bis 1500001899 -->
+    <!-- kann noch asset werden, ist aber bereits Text: 1500001509 -->
   <!-- daher nutze ich bis dahin jetzt ab 1500001900 bis 1500002150 für Audio -->
   <!-- 1500002151 bis 1500002179 reserviert für Hilfsressourcen zum Itemspawn -->
   <!-- dh ab 1500002182 zurzeit frei -->
@@ -19,7 +20,21 @@
    <!-- OnlySelectableForOwnerAndAllianceMembers for Spy/Posten? denke ja .. zumindest von human? -->
   
   
+  <!-- TODO: -->
+   <!-- Geld stehlen mit lua machen, sodass x prozent des Inseleinkommens oderso, bzw. die Kosten für einen -->
+    <!-- Insel Share gestohlen wird (high end game kostet ein share von Cape 55 Mio) -->
+  <!-- .. -->
+  <!-- Und auch Share einer Insel stehlen (die dem insel owner gehört), das weglassen, lieber geld stehlen und cooldown resetten -->
+    <!-- ts.Area.CurrentSelectedArea.SetBuyShare(PID,index) ignoriert Cooldown, aber startet ihn. und bezahlt Kosten -->
+    <!-- löst auch normale Reaktion der KI aus, also bei hard AI in der Regeln negative Rep und entsprechende Nachricht -->
+  <!-- ts.Area.CurrentSelectedArea.GetOwnerProfile(index) returned den Text der Owner PID/GUID (also mit ts.GetAssetData(GUID).Text abgleichen) -->
+  <!-- ts.Area.CurrentSelectedArea.SetHostileTakeover(PID) übernimmt Insel kostenlos für sich (normal ohne Gebäude) -->
+  <!-- .. -->
+  <!-- evlt muss das mit lua dann über CharacterNotification gelöst werden (während man gebäude der insel bzw. spy-posten -->
+   <!-- angegklickt hat, damit wir über lua möglichst simpel und schnell an die Area usw kommen. -->
+  <!-- evlt auch Hijack über CharacterNotification+Anklicken lösen, was dann nur bei schiffen geht, die nen schuss-buff haben) -->
   
+  <!-- und mit Spy den Buy-Shares Cooldown zurücksetzen: lua ts.Area.CurrentSelectedArea.SetResetCooldown(PID) -->
   
   
   <!-- Problem -->
@@ -1220,8 +1235,424 @@
   </ModOp>
   
   
+  <!-- No Spies Agreement from DiploActions mod -->
+  <!-- No Clue how to display the TimeLimit from ConditionTimer in Triggers ...  -->
+   <!-- So we will use a invisible MetaProduct to count from max TimeLimit to 0 and display it as minutes it still lasts -->
+  <ModOp Type="AddNextSibling" GUID="1010017">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004024</GUID>
+          <Name>TimeLimit NoSpies Jorgensen</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product>
+          <StorageLevel>Meta</StorageLevel>
+          <CanBeNegative>0</CanBeNegative>
+          <HideInUI>1</HideInUI>
+        </Product>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004025</GUID>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004026</GUID>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004027</GUID>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004028</GUID>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004029</GUID>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004030</GUID>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004031</GUID>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004032</GUID>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004033</GUID>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500004034</GUID>
+          <Name>TimeLimit Mercier 11</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <!-- global cooldown because its too complicated to find out where we used it  -->
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001878</GUID>
+          <Name>Cooldown Spy Report Global</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001880</GUID>
+          <Name>Cooldown Buy Extra Island Share Global</Name>
+        </Standard>
+      </Values>
+    </Asset>
+    
+    <!-- TODO: die folgenden cooldown guids können noch für was andres genutzt werden, wo wir wissen wer target ist -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001862</GUID> -->
+          <!-- <Name>Cooldown Spy Report Jorgensen</Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001863</GUID> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001864</GUID> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001865</GUID> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001866</GUID> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001867</GUID> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001868</GUID> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001869</GUID> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001870</GUID> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001871</GUID> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001872</GUID> -->
+          <!-- <Name>Cooldown Spy Report Mercier 11</Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001873</GUID> -->
+          <!-- <Name>Cooldown Spy Report Human0</Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001874</GUID> -->
+          <!-- <Name>Cooldown Spy Report Human1</Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001875</GUID> -->
+          <!-- <Name>Cooldown Spy Report Human2</Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001876</GUID> -->
+          <!-- <Name>Cooldown Spy Report Human3</Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+    
+    
+    <Asset>
+      <BaseAssetGUID>1500004024</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500006067</GUID>
+          <Name>test </Name>
+        </Standard>
+      </Values>
+    </Asset>
+    <!-- <Asset> -->
+      <!-- <BaseAssetGUID>1500004024</BaseAssetGUID> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500006068</GUID> -->
+          <!-- <Name>test </Name> -->
+        <!-- </Standard> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+    
+  </ModOp>
   
-  
+  <ModOp Type="AddNextSibling" GUID="500424">
+    <Asset>
+      <Template>ValueAssetMap</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004036</GUID>
+          <Name>Convert PID to TimeLimit Product</Name>
+        </Standard>
+        <ValueAssetMap>
+          <ValueAssetMap>
+            <Item>
+              <Asset>0</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>25</ValidFrom>
+              <Asset>1500004024</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>26</ValidFrom>
+              <Asset>1500004025</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>27</ValidFrom>
+              <Asset>1500004026</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>28</ValidFrom>
+              <Asset>1500004027</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>29</ValidFrom>
+              <Asset>1500004028</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>30</ValidFrom>
+              <Asset>1500004029</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>31</ValidFrom>
+              <Asset>1500004030</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>32</ValidFrom>
+              <Asset>1500004031</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>33</ValidFrom>
+              <Asset>1500004032</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>34</ValidFrom>
+              <Asset>1500004033</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>64</ValidFrom>
+              <Asset>1500004034</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>65</ValidFrom>
+              <Asset>0</Asset>
+            </Item>
+          </ValueAssetMap>
+        </ValueAssetMap>
+      </Values>
+    </Asset>
+    
+    <!-- <Asset> -->
+      <!-- <Template>ValueAssetMap</Template> -->
+      <!-- <Values> -->
+        <!-- <Standard> -->
+          <!-- <GUID>1500001877</GUID> -->
+          <!-- <Name>Convert PID to Cooldown Spy Report</Name> -->
+        <!-- </Standard> -->
+        <!-- <ValueAssetMap> -->
+          <!-- <ValueAssetMap> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>0</ValidFrom> -->
+              <!-- <Asset>1500001873</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>1</ValidFrom> -->
+              <!-- <Asset>1500001874</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>2</ValidFrom> -->
+              <!-- <Asset>1500001875</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>3</ValidFrom> -->
+              <!-- <Asset>1500001876</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>25</ValidFrom> -->
+              <!-- <Asset>1500001862</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>26</ValidFrom> -->
+              <!-- <Asset>1500001863</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>27</ValidFrom> -->
+              <!-- <Asset>1500001864</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>28</ValidFrom> -->
+              <!-- <Asset>1500001865</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>29</ValidFrom> -->
+              <!-- <Asset>1500001866</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>30</ValidFrom> -->
+              <!-- <Asset>1500001867</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>31</ValidFrom> -->
+              <!-- <Asset>1500001868</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>32</ValidFrom> -->
+              <!-- <Asset>1500001869</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>33</ValidFrom> -->
+              <!-- <Asset>1500001870</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>34</ValidFrom> -->
+              <!-- <Asset>1500001871</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>64</ValidFrom> -->
+              <!-- <Asset>1500001872</Asset> -->
+            <!-- </Item> -->
+            <!-- <Item> -->
+              <!-- <ValidFrom>65</ValidFrom> -->
+              <!-- <Asset>0</Asset> -->
+            <!-- </Item> -->
+          <!-- </ValueAssetMap> -->
+        <!-- </ValueAssetMap> -->
+      <!-- </Values> -->
+    <!-- </Asset> -->
+  </ModOp>
   
 
   
