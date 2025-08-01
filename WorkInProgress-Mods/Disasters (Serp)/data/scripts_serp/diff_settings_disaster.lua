@@ -1,6 +1,6 @@
 -- This script gets called with ActionExecuteScript everytime a human hits a "Mod-Settings-Details" Button.
  -- ActionExecuteScript makes the code be executed for all humans, regardless who it the button.
-  -- So this is our method to sync the button-hit between all humans
+  -- So this is our method to sync the button-hit between all humans (for global settings)
    -- (I tested alot of different methods, and this is by far the best and with the simplest code)
 
 -- (if you dont want to sync a chosen setting to all humans, you dont need lua, simply use xml ConditoinEvent/ObjectBuilt Trigger for each

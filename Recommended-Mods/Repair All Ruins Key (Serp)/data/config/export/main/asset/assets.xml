@@ -1,0 +1,67 @@
+<ModOps>
+
+  <!-- in vanilla you can select the next Ruin by pressing "J", so we use "Shift+J" for repairing all ruins (worldwide) -->
+  
+  <!-- I do not allow to change the keybind in settings, because the game does reset custom mod keybinds on every gamestart, so I see no point in allowing to change them... -->
+  
+	<ModOp Type="add" GUID='2001271' Path="/Values/GUIConfig/KeyBindings">
+    <Item>
+      <KeyTypes>Shift;J</KeyTypes>
+      <Command>local function get_oid(userdata);local oid,Namestring,success;success,Namestring = pcall(function();return userdata:getName();end);if success and Namestring~=nil and type(Namestring)=="string" then;oid = string.match(Namestring, "oid (.*)");if oid~=nil and type(oid)=="string" then;oid = tonumber(oid);end;end;return oid;end;system.start(function();local OIDlist = {};local OID;local PID = ts.Participants.GetGetCurrentParticipantID();local sessionguid = session.getSessionGUID();while true do;ts.Selection.SetSelectNextRuin();coroutine.yield();if sessionguid ~= session.getSessionGUID() then;if g_LTL_Serp~=nil then;g_LTL_Serp.waitForTimeDelta(800);else;system.waitForGameTimeDelta(800);end;end;if ts.Selection.Object.GUID~=0 and ts.Selection.Object.Owner==PID then;OID = get_oid(session.getSelectedFactory());if OIDlist[OID]==nil then;if ts.Selection.Object.Renovatability.IsRenovatable and ts.Selection.Object.Attackable.CurHitPoints==0 then;ts.Selection.UpgradeSelected(true);end;OIDlist[OID] = sessionguid;else;break;end;end;sessionguid = session.getSessionGUID();end;end,"upgradeallruins")</Command>
+      <Active>Session</Active>
+      <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+      <AudioEvent>200634</AudioEvent>
+      <Configurable>0</Configurable>
+      <HideInOptionMenu>1</HideInOptionMenu>
+      <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+    </Item>
+  </ModOp>
+    
+    
+
+
+<!-- local function get_oid(userdata) -->
+  <!-- local oid,Namestring,success -->
+  <!-- success,Namestring = pcall(function() ## may crash te game, eg on a session userdata object, so we use pcall -->
+    <!-- return userdata:getName() ## returns eg. "GameObject, oid 8589934647", while getOID returns an local ObjectID, not usuable in ts.Objects.GetObject. -->
+  <!-- end) -->
+  <!-- if success and Namestring~=nil and type(Namestring)=="string" then -->
+    <!-- oid = string.match(Namestring, "oid (.*)") -->
+    <!-- if oid~=nil and type(oid)=="string" then -->
+      <!-- oid = tonumber(oid) -->
+    <!-- end -->
+  <!-- end -->
+  <!-- return oid -->
+<!-- end -->
+<!-- system.start(function() -->
+  <!-- local OIDlist = {} -->
+  <!-- local OID -->
+  <!-- local PID = ts.Participants.GetGetCurrentParticipantID() -->
+  <!-- local sessionguid = session.getSessionGUID() -->
+  <!-- while true do  ##  dont know how to check if ruins exist (SetSelectNextRuin does not return anything and ProfileCounter can only check RuinCount with GUID, while pools do not work). so we do a loop and most likely will hit all -->
+    <!-- ts.Selection.SetSelectNextRuin() -->
+    <!-- coroutine.yield() -->
+    <!-- if sessionguid ~= session.getSessionGUID() then ## wait for the session switch to complete, because UpgradeSelected does not work while in transition -->
+      <!-- if g_LTL_Serp~=nil then -->
+        <!-- g_LTL_Serp.waitForTimeDelta(800) -->
+      <!-- else -->
+        <!-- system.waitForGameTimeDelta(800) ## is not long enough on fast forward -->
+      <!-- end -->
+    <!-- end -->
+    <!-- if ts.Selection.Object.GUID~=0 and ts.Selection.Object.Owner==PID then -->
+      <!-- OID = get_oid(session.getSelectedFactory()) -->
+      <!-- if OIDlist[OID]==nil then -->
+        <!-- if ts.Selection.Object.Attackable.CurHitPoints==0 and ts.Selection.Object.Renovatability.IsRenovatable then ## IsRenovatable checks if we can afford it (also returns true for not ruins) -->
+          <!-- ts.Selection.UpgradeSelected(true)  ##   upgrade all of this kind on the whole island (mouse cursor changes to upgrade if not upgradeable, so we check if sth is selected and hitpoints to prevent it) -->
+        <!-- end -->
+        <!-- OIDlist[OID] = sessionguid -->
+      <!-- else ## then we checked all ruins -->
+        <!-- print(OID,sessionguid,OIDlist[OID]) -->
+        <!-- break -->
+      <!-- end -->
+    <!-- end -->
+    <!-- sessionguid = session.getSessionGUID() -->
+  <!-- end -->
+<!-- end,"upgradeallruins") -->
+
+</ModOps> 

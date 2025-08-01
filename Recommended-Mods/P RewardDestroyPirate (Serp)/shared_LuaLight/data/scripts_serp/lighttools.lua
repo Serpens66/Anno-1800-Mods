@@ -478,6 +478,15 @@ local function HexToTable(_string)
   return _ioTable
 end
 
+local function argstotext(sep,...)
+  local ret = ""
+  local sep = sep or " , "
+  local args = {...}
+  for _,arg in pairs(args) do -- pairs instead of ipairs to also allow a value of nil
+    ret = ret..tostring(arg)..tostring(sep)
+  end
+  return ret
+end
 
 -- ##################################################################################################################
 -- ##################################################################################################################
@@ -810,6 +819,8 @@ end
     -- by using also CharacterNotification_DummyCommand (ObjectDummies shared mod) instead of ActionExecuteScript it saves from creating a new script per function and especially from creating one script per human and checking which human we are. -->
      -- by using CharacterNotification_DummyCommand together with the t_FnViaTextEmbed system, the function is only executed for the PID who executes the trigger (for coop its still executed multiple times!)
     
+    -- Notifications are most likley not executed for AIs processing the Trigger (not tested)
+   
    -- IMPORTANT:
    -- Before doing your <Command> in eg a xml trigger, first check if 1500005600 is unlocked ! If it is locked, this fn is currently in use and you need to wait!!
     -- For CharacterNotification with player interaction, use <ActiveCallback>[Unlock IsUnlocked(1500005600)]</ActiveCallback> 
@@ -945,7 +956,7 @@ end
   -- to get username use: ts.Online.GetUsername(peerint)
   -- for StatisticsMenu UIState = 176, for ships it is 119 (it is called RefGuid in infotips for whatever reason), get them eg with adding your log function to table event.OnLeaveUIState and log the one paramater of this function
   -- CompynaMenu (hitting on your profile) is UIState = 0, diplomenu=29, TradeRoutemenu is 165 or 177, ESC Menü 132, Optionsmenü 129, Annopedia 174, EinflussFenster ist 52, Stadt Attraktivität ist 3, 
-    -- 116 Bauernhaus, 103 Marktplatz, 102 Kontor/Lagerhaus,97 handelskammer UI, 113 Kirche, 120 Werft, 192/193 oder 194 ist Movie beenden
+    -- buildings (hängt vom GUIType ab): 116 Bauernhaus, 103 Marktplatz, 102 Kontor/Lagerhaus,97 handelskammer UI, 113 Kirche, 120 Werft, 192/193 oder 194 ist Movie beenden
   -- RefOid = 0 for whole menus , for ships/buildings: g_LTL_Serp.get_OID(session.getSelectedFactory()) 
   local function GetCoopPeersAtMarker(UIState,RefOid)
     local count = g_LTL_Serp.DoForSessionGameObject("[Online GetCoopPeersAtMarker("..tostring(UIState)..","..tostring(RefOid)..") Count]",true)
@@ -1144,7 +1155,21 @@ end
     end
   end
   
-  
+  -- is called whenever the local peer hits the "Confirm" Button on a "Do you really want to delete the object" PopUp (xml)
+  -- (only for the peer who hits the confirm popup button, so not for all coop peers)
+   -- (we could also overwrite "ts.Selection.DestructSelected" which would affect the "Del" keybind, but there is no way to check if it will directly delete or show a popup. and I think it does not catch the Delete-Tool)
+  local EventOnObjectDeletionConfirmed = {}
+  -- add your function which should be called to the list EventOnObjectDeletionConfirmed with ModID of your mod as key.
+  local function _OnObjectDeletionConfirmed(GUID)
+    for modname,fn in pairs(EventOnObjectDeletionConfirmed) do
+      if type(fn)=="function" then
+        local status,err = xpcall(fn,g_LTL_Serp.log_error,GUID)
+        if status==false then
+          g_LTL_Serp.modlog("ERROR in _OnObjectDeletionConfirmed for mod '"..tostring(modname).."': "..tostring(err),ModID)
+        end
+      end
+    end
+  end
   -- ###################################################################################################
   -- ###################################################################################################
   -- ###################################################################################################
@@ -1372,6 +1397,7 @@ g_LTL_Serp = {
   GetPairAtIndSortedKeys = GetPairAtIndSortedKeys,
   TableToHex = TableToHex,
   HexToTable = HexToTable,
+  argstotext = argstotext,
   
   -- ######################################
   -- Anno1800 related lightweigth lua helpers
@@ -1439,6 +1465,15 @@ g_LTL_Serp = {
   },
   -- GetTopLevelDiplomacyStateTo only returns 0 to 3. to check CeaseFire/NonAttack use GetCheckDiplomacyStateTo
   DiplomacyState = {War=0,Peace=1,TradeRights=2,Alliance=3,CeaseFire=4,NonAttack=5}, -- from datasets.xml
+   -- for StatisticsMenu UIState = 176, for ships it is 119 (it is called RefGuid in infotips for whatever reason), get them eg with adding your log function to table event.OnLeaveUIState and log the one paramater of this function
+  -- CompynaMenu (hitting on your profile) is UIState = 0, diplomenu=29, TradeRoutemenu is 165 or 177, ESC Menü 132, Optionsmenü 129, Annopedia 174, EinflussFenster ist 52, Stadt Attraktivität ist 3, 
+    -- buildings (hängt vom GUIType ab): 116 Bauernhaus, 103 Marktplatz, 102 Kontor/Lagerhaus,97 handelskammer UI, 113 Kirche, 120 Werft, 192/193 oder 194 ist Movie beenden
+  -- RefOid = 0 for whole menus , for ships/buildings: g_LTL_Serp.get_OID(session.getSelectedFactory()) 
+  
+  -- related to GUIType , but not the same like UIState from datasets.xml. There is no datasets.xml for this
+   -- but it is the thing returned from event.OnLeaveUIState and used eg for GetCoopPeersAtMarker
+  -- TODO vervollständigen
+  UITypeState = {Statistics=176,Shipyard=120},
   
   -- Trickster Anno Helpers
   t_FnViaTextEmbed = t_FnViaTextEmbed,
@@ -1450,6 +1485,8 @@ g_LTL_Serp = {
   GetActiveQuestInstances = GetActiveQuestInstances,
   GetCurrentSessionObjectsFromLocaleByProperty = GetCurrentSessionObjectsFromLocaleByProperty,
   DestroyGUIDByLocal = DestroyGUIDByLocal,
+  EventOnObjectDeletionConfirmed = EventOnObjectDeletionConfirmed,
+  _OnObjectDeletionConfirmed = _OnObjectDeletionConfirmed,
   
   -- CheckObjectHelpers 
   IsUserdataValid = IsUserdataValid,

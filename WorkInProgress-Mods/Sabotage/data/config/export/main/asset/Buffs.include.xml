@@ -11,14 +11,12 @@
     <!-- <EffectFile>data/graphics/effects/particles/special/fireworks/guild_house_01.cfg</EffectFile> -->
   <!-- </VisualEffectWhenActive> -->
   
-    
+  <!-- TODO: wenn alle buffs mit zielen fertig sind, dann sicherstellen, dass alle Ziele in 1500001209 als effecttarget gelistet sind -->
+
     <!-- Leider kann man keine MatcherGUID für die EffectTarget nutzen, richtig dumm... -->
     
-  <!-- bei einigen effekt-vanilla bezeichnungen könnte man das hardcodede "+" entfernen, damit da nicht "+-10%" steht (suche nach "<Text>+") -->
-    <!-- bzw. man könnte in infotips bei verwendung dieser strings eine condition davor schlaten, obs positiv oder negativ ist  -->
-    <!-- das evtl. in Tooltipbugfixes mod einbauen -->
-     <!-- zb auch (hat nichts mit spy zu tun) AreaTolerance <GUID>15319</GUID> <Name>FreeAreaTolerance</Name> -->
-  
+<!-- ####### -->
+
   <!-- Using ActionBuff to provide this PirateFlag buff, because UpgradeList-DefaultBuff does not work for pirate mode,because it tries to add it before object is completely initialized (same for alwaystrue trigger) -->
   <!-- pirate mode is very important, so the projectile can target non-enemies -->
   <!-- AttackSpeedUpgrade reduced, because I have no clue how the ReloadTime value works and we want slow attackrate for all spies/police -->
@@ -57,6 +55,9 @@
         <Buff>
           <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
         </Buff>
+        <CultureUpgrade>
+          <HideBuff>1</HideBuff>
+        </CultureUpgrade>
       </Values>
     </Asset>
 
@@ -114,7 +115,7 @@
       </Values>
     </Asset>
   
-  <!-- TODO: wenn alle buffs mit zielen fertig sind, dann sicherstellen, dass alle Ziele in 1500001209 als effecttarget gelistet sind -->
+  
   <!-- a buff to display a building/ship was sabotaged added to all buildings in range even if they are not affected by the particular debuff. it does nothing on its own, except on resolver buildings, making the units slower. -->
   <!-- only used for the incident sabotage, the others have their own debuffs which can show this directly -->
     <Asset>
@@ -200,10 +201,10 @@
           <AddedInfolayer>1500001212</AddedInfolayer>
           <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
         </Buff>
-        <!-- todo test ob sowas sinnvoll ist feuerwerk -->
-        <VisualEffectWhenActive>
-          <EffectFile>data/graphics/effects/particles/special/fireworks/guild_house_01.cfg</EffectFile>
-        </VisualEffectWhenActive>
+        <!-- todo test ob sowas sinnvoll ist feuerwerk, funzt nicht? -->
+        <!-- <VisualEffectWhenActive> -->
+          <!-- <EffectFile>data/graphics/effects/particles/special/fireworks/guild_house_01.cfg</EffectFile> -->
+        <!-- </VisualEffectWhenActive> -->
       </Values>
     </Asset>
     <Asset>
@@ -225,7 +226,9 @@
         </Standard>
       </Values>
     </Asset>
-
+    
+    <!-- TODO: diesen StatusEffect noch zu anderen Projektilen zufügen? -->
+     <!-- oder ein extra item für incidentresolver machen? -->
     <Asset>
       <Template>InfluenceTitleBuff</Template>
       <Values>
@@ -265,6 +268,26 @@
             <Percental>1</Percental>
           </ResolverUnitMovementSpeedUpgrade>
         </BuildingUpgrade>
+        <!-- TODO sowas noch zufügen? glaube ich für alle gebäude relevant nicht nur resolver -->
+         <!-- falls ich ResolverUnitDecreaseRateInPercent zufüge, testen wie tooltip bei activebuff aussieht, wenn werte negativ -->
+          <!-- vermutlich +- ? frage ist obs auch verständlich ohne irgendein zeichen wäre, dass + gemeint ist, -->
+           <!-- wenn ja dann in Tooltipbugfixes text änderung 21528 einkommentieren -->
+        <!-- <IncidentInfectableUpgrade> -->
+          <!-- <IncidentFireIncreaseUpgrade> -->
+            <!-- <Value>-50</Value> -->
+            <!-- <Percental>1</Percental> -->
+          <!-- </IncidentFireIncreaseUpgrade> -->
+        <!-- </IncidentInfectableUpgrade> -->
+        <!-- <IncidentInfluencerUpgrade> -->
+          <!-- <SpecialUnitHappinessThresholdUpgrade> -->
+            <!-- <Value>-10</Value> -->
+          <!-- </SpecialUnitHappinessThresholdUpgrade> -->
+          <!-- <FireInfluenceUpgrade> -->
+            <!-- <Value>-20</Value> -->
+            <!-- <Percental>1</Percental> -->
+          <!-- </FireInfluenceUpgrade> -->
+        <!-- </IncidentInfluencerUpgrade> -->
+        
       </Values>
     </Asset>
     <Asset>
@@ -603,7 +626,7 @@
     
     <!-- Instead of hitpoints we change DamageReceiveFactor so you get more damage, because changing max health is never a good idea (integer overflow and display problems) -->
     <Asset>
-      <Template>VehicleBuff</Template>
+      <Template>InfluenceTitleBuff</Template>
       <Values>
         <Standard>
           <GUID>1500001557</GUID>
@@ -664,7 +687,7 @@
     
     
     <Asset>
-      <Template>VehicleBuff</Template>
+      <Template>InfluenceTitleBuff</Template>
       <Values>
         <Standard>
           <GUID>1500001570</GUID>
@@ -734,7 +757,7 @@
 
     
     <Asset>
-      <Template>VehicleBuff</Template>
+      <Template>InfluenceTitleBuff</Template>
       <Values>
         <Standard>
           <GUID>1500001576</GUID>
@@ -777,7 +800,7 @@
 
     
     <Asset>
-      <Template>VehicleBuff</Template>
+      <Template>InfluenceTitleBuff</Template>
       <Values>
         <Standard>
           <GUID>1500001577</GUID>
@@ -816,7 +839,7 @@
 
     
     <Asset>
-      <Template>VehicleBuff</Template>
+      <Template>InfluenceTitleBuff</Template>
       <Values>
         <Standard>
           <GUID>1500001578</GUID>
@@ -862,7 +885,7 @@
         <Standard>
           <GUID>1500001508</GUID>
           <Name>Spy Post at this island</Name>
-          <IconFilename>data/sabotage_graphics_serp/icons/icon_tower_3.png</IconFilename>
+          <IconFilename>data/sabotage_graphics_serp/icons/icon_resident_spy.png</IconFilename>
           <InfoDescription>1500001509</InfoDescription>
         </Standard>
         <ItemEffect>
@@ -928,6 +951,129 @@
         </ItemEffect>
       </Values>
     </Asset>
+    
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001895</GUID>
+          <Name>No spy recruit: Punish for Deletion of Spy</Name>
+          <InfoDescription>1500001894</InfoDescription>
+          <IconFilename>data/sabotage_graphics_serp/icons/icon_machax_nospy.png</IconFilename>
+        </Standard>
+        <ShipyardUpgrade>
+          <ReplaceAssemblyOptions>
+            <Item>
+              <OldOption>1500001173</OldOption>
+              <!-- NewOption=0 does not work, so use a dummy that can not be built -->
+              <NewOption>1500001492</NewOption>
+            </Item>
+          </ReplaceAssemblyOptions>
+        </ShipyardUpgrade>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500001547</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001896</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001754</GUID>
+          <Name>Own Spy Difficulty Very Easy (recommended for testing)</Name>
+          <IconFilename>data/sabotage_graphics_serp/icons/spydiffeasy.png</IconFilename>
+        </Standard>
+        <Text>
+          <TextOverride>1500001744</TextOverride>
+        </Text>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500001435</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001896</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001534</GUID>
+            </Item>
+            <Item>
+              <GUID>1500001547</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>100</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+          <MaintainanceUpgrade>
+            <Value>-50</Value>
+            <Percental>1</Percental>
+          </MaintainanceUpgrade>
+        </VehicleUpgrade>
+        <ShipyardUpgrade>
+          <ConstructionCostInPercent>-95</ConstructionCostInPercent>
+          <ConstructionTimeInPercent>-95</ConstructionTimeInPercent>
+        </ShipyardUpgrade>
+        <BuildingUpgrade>
+          <MaintenanceUpgrade>
+            <Value>-50</Value>
+            <Percental>1</Percental>
+          </MaintenanceUpgrade>
+        </BuildingUpgrade>
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    <Asset>
+      <BaseAssetGUID>1500001754</BaseAssetGUID>
+      <Values>
+        <Standard>
+          <GUID>1500001755</GUID>
+          <Name>SettingOption: Own Spy Difficulty hard</Name>
+          <IconFilename>data/sabotage_graphics_serp/icons/spydiffhard.png</IconFilename>
+        </Standard>
+        <Text>
+          <TextOverride>1500001746</TextOverride>
+        </Text>
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>-25</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+          <MaintainanceUpgrade>
+            <Value>50</Value>
+            <Percental>1</Percental>
+          </MaintainanceUpgrade>
+        </VehicleUpgrade>
+        <ShipyardUpgrade>
+          <ConstructionCostInPercent>100</ConstructionCostInPercent>
+          <ConstructionTimeInPercent>100</ConstructionTimeInPercent>
+        </ShipyardUpgrade>
+        <BuildingUpgrade>
+          <MaintenanceUpgrade>
+            <Value>50</Value>
+            <Percental>1</Percental>
+          </MaintenanceUpgrade>
+        </BuildingUpgrade>
+        <Buff>
+          <ShouldBeShownInForeignObjectMenu>1</ShouldBeShownInForeignObjectMenu>
+        </Buff>
+      </Values>
+    </Asset>
+    
     
   </ModOp>
   
@@ -1239,6 +1385,32 @@
                 </Item>
                 <Item>
                   <GUID>1500001533</GUID>
+                </Item>
+              </EffectTargetGUIDs>
+            </ItemEffectTargetPool>
+          </Values>
+        </Asset>
+        
+        <Asset>
+          <Template>ItemEffectTargetPool</Template>
+          <Values>
+            <Standard>
+              <GUID>1500001896</GUID>
+              <Name>All Barracks</Name>
+            </Standard>
+            <ItemEffectTargetPool>
+              <EffectTargetGUIDs>
+                <Item>
+                  <GUID>1500001192</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001504</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001505</GUID>
+                </Item>
+                <Item>
+                  <GUID>1500001506</GUID>
                 </Item>
               </EffectTargetGUIDs>
             </ItemEffectTargetPool>

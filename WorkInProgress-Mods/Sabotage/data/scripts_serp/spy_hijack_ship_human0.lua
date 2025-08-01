@@ -1,5 +1,6 @@
 print("execute spy hijack script ..",ts.GameClock.CorporationTime)
 
+-- Braucht eventuell MEdium Lua tools, wobeis noch davon abhängt wie finales ergebnis aussieht
 
 -- Basiert auf altem code. noch an neue lua helper anpassen
  -- und auf spy (wobeis auch allgemein gehalten werden kann ,statt nach spy eben nach item suchen)

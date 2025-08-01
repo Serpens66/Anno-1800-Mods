@@ -1,13 +1,10 @@
 <ModOps>
   
   <!-- GUIDs 1500005030 to 1500005099 -->
-   <!-- 1500005034 bis 1500005035 aktuell wieder frei -->
   
   <!-- DecisionQuests are horrible and also cause problems in multiplayer (workaround exists, but they still suck) -->
    <!-- so we use a shipyard building only for the settings -->
 
-  
-  
   
   <!-- Use an IconFilename that kind of represents your mod here, so users easily know to which mod a button belongs -->
   <ModOp GUID="114166" Type="addNextSibling">
@@ -179,6 +176,43 @@
       <NewOption>1500005030</NewOption>
     </Item>
   </ModOp>
+  <!-- own pool for our disaster Mod-Settings-Details, only needed because we want to to sth special (call lua) if one of these settings was hit -->
+  <ModOp Type="addNextSibling" GUID="700138">
+    <Asset>
+      <Template>PlayerCounterContextPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005034</GUID>
+          <Name>CP - All Mod-Settings-Openers</Name>
+        </Standard>
+        <PlayerCounterContextPool>
+          <Contexts>
+            <Item>
+              <Asset>1500005036</Asset>
+            </Item>
+            <Item>
+              <Asset>1500005037</Asset>
+            </Item>
+            <Item>
+              <Asset>1500005038</Asset>
+            </Item>
+            <Item>
+              <Asset>1500005039</Asset>
+            </Item>
+            <Item>
+              <Asset>1500005040</Asset>
+            </Item>
+            <Item>
+              <Asset>1500005041</Asset>
+            </Item>
+            <Item>
+              <Asset>1500005042</Asset>
+            </Item>
+          </Contexts>
+        </PlayerCounterContextPool>
+      </Values>
+    </Asset>
+  </ModOp>
   
   
   <ModOp Type="AddNextSibling" GUID="190093">
@@ -232,7 +266,7 @@
   <!-- #################################### -->
   <!-- Trigger -->
   <!-- Hide the mod-specific settings again, if the "back"-button (1500005202) was hit -->
-  <ModOp Type="add" GUID="1500005201" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger[TriggerCondition/Values/ConditionEvent/ContextAsset='1500005202']/TriggerActions">
+  <ModOp Type="add" GUID="1500005205" Path="/Values/Trigger/TriggerActions">
     <Item>
       <TriggerAction>
         <Template>ActionBuff</Template>
@@ -247,22 +281,8 @@
       </TriggerAction>
     </Item>
   </ModOp>
-  <!-- when any of the Mod-Settings-Details was hit, execute the following lua script that locks/unlocks the other settings if they are exclusive to each other (and lua also syncs it to all other humans) -->
-   <!-- TODO: eigentlich ja nur nötig, wenn ein Details von diesem Mod geklickt wurde, nicht bei jedem.. -->
-    <!-- andererseits soviel kostet die lua ausführung jetzt auch nicht.. -->
-  <ModOp Type="AddPrevSibling" GUID="1500005201" Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger[TriggerCondition/Values/ConditionPlayerCounter/Context='1500005204']/TriggerActions/Item[TriggerAction/Values/ActionDelayedActions/DelayedActions/Values/ActionList/Actions/Item/Action/Values/ObjectFilter/ObjectGUID='1500005206']">
-    <Item>
-      <TriggerAction>
-        <Template>ActionExecuteScript</Template>
-        <Values>
-          <Action />
-          <ActionExecuteScript>
-            <ScriptFileName>data/scripts_serp/diff_settings_disaster.lua</ScriptFileName>
-          </ActionExecuteScript>
-        </Values>
-      </TriggerAction>
-    </Item>
-  </ModOp>
+
+
   
   <!-- Show Mod-Settings-Details if Opener was hit. -->
    <!-- If you do not want to sync the settings for all humans, you can add here multiple subtriggers, one ConditionEvent per Mod-Settings-Detail -->
@@ -322,6 +342,43 @@
                 </Values>
               </SubTrigger>
             </Item>
+            <!-- when any of the Mod-Settings-Details was hit, execute the following lua script  -->
+            <!-- that locks/unlocks the other settings if they are exclusive to each other  -->
+            <!-- (and lua also syncs it to all other humans, since we want them to be global settings) -->
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>ObjectBuilt</ConditionEvent>
+                          <ContextAsset>1500005034</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionRegisterTrigger</Template>
+                          <Values>
+                            <Action />
+                            <ActionRegisterTrigger>
+                              <TriggerAsset>1500005035</TriggerAsset>
+                            </ActionRegisterTrigger>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
           </SubTriggers>
           <ResetTrigger>
             <Template>AutoCreateTrigger</Template>
@@ -340,6 +397,67 @@
         </Trigger>
         <TriggerSetup>
           <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- put into a seperate trigger, to be sure 1500005032 can reset fast without waiting -->
+     <!-- and still having the advantage here to use ConditionPlayerCounter and wait for deletion before resetting -->
+     <!-- (deletion will be done in main settings mod after 500ms) -->
+     <!-- TODO: test what happens when blicking fast in a row different settings -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005035</GUID>
+          <Name>Mod Setting Detail was Hit, start lua</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionPlayerCounter</Template>
+            <Values>
+              <Condition />
+              <ConditionPlayerCounter>
+                <Context>1500005034</Context>
+                <CounterAmount>1</CounterAmount>
+              </ConditionPlayerCounter>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/diff_settings_disaster.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionPlayerCounter</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionPlayerCounter>
+                      <Context>1500005034</Context>
+                      <CounterAmount>0</CounterAmount>
+                      <ComparisonOp>AtMost</ComparisonOp>
+                    </ConditionPlayerCounter>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
           <UsedBySecondParties>0</UsedBySecondParties>
         </TriggerSetup>
       </Values>

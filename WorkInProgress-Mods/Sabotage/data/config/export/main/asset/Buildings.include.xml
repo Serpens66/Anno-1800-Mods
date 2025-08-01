@@ -35,6 +35,10 @@
   <!-- TODO: barrack zeigt aktuell keine maintenance an und auch Attractiveness ist nicht negativ -->
    <!-- (vermutlich wegen Template, da fehlts ja, evtl. iwelche standarad template werte die wir hier ins asset zufügen müssen) -->
   
+  <!-- todo -->
+  <!-- barracks evtl doch nur eine GUID nutzen und stattdessen Skins für die Sessionvarianten nutzen, die player dann halt selbst  -->
+   <!-- aktivieren muss -->
+  
   <ModOp Type="AddNextSibling" GUID='1010520'>
     <Asset>
       <!-- <Template>Shipyard</Template> -->
@@ -275,7 +279,6 @@
     
     <!-- also used to add the actions to the Spy Post building, only if spy unit is on same island -->
     <Asset>
-      <!-- <Template>BuildingDummy_WithOwner</Template> -->
       <Template>BuffFactoryDummy_WithOwner</Template>
       <Values>
         <Standard>
@@ -286,6 +289,15 @@
           <BaseBuff>1500001548</BaseBuff>
           <BaseBuffScope>Area</BaseBuffScope>
         </BuffFactory>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>BuildingDummy_WithOwner</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001509</GUID>
+          <Name>DummySpawnBuilding to mark AI police island</Name>
+        </Standard>
       </Values>
     </Asset>
     
@@ -303,10 +315,6 @@
   <ModOp Type="add" GUID='25000189' Path="/Values/ConstructionCategory/BuildingList">
     <Item>
       <Building>1500001192</Building>
-    </Item>
-    <!-- todo test (1500001547 wieder aus baumenu entfernen) -->
-    <Item>
-      <Building>1500001547</Building>
     </Item>
   </ModOp>
   <!-- moderate construction menu city (category) -->
@@ -379,11 +387,9 @@
     </Asset>
   </ModOp>
   
-  
-  <!-- wird mit InfoDescription 1500001861 aktuell genutzt -->
-   <!-- um Infos über die Inseln der Feinde anzuzeigen. -->
+
    <!-- TODO: noch von police unit zerstörbar machen und reaction dazu zufügen. dieselbe wie bei spy? Aber nur -1 Rep? -->
-   <!-- TODO: KI police schießt nur selten drauf, vermutlich selbes problem -->
+   <!-- TODO: KI police schießt nur selten drauf, vermutlich selbes problem wie bei spy units schißen auf gebäude (oft nur wenn krieg) -->
    <!-- Beim Spawn von Gebäude werden leider nicht die Bäume entfernt, lässt sich dadurch also leider weiterhin gut verstekcen... -->
   <ModOp Type="AddNextSibling" GUID='117736'>
     
@@ -397,11 +403,8 @@
         <Locked />
       </Values>
     </Asset>
-    <!-- TODO: evlt dieses Gebäude auch über Sonar aufspürbar machen? Oder ists dann zu leicht? -->
-    <!-- KI über Trigger alle x minuten chance so ein gebäude am besten auf ihrer eigenen insel zu entfernen. -->
-     <!-- am besten indem police unit daneben gespawned wird? -->
     
-    
+    <!-- evlt dieses Gebäude auch über Sonar aufspürbar machen? Oder ists dann zu leicht? ne, kann sich ja nicht wegbewegen. stattdessen haben wir Buff im Kontor der angezeigt wird -->
     <!-- Info: -->
       <!-- building on another island, not owned by us: -->
        <!-- The building belongs to us, the island to the kontor owner. If unsettled island, its still unsettled, but our building (ConditionPlayerCounter Area can most likely not fetch it, since it only loops through own islands) -->
@@ -409,6 +412,9 @@
      <!-- Wenn man eigenen Kontor auf fremder Insel spawned, wird man selbst der Besitzer, was zu diversen Problemen führt, also besser nicht machen -->
      <!-- ObjectFilter ObjectParticipantID findet Gebäude von fremden Spielern auf der eigenen Insel nicht -->
       <!-- Also wenn das Gebäude von Human0 auf der Insel von Jorgensen steht, dann findet ObjectParticipantID=Human0 es nicht, auch global nicht, aber auch nicht wenn wir ObjectParticipantID=Jorgensen machen, also geht nur ohne ObjectParticipantID -->
+
+    <!-- Wenn Ki Insel verliert wo ich Posten habe, bleibt mein Posten stehen. -->
+    <!-- Nur wenn ein Kontor von mir zerstört wird, wird auf der insel auch mein Posten zerstört. -->
 
      <!-- eventuell <GUID>2001042</GUID> <Name>MoveBuilding</Name> abändern, sodass OwnedByPlayer nicht nötig ist, sondern nur IsOnPlayerArea -->
       <!-- damit der Spieler auch Gebäude auf seiner insel die ihm nicht gehören verschieben kann. Andernfalls sind solche spy gebäude durch mass-verschieben schnell erkennbar? -->
@@ -419,7 +425,7 @@
         <Standard>
           <GUID>1500001547</GUID>
           <Name>Spionage Posten</Name>
-          <IconFilename>data/sabotage_graphics_serp/icons/icon_tower_3.png</IconFilename>
+          <IconFilename>data/sabotage_graphics_serp/icons/icon_resident_spy.png</IconFilename>
           <InfoDescription>1500001861</InfoDescription>
         </Standard>
         <Selection>
@@ -428,6 +434,7 @@
           <SecondGUIType>Kontor</SecondGUIType>
           <InteractionDistance>0</InteractionDistance>
           <AllowedDragType>[NONE]</AllowedDragType>
+          <OnlySelectableForOwnerAndAllianceMembers>1</OnlySelectableForOwnerAndAllianceMembers>
         </Selection>
         <Building>
           <BuildModeRandomRotation>180</BuildModeRandomRotation>
@@ -776,345 +783,7 @@
     
   </ModOp>
   
-  <!-- TODO default skins evtl in shared mod auslagern, weils evtl. auch andere mods gebrauchen können -->
-  <ModOp Type="AddNextSibling" GUID='698'>
-    <Asset>
-      <Template>Skin</Template>
-      <Values>
-        <Standard>
-          <GUID>1500001844</GUID>
-          <Name>Skin residence_tier02</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/ornaments/cosmetic_dlc06/icon_tier02_default.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>1010344</SkinName>
-          <SkinDescription>23853</SkinDescription>
-          <SkinVariations>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier02_estate01/residence_tier02_estate01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier02_estate02/residence_tier02_estate02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier02_estate03/residence_tier02_estate03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier02_estate04/residence_tier02_estate04.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier02_estate05/residence_tier02_estate05.cfg</FileName>
-            </Item>
-          </SkinVariations>
-          <SkinCategoryDescription>7312</SkinCategoryDescription>
-        </Skin>
-        <Locked>
-          <Scope>Participant</Scope>
-          <DefaultLockedState>0</DefaultLockedState>
-        </Locked>
-        <Text />
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001845</GUID>
-          <Name>Skin residence_tier03</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/ornaments/cosmetic_dlc06/icon_tier03_default.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>1010345</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier03_estate01/residence_tier03_estate01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier03_estate02/residence_tier03_estate02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier03_estate03/residence_tier03_estate03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier03_estate04/residence_tier03_estate04.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001846</GUID>
-          <Name>Skin residence_tier04</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/ornaments/cosmetic_dlc06/icon_tier04_default.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>1010346</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier04_01/residence_tier04_01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier04_02/residence_tier04_02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier04_03/residence_tier04_03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier04_04/residence_tier04_04.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier04_05/residence_tier04_05.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier04_06/residence_tier04_06.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier04_07/residence_tier04_07.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier04_08/residence_tier04_08.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001847</GUID>
-          <Name>Skin residence_tier05</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/ornaments/cosmetic_dlc06/icon_tier05_default.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>1010347</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier05_01/residence_tier05_01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier05_02/residence_tier05_02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier05_03/residence_tier05_03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier05_04/residence_tier05_04.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier05_05/residence_tier05_05.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier05_06/residence_tier05_06.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_tier05_07/residence_tier05_07.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001848</GUID>
-          <Name>Skin colony01_tier01</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/ornaments/cosmetic_dlc15/icon_tier01_default.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>101254</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_colony01_tier01_estate01/residence_colony01_tier01_estate01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_colony01_tier01_estate02/residence_colony01_tier01_estate02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_colony01_tier01_estate03/residence_colony01_tier01_estate03.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001849</GUID>
-          <Name>Skin colony01_tier02</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/resident/icon_resident_obrera.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>101255</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_colony01_tier02_estate01/residence_colony01_tier02_estate01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_colony01_tier02_estate02/residence_colony01_tier02_estate02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_colony01_tier02_estate03/residence_colony01_tier02_estate03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_colony01_tier02_estate04/residence_colony01_tier02_estate04.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/graphics/buildings/residence/residence_colony01_tier02_estate05/residence_colony01_tier02_estate05.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001850</GUID>
-          <Name>Skin residence_colony01_tier03</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/resident/icon_resident_artista.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>5405</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/dlc12/graphics/buildings/residence/residence_colony01_tier03_estate01/residence_colony01_tier03_estate01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc12/graphics/buildings/residence/residence_colony01_tier03_estate02/residence_colony01_tier03_estate02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc12/graphics/buildings/residence/residence_colony01_tier03_estate03/residence_colony01_tier03_estate03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc12/graphics/buildings/residence/residence_colony01_tier03_estate04/residence_colony01_tier03_estate04.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001851</GUID>
-          <Name>Skin residence_arctic_tier01</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/resident/icon_resident_colony03_tier01.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>112091</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier01_estate01/residence_colony03_tier01_estate01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier01_estate02/residence_colony03_tier01_estate02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier01_estate03/residence_colony03_tier01_estate03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier01_estate04/residence_colony03_tier01_estate04.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier01_estate05/residence_colony03_tier01_estate05.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier01_estate06/residence_colony03_tier01_estate06.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001852</GUID>
-          <Name>Skin residence_arctic_tier02</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/resident/icon_resident_colony03_tier02.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>112652</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier02_estate01/residence_colony03_tier02_estate01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier02_estate02/residence_colony03_tier02_estate02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier02_estate03/residence_colony03_tier02_estate03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc03/graphics/buildings/residence/residence_colony03_tier02_estate04/residence_colony03_tier02_estate04.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001853</GUID>
-          <Name>Skin residence_colony02_tier01</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/resident/icon_resident_sheperd.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>114436</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/dlc06/graphics/buildings/residence/residence_colony02_tier01_estate01/residence_colony02_tier01_estate01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc06/graphics/buildings/residence/residence_colony02_tier01_estate02/residence_colony02_tier01_estate02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc06/graphics/buildings/residence/residence_colony02_tier01_estate03/residence_colony02_tier01_estate03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc06/graphics/buildings/residence/residence_colony02_tier01_estate04/residence_colony02_tier01_estate04.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <Asset>
-      <BaseAssetGUID>1500001844</BaseAssetGUID>
-      <Values>
-        <Standard>
-          <GUID>1500001854</GUID>
-          <Name>Skin residence_colony02_tier02</Name>
-          <IconFilename>data/ui/2kimages/main/3dicons/resident/icon_resident_elder.png</IconFilename>
-        </Standard>
-        <Skin>
-          <SkinName>114437</SkinName>
-          <SkinVariations>
-            <Item>
-              <FileName>data/dlc06/graphics/buildings/residence/residence_colony02_tier02_estate01/residence_colony02_tier02_estate01.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc06/graphics/buildings/residence/residence_colony02_tier02_estate02/residence_colony02_tier02_estate02.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc06/graphics/buildings/residence/residence_colony02_tier02_estate03/residence_colony02_tier02_estate03.cfg</FileName>
-            </Item>
-            <Item>
-              <FileName>data/dlc06/graphics/buildings/residence/residence_colony02_tier02_estate04/residence_colony02_tier02_estate04.cfg</FileName>
-            </Item>
-          </SkinVariations>
-        </Skin>
-      </Values>
-    </Asset>
-    <!-- reserviert bis einschl 1500001860 für mod residences skins -->
-    
-  </ModOp>
+  
   
   
     

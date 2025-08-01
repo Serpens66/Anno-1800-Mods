@@ -1,11 +1,11 @@
 <ModOps>
     
   <!-- uses Serp GUID 1500005200 to 1500005220 -->
-   <!-- verbraucht vis einschl. 1500005210. 1500005205 und 1500005207 ist aktuell wieder frei -->
+   <!-- verbraucht vis einschl. 1500005211.  und  ist aktuell wieder frei -->
   
   
-
-
+    <!-- TODO: wir brauchen keinen AssetPool, weil auch PlayerCounterContextPool in ObjectFilter funktioniert -->
+      <!-- Wobei: testen ob PlayerCounterContextPool auch in UnlockAsset klappt! -->
   
   <!-- example how to use: -->
    <!-- disasters mod DifficultySettings.include.xml and diff_settings_disaster.lua  -->
@@ -46,7 +46,7 @@
         </Text>
         <Building>
           <BuildModeRandomRotation>180</BuildModeRandomRotation>
-          <AssociatedRegions>Moderate</AssociatedRegions>
+          <AssociatedRegions>Moderate;Colony01;Africa;Arctic;Mod1;Mod2;Mod3</AssociatedRegions>
           <TerrainType>Terrain</TerrainType>
           <SecondPartyRelevant>0</SecondPartyRelevant>
           <BuildingCategoryName>23758</BuildingCategoryName>
@@ -101,18 +101,29 @@
     </Asset>
   </ModOp>
     
-  <!-- scholar buildmenu -->
-  <ModOp Type="add" GUID="502107" Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-      <Building>1500005200</Building>
-    </Item>
-  </ModOp>
-  <!-- culture buildmenu -->
-  <ModOp Type="add" GUID="500116" Path="/Values/ConstructionCategory/BuildingList">
-    <Item>
-      <Building>1500005200</Building>
-    </Item>
-  </ModOp>
+    
+  <Group Condition="#DiplomacyExpansionSabotage_Serp">
+    <!-- diplo buildmenu -->
+    <ModOp Type="add" GUID="1500006071" Path="/Values/ConstructionCategory/BuildingList">
+      <Item>
+        <Building>1500005200</Building>
+      </Item>
+    </ModOp>
+  </Group>
+  <Group Condition="!#DiplomacyExpansionSabotage_Serp">
+    <!-- scholar buildmenu -->
+    <ModOp Type="add" GUID="502107" Path="/Values/ConstructionCategory/BuildingList">
+      <Item>
+        <Building>1500005200</Building>
+      </Item>
+    </ModOp>
+    <!-- culture buildmenu -->
+    <ModOp Type="add" GUID="500116" Path="/Values/ConstructionCategory/BuildingList">
+      <Item>
+        <Building>1500005200</Building>
+      </Item>
+    </ModOp>
+  </Group>
   <!-- adding EffectTargets to this asset, because this way my shared mod shared_ShipyardForBuffsTooltip will hide all the ship-details you normally see in a shipyard and instead displays the InfoDescription (and Buff-effects, if there are any) -->
   <ModOp GUID="114166" Type="addNextSibling">
     <Asset>
@@ -144,6 +155,8 @@
   
   
   <ModOp Type="addNextSibling" GUID="130248">
+    
+    <!-- just registering other triggers here, to reset 1500005201 fast, so it can detect other button hits -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
@@ -162,6 +175,7 @@
             </Values>
           </TriggerCondition>
           <SubTriggers>
+            <!-- Back Button was hit -->
             <Item>
               <SubTrigger>
                 <Template>AutoCreateTrigger</Template>
@@ -182,55 +196,12 @@
                     <TriggerActions>
                       <Item>
                         <TriggerAction>
-                          <Template>ActionDeleteObjects</Template>
+                          <Template>ActionRegisterTrigger</Template>
                           <Values>
                             <Action />
-                            <ActionDeleteObjects />
-                            <ObjectFilter>
-                              <ObjectGUID>1500005202</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                            </ObjectFilter>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <!-- remove the buff first here, in case we are in a new session where only the Back-Button is active and normally 1500005209 already active -->
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionBuff</Template>
-                          <Values>
-                            <Action />
-                            <ActionBuff>
-                              <BuffAsset>1500005209</BuffAsset>
-                              <AddBuff>0</AddBuff>
-                              <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                            </ActionBuff>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionBuff</Template>
-                          <Values>
-                            <Action />
-                            <ActionBuff>
-                              <BuffAsset>1500005209</BuffAsset>
-                              <AddBuff>1</AddBuff>
-                              <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                            </ActionBuff>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionBuff</Template>
-                          <Values>
-                            <Action />
-                            <ActionBuff>
-                              <BuffAsset>1500005210</BuffAsset>
-                              <AddBuff>0</AddBuff>
-                              <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                            </ActionBuff>
+                            <ActionRegisterTrigger>
+                              <TriggerAsset>1500005205</TriggerAsset>
+                            </ActionRegisterTrigger>
                           </Values>
                         </TriggerAction>
                       </Item>
@@ -259,62 +230,12 @@
                     <TriggerActions>
                       <Item>
                         <TriggerAction>
-                          <Template>ActionDeleteObjects</Template>
+                          <Template>ActionRegisterTrigger</Template>
                           <Values>
                             <Action />
-                            <ActionDeleteObjects />
-                            <ObjectFilter>
-                              <ObjectGUID>1500005206</ObjectGUID>
-                              <CheckParticipantID>1</CheckParticipantID>
-                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                            </ObjectFilter>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionBuff</Template>
-                          <Values>
-                            <Action />
-                            <ActionBuff>
-                              <BuffAsset>1500005209</BuffAsset>
-                              <AddBuff>0</AddBuff>
-                              <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                            </ActionBuff>
-                          </Values>
-                        </TriggerAction>
-                      </Item>
-                      <!-- tiny delay, so the "Back-Button" is added after the other buttons -->
-                      <Item>
-                        <TriggerAction>
-                          <Template>ActionDelayedActions</Template>
-                          <Values>
-                            <Action />
-                            <ActionDelayedActions>
-                              <ExecutionDelay>100</ExecutionDelay>
-                              <DelayedActions>
-                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                                <Values>
-                                  <ActionList>
-                                    <Actions>
-                                      <Item>
-                                        <Action>
-                                          <Template>ActionBuff</Template>
-                                          <Values>
-                                            <Action />
-                                            <ActionBuff>
-                                              <BuffAsset>1500005210</BuffAsset>
-                                              <AddBuff>1</AddBuff>
-                                              <BuffProcessingParticipant>1</BuffProcessingParticipant>
-                                            </ActionBuff>
-                                          </Values>
-                                        </Action>
-                                      </Item>
-                                    </Actions>
-                                  </ActionList>
-                                </Values>
-                              </DelayedActions>
-                            </ActionDelayedActions>
+                            <ActionRegisterTrigger>
+                              <TriggerAsset>1500005207</TriggerAsset>
+                            </ActionRegisterTrigger>
                           </Values>
                         </TriggerAction>
                       </Item>
@@ -323,24 +244,22 @@
                 </Values>
               </SubTrigger>
             </Item>
+            <!-- any mod Setting Detail was hit -->
             <Item>
               <SubTrigger>
                 <Template>AutoCreateTrigger</Template>
                 <Values>
                   <Trigger>
-                    <!-- For Mod-Settings-Details we use ConditionPlayerCounter instead of ConditionEvent, -->
-                     <!-- because we want the other mods to start lua scripts which are checking the PlayerCounter value -->
-                      <!-- and we noticed that PlayerCounter needs 100-200 ms after ConditionEvent was fired, to get updated. -->
-                      <!-- So its safer to start those lua scripts based on ConditionPlayerCounter, instead of ConditionEvent -->
-                       <!-- (in ResetTrigger we wait after the deletion was done, instead of AlwaysTrue) -->
                     <TriggerCondition>
-                      <Template>ConditionPlayerCounter</Template>
+                      <Template>ConditionEvent</Template>
                       <Values>
                         <Condition />
-                        <ConditionPlayerCounter>
-                          <Context>1500005204</Context>
-                          <CounterAmount>1</CounterAmount>
-                        </ConditionPlayerCounter>
+                        <ConditionEvent>
+                          <ConditionEvent>ObjectBuilt</ConditionEvent>
+                          <ContextAsset>1500005204</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
                       </Values>
                     </TriggerCondition>
                     <TriggerActions>
@@ -350,25 +269,21 @@
                           <Values>
                             <Action />
                             <ActionDelayedActions>
-                              <ExecutionDelay>200</ExecutionDelay>
+                              <ExecutionDelay>500</ExecutionDelay>
                               <DelayedActions>
                                 <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
                                 <Values>
                                   <ActionList>
                                     <Actions>
-                                      <!-- also put the delete in the tiny DelayedActions, because the setting-mods will start a lua script, which needs to find these settings-objects -->
-                                       <!-- only needed if Mod-Settings-Details was built -->
+                                      <!-- put the delete in the tiny DelayedActions (more than 200ms, because PlayerCounter/ProfilCounter needs ~200ms to update after ConditionEvent found it, because the setting-mods will start a lua script, which needs to find these settings-objects -->
                                       <Item>
                                         <Action>
-                                          <Template>ActionDeleteObjects</Template>
+                                          <Template>ActionRegisterTrigger</Template>
                                           <Values>
                                             <Action />
-                                            <ActionDeleteObjects />
-                                            <ObjectFilter>
-                                              <ObjectGUID>1500005206</ObjectGUID>
-                                              <CheckParticipantID>1</CheckParticipantID>
-                                              <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
-                                            </ObjectFilter>
+                                            <ActionRegisterTrigger>
+                                              <TriggerAsset>1500005211</TriggerAsset>
+                                            </ActionRegisterTrigger>
                                           </Values>
                                         </Action>
                                       </Item>
@@ -391,60 +306,12 @@
             <Values>
               <Trigger>
                 <TriggerCondition>
-                  <Template>ConditionPlayerCounter</Template>
+                  <Template>ConditionAlwaysTrue</Template>
                   <Values>
                     <Condition />
-                    <ConditionPlayerCounter>
-                      <Context>1500005204</Context>
-                      <CounterAmount>0</CounterAmount>
-                      <ComparisonOp>AtMost</ComparisonOp>
-                    </ConditionPlayerCounter>
+                    <ConditionAlwaysTrue />
                   </Values>
                 </TriggerCondition>
-                <SubTriggers>
-                  <Item>
-                    <SubTrigger>
-                      <Template>AutoCreateTrigger</Template>
-                      <Values>
-                        <Trigger>
-                          <TriggerCondition>
-                            <Template>ConditionPlayerCounter</Template>
-                            <Values>
-                              <Condition />
-                              <ConditionPlayerCounter>
-                                <Context>1500005202</Context>
-                                <CounterAmount>0</CounterAmount>
-                                <ComparisonOp>AtMost</ComparisonOp>
-                              </ConditionPlayerCounter>
-                            </Values>
-                          </TriggerCondition>
-                          <SubTriggers>
-                            <Item>
-                              <SubTrigger>
-                                <Template>AutoCreateTrigger</Template>
-                                <Values>
-                                  <Trigger>
-                                    <TriggerCondition>
-                                      <Template>ConditionPlayerCounter</Template>
-                                      <Values>
-                                        <Condition />
-                                        <ConditionPlayerCounter>
-                                          <Context>1500005203</Context>
-                                          <CounterAmount>0</CounterAmount>
-                                          <ComparisonOp>AtMost</ComparisonOp>
-                                        </ConditionPlayerCounter>
-                                      </Values>
-                                    </TriggerCondition>
-                                 </Trigger>
-                                </Values>
-                              </SubTrigger>
-                            </Item>
-                          </SubTriggers>
-                       </Trigger>
-                      </Values>
-                    </SubTrigger>
-                  </Item>
-                </SubTriggers>
               </Trigger>
             </Values>
           </ResetTrigger>
@@ -456,6 +323,218 @@
       </Values>
     </Asset>
     
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005205</GUID>
+          <Name>Back button was hit</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500005211</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- remove the buff first here, in case we are in a new session where only the Back-Button is active and normally 1500005209 already active -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500005209</BuffAsset>
+                    <AddBuff>0</AddBuff>
+                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500005209</BuffAsset>
+                    <AddBuff>1</AddBuff>
+                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500005210</BuffAsset>
+                    <AddBuff>0</AddBuff>
+                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005211</GUID>
+          <Name>Delete All Helpers</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDeleteObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionDeleteObjects />
+                  <ObjectFilter>
+                    <ObjectGUID>1500005202</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDeleteObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionDeleteObjects />
+                  <ObjectFilter>
+                    <ObjectGUID>1500005206</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005207</GUID>
+          <Name>Mod Settings Opener button 1500005203 was hit</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500005211</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500005209</BuffAsset>
+                    <AddBuff>0</AddBuff>
+                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- tiny delay, so the "Back-Button" is added after the other buttons -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>100</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionBuff</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionBuff>
+                                    <BuffAsset>1500005210</BuffAsset>
+                                    <AddBuff>1</AddBuff>
+                                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                                  </ActionBuff>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
     
     <Asset>
       <Template>Trigger</Template>
@@ -484,6 +563,47 @@
                         <Asset>1500005206</Asset>
                       </Item>
                     </UnhideAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Make sure your Trigger which does ActionUnlockAsset has a higher GUID than 1500005212, if you want to prevent an unlock text to be displayed -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005212</GUID>
+          <Name>Prevent Unlock Text for buttons (trigger with lowest GUID will be used for unlock condition display)</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysFalse</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysFalse />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <Asset>1500005206</Asset>
+                      </Item>
+                    </UnlockAssets>
                   </ActionUnlockAsset>
                 </Values>
               </TriggerAction>
@@ -530,6 +650,7 @@
       </Values>
     </Asset>
   </ModOp>
+
   
   <ModOp Type="addNextSibling" GUID="700047">
     <Asset>
@@ -537,7 +658,7 @@
       <Values>
         <Standard>
           <GUID>1500005206</GUID>
-          <Name>AP - All Mod-Settings-Assets</Name>
+          <Name>AP - All Mod-Settings-Assets (openers and details)</Name>
         </Standard>
         <AssetPool>
           <AssetList />

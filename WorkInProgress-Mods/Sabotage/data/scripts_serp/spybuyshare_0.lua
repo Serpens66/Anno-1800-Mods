@@ -1,5 +1,9 @@
 local PID = 0
 
+
+-- braucht nur lua light tools (nicht medium/ultra)
+
+
 -- spy post building
 local AllowedBuildings = {1500001547}
 
