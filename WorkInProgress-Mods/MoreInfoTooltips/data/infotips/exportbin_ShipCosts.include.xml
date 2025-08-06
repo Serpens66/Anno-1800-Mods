@@ -21,103 +21,31 @@
   <!-- remove the condition "needs no permit or you have a permit" to display the influence costs/construction time and so on -->
   <ModOp Type="remove" Path="//InfoTipData[Guid='500057']/InfoElement/InfoElement/VisibilityElement/VisibilityElement[VisibilityElement[Condition='[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]' and ExpectedValueBool='False'] and VisibilityElement[Condition='[BuildPermits BuildPermits([RefGuid])]' and CompareOperator/CompareOperator='5']]" />
 
-  <!-- TODO: besser ModOpContent nutzen um den "is not unlocked" code nach unten zu kopieren, bevor wir ihn löschen, -->
-   <!-- um änderungen anderer mods auch zu übernehmen (siehe community patch mod ein mod von taludas wo ich "siblbing" in path nutze) -->
-  
-  <!-- move the warning that the ship is not unlocked to the bottom (above the warning that you dont have enough permits) -->
+  <!-- ########### -->
+
+  <!-- move the warning (and precondition) that the ship is not unlocked to the bottom (above the warning that you dont have enough permits) -->
     <!-- because this is near the buildcosts and usually the first place to look at when hovering over a ship -->
-    <!-- remove the one at first position -->
-  <ModOp Type="remove" Path="//InfoTipData[Guid='500057']/InfoElement[VisibilityElement/VisibilityElement[Condition='[Unlock IsUnlocked([RefGuid])]' and ExpectedValueBool='False'] and InfoElement/Text/TextGUID='1092']" />
-  <!-- then add it to the bottom again. the vanilla code did put the unlock requirement of great eastern to the very bottom, so we will add it directly aboe, so it always makes sense -->
-  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='500057']/InfoElement[InfoElement/InfoElement/Text/TextGUID='270045']">
-    <InfoElement>
-      <ElementType>8</ElementType>
-      <ChildCount>4</ChildCount>
-      <VisibilityElement>
-        <ElementType>
-          <ElementType>2</ElementType>
-        </ElementType>
-        <ChildCount>1</ChildCount>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>1</ElementType>
-          </ElementType>
-          <CompareOperator />
-          <ResultType />
-          <ExpectedValueBool>False</ExpectedValueBool>
-          <Condition>[Unlock IsUnlocked([RefGuid])]</Condition>
-        </VisibilityElement>
-        <OperatorType />
-      </VisibilityElement>
-      <InfoElement>
-        <ElementType>3</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <Text>
-          <TextGUID>1092</TextGUID>
-          <Style />
-        </Text>
-        <Value>
-          <Style />
-        </Value>
-        <WarningType>
-          <WarningType>2</WarningType>
-        </WarningType>
-        <BackgroundType />
-      </InfoElement>
-      <InfoElement>
-        <ElementType>6</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <Text>
-          <Style />
-        </Text>
-      </InfoElement>
-      <InfoElement>
-        <ElementType>3</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <Text>
-          <TextGUID>100382</TextGUID>
-          <Style />
-        </Text>
-        <Value>
-          <Style />
-        </Value>
-        <WarningType />
-        <BackgroundType />
-      </InfoElement>
-      <InfoElement>
-        <ElementType>19</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <TemplateGUID>1563783317</TemplateGUID>
-        <Variables>
-          <None>
-            <ID>1956444253</ID>
-            <Name>UnlockGuid</Name>
-            <Source>[RefGuid]</Source>
-          </None>
-        </Variables>
-      </InfoElement>
-    </InfoElement>
+  <!-- copy paste the content (makes it more compatible to copy it) -->
+  <ModOp Type="AddPrevSibling" Path="//InfoTipData[Guid='500057']/InfoElement[InfoElement/Text/TextGUID='270045']" Content="//InfoTipData[Guid='500057']/InfoElement[VisibilityElement/VisibilityElement[Condition='[Unlock IsUnlocked([RefGuid])]' and ExpectedValueBool='False'] and InfoElement/Text/TextGUID='1092']">
+    <ModOpContent/>
   </ModOp>
+  <!-- remove the vanilla one (the first we find) -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='500057']/InfoElement[VisibilityElement/VisibilityElement[Condition='[Unlock IsUnlocked([RefGuid])]' and ExpectedValueBool='False'] and InfoElement/Text/TextGUID='1092'][1]"></ModOp>
+  <!-- remove text 1092 ("not unlocked") because it looks odd now and you see the Condition for the unlock, that should be enough. -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='500057']/InfoElement/InfoElement[Text/TextGUID='1092']"></ModOp>
+  <!-- highlight the great eastern condition as warning -->
+  <ModOp Type="merge" Path="//InfoTipData[Guid='500057']/InfoElement/InfoElement[Text/TextGUID='270045']">
+    <ElementType>3</ElementType>
+    <WarningType>
+      <WarningType>2</WarningType>
+    </WarningType>
+  </ModOp>
+
+
+
+
+
+  <!-- ############ -->
 
   <!-- den permit als baukosten mit 0/1 auch bei nicht-payable anzeigen (so wie im fixmod mit godlike icon) -->
     <!-- keep in mind that we are loading after the bugfix mod, so the condition looks a bit different than in vanilla (with index instead of 0) -->
@@ -227,14 +155,15 @@
   <!-- </ModOp> -->
 
 
-  <!-- unfortunately there is no ToolOneHelper/StaticData for attack Range, otherwise I would display this too for the ships in shipyard.. -->
-    <!-- not even for the ship object itself range is displayable as number -.- -->
 
 
+  <!-- replace ALL BuildCostForShip displays, regardless which one, with not only showing the costs, but also the current amount -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='500057']//InfoElement/Text/Text[text()='[Selection Object Shipyard BuildCostForShip([RefGuid]) Values AT(#index0#)]']">
+    <Text>[Selection Object Shipyard BuildCostForShip([RefGuid]) Available AT(#index0#)]/[Selection Object Shipyard BuildCostForShip([RefGuid]) Values AT(#index0#)]</Text>
+  </ModOp>
   
+
   
-  
-  
-  
+
   
 </ModOps>
