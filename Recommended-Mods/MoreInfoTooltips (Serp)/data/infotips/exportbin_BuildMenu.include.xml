@@ -77,11 +77,11 @@
 
   <!-- replace the buildcost display when we can not afford a cost with the "0/30" tooltip we also know from shipyard, so you directly see how much you have compared to what is needed -->
   <!-- <ModOp Type="replace" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement/InfoElement[VisibilityElement/VisibilityElement[Condition='[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]' and ExpectedValueBool='False'] and Text/Text='[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]']/Text/Text"> -->
-    <!-- <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text> -->
+    <!-- <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood10K] / [ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text> -->
   <!-- </ModOp> -->
   <!-- just replace ALL buildcost displays, regardless which one, with not only showing the costs, but also the current amount -->
-  <ModOp Type="replace" Path="//InfoTipData[Guid='25000020']//InfoElement/Text/Text[text()='[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]']">
-    <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+  <ModOp Type="replace" Path="//InfoElement/Text/Text[text()='[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]']">
+    <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood10K] / [ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
   </ModOp>
   
   <!-- Display permit-buildcosts for godlike permit buildings also if we can not afford it (in vanilla it does not show the permit buildcost and instead only that warning "you need research thing" -->
@@ -198,7 +198,7 @@
         <Style />
       </Icon>
       <Text>
-        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood10K] / [ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
         <Style />
       </Text>
       <WarningType>
@@ -261,7 +261,7 @@
         <Style />
       </Icon>
       <Text>
-        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood10K] / [ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
         <Style />
       </Text>
       <WarningType>
@@ -323,7 +323,7 @@
         <Style />
       </Icon>
       <Text>
-        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood10K] / [ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
         <Style />
       </Text>
       <WarningType>
@@ -385,7 +385,7 @@
         <Style />
       </Icon>
       <Text>
-        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood10K] / [ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
         <Style />
       </Text>
       <WarningType>
@@ -447,7 +447,7 @@
         <Style />
       </Icon>
       <Text>
-        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood]/[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) AvailableAmount &gt;&gt; storagegood10K] / [ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
         <Style />
       </Text>
       <WarningType>
@@ -527,6 +527,22 @@
   <!-- using preceding-sibling to remove all entries with TemplateGUID 1563783317 if they are found BEFORE 124968 -->
   <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement[InfoElement/Text/TextGUID='124968']/preceding-sibling::InfoElement[InfoElement/TemplateGUID='1563783317']"></ModOp>
   
-    
+  <!-- ########################################### -->
+  
+  <!-- Also showing Available amounts for all Upgradecosts -->
+  <ModOp Type="replace" Path="//InfoElement/Text/Text[text()='[Selection Object Upgradability UpgradeCosts Values AT(#index0#)]' or text()='[Selection Object Upgradability UpgradeCosts Values AT(#index0#) &gt;&gt; storagegood]']">
+    <Text>[Selection Object Upgradability UpgradeCosts Available AT(#index0#) &gt;&gt; storagegood10K] / [Selection Object Upgradability UpgradeCosts Values AT(#index0#) &gt;&gt; storagegood]</Text>
+  </ModOp>
+  <ModOp Type="replace" Path="//InfoElement/Text/Text[text()='[Selection Picked Upgradability UpgradeCosts Values AT(#index0#)]' or text()='[Selection Picked Upgradability UpgradeCosts Values AT(#index0#) &gt;&gt; storagegood]']">
+    <Text>[Selection Picked Upgradability UpgradeCosts Available AT(#index0#) &gt;&gt; storagegood10K] / [Selection Picked Upgradability UpgradeCosts Values AT(#index0#) &gt;&gt; storagegood]</Text>
+  </ModOp>
+  <ModOp Type="replace" Path="//InfoElement/Text/Text[text()='[Target UpgradeCosts Values AT(#index0#)]' or text()='[Target UpgradeCosts Values AT(#index0#) &gt;&gt; storagegood]']">
+    <Text>[Target UpgradeCosts Available AT(#index0#) &gt;&gt; storagegood10K] / [Target UpgradeCosts Values AT(#index0#) &gt;&gt; storagegood]</Text>
+  </ModOp>
+  <!-- same for Floors -->
+  <ModOp Type="replace" Path="//InfoElement/Text/Text[text()='[Selection Object FloorAddability UpgradeCosts Values AT(#index0#)]']">
+    <Text>[Selection Object FloorAddability UpgradeCosts Available AT(#index0#) &gt;&gt; storagegood10K] / [Selection Object FloorAddability UpgradeCosts Values AT(#index0#) &gt;&gt; storagegood]</Text>
+  </ModOp>
+  
   
 </ModOps>
