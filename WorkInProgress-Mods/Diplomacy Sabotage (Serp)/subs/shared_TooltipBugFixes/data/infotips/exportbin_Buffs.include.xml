@@ -1,0 +1,27 @@
+<ModOps>
+    
+  <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+    <!-- to export the tooltips from the game use FileDBReader and the FileFormat "infotip.xml" and unpack "data\infotips\export.bin" -->
+    <!-- or download it in anno modding discord here: -->
+    <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
+
+
+  <!-- Bug to fix: The Fire Incident on ships, using the Buff 192004 to display that fire is active,  -->
+  <!-- does not display the Remaining Incident Duration, while Illness Buff 192986 does display it. -->
+  
+  <!-- Cause: The devs used the GUID 2001025 from the Fire Incident, instead 192004 from the Fire Buff -->
+  
+  <!-- (the only reason why these buffs, whch do nothing on their own, are added is to dsiply the remaining time. -->
+   <!-- we dont need to add other incidents, since these buffs are usually granted by "CausedIncidentBuff", which only works for ships -->
+    <!-- and in vanilla ships only can have fire/illness incident. In theory one could add more (riot/arcticillness) but then the mods adding this -->
+     <!-- can add the tooltip code for them, since we have to hardcode the buff GUID here to only display the remaining time on them. -->
+   
+  <!-- GUID 25000102 is responsible for displaying buffs -->
+  
+  <ModOp Type="replace" Path="//InfoTipData[Guid='25000102']/InfoElement/InfoElement/VisibilityElement/VisibilityElement/ExpectedValueInt[text()='2001025']">
+    <ExpectedValueInt>192004</ExpectedValueInt>
+  </ModOp>
+  
+  
+  
+</ModOps>

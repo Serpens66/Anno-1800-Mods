@@ -5,22 +5,17 @@
     <!-- or download it in anno modding discord here: -->
     <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
 
-  <!-- All code here is very compatible to other mods, since it just adds more, not change anything -->
 
 
     <!-- unfortunately there is no ToolOneHelper/StaticData for attack Range, otherwise I would display this too for the ships in shipyard.. -->
     <!-- not even for the ship object itself range is displayable as number -.- -->
 
   <!-- Also StackLimit can not be displayed in Shipyard -->
-
-  
-  <!-- add the item name to the socketed items list -->
-  <ModOp Type="add" Path="//InfoElement[Icon/IconText='[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Icon]']/Text[not(Text) and not(TextGUID)]">
-    <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Text]</Text>
-  </ModOp>
-  <ModOp Type="add" Path="//InfoElement[Icon/IconText='[Selection Picked ItemContainer Sockets AT(#index0#) Icon]']/Text[not(Text) and not(TextGUID)]">
-    <Text>[Selection Picked ItemContainer Sockets AT(#index0#) Text]</Text>
-  </ModOp>
+    
+    
+    
+  <Include File="./exportbin_ShipStatsMore.include.xml" />
+    
   
   <!-- only show Cargo if the SlotAmount is > 0 (it is 0 for UnlimitedSlotCount and we dont want to show Cargo for Unlimited, because it may be too much to display) -->
   <ModOp Type="AddNextSibling" Path="//InfoElement[VisibilityElement/VisibilityElement/Condition='[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo COUNT]' and InfoElement/InfoElement/Text/Text='[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo AT(#index0#) Value]']/VisibilityElement/VisibilityElement">
@@ -53,6 +48,85 @@
       <Condition>[ToolOneHelper SlotAmount([Selection Picked GUID])]</Condition>
     </VisibilityElement>
   </ModOp>
+
+
+  <!-- show the cargo in each list below eachother with name, like in the ExpeditionShiplistInfotip -->
+  <ModOp Type="merge" Path="//InfoElement[InfoElement/Icon/IconText='[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo AT(#index0#) Icon]' and InfoElement/ElementType='11' and not(InfoElement/Value) ]">
+    <ElementType>7</ElementType>
+    <InfoElement>
+      <ElementType>4</ElementType>
+      <Icon>
+        <IconText>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo AT(#index0#) Icon]</IconText>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo AT(#index0#) Text]</Text>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo AT(#index0#) Value]</Text>
+        <Style />
+      </Value>
+    </InfoElement>
+    <Columns>0</Columns>
+  </ModOp>
+  <ModOp Type="merge" Path="//InfoElement[InfoElement/Icon/IconText='[Selection Picked ItemContainer Cargo AT(#index0#) Icon]' and InfoElement/ElementType='11' and not(InfoElement/Value) ]">
+    <ElementType>7</ElementType>
+    <InfoElement>
+      <ElementType>4</ElementType>
+      <Icon>
+        <IconText>[Selection Picked ItemContainer Cargo AT(#index0#) Icon]</IconText>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[Selection Picked ItemContainer Cargo AT(#index0#) Text]</Text>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[Selection Picked ItemContainer Cargo AT(#index0#) Value]</Text>
+        <Style />
+      </Value>
+    </InfoElement>
+    <Columns>0</Columns>
+  </ModOp>
+  <!-- add the item name to the socketed items list and show every socket entry below each other -->
+  <ModOp Type="merge" Path="//InfoElement[InfoElement/Icon/IconText='[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Icon]' and InfoElement/ElementType='11' and not(InfoElement/Text/Text) ]">
+    <ElementType>7</ElementType>
+    <InfoElement>
+      <ElementType>4</ElementType>
+      <Icon>
+        <IconText>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Icon]</IconText>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Text]</Text>
+        <Style />
+      </Text>
+      <Value>
+        <Style />
+      </Value>
+    </InfoElement>
+    <Columns>0</Columns>
+  </ModOp>
+  <ModOp Type="merge" Path="//InfoElement[InfoElement/Icon/IconText='[Selection Picked ItemContainer Sockets AT(#index0#) Icon]' and InfoElement/ElementType='11' and not(InfoElement/Text/Text) ]">
+    <ElementType>7</ElementType>
+    <InfoElement>
+      <ElementType>4</ElementType>
+      <Icon>
+        <IconText>[Selection Picked ItemContainer Sockets AT(#index0#) Icon]</IconText>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[Selection Picked ItemContainer Sockets AT(#index0#) Text]</Text>
+        <Style />
+      </Text>
+      <Value>
+        <Style />
+      </Value>
+    </InfoElement>
+    <Columns>0</Columns>
+  </ModOp>
+  
   
   <!-- 500411 ExpeditionShiplistInfotip -->
     
@@ -176,6 +250,131 @@
     <!-- 500503 ShipButtonInfoTip </ShipListInfoTip> TradeRouteScene, wenn man ein Schiff auswählen will, welches dann der traderoute zugewiesen wird? -->
      <!-- zeigt bereits Frachtplätz und Hitpoints an. add StackLimit,SocketAmount,LoadingSpeedFactor,SessionTransferSpeedFactorForGUID -->
   <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='500503']/InfoElement/InfoElement[Value/Text='[ToolOneHelper SlotAmount([RefGuid])]']">
+    
+    <!-- speed -->
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>3</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>5</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>0</ExpectedValueInt>
+          <Condition>[MetaObjects SessionGameObject([RefOid]) Walking BaseSpeedWithUpgrades]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType />
+            <ExpectedValueBool>False</ExpectedValueBool>
+            <Condition>[MetaObjects SessionGameObject([RefOid]) Walking AffectedByWind]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>2339</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>17375</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[MetaObjects SessionGameObject([RefOid]) Walking BaseSpeedWithStaticSpeedFactors&gt; knots] [AssetData(22260) Text]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType />
+            <Condition>[MetaObjects SessionGameObject([RefOid]) Walking AffectedByWind]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>1010210</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>17389</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[MetaObjects SessionGameObject([RefOid]) Walking BaseSpeedWithStaticSpeedFactors_MaxWindSlowdown &gt; knots] [AssetData(22260) Text]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType />
+            <Condition>[MetaObjects SessionGameObject([RefOid]) Walking AffectedByWind]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>1010210</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>17388</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[MetaObjects SessionGameObject([RefOid]) Walking BaseSpeedWithStaticSpeedFactors_MaxWindSpeedup &gt; knots] [AssetData(22260) Text]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+    </InfoElement>
+
+    
     <InfoElement>
       <ElementType>4</ElementType>
       <VisibilityElement>
@@ -230,7 +429,7 @@
         <Style />
       </Text>
       <Value>
-        <Text>[ToolOneHelper SocketAmount([RefGuid])]</Text>
+        <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Text>
         <Style />
       </Value>
       <WarningType />
@@ -314,11 +513,45 @@
     
   <!-- 500460 StrategicViewShip (wenn man im traderoutemenü über schiff hovered) -->
   <!-- UND auch wenn man in Schiffsleiste über Schiffe hovered! -->
-  <!-- Adding SlotAmount,StackLimit,SocketAmount,LoadingSpeedFactor,SessionTransferSpeedFactorForGUID,HitPoints , DamagePerSec ,  -->
+  <!-- Show Cargo/Sockets also for allied/spied on -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='500460']/InfoElement[InfoElement/Text/TextGUID='9986']/VisibilityElement[VisibilityElement/Condition='[MetaObjects SessionGameObject([RefOid]) IsOwnedByCurrentParticipant]']">
+    <!-- we are owner  or allied -->
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator />
+      <ResultType>
+        <ResultType>1</ResultType>
+      </ResultType>
+      <ExpectedValueInt>3</ExpectedValueInt>
+      <Condition>[Participants TopLevelDiplomacyStateTo([MetaObjects SessionGameObject([RefOid]) Owner], [Participants GetCurrentParticipantID()])]</Condition>
+    </VisibilityElement>
+    <!-- or we spied on him -->
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>5</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>1</ResultType>
+      </ResultType>
+      <Condition>[Economy MetaStorage StorageAmount([AssetForValue(1500006094, [MetaObjects SessionGameObject([RefOid]) Owner]) Guid])]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <ModOp Type="merge" Path="//InfoTipData[Guid='500460']/InfoElement[InfoElement/Text/TextGUID='9986']/VisibilityElement[VisibilityElement/Condition='[MetaObjects SessionGameObject([RefOid]) IsOwnedByCurrentParticipant]']">
+    <OperatorType>
+      <OperatorType>1</OperatorType>
+    </OperatorType>
+  </ModOp>
+  <!-- Adding Speed,SlotAmount,StackLimit,SocketAmount,LoadingSpeedFactor,SessionTransferSpeedFactorForGUID,HitPoints , DamagePerSec ,  -->
   <!-- Only show some of them if they are not the default value -->
-  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='500460']/InfoElement[SubText/Text='[AssetData([RefGuid]) Text]']">
+  <!-- and only showing the real values if we are owner, its allied or we spied on owner -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='500460']/InfoElement[InfoElement/Text/TextGUID='10434']">
     <InfoElement>
-      <ElementType>4</ElementType>
+      <ElementType>6</ElementType>
       <VisibilityElement>
         <ElementType>
           <ElementType>2</ElementType>
@@ -328,196 +561,48 @@
           <ElementType>
             <ElementType>1</ElementType>
           </ElementType>
-          <CompareOperator>
-            <CompareOperator>1</CompareOperator>
-          </CompareOperator>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[MetaObjects SessionGameObject([RefOid]) IsOwnedByCurrentParticipant]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <Style />
+      </Text>
+    </InfoElement>
+    
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>3</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>3</ChildCount>
+        <!-- Owner is me -->
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[MetaObjects SessionGameObject([RefOid]) IsOwnedByCurrentParticipant]</Condition>
+        </VisibilityElement>
+        <!-- or allied -->
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
           <ResultType>
             <ResultType>1</ResultType>
           </ResultType>
-          <ExpectedValueInt>0</ExpectedValueInt>
-          <Condition>[ToolOneHelper SlotAmount([RefGuid])]</Condition>
+          <ExpectedValueInt>3</ExpectedValueInt>
+          <Condition>[Participants TopLevelDiplomacyStateTo([MetaObjects SessionGameObject([RefOid]) Owner], [Participants GetCurrentParticipantID()])]</Condition>
         </VisibilityElement>
-        <OperatorType />
-      </VisibilityElement>
-      <Icon>
-        <IconGUID>500770</IconGUID>
-        <Style />
-      </Icon>
-      <Text>
-        <TextGUID>11893</TextGUID>
-        <Style />
-      </Text>
-      <Value>
-        <Text>[ToolOneHelper SlotAmount([RefGuid])]</Text>
-        <Style />
-      </Value>
-      <WarningType />
-      <BackgroundType />
-    </InfoElement>
-    <InfoElement>
-      <ElementType>4</ElementType>
-      <VisibilityElement>
-        <ElementType>
-          <ElementType>2</ElementType>
-        </ElementType>
-        <ChildCount>1</ChildCount>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>1</ElementType>
-          </ElementType>
-          <CompareOperator>
-            <CompareOperator>1</CompareOperator>
-          </CompareOperator>
-          <ResultType>
-            <ResultType>1</ResultType>
-          </ResultType>
-          <ExpectedValueInt>50</ExpectedValueInt>
-          <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer StackLimit]</Condition>
-        </VisibilityElement>
-        <OperatorType />
-      </VisibilityElement>
-      <Icon>
-        <IconGUID>501666</IconGUID>
-        <Style />
-      </Icon>
-      <Text>
-        <TextGUID>1164</TextGUID>
-        <Style />
-      </Text>
-      <Value>
-        <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer StackLimit]</Text>
-        <Style />
-      </Value>
-      <WarningType />
-      <BackgroundType />
-    </InfoElement>
-    <InfoElement>
-      <ElementType>4</ElementType>
-      <VisibilityElement>
-        <ElementType>
-          <ElementType>2</ElementType>
-        </ElementType>
-        <OperatorType />
-      </VisibilityElement>
-      <Icon>
-        <IconGUID>3220</IconGUID>
-        <Style />
-      </Icon>
-      <Text>
-        <TextGUID>4000</TextGUID>
-        <Style />
-      </Text>
-      <Value>
-        <Text>[ToolOneHelper SocketAmount([RefGuid])]</Text>
-        <Style />
-      </Value>
-      <WarningType />
-      <BackgroundType />
-    </InfoElement>
-    <InfoElement>
-      <ElementType>4</ElementType>
-      <VisibilityElement>
-        <ElementType>
-          <ElementType>2</ElementType>
-        </ElementType>
-        <ChildCount>1</ChildCount>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>1</ElementType>
-          </ElementType>
-          <CompareOperator>
-            <CompareOperator>1</CompareOperator>
-          </CompareOperator>
-          <ResultType>
-            <ResultType>2</ResultType>
-          </ResultType>
-          <ExpectedValueFloat>1</ExpectedValueFloat>
-          <Condition>[MetaObjects SessionGameObject([RefOid]) TradeRouteVehicle LoadingSpeedFactor]</Condition>
-        </VisibilityElement>
-        <OperatorType />
-      </VisibilityElement>
-      <Icon>
-        <IconGUID>15197</IconGUID>
-        <Style />
-      </Icon>
-      <Text>
-        <TextGUID>15197</TextGUID>
-        <Style />
-      </Text>
-      <Value>
-        <Text>[MetaObjects SessionGameObject([RefOid]) TradeRouteVehicle LoadingSpeedFactor &gt; percentage]%</Text>
-        <Style />
-      </Value>
-      <WarningType />
-      <BackgroundType />
-    </InfoElement>
-    <InfoElement>
-      <ElementType>4</ElementType>
-      <VisibilityElement>
-        <ElementType>
-          <ElementType>2</ElementType>
-        </ElementType>
-        <ChildCount>1</ChildCount>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>1</ElementType>
-          </ElementType>
-          <CompareOperator>
-            <CompareOperator>1</CompareOperator>
-          </CompareOperator>
-          <ResultType>
-            <ResultType>2</ResultType>
-          </ResultType>
-          <ExpectedValueFloat>1</ExpectedValueFloat>
-          <Condition>[SessionTransferSpeedFactorForGUID([RefGuid])]</Condition>
-        </VisibilityElement>
-        <OperatorType />
-      </VisibilityElement>
-      <Icon>
-        <IconGUID>7218</IconGUID>
-        <Style />
-      </Icon>
-      <Text>
-        <TextGUID>7218</TextGUID>
-        <Style />
-      </Text>
-      <Value>
-        <Text>[SessionTransferSpeedFactorForGUID([RefGuid])  &gt; percentage]%</Text>
-        <Style />
-      </Value>
-      <WarningType />
-      <BackgroundType />
-    </InfoElement>
-    <InfoElement>
-      <ElementType>4</ElementType>
-      <VisibilityElement>
-        <ElementType>
-          <ElementType>2</ElementType>
-        </ElementType>
-        <OperatorType />
-      </VisibilityElement>
-      <Icon>
-        <IconGUID>1154</IconGUID>
-        <Style />
-      </Icon>
-      <Text>
-        <TextGUID>1154</TextGUID>
-        <Style />
-      </Text>
-      <Value>
-        <Text>[MetaObjects SessionGameObject([RefOid]) Attackable CurHitPoints]/[MetaObjects SessionGameObject([RefOid]) Attackable MaxHitPoints]</Text>
-        <Style />
-      </Value>
-      <WarningType />
-      <BackgroundType />
-    </InfoElement>
-    <InfoElement>
-      <ElementType>4</ElementType>
-      <VisibilityElement>
-        <ElementType>
-          <ElementType>2</ElementType>
-        </ElementType>
-        <ChildCount>1</ChildCount>
+        <!-- or spied on him -->
         <VisibilityElement>
           <ElementType>
             <ElementType>1</ElementType>
@@ -526,789 +611,767 @@
             <CompareOperator>5</CompareOperator>
           </CompareOperator>
           <ResultType>
-            <ResultType>2</ResultType>
+            <ResultType>1</ResultType>
           </ResultType>
-          <Condition>[StaticData Attacker DPS([RefGuid])]</Condition>
+          <Condition>[Economy MetaStorage StorageAmount([AssetForValue(1500006094, [MetaObjects SessionGameObject([RefOid]) Owner]) Guid])]</Condition>
         </VisibilityElement>
-        <OperatorType />
+        <OperatorType>
+          <OperatorType>1</OperatorType>
+        </OperatorType>
       </VisibilityElement>
-      <Icon>
-        <IconGUID>1151</IconGUID>
-        <Style />
-      </Icon>
-      <Text>
-        <TextGUID>1151</TextGUID>
-        <Style />
-      </Text>
-      <Value>
-        <Text>[StaticData Attacker DPS([RefGuid]) &gt;&gt; dps]</Text>
-        <Style />
-      </Value>
-      <WarningType />
-      <BackgroundType />
+    
+      <!-- speed -->
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>3</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>0</ExpectedValueInt>
+            <Condition>[MetaObjects SessionGameObject([RefOid]) Walking BaseSpeedWithUpgrades]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <ExpectedValueBool>False</ExpectedValueBool>
+              <Condition>[MetaObjects SessionGameObject([RefOid]) Walking AffectedByWind]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>2339</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>17375</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[MetaObjects SessionGameObject([RefOid]) Walking BaseSpeedWithStaticSpeedFactors&gt; knots] [AssetData(22260) Text]</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <Condition>[MetaObjects SessionGameObject([RefOid]) Walking AffectedByWind]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1010210</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>17389</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[MetaObjects SessionGameObject([RefOid]) Walking BaseSpeedWithStaticSpeedFactors_MaxWindSlowdown &gt; knots] [AssetData(22260) Text]</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <Condition>[MetaObjects SessionGameObject([RefOid]) Walking AffectedByWind]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1010210</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>17388</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[MetaObjects SessionGameObject([RefOid]) Walking BaseSpeedWithStaticSpeedFactors_MaxWindSpeedup &gt; knots] [AssetData(22260) Text]</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+      
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>0</ExpectedValueInt>
+            <Condition>[ToolOneHelper SlotAmount([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>500770</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>11893</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[ToolOneHelper SlotAmount([RefGuid])]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>50</ExpectedValueInt>
+            <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer StackLimit]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>501666</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>1164</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer StackLimit]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>3220</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>4000</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>2</ResultType>
+            </ResultType>
+            <ExpectedValueFloat>1</ExpectedValueFloat>
+            <Condition>[MetaObjects SessionGameObject([RefOid]) TradeRouteVehicle LoadingSpeedFactor]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>15197</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>15197</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[MetaObjects SessionGameObject([RefOid]) TradeRouteVehicle LoadingSpeedFactor &gt; percentage]%</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>2</ResultType>
+            </ResultType>
+            <ExpectedValueFloat>1</ExpectedValueFloat>
+            <Condition>[SessionTransferSpeedFactorForGUID([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>7218</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>7218</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[SessionTransferSpeedFactorForGUID([RefGuid])  &gt; percentage]%</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>1154</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>1154</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[MetaObjects SessionGameObject([RefOid]) Attackable CurHitPoints &gt; healthpoint]/[MetaObjects SessionGameObject([RefOid]) Attackable MaxHitPoints &gt; healthpoint]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>2</ResultType>
+            </ResultType>
+            <Condition>[MetaObjects SessionGameObject([RefOid]) Attacker DPS]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>1151</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>1151</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[MetaObjects SessionGameObject([RefOid]) Attacker DPS &gt;&gt; dps]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>6</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Style />
+        </Text>
+      </InfoElement>
     </InfoElement>
+    
+    <!-- not owned by us, no ally and not spied. Then do not display real values, but just the general ones for that ship GUID -->
     <InfoElement>
-      <ElementType>6</ElementType>
+      <ElementType>8</ElementType>
+      <ChildCount>3</ChildCount>
       <VisibilityElement>
         <ElementType>
           <ElementType>2</ElementType>
         </ElementType>
-        <OperatorType />
+        <ChildCount>3</ChildCount>
+        <!-- not Owner is me -->
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>1</CompareOperator>
+          </CompareOperator>
+          <ResultType />
+          <Condition>[MetaObjects SessionGameObject([RefOid]) IsOwnedByCurrentParticipant]</Condition>
+        </VisibilityElement>
+        <!-- and not allied -->
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>1</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>3</ExpectedValueInt>
+          <Condition>[Participants TopLevelDiplomacyStateTo([MetaObjects SessionGameObject([RefOid]) Owner], [Participants GetCurrentParticipantID()])]</Condition>
+        </VisibilityElement>
+        <!-- and not spied on him -->
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <Condition>[Economy MetaStorage StorageAmount([AssetForValue(1500006094, [MetaObjects SessionGameObject([RefOid]) Owner]) Guid])]</Condition>
+        </VisibilityElement>
+        <OperatorType>
+          <OperatorType>0</OperatorType>
+        </OperatorType>
       </VisibilityElement>
-      <Text>
-        <Style />
-      </Text>
+    
+      <!-- speed -->
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>3</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>0</ExpectedValueInt>
+            <Condition>[ToolOneHelper BaseSpeed([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <ExpectedValueBool>False</ExpectedValueBool>
+              <Condition>[ToolOneHelper AffectedByWind([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>2339</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>17375</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[ToolOneHelper BaseSpeed([RefGuid]) &gt; knots] [AssetData(22260) Text]</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <Condition>[ToolOneHelper AffectedByWind([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1010210</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>17389</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[ToolOneHelper BaseSpeed_MaxWindSlowdown([RefGuid]) &gt; knots] [AssetData(22260) Text]</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+        <InfoElement>
+          <ElementType>4</ElementType>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>1</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator />
+              <ResultType />
+              <Condition>[ToolOneHelper AffectedByWind([RefGuid])]</Condition>
+            </VisibilityElement>
+            <OperatorType />
+          </VisibilityElement>
+          <Icon>
+            <IconGUID>1010210</IconGUID>
+            <Style />
+          </Icon>
+          <Text>
+            <TextGUID>17388</TextGUID>
+            <Style />
+          </Text>
+          <Value>
+            <Text>[ToolOneHelper BaseSpeed_MaxWindSpeedup([RefGuid]) &gt; knots] [AssetData(22260) Text]</Text>
+            <Style />
+          </Value>
+          <WarningType />
+          <BackgroundType />
+        </InfoElement>
+      </InfoElement>
+      
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <ExpectedValueInt>0</ExpectedValueInt>
+            <Condition>[ToolOneHelper SlotAmount([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>500770</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>11893</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[ToolOneHelper SlotAmount([RefGuid])]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>3220</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>4000</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[ToolOneHelper SocketAmount([RefGuid])]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>2</ResultType>
+            </ResultType>
+            <ExpectedValueFloat>1</ExpectedValueFloat>
+            <Condition>[LoadingSpeedFactorForGUID([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>15197</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>15197</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[LoadingSpeedFactorForGUID([RefGuid]) &gt; percentage]%</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>2</ResultType>
+            </ResultType>
+            <ExpectedValueFloat>1</ExpectedValueFloat>
+            <Condition>[SessionTransferSpeedFactorForGUID([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>7218</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>7218</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[SessionTransferSpeedFactorForGUID([RefGuid])  &gt; percentage]%</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>1154</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>1154</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[ToolOneHelper HitPoints([RefGuid]) &gt; healthpoint]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>5</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>2</ResultType>
+            </ResultType>
+            <Condition>[StaticData Attacker DPS([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>1151</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>1151</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[StaticData Attacker DPS([RefGuid]) &gt;&gt; dps]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>6</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Style />
+        </Text>
+      </InfoElement>
     </InfoElement>
+  
   </ModOp>
   
-  <!-- ############################################### -->
   
-  <!-- Our new infotip we make displayed with invisible infolayer above all ships (only displayed if no other infolayer has higher priority) -->
-  <!-- using this because I found no way to add an infotip to the foreign objectmenu UI (when AI ship is selected) -->
-  <!-- Only showing relevant info, SlotAmount and so on are not important here, mostly military info and buffs is important -->
-  <!-- But also showing current cargo/sockets -->
-  <!-- <Columns> does not work, its always 2 coloumns so we can not save space here -->
   
-  <!-- There is no way in textsource to fetch the buffs an object is affected -->
-   <!-- Factory/Monument ProductivityUpgradeList which also only shows Productivity -->
-   <!-- And by looping over the equipped Items we can show their effects. -->
-  <!-- But other buffs are not possible -->
   
-  <!-- No way to get the Infolayer Name here ... -->
-  <!-- no clue how to create and use my own Template, I added IsTemplate and used it like any other tempalte, but it did not work for whatever reason.. -->
-    <!-- so we have to copy paste the whole thing -->
-  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='500460']">
-    <!-- invisible stats infolayer -->
-    <InfoTipData>
-      <Guid>1500003817</Guid>
-      <ChildCount>1</ChildCount>
-      <InfoElement>
-        <ElementType>2</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <Icon>
-          <IconText>[AssetData([RefGuid]) Icon]</IconText>
-          <Style />
-        </Icon>
-        <Text>
-          <Text>[AssetData([RefGuid]) Text]</Text>
-          <Style />
-        </Text>
-        <SubText>
-          <TextGUID>22438</TextGUID>
-          <Style />
-        </SubText>
-        <Value>
-          <Style />
-        </Value>
-        <BackgroundType />
-      </InfoElement>
-      <InfoElement>
-        <ElementType>4</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <Icon>
-          <IconGUID>1154</IconGUID>
-          <Style />
-        </Icon>
-        <Text>
-          <TextGUID>1154</TextGUID>
-          <Style />
-        </Text>
-        <Value>
-          <Text>[MetaObjects SessionGameObject([RefOid]) Attackable CurHitPoints]/[MetaObjects SessionGameObject([RefOid]) Attackable MaxHitPoints]</Text>
-          <Style />
-        </Value>
-        <WarningType />
-        <BackgroundType />
-      </InfoElement>
-      <InfoElement>
-        <ElementType>4</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <ChildCount>1</ChildCount>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>1</ElementType>
-            </ElementType>
-            <CompareOperator>
-              <CompareOperator>5</CompareOperator>
-            </CompareOperator>
-            <ResultType>
-              <ResultType>2</ResultType>
-            </ResultType>
-            <Condition>[StaticData Attacker DPS([RefGuid])]</Condition>
-          </VisibilityElement>
-          <OperatorType />
-        </VisibilityElement>
-        <Icon>
-          <IconGUID>1151</IconGUID>
-          <Style />
-        </Icon>
-        <Text>
-          <TextGUID>1151</TextGUID>
-          <Style />
-        </Text>
-        <Value>
-          <Text>[StaticData Attacker DPS([RefGuid]) &gt;&gt; dps]</Text>
-          <Style />
-        </Value>
-        <WarningType />
-        <BackgroundType />
-      </InfoElement>
-      <InfoElement>
-        <ElementType>6</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <Text>
-          <Style />
-        </Text>
-      </InfoElement>
-      <!-- Cargo/Sockets if we are owner -->
-      <InfoElement>
-        <ElementType>8</ElementType>
-        <ChildCount>3</ChildCount>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <ChildCount>1</ChildCount>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>1</ElementType>
-            </ElementType>
-            <CompareOperator />
-            <ResultType />
-            <Condition>[MetaObjects SessionGameObject([RefOid]) IsOwnedByCurrentParticipant]</Condition>
-          </VisibilityElement>
-          <OperatorType />
-        </VisibilityElement>
-        <InfoElement>
-          <ElementType>5</ElementType>
-          <ChildCount>1</ChildCount>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator>
-                <CompareOperator>1</CompareOperator>
-              </CompareOperator>
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo COUNT]</Condition>
-            </VisibilityElement>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator>
-                <CompareOperator>1</CompareOperator>
-              </CompareOperator>
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <ExpectedValueInt>0</ExpectedValueInt>
-              <Condition>[ToolOneHelper SlotAmount([RefGuid])]</Condition>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <InfoElement>
-            <ElementType>10</ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <OperatorType />
-            </VisibilityElement>
-            <InfoElement>
-              <ElementType>11</ElementType>
-              <VisibilityElement>
-                <ElementType>
-                  <ElementType>2</ElementType>
-                </ElementType>
-                <OperatorType />
-              </VisibilityElement>
-              <Icon>
-                <IconText>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo AT(#index0#) Icon]</IconText>
-                <Style />
-              </Icon>
-              <Text>
-                <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo AT(#index0#) Value]</Text>
-                <Style />
-              </Text>
-              <WarningType />
-            </InfoElement>
-            <Source>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo COUNT]</Source>
-            <Columns>3</Columns>
-          </InfoElement>
-          <Text>
-            <TextGUID>9986</TextGUID>
-            <Style />
-          </Text>
-          <BackgroundType />
-        </InfoElement>
-        
-        <InfoElement>
-          <!-- <ElementType>4</ElementType> -->
-          <ElementType>5</ElementType>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator>
-                <CompareOperator>1</CompareOperator>
-              </CompareOperator>
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Condition>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <Icon>
-            <IconGUID>502218</IconGUID>
-            <Style />
-          </Icon>
-          <Text>
-            <TextGUID>9987</TextGUID>
-            <Style />
-          </Text>
-          <Value>
-            <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Text>
-            <Style />
-          </Value>
-          <WarningType />
-          <BackgroundType />
-        </InfoElement>
-        
-        <InfoElement>
-          <ElementType>7</ElementType>
-          <ChildCount>1</ChildCount>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator>
-                <CompareOperator>1</CompareOperator>
-              </CompareOperator>
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Condition>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <InfoElement>
-            <ElementType>4</ElementType>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <OperatorType />
-            </VisibilityElement>
-            <Icon>
-              <IconText>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Icon]</IconText>
-              <Style />
-            </Icon>
-            <Text>
-              <Text>&lt;b&gt;[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Text]&lt;/b&gt;</Text>
-              <Style />
-            </Text>
-            <Value>
-              <Text>1</Text>
-              <Style />
-            </Value>
-            <WarningType />
-          </InfoElement>
-          <!-- two times buff template 454144439, because for non-activly useable items, ItemActiveBuff fails and therefore nothing is displayed (also vanilla devs do it this way instead of fixing the issue ..) -->
-          <InfoElement>
-            <ElementType>19</ElementType>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <OperatorType />
-            </VisibilityElement>
-            <TemplateGUID>454144439</TemplateGUID>
-            <Variables>
-              <None>
-                <Name>ItemGuid</Name>
-                <Source>[ItemAssetData([MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Guid]) Guid]</Source>
-              </None>
-            </Variables>
-          </InfoElement>
-          <InfoElement>
-            <ElementType>19</ElementType>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <OperatorType />
-            </VisibilityElement>
-            <TemplateGUID>454144439</TemplateGUID>
-            <Variables>
-              <None>
-                <Name>ItemGuid</Name>
-                <Source>[ToolOneHelper ItemActiveBuff([MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Guid])]</Source>
-              </None>
-              <None>
-                <Name>ItemGuid</Name>
-                <Source>[ItemAssetData([MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Guid]) Guid]</Source>
-              </None>
-            </Variables>
-          </InfoElement>
-          
-          <BackgroundType />
-          <Source>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Source>
-        </InfoElement>
-        
-        <InfoElement>
-          <ElementType>6</ElementType>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <ChildCount>2</ChildCount>
-              <VisibilityElement>
-                <ElementType>
-                  <ElementType>1</ElementType>
-                </ElementType>
-                <CompareOperator>
-                  <CompareOperator>1</CompareOperator>
-                </CompareOperator>
-                <ResultType>
-                  <ResultType>1</ResultType>
-                </ResultType>
-                <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo COUNT]</Condition>
-              </VisibilityElement>
-              <VisibilityElement>
-                <ElementType>
-                  <ElementType>1</ElementType>
-                </ElementType>
-                <CompareOperator>
-                  <CompareOperator>1</CompareOperator>
-                </CompareOperator>
-                <ResultType>
-                  <ResultType>1</ResultType>
-                </ResultType>
-                <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Condition>
-              </VisibilityElement>
-              <OperatorType>
-                <OperatorType>1</OperatorType>
-              </OperatorType>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <Text>
-            <Style />
-          </Text>
-        </InfoElement>
-      </InfoElement>
-      <Variables />
-    </InfoTipData>
-    
-    <!-- piratemode -->
-    <InfoTipData>
-      <Guid>1500003818</Guid>
-      <ChildCount>1</ChildCount>
-      <InfoElement>
-        <ElementType>2</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <Icon>
-          <IconText>[AssetData([RefGuid]) Icon]</IconText>
-          <Style />
-        </Icon>
-        <Text>
-          <Text>[AssetData([RefGuid]) Text]</Text>
-          <Style />
-        </Text>
-        <SubText>
-          <TextGUID>500937</TextGUID>
-          <Style />
-        </SubText>
-        <Value>
-          <Style />
-        </Value>
-        <BackgroundType />
-      </InfoElement>
-      <InfoElement>
-        <ElementType>4</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <Icon>
-          <IconGUID>1154</IconGUID>
-          <Style />
-        </Icon>
-        <Text>
-          <TextGUID>1154</TextGUID>
-          <Style />
-        </Text>
-        <Value>
-          <Text>[MetaObjects SessionGameObject([RefOid]) Attackable CurHitPoints]/[MetaObjects SessionGameObject([RefOid]) Attackable MaxHitPoints]</Text>
-          <Style />
-        </Value>
-        <WarningType />
-        <BackgroundType />
-      </InfoElement>
-      <InfoElement>
-        <ElementType>4</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <ChildCount>1</ChildCount>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>1</ElementType>
-            </ElementType>
-            <CompareOperator>
-              <CompareOperator>5</CompareOperator>
-            </CompareOperator>
-            <ResultType>
-              <ResultType>2</ResultType>
-            </ResultType>
-            <Condition>[StaticData Attacker DPS([RefGuid])]</Condition>
-          </VisibilityElement>
-          <OperatorType />
-        </VisibilityElement>
-        <Icon>
-          <IconGUID>1151</IconGUID>
-          <Style />
-        </Icon>
-        <Text>
-          <TextGUID>1151</TextGUID>
-          <Style />
-        </Text>
-        <Value>
-          <Text>[StaticData Attacker DPS([RefGuid]) &gt;&gt; dps]</Text>
-          <Style />
-        </Value>
-        <WarningType />
-        <BackgroundType />
-      </InfoElement>
-      <InfoElement>
-        <ElementType>6</ElementType>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <OperatorType />
-        </VisibilityElement>
-        <Text>
-          <Style />
-        </Text>
-      </InfoElement>
-      <!-- Cargo/Sockets if we are owner -->
-      <InfoElement>
-        <ElementType>8</ElementType>
-        <ChildCount>3</ChildCount>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <ChildCount>1</ChildCount>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>1</ElementType>
-            </ElementType>
-            <CompareOperator />
-            <ResultType />
-            <Condition>[MetaObjects SessionGameObject([RefOid]) IsOwnedByCurrentParticipant]</Condition>
-          </VisibilityElement>
-          <OperatorType />
-        </VisibilityElement>
-        <InfoElement>
-          <ElementType>5</ElementType>
-          <ChildCount>1</ChildCount>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator>
-                <CompareOperator>1</CompareOperator>
-              </CompareOperator>
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo COUNT]</Condition>
-            </VisibilityElement>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator>
-                <CompareOperator>1</CompareOperator>
-              </CompareOperator>
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <ExpectedValueInt>0</ExpectedValueInt>
-              <Condition>[ToolOneHelper SlotAmount([RefGuid])]</Condition>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <InfoElement>
-            <ElementType>10</ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <OperatorType />
-            </VisibilityElement>
-            <InfoElement>
-              <ElementType>11</ElementType>
-              <VisibilityElement>
-                <ElementType>
-                  <ElementType>2</ElementType>
-                </ElementType>
-                <OperatorType />
-              </VisibilityElement>
-              <Icon>
-                <IconText>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo AT(#index0#) Icon]</IconText>
-                <Style />
-              </Icon>
-              <Text>
-                <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo AT(#index0#) Value]</Text>
-                <Style />
-              </Text>
-              <WarningType />
-            </InfoElement>
-            <Source>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo COUNT]</Source>
-            <Columns>3</Columns>
-          </InfoElement>
-          <Text>
-            <TextGUID>9986</TextGUID>
-            <Style />
-          </Text>
-          <BackgroundType />
-        </InfoElement>
-        
-        <InfoElement>
-          <!-- <ElementType>4</ElementType> -->
-          <ElementType>5</ElementType>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator>
-                <CompareOperator>1</CompareOperator>
-              </CompareOperator>
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Condition>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <Icon>
-            <IconGUID>502218</IconGUID>
-            <Style />
-          </Icon>
-          <Text>
-            <TextGUID>9987</TextGUID>
-            <Style />
-          </Text>
-          <Value>
-            <Text>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Text>
-            <Style />
-          </Value>
-          <WarningType />
-          <BackgroundType />
-        </InfoElement>
-        
-        <InfoElement>
-          <ElementType>7</ElementType>
-          <ChildCount>1</ChildCount>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>1</ElementType>
-              </ElementType>
-              <CompareOperator>
-                <CompareOperator>1</CompareOperator>
-              </CompareOperator>
-              <ResultType>
-                <ResultType>1</ResultType>
-              </ResultType>
-              <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Condition>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <InfoElement>
-            <ElementType>4</ElementType>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <OperatorType />
-            </VisibilityElement>
-            <Icon>
-              <IconText>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Icon]</IconText>
-              <Style />
-            </Icon>
-            <Text>
-              <Text>&lt;b&gt;[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Text]&lt;/b&gt;</Text>
-              <Style />
-            </Text>
-            <Value>
-              <Text>1</Text>
-              <Style />
-            </Value>
-            <WarningType />
-          </InfoElement>
-          <!-- two times buff template 454144439, because for non-activly useable items, ItemActiveBuff fails and therefore nothing is displayed (also vanilla devs do it this way instead of fixing the issue ..) -->
-          <InfoElement>
-            <ElementType>19</ElementType>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <OperatorType />
-            </VisibilityElement>
-            <TemplateGUID>454144439</TemplateGUID>
-            <Variables>
-              <None>
-                <Name>ItemGuid</Name>
-                <Source>[ItemAssetData([MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Guid]) Guid]</Source>
-              </None>
-            </Variables>
-          </InfoElement>
-          <InfoElement>
-            <ElementType>19</ElementType>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <OperatorType />
-            </VisibilityElement>
-            <TemplateGUID>454144439</TemplateGUID>
-            <Variables>
-              <None>
-                <Name>ItemGuid</Name>
-                <Source>[ToolOneHelper ItemActiveBuff([MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Guid])]</Source>
-              </None>
-              <None>
-                <Name>ItemGuid</Name>
-                <Source>[ItemAssetData([MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets AT(#index0#) Guid]) Guid]</Source>
-              </None>
-            </Variables>
-          </InfoElement>
-          
-          <BackgroundType />
-          <Source>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Source>
-        </InfoElement>
-        
-        <InfoElement>
-          <ElementType>6</ElementType>
-          <VisibilityElement>
-            <ElementType>
-              <ElementType>2</ElementType>
-            </ElementType>
-            <ChildCount>1</ChildCount>
-            <VisibilityElement>
-              <ElementType>
-                <ElementType>2</ElementType>
-              </ElementType>
-              <ChildCount>2</ChildCount>
-              <VisibilityElement>
-                <ElementType>
-                  <ElementType>1</ElementType>
-                </ElementType>
-                <CompareOperator>
-                  <CompareOperator>1</CompareOperator>
-                </CompareOperator>
-                <ResultType>
-                  <ResultType>1</ResultType>
-                </ResultType>
-                <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Cargo COUNT]</Condition>
-              </VisibilityElement>
-              <VisibilityElement>
-                <ElementType>
-                  <ElementType>1</ElementType>
-                </ElementType>
-                <CompareOperator>
-                  <CompareOperator>1</CompareOperator>
-                </CompareOperator>
-                <ResultType>
-                  <ResultType>1</ResultType>
-                </ResultType>
-                <Condition>[MetaObjects SessionGameObject([RefOid]) ItemContainer Sockets COUNT]</Condition>
-              </VisibilityElement>
-              <OperatorType>
-                <OperatorType>1</OperatorType>
-              </OperatorType>
-            </VisibilityElement>
-            <OperatorType />
-          </VisibilityElement>
-          <Text>
-            <Style />
-          </Text>
-        </InfoElement>
-      </InfoElement>
-      <Variables />
-    </InfoTipData>
-    
-  </ModOp>
-    
+  
   
 </ModOps>

@@ -1,52 +1,203 @@
 <ModOps>
   
   <!-- Serp GUIDs 1500003815 to 1500003818 reserved for this mod -->
+  <!-- 1500003815 is free but was a Trigger, so dont use for another trigger or also not questpool -->
+  <!-- and used 1500006074+1500006075 -->
+  
+  <!-- And from 1500006076 to including 1500006094 for unlocks for different participants (to also show cargo of ships if not allied, support for diplo/sabotage mod) -->
+  <!-- this is in sabotage mod -->
   
   <!-- for unhiding everything I made a seperate mod called UnhideAllShipsandBuildings_Serp -->
+
   
-  <ModOp Type="addNextSibling" GUID="130248">
-    <Asset>
-      <Template>Trigger</Template>
-      <Values>
-        <Standard>
-          <GUID>1500003815</GUID>
-          <Name>start infolayer quest</Name>
-        </Standard>
-        <Trigger>
-          <TriggerCondition>
-            <Template>ConditionAlwaysTrue</Template>
-            <Values>
-              <Condition />
-              <ConditionAlwaysTrue />
-            </Values>
-          </TriggerCondition>
-          <TriggerActions>
-            <Item>
-              <TriggerAction>
-                <Template>ActionStartQuest</Template>
-                <Values>
-                  <Action />
-                  <ActionStartQuest>
-                    <Quest>1500003817</Quest>
-                  </ActionStartQuest>
-                </Values>
-              </TriggerAction>
-            </Item>
-          </TriggerActions>
-        </Trigger>
-        <TriggerSetup>
-          <AutoRegisterTrigger>1</AutoRegisterTrigger>
-          <UsedBySecondParties>0</UsedBySecondParties>
-        </TriggerSetup>
-      </Values>
-    </Asset>
-  </ModOp>
-  
+
   <!-- we add an invalid war flag to all Attackable buildings, to make the UI show the hitpoints (somewhere hardcoded to not show it if it is 0) -->
   <!-- residence GUIDType still does not show it.. but most others -->
   <ModOp Type="merge" Path="//Values/Attackable[(AttackableType='HarbourBuilding' or AttackableType='IslandBuilding') and not(IslandWarFlag)]">              
     <IslandWarFlag>12</IslandWarFlag>
   </ModOp>
+  
+  <!-- ################################################################################################## -->
+  
+  <ModOp Type="add" GUID='2001271' Path="/Values/GUIConfig/KeyBindings">
+    <Item>
+      <KeyTypes>Control;I</KeyTypes>
+      <Command>ts.Conditions.RegisterTriggerForCurrentParticipant(1500006074)</Command>
+      <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+      <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+      <AudioEvent>200634</AudioEvent>
+      <Configurable>0</Configurable>
+      <HideInOptionMenu>1</HideInOptionMenu>
+      <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+      <Identifier>toggleinfolayerinfotip_serp</Identifier>
+    </Item>
+  </ModOp>
+  
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006074</GUID>
+          <Name>Enable/Disable Hover infolayer infotip Quest (shown while locked, because non existend guids are unlocked)</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>1</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500006074</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500006074</Asset>
+                                </Item>
+                              </UnlockAssets>
+                              <UnhideAssets />
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <!-- KeepCheckingPreconditionsWhenRunning also aborts the quest, but ActionEndQuest is needed for compatibility to previous mod version anyways -->
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionEndQuest</Template>
+                          <Values>
+                            <Action />
+                            <ActionEndQuest>
+                              <Quest>1500003817</Quest>
+                              <AbortQuestExceptionally>1</AbortQuestExceptionally>
+                            </ActionEndQuest>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500006074</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionLockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionLockAsset>
+                              <LockAssets>
+                                <Item>
+                                  <Asset>1500006074</Asset>
+                                </Item>
+                              </LockAssets>
+                            </ActionLockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+    
+  <ModOp Type="addNextSibling" GUID="150725">
+    <Asset>
+      <Template>QuestPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006075</GUID>
+          <Name>start infolayer quest</Name>
+        </Standard>
+        <QuestPool>
+          <Quests>
+            <Item>
+              <Quest>1500003817</Quest>
+            </Item>
+          </Quests>
+          <PoolCooldown>1000</PoolCooldown>
+          <QuestCooldown>0</QuestCooldown>
+          <CooldownOnQuestStart>1</CooldownOnQuestStart>
+          <CooldownOnQuestEnd>0</CooldownOnQuestEnd>
+          <AffectedByCooldownFactor>0</AffectedByCooldownFactor>
+          <IsMainStoryPool>0</IsMainStoryPool>
+          <IsTopLevel>1</IsTopLevel>
+          <QuestLimit>1</QuestLimit>
+        </QuestPool>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500006074</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </Condition>
+        </PreConditionList>
+      </Values>
+    </Asset>
+  </ModOp>
+  
   
   <ModOp Type="addNextSibling" GUID="2002086">
     <Asset>
@@ -113,7 +264,7 @@
   
   <!-- Distribute the Infolayer via Quest, because this is the only way to also show it for foreign ships -->
   <!-- neu gebaute Schiffe haben es nicht, deswegen müssen wir es regelmäßig aktualisieren... -->
-   <!-- to save the amount of started Quests, we copy paste alot of SustainObjective_ShowStatsSerp (60 seconds) winconditions into it. -->
+   <!-- to save the amount of started Quests, we copy paste alot of SustainObjective_ShowStatsSerp (10 seconds) winconditions into it. -->
     <!-- and after they are done, restart the Quest -->
   <ModOp Type="AddNextSibling" GUID="152264">
     <Asset>
@@ -124,53 +275,958 @@
           <Name>Show invisible infolayer with tooltip on every ship</Name>
         </Standard>
         <Quest>
-          <OnQuestEnd>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-            <Values>
-              <ActionList>
-                <Actions>
-                  <Item>
-                    <Action>
-                      <Template>ActionDelayedActions</Template>
-                      <Values>
-                        <Action />
-                        <ActionDelayedActions>
-                          <ExecutionDelay>1000</ExecutionDelay>
-                          <DelayedActions>
-                            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                            <Values>
-                              <ActionList>
-                                <Actions>
-                                  <Item>
-                                    <Action>
-                                      <Template>ActionStartQuest</Template>
-                                      <Values>
-                                        <Action />
-                                        <ActionStartQuest>
-                                          <Quest>1500003817</Quest>
-                                        </ActionStartQuest>
-                                      </Values>
-                                    </Action>
-                                  </Item>
-                                </Actions>
-                              </ActionList>
-                            </Values>
-                          </DelayedActions>
-                        </ActionDelayedActions>
-                      </Values>
-                    </Action>
-                  </Item>
-                </Actions>
-              </ActionList>
-            </Values>
-          </OnQuestEnd>
+          <KeepCheckingPreconditionsWhenRunning>1</KeepCheckingPreconditionsWhenRunning>
         </Quest>
+        <PreConditionList>
+          <Condition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500006074</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </Condition>
+        </PreConditionList>
         <Locked>
           <DefaultLockedState>0</DefaultLockedState>
         </Locked>
         <Objectives>
           <WinConditionCompletionOrder>Linear</WinConditionCompletionOrder>
           <WinConditions>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SustainObjective_ShowStatsSerp</Template>
+                <Values />
+              </Objective>
+            </Item>
             <Item>
               <Objective>
                 <Template>SustainObjective_ShowStatsSerp</Template>

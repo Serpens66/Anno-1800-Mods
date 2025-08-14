@@ -1,0 +1,68 @@
+<ModOps>
+  
+  <!-- fix the condition to display "build-Warning". -->
+   
+  
+  <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+    <!-- to export the tooltips from the game use FileDBReader and the FileFormat "infotip.xml" and unpack "data\infotips\export.bin" -->
+    <!-- or download it in anno modding discord here: -->
+    <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
+
+  <!-- guid 25000020 is responsilbe for tooltips when hovering over buildings in the build menu -->
+  
+  
+  
+  
+  <!-- my new code I chose, because I saw the other correct occurances of 12662 and think this wrong one was meant to look exactly like this -->
+  <!-- place the VisibilityElement at correct location -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement[InfoElement/VisibilityElement/VisibilityElement[Condition='[BuildPermits BuildPermits([RefGuid])]' and CompareOperator/CompareOperator='3']]/VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(0) ProductGUID])]' and (not(ExpectedValueBool) or ExpectedValueBool='True')]">
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>3</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>1</ResultType>
+      </ResultType>
+      <Condition>[BuildPermits BuildPermits([RefGuid])]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <!-- remove the wrong placed VisibilityElement. when you compare it to other occurances of 12662, this infoelement should just create an empty line -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement[VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(0) ProductGUID])]' and (not(ExpectedValueBool) or ExpectedValueBool='True')]]/InfoElement[VisibilityElement/VisibilityElement[Condition='[BuildPermits BuildPermits([RefGuid])]' and CompareOperator/CompareOperator='3'] and (Text/Style and not(Text/TextGUID))]/VisibilityElement/VisibilityElement" />
+
+  
+
+  
+  <!-- #################################################### -->
+  <!-- #################################################### -->
+  <!-- #################################################### -->
+
+  <!-- OLD code that also works fine, but I think new one is more what was intended by the devs: -->
+  
+  
+  <!-- add the correct VisibilityElement at the correct location -->
+  <!-- <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement[VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(0) ProductGUID])]' and (not(ExpectedValueBool) or ExpectedValueBool='True')] and InfoElement[VisibilityElement/VisibilityElement[Condition='[BuildPermits BuildPermits([RefGuid])]' and CompareOperator/CompareOperator='3']]]/VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(0) ProductGUID])]' and (not(ExpectedValueBool) or ExpectedValueBool='True')]"> -->
+  <!-- <ModOp Type="merge" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement[VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(0) ProductGUID])]' and (not(ExpectedValueBool) or ExpectedValueBool='True')]]/InfoElement[VisibilityElement/VisibilityElement[Condition='[BuildPermits BuildPermits([RefGuid])]' and CompareOperator/CompareOperator='3']]/Text"> -->
+    <!-- <TextGUID>12662</TextGUID> -->
+  <!-- </ModOp> -->
+  
+  <!-- remove the wrong InfoElement -->
+  <!-- <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement -->
+      <!-- [VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(0) ProductGUID])]' and (not(ExpectedValueBool) or ExpectedValueBool='True')]  -->
+        <!-- and  -->
+      <!-- InfoElement[VisibilityElement/VisibilityElement[Condition='[BuildPermits BuildPermits([RefGuid])]' and CompareOperator/CompareOperator='3']]] -->
+    <!-- /InfoElement[Text/TextGUID='12662' and not(VisibilityElement/VisibilityElement)]" /> -->
+  
+  
+  
+</ModOps>
+
+
+
+
+
+
+
+
