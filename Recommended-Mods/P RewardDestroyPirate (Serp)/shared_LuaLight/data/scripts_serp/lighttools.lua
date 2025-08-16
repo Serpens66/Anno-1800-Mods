@@ -290,6 +290,10 @@ local function weighted_random_choices(choices, num_choices)
   end
   return picks
 end
+-- choices = {"a","b","c"}
+local function random_choice(choices)
+  return choices[math.random(#choices)]
+end
 
 -- https://stackoverflow.com/a/32660766
 ---@param o1 any|table First object to compare
@@ -657,6 +661,17 @@ local function AddToNameInvisible(origname,addstring,onlifnotaddedyet)
     new_name = new_name .. addstring .. "#" -- # used as seperator
   end
   return new_name
+end
+
+
+-- plays one of the sounds on the sounds list. key is the sound GUID and value is a weight:
+ -- sounds = {[Sound1GUID]=10,[Sound2GUID]=20}
+local function play_random_sound(sounds)
+  local picks = g_LTL_Serp.weighted_random_choices(sounds,1)
+  local pick = next(picks)
+  if pick~=nil then
+    game.playSound(pick) -- macht kein desync und wird scheinbar nur für den peer abgespielt der den lua cde ausführt. alternative: game.GUIManager.playAudioText(GUID) (nicht getestet im MP)
+  end
 end
 
 
@@ -1368,7 +1383,6 @@ end
   end
   -- for Productivity Buffs for Factory/Monument see GetVectorGuidsFromSessionObject ProductivityUpgradeList
   -- And you can check ItemContainer for "GetItemAlreadyEquipped" to check if a ship/guildhouse has an item euqipped
-    -- (mit ts.GetItemAssetData(BuffGUID) kommen wir an infos zu buffs/items, aber nicht ob etwas davon betroffen ist)
   -- I fear checking other buffs is not possible in lua...
 
 
@@ -1399,6 +1413,7 @@ g_LTL_Serp = {
   TableToHex = TableToHex,
   HexToTable = HexToTable,
   argstotext = argstotext,
+  random_choice = random_choice,
   
   -- ######################################
   -- Anno1800 related lightweigth lua helpers
@@ -1416,6 +1431,7 @@ g_LTL_Serp = {
   SplitNumberFromName = SplitNumberFromName,
   AddToNameInvisible = AddToNameInvisible,
   GetNameInvisible = GetNameInvisible,
+  play_random_sound = play_random_sound,
   
   -- ID Converter
   AreatableToAreaID = AreatableToAreaID,
