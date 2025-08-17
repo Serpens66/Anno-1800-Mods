@@ -1,0 +1,247 @@
+<ModOps>
+  
+  <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+    <!-- to export the tooltips from the game use FileDBReader and the FileFormat "infotip.xml" and unpack "data\infotips\export.bin" -->
+    <!-- or download it in anno modding discord here: -->
+    <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
+
+
+    <!-- Fix the infotip in BuildMenu for unlocked building which require permits, to show the PermitSource as tooltip you defined in xml (instead of always showing Text of GUID 22395) -->
+    <!-- not only relevant for mods, but also vanilla objects using PermitSource do not properly display their specific text, instead they all show only string like: -->
+      <!-- >22395</  >19754</ >22396</ (while they wnat <PermitSource>14182</PermitSource> to be displayed) -->
+  
+  <!-- For upgrading a blueprint (see 502064) and also for locked+unhidden (see 1563783317) objects it works correctly -->
+    <!--  so this way we know how the correct it should look like -->
+  
+  <!-- replacing a whole Elemement does not work in infotips unfortunately, so we add and remove instead -->
+  
+  <ModOp Type="AddPrevSibling" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement/InfoElement[Text/TextGUID='22396']">
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>1</ChildCount>
+      <!-- if building needs a permit, we have none and it is not a godlike permit -->
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>7</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[BuildPermits NeedsBuildPermit([RefGuid])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>3</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <Condition>[BuildPermits BuildPermits([RefGuid])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(0) ProductGUID])]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <!-- if it has a PermitSource in xml defined, then display it -->
+      <InfoElement>
+        <ElementType>3</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[ToolOneHelper PermitSource([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Text>[AssetData([ToolOneHelper PermitSource([RefGuid])]) Text]</Text>
+          <Style />
+        </Text>
+        <Value>
+          <Style />
+        </Value>
+        <WarningType>
+          <WarningType>2</WarningType>
+        </WarningType>
+        <BackgroundType />
+      </InfoElement>
+      <!-- if no permitsource was entered in xml display as default 22383 (Building Permit) as warning text -->
+      <InfoElement>
+        <ElementType>3</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[ToolOneHelper PermitSource([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <TextGUID>22383</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Style />
+        </Value>
+        <WarningType>
+          <WarningType>2</WarningType>
+        </WarningType>
+        <BackgroundType />
+      </InfoElement>
+    </InfoElement>
+    
+    <!-- if building needs a permit, we have at least one and it is not a godlike permit, then still show the PermitSource, but not as warning -->
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>1</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>7</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[BuildPermits NeedsBuildPermit([RefGuid])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>5</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <Condition>[BuildPermits BuildPermits([RefGuid])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(0) ProductGUID])]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <!-- if it has a PermitSource in xml defined, then display it -->
+      <InfoElement>
+        <ElementType>3</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[ToolOneHelper PermitSource([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Text>[AssetData([ToolOneHelper PermitSource([RefGuid])]) Text]</Text>
+          <Style />
+        </Text>
+        <Value>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <!-- if no permitsource was entered in xml display as default 22383 (Building Permit) -->
+      <InfoElement>
+        <ElementType>3</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[ToolOneHelper PermitSource([RefGuid])]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <TextGUID>22383</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+    </InfoElement>
+    
+    
+  </ModOp>
+  
+  <!-- remove the wrong elements including these 3 guids >22395</  >19754</ >22396</ -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement/InfoElement[Text/TextGUID='22396']" />
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement/InfoElement[Text/TextGUID='22395']" />
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement/InfoElement[Text/TextGUID='19754']" />
+  
+  <Group Condition="#lion053_Enbesa_Tourism">
+    <!-- remove hardcoded GUID code from Lion Enbesa Tourism... not needed with this bugfix anymore (also adjusting assets.xml to still display his intended text) -->
+    <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement[Text/TextGUID='2100119815']" />
+    <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement[Text/TextGUID='2100119818']" />
+    <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement[Text/TextGUID='2100119816']" />
+    <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement[Text/TextGUID='2100119829']" />
+  </Group>
+  
+</ModOps>

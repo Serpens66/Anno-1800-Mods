@@ -1,0 +1,77 @@
+<ModOps>
+  
+  <!-- use a FeatureUnlock like this and lock it with SetRelockNet in lua to start it, instead of using RegisterTrigger in lua, -->
+   <!-- to make sure even in coop its only executed one time per participant  -->
+  
+  <ModOp Type="addNextSibling" Template="FeatureUnlock">
+    <Template>
+      <Name>FeatureUnlock_MPLua</Name>
+      <Properties>
+      <Standard>
+        <!-- <GUID>1500005610</GUID> -->
+      </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <!-- <UnlockNeeded>1500005610</UnlockNeeded> -->
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <!-- <Asset>1500005610</Asset> -->
+                      </Item>
+                    </UnlockAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- add your actions here -->
+          </TriggerActions>
+          <!-- using a small timer to reset, because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>500</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Properties>
+    </Template>
+  </ModOp>
+    
+    
+
+    
+</ModOps>

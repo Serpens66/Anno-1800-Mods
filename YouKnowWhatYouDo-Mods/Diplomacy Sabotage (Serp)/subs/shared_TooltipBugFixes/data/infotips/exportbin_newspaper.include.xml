@@ -1,0 +1,629 @@
+<ModOps>
+    
+  <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+    <!-- to export the tooltips from the game use FileDBReader and the FileFormat "infotip.xml" and unpack "data\infotips\export.bin" -->
+    <!-- or download it in anno modding discord here: -->
+    <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
+
+  <!-- Fixes for newspaper infotips and also differentiate between negative/posivite values -->
+  
+
+
+  <!-- workforce overview, display the amount from newspaper in brackets (its already included to the total amount) -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000059']/InfoElement/InfoElement[Value/Text='[WorkforceTransferManager ProvidedWorkforceOnArea([Area Current ID], [RefGuid]) &gt;&gt; workforce]']">
+    <InfoElement>
+      <ElementType>4</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>5</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Newspaper ActiveEffectValue(14,[RefGuid]) &gt;&gt; workforce]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconGUID>500894</IconGUID>
+        <Style />
+      </Icon>
+      <Text>
+        <TextGUID>111008</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>(+[Newspaper ActiveEffectValue(14,[RefGuid]) &gt;&gt; workforce])</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+    <InfoElement>
+      <ElementType>4</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>2</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Newspaper ActiveEffectValue(14,[RefGuid]) &gt;&gt; workforce]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconGUID>500894</IconGUID>
+        <Style />
+      </Icon>
+      <Text>
+        <TextGUID>111008</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>([Newspaper ActiveEffectValue(14,[RefGuid]) &gt;&gt; workforce])</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  
+
+  <!-- show the NewspaperIncome in Balance summary with other icon/text depending if positive or negative -->
+  <!-- check if positive for vanilla display -->
+  <ModOp Type="merge" Path="//InfoTipData[Guid='25000057']/InfoElement[Value/Text='[Money NewspaperIncome &gt;&gt; balance]']/VisibilityElement/VisibilityElement[Condition='[Money NewspaperIncome]']">
+    <CompareOperator>
+      <CompareOperator>5</CompareOperator>
+    </CompareOperator>
+  </ModOp>
+  <!-- display without the "+" if negative -->
+  <!-- &gt;&gt; balance adds the + sign, so use sth else eg. storagegood10K (is also rounded to 1k) -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000057']/InfoElement[Value/Text='[Money NewspaperIncome &gt;&gt; balance]']">
+    <InfoElement>
+      <ElementType>4</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>2</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <Condition>[Money NewspaperIncome]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconGUID>501142</IconGUID>
+        <Style />
+      </Icon>
+      <Text>
+        <TextGUID>111008</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[Money NewspaperIncome &gt;&gt; storagegood10K]</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+
+  
+  <!-- GUID 502304 is fine with only negative, because its a tooltip only displayed for negative newspapers (most likely categorized by "Rating" of the Artcile) -->
+  
+  <!-- WarSpeechInfoTip -->
+  <!-- Use Text "Zeitung: Kriegstreiberei" instead "Propaganda -​ Kriegstreiberei" to be more neutral in regards to pos/neg and by what it was caused -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501116']/InfoElement/Text/TextGUID[text()='14002']">
+    <Text>[AssetData(111008) Text]: [AssetData(21517) Text]</Text>
+  </ModOp>
+  <!-- use newspaper icon in infotip header, to be neutral (other infotips already using it, so its intended anyways) -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501116']/InfoElement/Icon/IconGUID[text()='501110']">
+    <IconGUID>500894</IconGUID>
+  </ModOp>
+  <!-- show vanilla text (+) only if value is positive -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='501116']/InfoElement[Value/Text='+[Selection Object Attacker NewspaperFireRateIncrease &gt;&gt; percentage]%']/VisibilityElement">
+    <ChildCount>1</ChildCount>
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>5</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>2</ResultType>
+      </ResultType>
+      <Condition>[Selection Object Attacker NewspaperFireRateIncrease]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <!-- display without the "+" if negative -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='501116']/InfoElement[Value/Text='+[Selection Object Attacker NewspaperFireRateIncrease &gt;&gt; percentage]%']">
+    <InfoElement>
+      <ElementType>3</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>2</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Selection Object Attacker NewspaperFireRateIncrease]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <TextGUID>14123</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[Selection Object Attacker NewspaperFireRateIncrease &gt;&gt; percentage]%</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  
+  <!-- ArmamentRepairRateInfoTip -->
+  <!-- Use Text "Zeitung: Kriegsanstrengungen" instead "Propaganda -​ Kriegsanstrengungen" to be more neutral in regards to pos/neg and by what it was caused -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501107']/InfoElement/Text/TextGUID[text()='14042']">
+    <Text>[AssetData(111008) Text]: [AssetData(21518) Text]</Text>
+  </ModOp>
+  <!-- use newspaper icon in infotip header, to be neutral (other infotips already using it, so its intended anyways) -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501107']/InfoElement/Icon/IconGUID[text()='501111']">
+    <IconGUID>500894</IconGUID>
+  </ModOp>
+  <!-- show vanilla text (+) only if value is positive -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='501107']/InfoElement[Value/Text='+[Selection Object Repair NewspaperProductivityIncrease &gt;&gt; percentage]%']/VisibilityElement">
+    <ChildCount>1</ChildCount>
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>5</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>2</ResultType>
+      </ResultType>
+      <Condition>[Selection Object Repair NewspaperProductivityIncrease]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <!-- display without the "+" if negative -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='501107']/InfoElement[Value/Text='+[Selection Object Repair NewspaperProductivityIncrease &gt;&gt; percentage]%']">
+    <InfoElement>
+      <ElementType>3</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>2</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Selection Object Repair NewspaperProductivityIncrease]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <TextGUID>14125</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[Selection Object Repair NewspaperProductivityIncrease &gt;&gt; percentage]%</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  
+  <!-- ConsumptionTaxInfoTip (income) -->
+  <!-- more neutral header -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501125']/InfoElement/Text/TextGUID[text()='14001']">
+    <Text>[AssetData(111008) Text]: [AssetData(21516) Text]</Text>
+  </ModOp>
+  <!-- use newspaper icon in infotip header, to be neutral (other infotips already using it, so its intended anyways) -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501125']/InfoElement/Icon/IconGUID[text()='501109']">
+    <IconGUID>500894</IconGUID>
+  </ModOp>
+  <!-- show vanilla text (+) only if value is positive -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='501125']/InfoElement[Value/Text='+[Newspaper ActiveEffectValuePropagandaSensitive(3, true, 0)]%']/VisibilityElement">
+    <ChildCount>1</ChildCount>
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>5</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>2</ResultType>
+      </ResultType>
+      <Condition>[Newspaper ActiveEffectValuePropagandaSensitive(3, true, 0)]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <!-- display without the "+" if negative -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='501125']/InfoElement[Value/Text='+[Newspaper ActiveEffectValuePropagandaSensitive(3, true, 0)]%']">
+    <InfoElement>
+      <ElementType>3</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>2</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Newspaper ActiveEffectValuePropagandaSensitive(3, true, 0)]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <TextGUID>14124</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[Newspaper ActiveEffectValuePropagandaSensitive(3, true, 0)]%</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  
+  <!-- ConsumptionTaxInfoTipRegular (income) -->
+  <!-- header is already neutral -->
+  <!-- use newspaper icon in infotip header, to be neutral (other infotips already using it, so its intended anyways) -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501716']/InfoElement/Icon/IconGUID[text()='501109']">
+    <IconGUID>500894</IconGUID>
+  </ModOp>  
+  <!-- show vanilla text (+) only if value is positive -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='501716']/InfoElement[Value/Text='+[Newspaper ActiveEffectValuePropagandaSensitive(3, false, 0)]%']/VisibilityElement">
+    <ChildCount>1</ChildCount>
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>5</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>2</ResultType>
+      </ResultType>
+      <Condition>[Newspaper ActiveEffectValuePropagandaSensitive(3, false, 0)]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <!-- display without the "+" if negative -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='501716']/InfoElement[Value/Text='+[Newspaper ActiveEffectValuePropagandaSensitive(3, false, 0)]%']">
+    <InfoElement>
+      <ElementType>3</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>2</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Newspaper ActiveEffectValuePropagandaSensitive(3, false, 0)]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <TextGUID>14124</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[Newspaper ActiveEffectValuePropagandaSensitive(3, false, 0)]%</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  
+  <!-- RationalisationInfoTipRegular (income) -->
+  <!-- header is already neutral -->
+  <!-- use newspaper icon in infotip header, to be neutral (other infotips already using it, so its intended anyways) -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501715']/InfoElement/Icon/IconGUID[text()='500626']">
+    <IconGUID>500894</IconGUID>
+  </ModOp>
+  <!-- show vanilla text (-) only if value is negative -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='501715']/InfoElement[Value/Text='[Newspaper ActiveEffectValuePropagandaSensitive(4, false, 0)]%']/VisibilityElement">
+    <ChildCount>1</ChildCount>
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>2</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>2</ResultType>
+      </ResultType>
+      <Condition>[Newspaper ActiveEffectValuePropagandaSensitive(4, false, 0)]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <!-- display with the "+" if positive -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='501715']/InfoElement[Value/Text='[Newspaper ActiveEffectValuePropagandaSensitive(4, false, 0)]%']">
+    <InfoElement>
+      <ElementType>3</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>5</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Newspaper ActiveEffectValuePropagandaSensitive(4, false, 0)]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <TextGUID>10832</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>+[Newspaper ActiveEffectValuePropagandaSensitive(4, false, 0)]%</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  
+  <!-- RationalisationInfoTip -->
+  <!-- more neutral header -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501124']/InfoElement/Text/TextGUID[text()='10940']">
+    <Text>[AssetData(111008) Text]: [AssetData(21515) Text]</Text>
+  </ModOp>
+  <!-- use newspaper icon in infotip header, to be neutral (other infotips already using it, so its intended anyways) -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501124']/InfoElement/Icon/IconGUID[text()='500626']">
+    <IconGUID>500894</IconGUID>
+  </ModOp>
+  <!-- show vanilla text (-) only if value is negative -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='501124']/InfoElement[Value/Text='[Newspaper ActiveEffectValuePropagandaSensitive(4, true, 0)]%']/VisibilityElement">
+    <ChildCount>1</ChildCount>
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>2</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>2</ResultType>
+      </ResultType>
+      <Condition>[Newspaper ActiveEffectValuePropagandaSensitive(4, true, 0)]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <!-- display with the "+" if positive -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='501124']/InfoElement[Value/Text='[Newspaper ActiveEffectValuePropagandaSensitive(4, true, 0)]%']">
+    <InfoElement>
+      <ElementType>3</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>5</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Newspaper ActiveEffectValuePropagandaSensitive(4, true, 0)]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <TextGUID>10832</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>+[Newspaper ActiveEffectValuePropagandaSensitive(4, true, 0)]%</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  
+  
+  <!-- ArmamentProductionInfoTip -->
+  <!-- Replace "Propaganda" with "Zeitung: " (again more neutral) -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='501115']/InfoElement/Text/TextGUID[text()='14013']">
+    <Text>[AssetData(111008) Text]: [AssetData(14130) Text]</Text>
+  </ModOp>
+  <!-- already has newspaper icon -->
+  <!-- vanilla adds a "-" in front of the value is positive -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='501115']/InfoElement[Value/Text='-[Selection Object Shipyard NewspaperProductivityIncrease &gt;&gt; percentage]%']/VisibilityElement">
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>5</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>2</ResultType>
+      </ResultType>
+      <Condition>[Selection Object Shipyard NewspaperProductivityIncrease]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <!-- display without the "+" if negative -->
+  <!-- use percentageInvert to multiply the value with -1 to not make the game automatically display the "-" in front of it -->
+   <!-- percentageInvert already adds a "+" in front it seems -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='501115']/InfoElement[Value/Text='-[Selection Object Shipyard NewspaperProductivityIncrease &gt;&gt; percentage]%']">
+    <InfoElement>
+      <ElementType>3</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>2</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Selection Object Shipyard]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>2</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Selection Object Shipyard NewspaperProductivityIncrease]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <TextGUID>21599</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[Selection Object Shipyard NewspaperProductivityIncrease &gt;&gt; percentageInvert]%</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  <!-- 501115 has 2 entries -->
+  <!-- show vanilla text (+) only if value is positive -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='501115']/InfoElement[Value/Text='+[Selection Object Factory NewspaperProductivityIncrease &gt;&gt; percentage]%']/VisibilityElement">
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator>
+        <CompareOperator>5</CompareOperator>
+      </CompareOperator>
+      <ResultType>
+        <ResultType>2</ResultType>
+      </ResultType>
+      <Condition>[Selection Object Factory NewspaperProductivityIncrease]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  <!-- display without the "+" if negative -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='501115']/InfoElement[Value/Text='+[Selection Object Factory NewspaperProductivityIncrease &gt;&gt; percentage]%']">
+    <InfoElement>
+      <ElementType>3</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>2</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Selection Object Factory]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>2</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>2</ResultType>
+          </ResultType>
+          <Condition>[Selection Object Factory NewspaperProductivityIncrease]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <TextGUID>111271</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[Selection Object Factory NewspaperProductivityIncrease &gt;&gt; percentage]%</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
+  
+  
+  
+</ModOps>

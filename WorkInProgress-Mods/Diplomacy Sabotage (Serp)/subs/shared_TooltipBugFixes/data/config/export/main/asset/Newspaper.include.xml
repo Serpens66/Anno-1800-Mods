@@ -1,0 +1,259 @@
+<ModOps>
+  
+  <!-- used GUIDs for bugfixing: 1500006095, 1500006096, 1500006097, 1500006098 -->
+  
+  <!-- Newspaper has alot of missing/wrong text and icons. -->
+   <!-- and does not display negative values properly -->
+  
+
+  
+  <!-- add ExplosionChanceGlobal and fix description of FireChanceGlobal -->
+  <ModOp Type="merge" GUID="500045" Path="/Values/NewspaperScene/EffectVisualization">
+    <ExplosionChanceGlobal>
+      <EffectName>14292</EffectName>
+      <ArticleValueText>10875</ArticleValueText>
+      <IconMap>1500006098</IconMap>
+      <EffectDescription>14292</EffectDescription>
+      <CategoryIcon>501181</CategoryIcon>
+    </ExplosionChanceGlobal>
+    <FireChanceGlobal>
+      <EffectDescription>10833</EffectDescription>
+    </FireChanceGlobal>
+    <IllnessChanceGlobal>
+      <CategoryIcon>500644</CategoryIcon>
+    </IllnessChanceGlobal>
+  </ModOp>
+  
+  <ModOp Type="AddNextSibling" GUID="501742">
+    <Asset>
+      <Template>NewspaperEffectIcon</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006095</GUID>
+          <Name>ExplosionChanceGlobalNegative</Name>
+          <IconFilename>data/ui/2kimages/main/icons/notification_icons/icon_incident_explosion_outline.png</IconFilename>
+        </Standard>
+        <NewspaperEffectIcon>
+          <EffectColor>DeepRed</EffectColor>
+        </NewspaperEffectIcon>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>NewspaperEffectIcon</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006096</GUID>
+          <Name>ExplosionChanceGlobalNeutral</Name>
+          <IconFilename>data/ui/2kimages/main/icons/notification_icons/icon_incident_explosion_outline.png</IconFilename>
+        </Standard>
+        <NewspaperEffectIcon>
+          <EffectColor>Yellow</EffectColor>
+        </NewspaperEffectIcon>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>NewspaperEffectIcon</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006097</GUID>
+          <Name>ExplosionChanceGlobalPositive</Name>
+          <IconFilename>data/ui/2kimages/main/icons/notification_icons/icon_incident_explosion_outline.png</IconFilename>
+        </Standard>
+        <NewspaperEffectIcon>
+          <EffectColor>DeepGreen</EffectColor>
+        </NewspaperEffectIcon>
+      </Values>
+    </Asset>
+  </ModOp>
+  <ModOp Type="AddNextSibling" GUID="501738">
+    <Asset>
+      <Template>ValueAssetMap</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006098</GUID>
+          <Name>ExplosionChanceGlobalIconMap</Name>
+          <IconFilename>data/ui/2kimages/main/icons/notification_icons/icon_incident_explosion_outline.png</IconFilename>
+        </Standard>
+        <ValueAssetMap>
+          <ValueAssetMap>
+            <Item>
+              <ValidFrom>-1000000</ValidFrom>
+              <Asset>1500006097</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>-1</ValidFrom>
+              <Asset>1500006096</Asset>
+            </Item>
+            <Item>
+              <ValidFrom>1</ValidFrom>
+              <Asset>1500006095</Asset>
+            </Item>
+          </ValueAssetMap>
+        </ValueAssetMap>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <!-- NewspaperEffectIcon use fitting firechance icon -->
+  <ModOp Type="merge" GUID="500628,500629" Path="/Values/Standard">
+    <IconFilename>data/ui/2kimages/main/icons/dlc_11/icon_ship_fire_armed_red.png</IconFilename>
+  </ModOp>
+  <ModOp Type="merge" GUID="500630" Path="/Values/Standard">
+    <IconFilename>data/ui/2kimages/main/icons/dlc_11/icon_ship_fire_armed_light.png</IconFilename>
+  </ModOp>
+  <ModOp Type="merge" GUID="500631,500632" Path="/Values/Standard">
+    <IconFilename>data/ui/2kimages/main/icons/dlc_11/icon_ship_fire_armed.png</IconFilename>
+  </ModOp>
+  <!-- its sorted in wrong order... -->
+  <ModOp Type="replace" GUID="500599" Path="/Values/ValueAssetMap/ValueAssetMap">
+    <ValueAssetMap>
+      <Item>
+        <ValidFrom>-1000000</ValidFrom>
+        <Asset>500631</Asset>
+      </Item>
+      <Item>
+        <ValidFrom>-1</ValidFrom>
+        <Asset>500630</Asset>
+      </Item>
+      <Item>
+        <ValidFrom>1</ValidFrom>
+        <Asset>500629</Asset>
+      </Item>
+    </ValueAssetMap>
+  </ModOp>
+
+  
+  <!-- ObjectmenuShipScene Also display negative newspaper effects -->
+  <ModOp Type="add" GUID="500027" Path="/Values/ObjectmenuHeader/BuffDisplayList">
+    <Item>
+      <Buffgroup>
+        <Item>
+          <DataSource>[Selection Object Attacker NewspaperFireRateIncrease]</DataSource>
+          <MinThreshold>-10000</MinThreshold>
+          <MaxThreshold>-0.0001</MaxThreshold>
+        </Item>
+      </Buffgroup>
+      <Icon>501138</Icon>
+      <InfoTip>501116</InfoTip>
+    </Item>
+  </ModOp>
+  <!-- ObjectmenuProductionScene also show negative -->
+  <ModOp Type="add" GUID="500365" Path="/Values/ObjectmenuHeader/BuffDisplayList">
+    <Item>
+      <Buffgroup>
+        <Item>
+          <DataSource>[Selection Object Factory NewspaperProductivityIncrease]</DataSource>
+          <MinThreshold>-10000</MinThreshold>
+          <MaxThreshold>-0.0001</MaxThreshold>
+        </Item>
+      </Buffgroup>
+      <Icon>501739</Icon>
+      <InfoTip>501115</InfoTip>
+    </Item>
+  </ModOp>
+  <!-- use proper icon -->
+  <ModOp Type="merge" GUID="500365" Path="/Values/ObjectmenuHeader/BuffDisplayList/Item[Buffgroup/Item[DataSource='[Selection Object Factory NewspaperProductivityIncrease]' and MaxThreshold='10000']]">
+    <Icon>501741</Icon>
+  </ModOp>
+  <!-- ObjectmenuShipYardScene also show negative -->
+  <ModOp Type="add" GUID="501105" Path="/Values/ObjectmenuHeader/BuffDisplayList">
+    <Item>
+      <Buffgroup>
+        <Item>
+          <DataSource>[Selection Object Shipyard NewspaperProductivityIncrease]</DataSource>
+          <MinThreshold>-10000</MinThreshold>
+          <MaxThreshold>-0.0001</MaxThreshold>
+        </Item>
+      </Buffgroup>
+      <Icon>501148</Icon>
+      <InfoTip>501115</InfoTip>
+    </Item>
+  </ModOp>
+  <!-- use proper icon -->
+  <ModOp Type="merge" GUID="501105" Path="/Values/ObjectmenuHeader/BuffDisplayList/Item[Buffgroup/Item[DataSource='[Selection Object Shipyard NewspaperProductivityIncrease]' and MaxThreshold='10000']]">
+    <Icon>501111</Icon>
+  </ModOp>
+  <!-- ObjectmenuMilitaryScene also show negative -->
+  <ModOp Type="add" GUID="501106" Path="/Values/ObjectmenuHeader/BuffDisplayList">
+    <Item>
+      <Buffgroup>
+        <Item>
+          <DataSource>[Selection Object Repair NewspaperProductivityIncrease]</DataSource>
+          <MinThreshold>-10000</MinThreshold>
+          <MaxThreshold>-0.0001</MaxThreshold>
+        </Item>
+      </Buffgroup>
+      <Icon>501148</Icon>
+      <InfoTip>501107</InfoTip>
+    </Item>
+    <Item>
+      <Buffgroup>
+        <Item>
+          <DataSource>[Selection Object Attacker NewspaperFireRateIncrease]</DataSource>
+          <MinThreshold>-10000</MinThreshold>
+          <MaxThreshold>-0.0001</MaxThreshold>
+        </Item>
+      </Buffgroup>
+      <Icon>501138</Icon>
+      <InfoTip>501116</InfoTip>
+    </Item>
+  </ModOp>
+  <!-- use proper icon -->
+  <ModOp Type="merge" GUID="501106" Path="/Values/ObjectmenuHeader/BuffDisplayList/Item[Buffgroup/Item[DataSource='[Selection Object Repair NewspaperProductivityIncrease]' and MaxThreshold='10000']]">
+    <Icon>501111</Icon>
+  </ModOp>
+  
+  <!-- ObjectmenuResidenceScene also show positive/negative -->
+  <ModOp Type="add" GUID="25000118" Path="/Values/ObjectmenuHeader/BuffDisplayList">
+    <!-- NeedConsumption -->
+    <Item>
+      <Buffgroup>
+        <Item>
+          <DataSource>[Newspaper ActiveEffectValuePropagandaSensitive(4, true, 0)]</DataSource>
+          <MinThreshold>0.0001</MinThreshold>
+          <MaxThreshold>10000</MaxThreshold>
+        </Item>
+      </Buffgroup>
+      <Icon>500624</Icon>
+      <InfoTip>501124</InfoTip>
+    </Item>
+    <Item>
+      <Buffgroup>
+        <Item>
+          <DataSource>[Newspaper ActiveEffectValuePropagandaSensitive(4, false, 0)]</DataSource>
+          <MinThreshold>0.0001</MinThreshold>
+          <MaxThreshold>10000</MaxThreshold>
+        </Item>
+      </Buffgroup>
+      <Icon>500624</Icon>
+      <InfoTip>501124</InfoTip>
+    </Item>
+    <!-- Income -->
+    <Item>
+      <Buffgroup>
+        <Item>
+          <DataSource>[Newspaper ActiveEffectValuePropagandaSensitive(3, true, 0)]</DataSource>
+          <MinThreshold>-10000</MinThreshold>
+          <MaxThreshold>-0.0001</MaxThreshold>
+        </Item>
+      </Buffgroup>
+      <Icon>501142</Icon>
+      <InfoTip>501125</InfoTip>
+    </Item>
+    <Item>
+      <Buffgroup>
+        <Item>
+          <DataSource>[Newspaper ActiveEffectValuePropagandaSensitive(3, false, 0)]</DataSource>
+          <MinThreshold>-10000</MinThreshold>
+          <MaxThreshold>-0.0001</MaxThreshold>
+        </Item>
+      </Buffgroup>
+      <Icon>501142</Icon>
+      <InfoTip>501125</InfoTip>
+    </Item>
+  </ModOp>
+  
+  
+  
+</ModOps>

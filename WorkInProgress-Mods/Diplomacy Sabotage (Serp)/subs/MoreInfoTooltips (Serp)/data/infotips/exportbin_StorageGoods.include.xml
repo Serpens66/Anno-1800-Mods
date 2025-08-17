@@ -1,0 +1,26 @@
+<ModOps>
+  
+  <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+    <!-- to export the tooltips from the game use FileDBReader and the FileFormat "infotip.xml" and unpack "data\infotips\export.bin" -->
+    <!-- or download it in anno modding discord here: -->
+    <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
+
+
+  <!-- always display the buy/sell prices for goods when hovering over them in your storage -->
+
+  <!-- guid 25000151 is responsible for storage goods tooltips at your own buildings -->
+    <!-- for whatever reason sometimes there is a owner differentiation, but I'm sure this tooltip is eg. not used for the trading GUI at harbors from other players -->
+
+  
+  <!-- remove condition to only display "Handeln" when the good is an passive trade offer -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000151']//InfoElement/InfoElement[Text/TextGUID='2387']/VisibilityElement/VisibilityElement[VisibilityElement[Condition='[Area CurrentSelectedArea IsOwnedByCurrentParticipant]' and ExpectedValueBool='False'] and OperatorType/OperatorType='1']/VisibilityElement[VisibilityElement/Condition='[Area CurrentSelectedArea IsOwnedByCurrentParticipant]' and (not(ExpectedValueBool) or ExpectedValueBool='True')]/VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade HasOffer([RefGuid])]']" />
+  <!-- remove condition to only display "any prices" when the good is an passive trade offer -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000151']//InfoElement[InfoElement/Text/TextGUID='12725' and InfoElement/Text/TextGUID='12724']/VisibilityElement[VisibilityElement[Condition='[Area CurrentSelectedArea IsOwnedByCurrentParticipant]' and (not(ExpectedValueBool) or ExpectedValueBool='True')]]/VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade HasOffer([RefGuid])]']" />
+  <!-- remove the condition to only display buy price if we passive buy the good -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000151']//InfoElement/InfoElement[Text/TextGUID='12725']/VisibilityElement/VisibilityElement[VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade Offer([RefGuid]) IsSellOnly]'] and VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade Offer([RefGuid]) IsBuyOrSell]'] and OperatorType/OperatorType='1']" />
+  <!-- remove the condition to only display sell price if we passive sell the good -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='25000151']//InfoElement/InfoElement[Text/TextGUID='12724']/VisibilityElement/VisibilityElement[VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade Offer([RefGuid]) IsBuyOnly]'] and VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade Offer([RefGuid]) IsBuyOrSell]'] and OperatorType/OperatorType='1']" />
+  
+  
+  
+</ModOps>

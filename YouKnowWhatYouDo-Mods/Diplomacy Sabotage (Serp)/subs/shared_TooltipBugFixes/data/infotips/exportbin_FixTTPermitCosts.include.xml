@@ -1,0 +1,219 @@
+<ModOps>
+  
+  <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+    <!-- to export the tooltips from the game use FileDBReader and the FileFormat "infotip.xml" and unpack "data\infotips\export.bin" -->
+    <!-- or download it in anno modding discord here: -->
+    <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
+
+
+  <!-- guid 500057 is responsible for tooltips showing when hovering over buildable ships in the shipyard -->
+  <!-- first half of this guid is without gamepadmode and the other half is with gamepadmode, my code should work for both -->
+  
+  <!-- Bug we want to fix: -->
+   <!-- Ships which require a godlike permit are no showing the needed buildcosts as long as you can not afford the ship -->
+  
+  
+  
+  <!-- ################################################################################################## -->
+  <!-- ################################################################################################## -->
+  
+  <!-- OLD CODE -->
+  <!-- (see german explanation below why I used different code in the end, but both work. in short the newer code is more compatible and most likely more what the devs intended) -->
+  
+  <!-- the buildcosts entry that should be shown when we can not afford it is: -->
+   <!-- <Text>[Selection Object Shipyard BuildCostForShip([RefGuid]) Available AT(#index0#)]/[Selection Object Shipyard BuildCostForShip([RefGuid]) Values AT(#index0#)]</Text> -->
+
+   <!-- an den stellen wo  -->
+   <!-- <Condition>[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]</Condition> -->
+   <!-- und darüber  -->
+   <!-- <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition> -->
+   <!-- mit <ExpectedValueInt>1010190</ExpectedValueInt> -->
+   <!-- geprüft wird, wird das Spiel 3 Situationen um die Baukosten anzuzigen:    -->
+   <!-- payable und es ist kein godlike -->
+   <!-- nicht payable und es ist kein godlike  -->
+   <!-- payable und es ist godlike -->
+   <!-- ..  -->
+  <!-- wobei beide payables identisch aussehen, dass heißt diese unterscheidung macht überhaupt keinen sinn und wenn man die unterscheidung dennoch haben wollte, fehlt halt der "nicht payable und godlike" Fall -->
+  <!-- Daher ist der Fix die godlike Bedingung hier einfach zu streichen und den dritten ast auch zu entfernen -->
+  
+  <!-- remove the godlike condition for buildcosts display -->
+  <!-- <ModOp Type="remove" Path="//InfoTipData[Guid='500057']//VisibilityElement[VisibilityElement[Condition='[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(#index0#) ProductGUID]' and ExpectedValueInt='1010190' and CompareOperator/CompareOperator='1']]/VisibilityElement[Condition='[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]' and ExpectedValueBool='False']" /> -->
+  <!-- remove the InfoElement for payable+godlike which is not needed anymore -->
+  <!-- <ModOp Type="remove" Path="//InfoTipData[Guid='500057']//InfoElement[VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]' and (not(ExpectedValueBool) or ExpectedValueBool='True')] and VisibilityElement/VisibilityElement[Condition='[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(#index0#) ProductGUID]' and ExpectedValueInt='1010190' and CompareOperator/CompareOperator='1']]" /> -->
+
+  <!-- ################################################################################################## -->
+  <!-- ################################################################################################## -->
+  
+  
+  
+  <!-- Allerdings: -->
+  <!-- wenn man sich die tooltips fürs Gebäude Baumenü anguckt, dann sieht man, dass es dort so vorgesehen ist, dass für die Godlike permits ein spezielles Icon angezeigt werden soll, -->
+   <!-- nicht das von dem Gebäude, sondern das der Discovery. -->
+  <!-- Vermutlich war es also für die Great Eastern geplant auch so einen Speziallfall reinzupacken und mein Fix oben zeigt einfach schlicht das Schiffsicon als Permit Icon an. -->
+  <!-- Daher machen wir es doch nicht so, sondern fixen die eigentlichen Fehler, die da wären: AT(#index0#) anstatt AT(0) , weil es hier um den bestimmten Baustoff geht wie er angezegit werden soll und nicht ob überhaupt ein permit noetig ist. -->
+     <!-- und zweitens dann den Spezialfall der Great Eastern korrigieren, indem die GUID explizit genannt wird und das korrekte icon der discovery eingetragen wird. -->
+    <!-- dieses majordisc icon wird nur angezeigt, wenn man es sich leisten kann, -->
+      <!-- wenn nichts leisten, dann wirds nicht als baumaterial angzeigt, sondern es kommt eben der Text, dass man bahnbrechende Entdeckung benötigt. -->
+   
+  <!-- Problem an diesem von den devs gewollten Weg ist aber: -->
+   <!-- wenn neue godlike permit gebäude zugefügt werden, werden deren icons dann ohne so einen extra check überhaupt angezeigt? -->
+   <!-- ja, wenn man neue godlike permitss zufügt, werden diese wohl nicht angzeigt beim payable verbrauch -->
+     <!-- (normale permits aber schon)   -->
+   <!-- ist bei Schiffen aber nicht so schlimm, denn da gibts es von vanilla nur ein godlike permit für schiffe -->
+    <!-- und neue godlikes können mods eh nicht zufügen. -->
+     <!-- dh. wir zeigen für alle godlikes einfach das Icon von dem Schiff Permit Godlike great eastern an: 124843 egal welche GUID das Schiff hat -->
+  
+  <!-- replace the displayed icon for all "payable and requires godlike" to the icon from the godlike-research 124843 , like it was most likely intended (because this is how it was done for godlike buildings) -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='500057']//InfoElement[VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]' and (not(ExpectedValueBool) or ExpectedValueBool='True')] and VisibilityElement/VisibilityElement[Condition='[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(#index0#) ProductGUID]'] and VisibilityElement/VisibilityElement[Condition='[Selection Object Shipyard BuildCostForShip([RefGuid]) Payable AT(#index0#)]' and (not(ExpectedValueBool) or ExpectedValueBool='True')]]/Icon[IconText='[Selection Object Shipyard BuildCostForShip([RefGuid]) Icons AT(#index0#)]']/IconText">
+    <IconGUID>124843</IconGUID>
+  </ModOp>
+  <!-- replace all Conditions checking for "requires godlike" with "is current material godlike" if on the same level another condition checks for specific buildmaterial (cause this was most likely a type by devs) -->
+  <ModOp Type="replace" Path="//InfoTipData[Guid='500057']//VisibilityElement[VisibilityElement[Condition='[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(#index0#) ProductGUID]']]/VisibilityElement[Condition='[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]']/Condition">
+    <Condition>[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(#index0#) ProductGUID])]</Condition>
+  </ModOp>
+  
+  <!-- add additional "or" condition to check "if buildcost is godlike" to support the case that the ship has no buildcost at all (no ressource, no influence and no permit) -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='500057']//VisibilityElement[OperatorType/OperatorType='1']/VisibilityElement[Condition='[Research IsGodlikePermit([Selection Object Shipyard BuildCostForShip([RefGuid]) Costs AT(0) ProductGUID])]' and ExpectedValueBool='False']">
+    <VisibilityElement>
+      <ElementType>
+        <ElementType>1</ElementType>
+      </ElementType>
+      <CompareOperator />
+      <ResultType>
+        <ResultType>1</ResultType>
+      </ResultType>
+      <Condition>[Selection Object Shipyard BuildCostForShip([RefGuid]) Costs Count]</Condition>
+    </VisibilityElement>
+  </ModOp>
+  
+  
+  <!-- ##################################################################################################### -->
+  <!-- ##################################################################################################### -->
+  
+  
+  <!-- BUILDINGS -->
+  <!-- guid 25000020 is responsilbe for tooltips when hovering over buildings in the build menu -->
+  
+  <!-- The godlike permit buildings coffee/rum/cotton/scholar house are hardcoded to display their godlike icon when you can afford it as buildcosts -->
+    <!-- But if modders add more buildings requiring these godlike permits, they won't show this permit as buildcosts, since there is no code for this case. -->
+    <!-- Hardcoding the GUIDs really suck, because regardless what I do, it might break other mods. -->
+     <!-- I can add a new InfoElement to display the permit icon (usually the building icon) if it is not Rum/coffee/rum/cotton/scholar house. -->
+      <!-- But if another mod edits the tooltips to also add such an hardcoded case for his GUID, my code will make it show twice... -->
+      <!-- So I think I should just tell every modder to NOT hardcode their GUIDs in there and give a f**k on which icon is displayed and be fine with the building icon. -->
+  <!-- Display permit-buildcost when we can afford it also for not hardcoded godlike-permit buildings, eg. ones added by mods -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000020']//InfoElement/InfoElement/InfoElement[VisibilityElement/VisibilityElement[Condition='[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID])]' and ExpectedValueBool='False'] and VisibilityElement/VisibilityElement[Condition='[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]' and ExpectedValueBool='False'] and VisibilityElement/VisibilityElement[not(Condition='[RefGuid]')]]">
+    <InfoElement>
+      <ElementType>11</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>4</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) IsAffordable]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator>
+            <CompareOperator>1</CompareOperator>
+          </CompareOperator>
+          <ResultType>
+            <ResultType>1</ResultType>
+          </ResultType>
+          <ExpectedValueInt>1010190</ExpectedValueInt>
+          <Condition>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Research IsGodlikePermit([ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) ProductGUID])]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>3</ChildCount>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>1</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <ExpectedValueInt>124737</ExpectedValueInt>
+              <Condition>[RefGuid]</Condition>
+            </VisibilityElement>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>1</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <ExpectedValueInt>124738</ExpectedValueInt>
+              <Condition>[RefGuid]</Condition>
+            </VisibilityElement>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>1</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <ExpectedValueInt>124739</ExpectedValueInt>
+              <Condition>[RefGuid]</Condition>
+            </VisibilityElement>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>1</ElementType>
+              </ElementType>
+              <CompareOperator>
+                <CompareOperator>1</CompareOperator>
+              </CompareOperator>
+              <ResultType>
+                <ResultType>1</ResultType>
+              </ResultType>
+              <ExpectedValueInt>114445</ExpectedValueInt>
+              <Condition>[RefGuid]</Condition>
+            </VisibilityElement>
+          </VisibilityElement>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconText>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Icon]</IconText>
+        <Style />
+      </Icon>
+      <Text>
+        <Text>[ToolOneHelper BuildCost([RefGuid]) Costs AT(#index0#) Amount &gt;&gt; storagegood]</Text>
+        <Style />
+      </Text>
+      <WarningType />
+    </InfoElement>
+  </ModOp>
+  
+</ModOps>

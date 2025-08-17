@@ -1,0 +1,181 @@
+<ModOps>
+  
+  <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+    <!-- to export the tooltips from the game use FileDBReader and the FileFormat "infotip.xml" and unpack "data\infotips\export.bin" -->
+    <!-- or download it in anno modding discord here: -->
+    <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
+
+
+  <!-- guid 454144439 is responsible for tooltips of effects -->
+  
+  <!-- Bug we want to fix: -->
+    <!-- vanilla can not display tooltip properly for items that are adding as AdditionalOutput the same (ForceProductSameAsFactoryOutput) and more products -->
+      <!-- This is again because the vanilla code only checks index 0 (AdditionalOutputForceProductSameAsFactoryOutput(0)) instead of the relevant index. -->
+    <!-- and the tooltip for ItemSetBuff 191141 looks different in old world Museum 1010471 than in new world Museum 102283. Instead of hardcoding these, we will remove the hardcode. it is fine without that hardcode -->
+  
+  <!-- This mod does remove all InfoElements with: -->
+    <!-- AdditionalOutputForceProductSameAsFactoryOutput(0) -->
+   <!-- from 454144439 -->
+   <!-- and replaces them with a single InfoElement that checks AdditionalOutputForceProductSameAsFactoryOutput(#index0#) instead -->
+   <!-- and removing the hardcoded Museum 1010471 check. -->
+  <!-- It adds GUID 1500004502 as "In-house production" text. you can change the displayed text as usual in the test_language.xml files -->
+  
+  <!-- ################################################################################################## -->
+  
+  <!-- Der Spezialfall mit 191141+1010471 (ItemSet Buff im Museum) sieht auch etwas komisch aus. Klar ist, wenn es der Buff ist UND das Museum angeklickt ist, -->
+    <!-- dann will vanilla, dass hardgecodede Outputs angezeigt werden, ok. -->
+   <!-- Aber was will vanilla das angezeigt wird, wenn nur eins von beiden erfüllt ist, also anderer Buff und Museum oder Buff und nicht Museum? -->
+    <!-- Aktuell ist die Condition: Wenn es nicht Buff ODER nicht Museum ist, dann zeig normalen tooltip an. -->
+   <!-- Vermutlich ist das so tatsächlich richtig und gilt zb. wenn der Buff dann auf ein Produktionsgebäude wirkt, dann soll er da den ganz normalen tooltip anzeigen. Ja klingt sinnvoll. -->
+  <!-- .. -->
+  <!-- allerdings gibts auch ein new world Museum 102283, was hier garnicht berücksichtigt wird, also wie immer ist dieses hardcoden Blödsinn -->
+    <!-- also ja, in vanilla wird dieser buff in der neuen welt nicht korrekt angezeigt -->
+   <!-- Wobei an sich die Kiste als Icon absolut ausreichend ist, da dadrüber ja noch steht, welche Betriebe betroffen sind. -->
+    <!-- Man könnte noch als Text zufügen "Eigenproduktion" oderso, was eben beschreibt, dass es vom Gebäude abhängt, jop machen wir  -->
+  
+  
+  <!-- ################################################################################################## -->
+  <!-- ################################################################################################## -->
+  
+  <!-- add better code in front of the one AdditionalOutputForceProductSameAsFactoryOutput(0)==False -->
+  <!-- merge the 4 seperated AdditionalOutputForceProductSameAsFactoryOutput InfoElements into a single one, so they all properly loop through <Source>[ItemAssetData({ItemGuid}) AdditionalOutputCount]</Source> , including their VisibilityElements -->
+  <!-- But we won't add the exception for ItemSet Bronce + Museum, because it is only an exception in Old World, not in New World and one should avoid exceptions anyway, if not really needed. -->
+  <ModOp Type="AddPrevSibling" Path="//InfoTipData[Guid='454144439']//InfoElement[VisibilityElement/VisibilityElement[Condition='[ItemAssetData({ItemGuid}) AdditionalOutputForceProductSameAsFactoryOutput(0)]' and ExpectedValueBool='False']]">
+
+    <InfoElement>
+      <ElementType>7</ElementType>
+      <ChildCount>1</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <OperatorType />
+      </VisibilityElement>
+      
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[ItemAssetData({ItemGuid}) AdditionalOutputForceProductSameAsFactoryOutput(#index0#)]</Condition>
+        </VisibilityElement>
+        <Icon>
+          <IconText>[AssetData([ItemAssetData({ItemGuid}) AdditionalOutputProduct(#index0#)]) Icon]</IconText>
+          <Style />
+        </Icon>
+        <Text>
+          <Text>&lt;font color='0xff817f87'&gt; [AssetData([ItemAssetData({ItemGuid}) AdditionalOutputProduct(#index0#)]) Text]&lt;/font&gt;</Text>
+          <Style />
+        </Text>
+        <Value>
+          <Text>&lt;font color='0xff817f87'&gt;+[ItemAssetData({ItemGuid}) AdditionalOutputAmount(#index0#)]/[ItemAssetData({ItemGuid}) AdditionalOutputCycle(#index0#)] &lt;/font&gt;</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>3</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType />
+            <Condition>[ItemAssetData({ItemGuid}) AdditionalOutputForceProductSameAsFactoryOutput(#index0#)]</Condition>
+          </VisibilityElement>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>1</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[ToolOneHelper MainBuildingOutput Guid]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconText>[ToolOneHelper MainBuildingOutput Icon]</IconText>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>23727</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <TextGUID>23726</TextGUID>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>3</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType />
+            <Condition>[ItemAssetData({ItemGuid}) AdditionalOutputForceProductSameAsFactoryOutput(#index0#)]</Condition>
+          </VisibilityElement>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator />
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[ToolOneHelper MainBuildingOutput Guid]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>501934</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>1500004502</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <TextGUID>23726</TextGUID>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      
+      <Source>[ItemAssetData({ItemGuid}) AdditionalOutputCount]</Source>
+    </InfoElement>
+
+  </ModOp>
+  
+  <!-- remove everything that is checking anything AdditionalOutputForceProductSameAsFactoryOutput(0) related -->
+  <ModOp Type="remove" Path="//InfoTipData[Guid='454144439']//InfoElement[VisibilityElement/VisibilityElement[Condition='[ItemAssetData({ItemGuid}) AdditionalOutputForceProductSameAsFactoryOutput(0)]']]" />
+  
+  
+</ModOps>

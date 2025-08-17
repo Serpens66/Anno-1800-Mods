@@ -247,5 +247,105 @@
       </Values>
     </Asset>
   </ModOp>
+  
+  
+  <ModOp Type="AddNextSibling" GUID="152264">
+    <!-- this 1500006099 Helper is needed, because ActionMoveObject is not able to move to a random building, but it is always the same -->
+     <!-- But spawning this helper with MatcherGUID is random, so it will spawn at a random allowed target. -->
+     <!-- That way we can randomize ActionMoveObject -->
+    <Asset>
+      <Template>ObjectDummyWithoutOwner</Template>
+			<Values>
+				<Standard>
+					<GUID>1500006099</GUID>
+          <Name>MoveHelper-Dummy</Name>
+				</Standard>
+      </Values>
+		</Asset>
+    <!-- You can start this 1500006100 Quest with ActionStartQuest from within your main Quest and set to 1 : InheritQuestArea,GetQuestSessionFromArea and InheritQuestObjects  -->
+     
+     <!-- It will give a move to command for every quest object (starter object and everything spawned within the Quest) to a random building owned by processing on the QuestArea Island -->
+     
+     <!-- So use this at best if you either also want to move the starter or have no starter object or the starter is not able to move -->
+      <!-- To customize this, just copy paste this quest, use your own GUID and eg. add an ObjectGUID in the ActionMoveObject action to limit the command to a specific unit -->
+       <!-- and/or change the MatcherGUID if you want it to move somewhere specific (1500004909 is from my shared_Matchers mod) -->
+    <Asset>
+      <Template>A7_QuestDummyQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006100</GUID>
+          <Name>Move QuestObjects (starter object and everything spawned within the Quest) to any building owned by processing player on the QuestArea island</Name>
+        </Standard>
+        <Quest>
+          <OnQuestStart>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList>
+                <Actions>
+                  <Item>
+                    <Action>
+                      <Template>ActionSpawnObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionSpawnObjects>
+                          <SpawnGUID>1500006099</SpawnGUID>
+                          <Amount>1</Amount>
+                          <Owner>Neutral</Owner>
+                          <RandomRotation>1</RandomRotation>
+                        </ActionSpawnObjects>
+                        <SpawnArea>
+                          <SpawnContext>ForceContextPosition</SpawnContext>
+                          <MatcherGUID>1500004909</MatcherGUID>
+                          <LimitToQuestArea>1</LimitToQuestArea>
+                        </SpawnArea>
+                        <SessionFilter>
+                          <AllowParentConditionSession>0</AllowParentConditionSession>
+                          <AllowQuestSession>1</AllowQuestSession>
+                          <AllowQuestArea>1</AllowQuestArea>
+                        </SessionFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionMoveObject</Template>
+                      <Values>
+                        <Action />
+                        <ObjectFilter>
+                          <!-- <ObjectGUID></ObjectGUID> -->
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                        </ObjectFilter>
+                        <ObjectTargetFilter>
+                          <TargetGUID>1500006099</TargetGUID>
+                          <TargetObjectRestrictToQuestObjects>1</TargetObjectRestrictToQuestObjects>
+                        </ObjectTargetFilter>
+                        <ActionMoveObject>
+                          <SearchMode>Closest</SearchMode>
+                        </ActionMoveObject>
+                      </Values>
+                    </Action>
+                  </Item>
+                  <Item>
+                    <Action>
+                      <Template>ActionDeleteObjects</Template>
+                      <Values>
+                        <Action />
+                        <ActionDeleteObjects />
+                        <ObjectFilter>
+                          <ObjectGUID>1500006099</ObjectGUID>
+                          <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+                        </ObjectFilter>
+                      </Values>
+                    </Action>
+                  </Item>
+                </Actions>
+              </ActionList>
+            </Values>
+          </OnQuestStart>
+        </Quest>
+      </Values>
+    </Asset>
+  </ModOp>
+  
 
 </ModOps>

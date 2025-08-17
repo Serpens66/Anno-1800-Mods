@@ -1,0 +1,353 @@
+<ModOps>
+    
+  <!-- uses Serp guids 1500005608 to including 1500005615 -->
+  <!-- ab 1500005612 noch frei -->
+    
+    
+    
+    <!-- just notes how to prevent selling a ship can be done: -->
+        <!-- Idee um Verkauf von schiffen zu verhinden: -->
+       <!-- In die Notification der Händler ActiveCallback einbauen, der verhindert dass bestimmte schiffe verkauft werden können. -->
+       <!-- (nach allen mods, auch NH+update laden und automatisiert finden) -->
+      <!-- Theoretisch sehr gut wäre: GetIsPartOfActiveStatusEffectChain -->
+       <!-- müssten nur den gewünschten Schiffen irgendwie einen StatusEffect (durch Projektile verursacht) geben... -->
+        <!-- aber wie... -->
+      <!-- Oder mit GetItemAlreadyEquipped , dafür müsste man einen socket slot opfern... aber item kann unsocket werden! -->
+       <!-- Oder ItemContainer.SetCheatItemInSlot(1500001568, 1) und CommandQueue.UI_IsHoldingQuestObject -->
+        <!-- mit einem Item der Category Quest. Blockiert dann einen Slot (was bei schiffen mit nur einem Slot echt scheiße ist) -->
+      <!-- Wäre aber sinnoll UI_IsHoldingQuestObject  -->
+      <!-- .. -->
+      <!-- Problem: -->
+       <!-- all das returned true, wenn ich NICHT will dass es verkauft werden kann, -->
+        <!-- währen ActiveCallback bei true den Verkauf erlaubt... -->
+      <!-- Also im Endeffekt wohl den Command überschreiben mit lualighttools -->
+       <!-- und wenn wir schon dabei sind, daraus einen shared mod machen. -->
+       <!-- und dabei auch neuen infotip machen, der als notification text genutzt wird, -->
+        <!-- damit wir variabel alle Kosten anzeigen können, auch wenn mods noch welche zufügen -->
+          <!-- (vorher testen ob notification überhaupt infotips anzeigen kann) -->
+      <!-- Testen ob wir irgendwie einen StatusEffect auf ein Schiff unserer Wahl bekommen... -->
+      <!-- # -->
+     <!-- Vanilla prevented bereits Verkauf von UI_IsHoldingQuestObject! (aber erkennt sie auch nicht in socket, nur in slot) -->
+      <!-- aber dennoch doof dass slot dadurch blockiert wird, also keine echte option -->
+      <!-- .. -->
+    <!-- Buying/Selling already supports displaying more costs. not in the NotificationText, but as info below it -->
+    
+    
+  <!-- final ida is overwriting the Commands from ThirdpartyNotificationButtons and in the lua function we call, -->
+   <!-- we can check stuff. the easiest one is checking the Name of the ship. If we put NOSELL in it, the ship can not be sold -->
+    <!-- (also long as the name was not changed..). This is used in my SupportFleet mod to prevent selling the ships you got this way -->
+    
+    
+  <!-- sell ship, also add missing infotip to them -->
+  <!-- using merge here with list is wanted, since we want to merge into the first 2 item entries -->
+  <ModOp Type="merge" Condition="#shared_LuaTools_Light_Serp" Path="//Values/Notification/NotificationType/Values/CharacterNotification/ThirdpartyNotificationButtons[Item/Command='[NotificationContext Value(Ship) Object Sellable BuyNet([NotificationContext Value(TraderIndex) Int])]']">
+    <Item>
+      <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_sellable_serp.t_SimpleSellSelected|usetextembed|true|false)];[Participants Participant(122) Profile SetCompanyName([NotificationContext Value(TraderIndex) Int])];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+      <ActiveCallback>[Unlock IsUnlocked(1500005600)]</ActiveCallback>
+      <Infotip>2904</Infotip>
+    </Item>
+    <Item>
+      <Infotip>500663</Infotip>
+    </Item>
+  </ModOp>
+  <!-- buy ship (affordable is tested in our lua fn instead, assuming ActiveCallback can not handle 2 textembeds) -->
+   <!-- allow "not sellable" here, since eg. vanilla wants you to be able to buy the flagship from neutral traders -->
+  <ModOp Type="merge" Condition="#shared_LuaTools_Light_Serp" Path="//Values/Notification/NotificationType/Values/CharacterNotification/ThirdpartyNotificationButtons/Item[Command='[NotificationContext Value(Ship) Object Sellable BuyNet([NotificationContext Value(PlayerIndex) Int])]']">
+    <Command>[Unlock RelockNet(1500005600)];[Participants Participant(121) Profile SetCompanyName(g_sellable_serp.t_SimpleBuySelected|1500005608|true|false|nil)];[Conditions RegisterTriggerForCurrentParticipant(1500005600)]</Command>
+    <ActiveCallback>[Unlock IsUnlocked(1500005600)]</ActiveCallback>
+  </ModOp>
+  <!-- The mod TooltipBugFixes_Serp 1.031 adds to the "buy ship" button the infotip if you can not afford the ship -->
+  
+  
+  <!-- Meta Product for pricefactor -->
+  <ModOp Type="AddNextSibling" GUID="119392">
+    <Asset>
+      <Template>Product</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005608</GUID>
+          <Name>Sellabe pricefactor</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_resource_money_1.png</IconFilename>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Product>
+          <StorageLevel>Meta</StorageLevel>
+        </Product>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp GUID="130248" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005609</GUID>
+          <Name>Distribute 1500005608</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500005608</Resource>
+                    <ResourceAmount>100</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>1</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- notifications, locked via lua to send it -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005610</GUID>
+          <Name>Notification can not afford ship</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005610</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501635</IconAsset>
+                          <FilterType>Trade</FilterType>
+                          <HasJumpLocation>0</HasJumpLocation>
+                          <IsArchived>0</IsArchived>
+                          <Infotip>0</Infotip>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>11013</NotificationText>
+                          <NotificationMinDisplayTime>2500</NotificationMinDisplayTime>
+                          <NotificationPriority>800</NotificationPriority>
+                          <NotificationAudioAsset>239732</NotificationAudioAsset>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <Asset>1500005610</Asset>
+                      </Item>
+                    </UnlockAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>500</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005611</GUID>
+          <Name>Notification can not sell this ship</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005611</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501635</IconAsset>
+                          <FilterType>Trade</FilterType>
+                          <HasJumpLocation>0</HasJumpLocation>
+                          <IsArchived>0</IsArchived>
+                          <Infotip>0</Infotip>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>17511</NotificationText>
+                          <NotificationMinDisplayTime>2500</NotificationMinDisplayTime>
+                          <NotificationPriority>-1</NotificationPriority>
+                          <NotificationAudioAsset>239732</NotificationAudioAsset>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <Asset>1500005611</Asset>
+                      </Item>
+                    </UnlockAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>500</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  
+  </ModOp>
+  
+  <!-- call our register scripts on savegame load -->
+  <ModOp Type="add" GUID="1500004636" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/sellable.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  <!-- testing if everything works when adding more costs -->
+  <!-- <ModOp Type="merge" GUID="100437,100438" Path="/Values/Sellable"> -->
+    <!-- <Sellable> -->
+      <!-- <Baseprice> -->
+        <!-- <Item> -->
+          <!-- <VectorElement> -->
+            <!-- <InheritedIndex>0</InheritedIndex> -->
+          <!-- </VectorElement> -->
+          <!-- <Amount>12000</Amount> -->
+        <!-- </Item> -->
+        <!-- <Item> -->
+          <!-- <VectorElement> -->
+            <!-- <InheritedIndex>1</InheritedIndex> -->
+          <!-- </VectorElement> -->
+        <!-- </Item> -->
+        <!-- <Item> -->
+          <!-- <Resource>119392</Resource> -->
+          <!-- <Amount>25</Amount> -->
+        <!-- </Item> -->
+      <!-- </Baseprice> -->
+    <!-- </Sellable> -->
+  <!-- </ModOp> -->
+  
+  
+</ModOps>

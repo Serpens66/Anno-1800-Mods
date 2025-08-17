@@ -1,0 +1,794 @@
+<ModOps>
+    
+  <!-- uses Serp GUID 1500005200 to 1500005220 -->
+   <!-- verbraucht vis einschl. 1500005211.  und  ist aktuell wieder frei -->
+  
+  
+    <!-- TODO: wir brauchen keinen AssetPool, weil auch PlayerCounterContextPool in ObjectFilter funktioniert -->
+      <!-- Wobei: testen ob PlayerCounterContextPool auch in UnlockAsset klappt! -->
+  
+  <!-- example how to use: -->
+   <!-- disasters mod DifficultySettings.include.xml and diff_settings_disaster.lua  -->
+
+   
+   <!-- theoretisch könnte man so auch handicap umsetzen, -->
+    <!-- also dass ein spieler dadurch andere buffs/debufs hat als ein anderer.. -->
+
+  
+
+  <!-- Info: -->
+   <!-- if you want to add a gobal Buff via a chosen setting, here is sample code how you add it and make sure it is applied for every session: -->
+    <!-- https://github.com/Serpens66/Anno-1800-SharedMods-for-Modders-/blob/main/CodeSnippets.md#global-buffs -->
+  <!-- (for the buffs to display options I add some code to 1500004530 from my shared mod shared_OncePerSessionPerSaveLoad, to mimic a "back-Button-hit" on each first session-visit) -->
+
+  <!-- info about the code of this shared mod if you are interested: -->
+   <!-- There are 2 major way to hide/show the different option as AssemblyOptions in this shipyard-like building: -->
+    <!-- 1) switch between lock/unlock/unhide (locking also hides) -->
+    <!-- 2) Using a Buff with AddAssemblyOptions -->
+    <!-- We will use the 2) one here, because locking will be used instead to 1) mark a setting as currently chosen and 2) other mods can check the chosen setting by checking what is locked (locked means chosen) -->
+    <!-- (Beware, the lock of ObjectDummyWithOwner_BuildInShipyard-Assets are only changed for the player who did the setting, not for all! -->
+     <!-- for general settings that should affect everyone you need to add a new unlockableasset and change its lock state for all if one player changes settings, see my disaster mods for example diff_settings_disaster.lua ) -->
+
+  <!-- VisibleWhenLocked unfortunately does not work for ships/buildings, just portraits/skins... -->
+
+  <ModOp Type="addNextSibling" GUID="153189">
+    <Asset>
+      <Template>Min_Shipyard_Serp</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005200</GUID>
+          <Name>Settings-Building</Name>
+          <IconFilename>data/graphics_serp/icon_difficulties.png</IconFilename>
+          <InfoDescription>19826</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>17154</TextOverride>
+        </Text>
+        <Building>
+          <BuildModeRandomRotation>180</BuildModeRandomRotation>
+          <AssociatedRegions>Moderate;Colony01;Africa;Arctic;Mod1;Mod2;Mod3</AssociatedRegions>
+          <TerrainType>Terrain</TerrainType>
+          <SecondPartyRelevant>0</SecondPartyRelevant>
+          <BuildingCategoryName>23758</BuildingCategoryName>
+          <BuildModeStartVariation>0</BuildModeStartVariation>
+          <AllowChangeVariation>1</AllowChangeVariation>
+        </Building>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/buildings/ornamental/celebration_ornament_01/celebration_ornament_01.cfg</Filename>
+            </Item>
+            <Item>
+              <Filename>data/graphics/buildings/ornamental/preorder/preorder_statue.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Shipyard>
+          <AssemblyOptions />
+        </Shipyard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Attackable>
+          <AttackableType>[NONE]</AttackableType>
+          <MoralePower>0</MoralePower>
+        </Attackable>
+        <SoundEmitter>
+          <ActiveSounds>
+            <Item>
+              <Sound>200896</Sound>
+            </Item>
+          </ActiveSounds>
+          <IncidentSounds>
+            <InfectedFire>
+              <Item>
+                <Sound>214659</Sound>
+              </Item>
+            </InfectedFire>
+          </IncidentSounds>
+          <BuildingRuined>
+            <Item>
+              <Sound>203848</Sound>
+            </Item>
+          </BuildingRuined>
+          <BuildingRepaired>
+            <Item>
+              <Sound>203866</Sound>
+            </Item>
+          </BuildingRepaired>
+        </SoundEmitter>
+      </Values>
+    </Asset>
+  </ModOp>
+    
+    
+  <Group Condition="#DiplomacyExpansionSabotage_Serp">
+    <!-- diplo buildmenu -->
+    <ModOp Type="add" GUID="1500006071" Path="/Values/ConstructionCategory/BuildingList">
+      <Item>
+        <Building>1500005200</Building>
+      </Item>
+    </ModOp>
+  </Group>
+  <Group Condition="!#DiplomacyExpansionSabotage_Serp">
+    <!-- scholar buildmenu -->
+    <ModOp Type="add" GUID="502107" Path="/Values/ConstructionCategory/BuildingList">
+      <Item>
+        <Building>1500005200</Building>
+      </Item>
+    </ModOp>
+    <!-- culture buildmenu -->
+    <ModOp Type="add" GUID="500116" Path="/Values/ConstructionCategory/BuildingList">
+      <Item>
+        <Building>1500005200</Building>
+      </Item>
+    </ModOp>
+  </Group>
+  <!-- adding EffectTargets to this asset, because this way my shared mod shared_ShipyardForBuffsTooltip will hide all the ship-details you normally see in a shipyard and instead displays the InfoDescription (and Buff-effects, if there are any) -->
+  <ModOp GUID="114166" Type="addNextSibling">
+    <Asset>
+      <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005202</GUID>
+          <Name>ModSettings-Back-To-Mod-Selection-Button</Name>
+          <IconFilename>data/graphics_serp/icon_arrow_left2_brown.png</IconFilename>
+          <InfoDescription>20089</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>16815</TextOverride>
+        </Text>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500005200</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+
+  </ModOp>
+  
+  
+  <ModOp Type="addNextSibling" GUID="130248">
+    
+    <!-- just registering other triggers here, to reset 1500005201 fast, so it can detect other button hits -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005201</GUID>
+          <Name>Shared General Pools Trigger to Delete Helper Objects and hide/show basics</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <!-- Back Button was hit -->
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>ObjectBuilt</ConditionEvent>
+                          <ContextAsset>1500005202</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionRegisterTrigger</Template>
+                          <Values>
+                            <Action />
+                            <ActionRegisterTrigger>
+                              <TriggerAsset>1500005205</TriggerAsset>
+                            </ActionRegisterTrigger>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>ObjectBuilt</ConditionEvent>
+                          <ContextAsset>1500005203</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionRegisterTrigger</Template>
+                          <Values>
+                            <Action />
+                            <ActionRegisterTrigger>
+                              <TriggerAsset>1500005207</TriggerAsset>
+                            </ActionRegisterTrigger>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <!-- any mod Setting Detail was hit -->
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>ObjectBuilt</ConditionEvent>
+                          <ContextAsset>1500005204</ContextAsset>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionDelayedActions</Template>
+                          <Values>
+                            <Action />
+                            <ActionDelayedActions>
+                              <ExecutionDelay>500</ExecutionDelay>
+                              <DelayedActions>
+                                <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                <Values>
+                                  <ActionList>
+                                    <Actions>
+                                      <!-- put the delete in the tiny DelayedActions (more than 200ms, because PlayerCounter/ProfilCounter needs ~200ms to update after ConditionEvent found it, because the setting-mods will start a lua script, which needs to find these settings-objects -->
+                                      <Item>
+                                        <Action>
+                                          <Template>ActionRegisterTrigger</Template>
+                                          <Values>
+                                            <Action />
+                                            <ActionRegisterTrigger>
+                                              <TriggerAsset>1500005211</TriggerAsset>
+                                            </ActionRegisterTrigger>
+                                          </Values>
+                                        </Action>
+                                      </Item>
+                                    </Actions>
+                                  </ActionList>
+                                </Values>
+                              </DelayedActions>
+                            </ActionDelayedActions>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                 </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionAlwaysTrue</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005205</GUID>
+          <Name>Back button was hit</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500005211</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- remove the buff first here, in case we are in a new session where only the Back-Button is active and normally 1500005209 already active -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500005209</BuffAsset>
+                    <AddBuff>0</AddBuff>
+                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500005209</BuffAsset>
+                    <AddBuff>1</AddBuff>
+                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500005210</BuffAsset>
+                    <AddBuff>0</AddBuff>
+                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005211</GUID>
+          <Name>Delete All Helpers</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDeleteObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionDeleteObjects />
+                  <ObjectFilter>
+                    <ObjectGUID>1500005202</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDeleteObjects</Template>
+                <Values>
+                  <Action />
+                  <ActionDeleteObjects />
+                  <ObjectFilter>
+                    <ObjectGUID>1500005206</ObjectGUID>
+                    <CheckParticipantID>1</CheckParticipantID>
+                    <CheckProcessingParticipantID>1</CheckProcessingParticipantID>
+                  </ObjectFilter>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005207</GUID>
+          <Name>Mod Settings Opener button 1500005203 was hit</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500005211</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionBuff</Template>
+                <Values>
+                  <Action />
+                  <ActionBuff>
+                    <BuffAsset>1500005209</BuffAsset>
+                    <AddBuff>0</AddBuff>
+                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                  </ActionBuff>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <!-- tiny delay, so the "Back-Button" is added after the other buttons -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>100</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionBuff</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionBuff>
+                                    <BuffAsset>1500005210</BuffAsset>
+                                    <AddBuff>1</AddBuff>
+                                    <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                                  </ActionBuff>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005208</GUID>
+          <Name>Unhide all Mod-Settings</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnhideAssets>
+                      <Item>
+                        <Asset>1500005206</Asset>
+                      </Item>
+                    </UnhideAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Make sure your Trigger which does ActionUnlockAsset has a higher GUID than 1500005212, if you want to prevent an unlock text to be displayed -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005212</GUID>
+          <Name>Prevent Unlock Text for buttons (trigger with lowest GUID will be used for unlock condition display)</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysFalse</Template>
+            <Values>
+              <Condition />
+              <ConditionAlwaysFalse />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <Asset>1500005206</Asset>
+                      </Item>
+                    </UnlockAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  <!-- PlayerCounterContextPool can be used in ConditionEvent ObjectBuilt as ContextAsset -->
+  <!-- While AssetPool is used in ActionDeleteObjects , ActionLockAsset/ActionUnlockAsset -->
+   <!-- (AddAssemblyOptions unfortunately does not accept a pool, so there you also need to add manually in your mod) -->
+  <!-- Add your ObjectDummyWithOwner_BuildInShipyard - Assets to these Pools. -->
+   <!-- There should be no need to use these pools in your mod, they are used in this shared mod to reduce your work -->
+  <ModOp Type="addNextSibling" GUID="700138">
+    <Asset>
+      <Template>PlayerCounterContextPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005203</GUID>
+          <Name>CP - All Mod-Settings-Openers</Name>
+        </Standard>
+        <PlayerCounterContextPool>
+          <Contexts />
+        </PlayerCounterContextPool>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>PlayerCounterContextPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005204</GUID>
+          <Name>CP - All Mod-Settings-Details</Name>
+        </Standard>
+        <PlayerCounterContextPool>
+          <Contexts />
+        </PlayerCounterContextPool>
+      </Values>
+    </Asset>
+  </ModOp>
+
+  
+  <ModOp Type="addNextSibling" GUID="700047">
+    <Asset>
+      <Template>AssetPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005206</GUID>
+          <Name>AP - All Mod-Settings-Assets (openers and details)</Name>
+        </Standard>
+        <AssetPool>
+          <AssetList />
+        </AssetPool>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- ignore these dummy asset for FunFactsCounter -->
+  <ModOp Type="add" GUID="140560" Path="/Values/PlayerCounterConfig/CounterConfig/FunFactsCounter/Item[not(PlayerCounter) or PlayerCounter='ObjectDestroyed' or PlayerCounter='ObjectLost']/FilterResults/IgnoreContexts">
+    <Item>
+      <Asset>1500005203</Asset>
+    </Item>
+    <Item>
+      <Asset>1500005204</Asset>
+    </Item>
+  </ModOp>
+
+  <ModOp Type="AddNextSibling" GUID="190093">
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005209</GUID>
+          <Name>Show All Mod-Settings-Openers and hide Back-Button</Name>
+        </Standard>
+        <ShipyardUpgrade>
+          <AddAssemblyOptions />
+        </ShipyardUpgrade>
+        <CultureUpgrade>
+          <HideBuff>1</HideBuff>
+        </CultureUpgrade>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500005200</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+       
+    
+    <Asset>
+      <Template>GuildhouseBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500005210</GUID>
+          <Name>Show Back-Button</Name>
+        </Standard>
+        <ShipyardUpgrade>
+          <AddAssemblyOptions>
+            <Item>
+              <NewOption>1500005202</NewOption>
+            </Item>
+          </AddAssemblyOptions>
+        </ShipyardUpgrade>
+        <CultureUpgrade>
+          <HideBuff>1</HideBuff>
+        </CultureUpgrade>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500005200</GUID>
+            </Item>
+          </EffectTargets>
+        </ItemEffect>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  <!-- reset the AssemblyOptions-Display Buff for new sessions (by forcing the "back-button"), when we enter a new session first time since loading a save... -->
+  <ModOp Type="merge" GUID="1500004530" Path="/Values/Trigger/ResetTrigger/Values/Trigger">
+    <SubTriggers />
+  </ModOp>
+  <!-- important to use IsOptional here (although the condition is alawys true, checking for "at least 0". -->
+   <!-- the conditoin is just there to fetch any active Session that then can be used to spawn 1500005202 successfully, without hardcoding a session GUID) -->
+  <ModOp Type="add" GUID="1500004530" Path="/Values/Trigger/ResetTrigger/Values/Trigger/SubTriggers">
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionPlayerCounter</Template>
+              <Values>
+                <Condition>
+                  <IsOptional>1</IsOptional>
+                </Condition>
+                <ConditionPlayerCounter>
+                  <Context>1500005202</Context>
+                  <CounterAmount>0</CounterAmount>
+                  <ComparisonOp>AtLeast</ComparisonOp>
+                  <CounterScope>Session</CounterScope>
+                  <CounterScopeUseCurrentContext>1</CounterScopeUseCurrentContext>
+                  <CounterScopeUseActiveSession>1</CounterScopeUseActiveSession>
+                </ConditionPlayerCounter>
+              </Values>
+            </TriggerCondition>
+            <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionSpawnObjects</Template>
+                  <Values>
+                    <Action />
+                    <ActionSpawnObjects>
+                      <SpawnGUID>1500005202</SpawnGUID>
+                      <Amount>1</Amount>
+                      <OwnerIsProcessingParticipant>1</OwnerIsProcessingParticipant>
+                    </ActionSpawnObjects>
+                    <SpawnArea>
+                      <DistanceToBorder>Near</DistanceToBorder>
+                      <DistanceToIsland>Far</DistanceToIsland>
+                    </SpawnArea>
+                    <SessionFilter>
+                      <AllowProcessingSession>0</AllowProcessingSession>
+                      <AllowParentConditionSession>1</AllowParentConditionSession>
+                      <AllowQuestSession>0</AllowQuestSession>
+                      <AllowQuestArea>0</AllowQuestArea>
+                    </SessionFilter>
+                  </Values>
+                </TriggerAction>
+              </Item>
+            </TriggerActions>
+         </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+  </ModOp>
+   
+
+</ModOps>
