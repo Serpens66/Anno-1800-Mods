@@ -36,8 +36,8 @@ if g_LuaScriptBlockers[ModID]==nil then
       elseif TargetPID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID or TargetPID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID then
         if GUID==100440 then -- pirates usually index 3, but its 10 for Liner ()
           ts.Objects.GetObject(OID).SetChangeSkin(10,true,true)
-        -- else
-          -- ts.Objects.GetObject(OID).SetChangeSkin(3,true,true)
+        else
+          ts.Objects.GetObject(OID).SetChangeSkin(3,true,true)
         end
         
       end
@@ -76,35 +76,34 @@ if g_LuaScriptBlockers[ModID]==nil then
           g_LTL_Serp.start_thread("WaitForSupportQuest "..tostring(PID)..tostring(TargetPID)..tostring(fleetname),ModID,function()
             system.waitForGameTimeDelta(500) -- wait for the Quest to start. it is started without waittime and after ~1 second it shows the "request success" message. So waittime between 500 and 900 ms should be good. Do not wait too short, because the quest must be started completely. Do not wait too long, because in MP we dont know for sure which Quest belong to which player. So within that time no other player should start a request
             local QuestDescriptionTextGUID = g_SupportFleet_Serp.SupportFleetQuestGuids[fleetname][TargetPID]
-            local QuestIndices = g_LTL_Serp.GetActiveQuestInstances(QuestDescriptionTextGUID)
+            local QuestIndices = g_LTL_Serp.GetActiveQuestInstances(QuestDescriptionTextGUID,true,nil,nil,2000)
             local last_QID = table.remove(QuestIndices) -- last entry is the newest running instance of this quest (normally its only one, but just in case we want to allow multiple at once)
-            if last_QID~=nil then -- only when we found the quest, everything is fine
-              if requestsuccess then
-                g_LTL_Serp.start_thread("t_DoSupportFleet wait for owner change "..tostring(PID)..tostring(TargetPID)..tostring(fleetname),ModID,g_SupportFleet_Serp.t_DoSupportFleet,PID,TargetPID,IsThirdParty,last_QID,fleetname)
-                g_LTL_Serp.modlog("_OnFleetRequested keep quest active "..tostring(QuestDescriptionTextGUID),ModID)
-              else
-                ts.Quests.GetQuest(last_QID).SetAbortedNet(false,1) -- SetAbortedNet(bool_isManually,int_QuestAbortReason)
-                g_LTL_Serp.modlog("_OnFleetRequested abort newest quest "..tostring(QuestDescriptionTextGUID),ModID)
-              end
-              
-              -- we could add this as xml adding of reessources to the parts which also starts this lua function... but we save some work and its not super important to have precise cooldown
-              local cooldownall = 2 -- TODO Test noch auf finale werte setzen, zb 30 min TargetPID und 10 Min All
-              local cooldowntarget = 3
-              if continue=="AllCoop" then -- executed for all coop peers
-                cooldownall = math.max(1,g_LTL_Serp.myround(cooldownall / g_CoopCountResSerp.LocalCount))
-                cooldowntarget = math.max(2,g_LTL_Serp.myround(cooldowntarget / g_CoopCountResSerp.LocalCount))
-              end
-              ts.Economy.MetaStorage.AddAmount(g_SupportFleet_Serp._OnCooldownproducts.All, cooldownall)
-              ts.Economy.MetaStorage.AddAmount(g_SupportFleet_Serp._OnCooldownproducts[TargetPID], cooldowntarget)
-              
-              for i,fleetname in pairs(g_SupportFleet_Serp.Fleets) do
-                ts.Unlock.SetRelockNet(g_DiploActions_Serp.DiploButtonsUnlocks[fleetname].unlock)  -- update buttons
-              end
-              g_DiploActions_Serp.UnhideAllDiploButtons()
-              
-            else
-              g_LTL_Serp.modlog("ERROR: Failed to find ActiveQuestInstances of Quest "..tostring(QuestDescriptionTextGUID).." (This is fine if the QuestGiver does not have a lighthouse in the current session. make sure the GUID is set as DescriptionText in the Quest!)",ModID)
+            if last_QID==nil then
+              g_LTL_Serp.modlog("ERROR: Failed to find ActiveQuestInstances of Quest "..tostring(QuestDescriptionTextGUID),ModID)
             end
+            if requestsuccess then
+              g_LTL_Serp.start_thread("t_DoSupportFleet wait for owner change "..tostring(PID)..tostring(TargetPID)..tostring(fleetname),ModID,g_SupportFleet_Serp.t_DoSupportFleet,PID,TargetPID,IsThirdParty,last_QID,fleetname)
+              g_LTL_Serp.modlog("_OnFleetRequested keep quest active "..tostring(QuestDescriptionTextGUID),ModID)
+            elseif last_QID~=nil then -- only when found, we can abort it... if not found, it will always succeed... but I hope 2000 is enough to always find it..
+              ts.Quests.GetQuest(last_QID).SetAbortedNet(false,1) -- SetAbortedNet(bool_isManually,int_QuestAbortReason)
+              g_LTL_Serp.modlog("_OnFleetRequested abort newest quest "..tostring(QuestDescriptionTextGUID),ModID)
+            end
+            
+            -- we could add this as xml adding of reessources to the parts which also starts this lua function... but we save some work and its not super important to have precise cooldown
+            local cooldownall = 2 -- TODO Test noch auf finale werte setzen, zb 30 min TargetPID und 10 Min All
+            local cooldowntarget = 3
+            if continue=="AllCoop" then -- executed for all coop peers
+              cooldownall = math.max(1,g_LTL_Serp.myround(cooldownall / g_CoopCountResSerp.LocalCount))
+              cooldowntarget = math.max(2,g_LTL_Serp.myround(cooldowntarget / g_CoopCountResSerp.LocalCount))
+            end
+            ts.Economy.MetaStorage.AddAmount(g_SupportFleet_Serp._OnCooldownproducts.All, cooldownall)
+            ts.Economy.MetaStorage.AddAmount(g_SupportFleet_Serp._OnCooldownproducts[TargetPID], cooldowntarget)
+            
+            for i,fleetname in pairs(g_SupportFleet_Serp.Fleets) do
+              ts.Unlock.SetRelockNet(g_DiploActions_Serp.DiploButtonsUnlocks[fleetname].unlock)  -- update buttons
+            end
+            g_DiploActions_Serp.UnhideAllDiploButtons()
+            
           end)
         end
       end

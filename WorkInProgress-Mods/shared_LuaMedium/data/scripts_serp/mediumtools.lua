@@ -1,7 +1,7 @@
 -- Uses Nameable from:
 -- Scenario_Item_Trader  GUID: 4387 , PID: 139
 -- (I think the only Participant with Queen Template where I do not use the Nameable yet (besides Void Trader and Queen) is Scenario02_Actuary)
--- And using Scenario3_Challenger1  GUID: 100132 , PID: 118
+-- And using Scenario3_Archie  GUID: 100132 , PID: 118
  -- as Helper-Owner for ships gifted to the pirate within t_ChangeOwnerOIDToPID
 
 
@@ -229,6 +229,23 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- maybe ActionStopObjectMovement? but we can not properly target there, only all ships owned by eg. Nature... at least using a Pool of ships owned by 1st/2nd party, so no Quest/helper ships are hit
      -- not that important. AI gives them new task and human can simply give it new command manually
     
+  -- add your function which should be called everytime t_ChangeOwnerOIDToPID changes the owner of an object 
+  -- to the list EventOnObjectOwnerChanged with ModID of your mod as key.
+  local EventOnObjectOwnerChanged = {}
+  local function _OnObjectOwnerChanged(success,Local_PID,Owner,GUID,OID,To_PID,ignoreowner,notifyonfail,forbidpiratenewowner,with_middleman,CallerModID)
+    g_LTL_Serp.modlog("EventOnObjectOwnerChanged",ModID)
+    for modname,fn in pairs(g_LTM_Serp.EventOnObjectOwnerChanged) do
+      g_LTL_Serp.modlog("EventOnObjectOwnerChanged "..tostring(modname),ModID)
+      if type(fn)=="function" then
+        local status,err = xpcall(fn,g_LTL_Serp.log_error,success,Local_PID,Owner,GUID,OID,To_PID,ignoreowner,notifyonfail,forbidpiratenewowner,with_middleman,CallerModID)
+        if status==false then
+          g_LTL_Serp.modlog("ERROR in t_ChangeOwnerOIDToPID _OnObjectOwnerChanged for mod '"..tostring(modname).."': "..tostring(err),ModID)
+        end
+      else
+        g_LTL_Serp.modlog("Not a function in t_ChangeOwnerOIDToPID _OnObjectOwnerChanged for mod '"..tostring(modname),ModID)
+      end
+    end
+  end   
     
   -- only works for Sellable Objects! (because we use the BuyNet Feature, which is the only way to change owner without desync/forcing everyone in the same session)
   -- When changing the owner to ThirdParty, the ship will leave map (this is what BuyNet does, so normal behaviour when selling a ship to a shiptrader). I think it is ok, since we dont want Pirates and so on to use the same ship GUID like players. So if we really want gifting ship to Pirate, we should also use changeGUID .. in rare cases it does not leave map! (and it seems the owner is not Neutral, but the pirate. maybe thats why they sometimes do not leave, because they get another command..)
@@ -245,110 +262,122 @@ if g_LuaScriptBlockers[ModID]==nil then
      -- that trigger will use ActionChangeParticipant to change the owner of all ships owned by the helper to Pirate
       -- And (before the ownerchange!) it will make sure to convert the playership to a pirate variant to make sure pirate never owns a non-pirate ship
      -- (changing the GUID could also be done here in lua, BUT it requires userdata which is only available if we are in the same session. to support the most cases we will use trigger to change guid so it works regardless of the session)
-  local function t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner,notifyonfail,forbidpiratenewowner)
+  local function t_ChangeOwnerOIDToPID(OID,To_PID,ignoreowner,notifyonfail,forbidpiratenewowner,CallerModID)
+    local Local_PID,Owner,with_middleman,continue,To_IsHuman,Owner_IsHuman,To_Kontor_OID,Owner_KontorOID,To_IsThirdPartyTrader -- define the local variables here, because if defined inside the if condition they do not exist outside, which makes _OnObjectOwnerChanged call fail
     local GUID = g_LTL_Serp.GetGameObjectPath(OID,"GUID")
     g_LTL_Serp.modlog("ChangeOwnerOIDToPID called. OID:"..tostring(OID).." GUID: "..tostring(GUID).." To_PID: "..tostring(To_PID),ModID)
     local InfluenceProduct = 1010190 -- we dont care for Influence costs. Other costs are refunded
+    local success = false
     if GUID~=nil and GUID~=0 then
-      local Local_PID = ts.Participants.GetGetCurrentParticipantID()
+      Local_PID = ts.Participants.GetGetCurrentParticipantID()
       To_PID = To_PID or Local_PID
-      local Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
-      local with_middleman = g_LTM_Serp.NatureParticipantPID -- if they have no traderights, we will make use of a middleman (PID=158) who has traderights with everyone
-      if ts.Participants.GetCheckDiplomacyStateTo(Owner,To_PID,2) then -- BuyNet only works with traderights
+      Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
+      with_middleman = g_LTM_Serp.NatureParticipantPID -- if they have no traderights, we will make use of a middleman (PID=158) who has traderights with everyone
+      continue = true
+      if ts.Participants.GetCheckDiplomacyStateTo(Owner,To_PID,g_LTL_Serp.DiplomacyState.TradeRights) then -- BuyNet only works with traderights
         with_middleman = false
-      elseif not (ts.Participants.GetCheckDiplomacyStateTo(with_middleman,To_PID,2) and ts.Participants.GetCheckDiplomacyStateTo(Owner,with_middleman,2)) then
+      elseif not (ts.Participants.GetCheckDiplomacyStateTo(with_middleman,To_PID,g_LTL_Serp.DiplomacyState.TradeRights) and ts.Participants.GetCheckDiplomacyStateTo(Owner,with_middleman,g_LTL_Serp.DiplomacyState.TradeRights)) then
         g_LTL_Serp.modlog("ChangeOwnerOIDToPID FAILED, because either To_PID or Owner does not even have traderights with my Nature-Helper-Participant (most likely a mod participant with DefaultTreaties War ... it will work if my submod_NatureParticipant mod loads after that mod)",ModID)
-        return false
+        continue = false
       end
-      local To_IsHuman = g_LTL_Serp.IsHuman(To_PID) -- AI does cheat anyway, cant go bancrupt and AddAmount does not do anything for them anyways (also BuyNet does not change their money). So we can skip this for them
-      local Owner_IsHuman = g_LTL_Serp.IsHuman(Owner)
-      if (ignoreowner or Owner==Local_PID) and To_PID~=Owner then
-        if g_LTL_Serp.GetGameObjectPath(OID,"Sellable.CanBeSoldToTrader") then
-          -- we can credit other PIDs the money without calling code for them, by having at least one valid OID of any building.
-          local To_Kontor_OID = To_IsHuman and To_PID~=Local_PID and g_ObjectFinderSerp.GetAnyValidKontorOIDFrom(To_PID) or true
-          local Owner_KontorOID = Owner_IsHuman and Owner~=Local_PID and g_ObjectFinderSerp.GetAnyValidKontorOIDFrom(Owner) or true
-          local To_IsThirdPartyTrader = g_LTM_Serp.IsThirdPartyTrader(To_PID)
-          if To_Kontor_OID~=nil and To_Kontor_OID~=0 and Owner_KontorOID~=nil and Owner_KontorOID~=0 then
-            
-              if To_IsHuman then
-                local BuyPrices = g_LTL_Serp.GetVectorGuidsFromSessionObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable CurrentParticipantBuyPrice Costs Count]",{ProductGUID="number",Amount="number"}) -- this way we support mods adding more costs to buy/sell ships
-                for i,Buyinfo in pairs(BuyPrices) do -- using this instead of MoneyCost, because in theory modders could add more costs than just money
-                  local Price = Buyinfo.Amount
-                  local Product = Buyinfo.ProductGUID
-                  -- g_LTL_Serp.modlog("BuyPrice: Product:"..Product..", Price:"..Price,ModID)
-                  if Price~=nil and Price~=0 and Product~=nil and Product~=0 and Product~=InfluenceProduct then
-                    if To_PID==Local_PID then
-                      ts.Economy.MetaStorage.AddAmount(Product, Price)
-                    else
-                      g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(To_Kontor_OID)..") Area Economy AddAmount("..tostring(Product)..","..tostring(Price)..")]")
-                    end
-                  end
-                end
-                g_LTL_Serp.waitForTimeDelta(1000) -- keep it simple, 1s should be enough (eg buyer could have negative money and stuff like this we dont want to deal with code..)
-              end
+      if continue then
+        To_IsHuman = g_LTL_Serp.IsHuman(To_PID) -- AI does cheat anyway, cant go bancrupt and AddAmount does not do anything for them anyways (also BuyNet does not change their money). So we can skip this for them
+        Owner_IsHuman = g_LTL_Serp.IsHuman(Owner)
+        if (ignoreowner or Owner==Local_PID) and To_PID~=Owner then
+          if g_LTL_Serp.GetGameObjectPath(OID,"Sellable.CanBeSoldToTrader") then
+            -- we can credit other PIDs the money without calling code for them, by having at least one valid OID of any building.
+            To_Kontor_OID = To_IsHuman and To_PID~=Local_PID and g_ObjectFinderSerp.GetAnyValidKontorOIDFrom(To_PID) or true
+            Owner_KontorOID = Owner_IsHuman and Owner~=Local_PID and g_ObjectFinderSerp.GetAnyValidKontorOIDFrom(Owner) or true
+            To_IsThirdPartyTrader = g_LTM_Serp.IsThirdPartyTrader(To_PID)
+            if To_Kontor_OID~=nil and To_Kontor_OID~=0 and Owner_KontorOID~=nil and Owner_KontorOID~=0 then
               
-              if not forbidpiratenewowner and g_LTM_Serp._supportedShipsOwnerToPirate[GUID]~=nil and (To_PID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID or To_PID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID) then
-                -- changing owner to a helper participant which will only be used for this function!
-                 -- that means all ships owned by this participant are ment to be changed by xml triggers (except the 2 scenario ships, but they are in no vanilla pool)
-                -- Pirates dont use spawned/gifted ships 100% correctly, similar to comebackfleet. So sometimes they will stand there doing nothing and sometimes roaming around. Not really a way to fix this except changing owner back and forth every 5 minutes, which interrupts their current action, if there is any
-                helper_PID = g_LTL_Serp.PIDs.Scenario3_Challenger1.PID
-                g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(helper_PID)..")]")
-                if To_PID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID then
-                  ts.Conditions.RegisterTriggerForCurrentParticipant(1500005617)
-                elseif To_PID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID then
-                  ts.Conditions.RegisterTriggerForCurrentParticipant(1500005618)
+                if To_IsHuman then
+                  local BuyPrices = g_LTL_Serp.GetVectorGuidsFromSessionObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable CurrentParticipantBuyPrice Costs Count]",{ProductGUID="number",Amount="number"}) -- this way we support mods adding more costs to buy/sell ships
+                  for i,Buyinfo in pairs(BuyPrices) do -- using this instead of MoneyCost, because in theory modders could add more costs than just money
+                    local Price = Buyinfo.Amount
+                    local Product = Buyinfo.ProductGUID
+                    -- g_LTL_Serp.modlog("BuyPrice: Product:"..Product..", Price:"..Price,ModID)
+                    if Price~=nil and Price~=0 and Product~=nil and Product~=0 and Product~=InfluenceProduct then
+                      if To_PID==Local_PID then
+                        ts.Economy.MetaStorage.AddAmount(Product, Price)
+                      else
+                        g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(To_Kontor_OID)..") Area Economy AddAmount("..tostring(Product)..","..tostring(Price)..")]")
+                      end
+                    end
+                  end
+                  g_LTL_Serp.waitForTimeDelta(1000) -- keep it simple, 1s should be enough (eg buyer could have negative money and stuff like this we dont want to deal with code..)
                 end
-              else
-                if not To_IsThirdPartyTrader then -- if it is trader, we dont want to stop, because it gets the command to leave map (and if we do DebugStop it instantly disappears instead)
-                  g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Walking DebugStop()]") -- revoke all current commands, especially traderoutes
+                
+                if not forbidpiratenewowner and g_LTM_Serp._supportedShipsOwnerToPirate[GUID]~=nil and (To_PID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID or To_PID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID) then
+                  -- change owner to pirate and keep it as pirate (with BuyNet the game makes them neutral, so we need a xml workaround)
+                  -- changing owner to a helper participant which will only be used for this function!
+                   -- that means all ships owned by this participant are ment to be changed by xml triggers (except the 2 scenario ships, but they are in no vanilla pool)
+                  -- Pirates dont use spawned/gifted ships 100% correctly, similar to comebackfleet. So sometimes they will stand there doing nothing and sometimes roaming around. Not really a way to fix this except changing owner back and forth every 5 minutes, which interrupts their current action, if there is any
+                  helper_PID = g_LTL_Serp.PIDs.Scenario3_Archie.PID -- using this one because it has TradeRights by default with humans on gamestart (unlike the Challengers)
+                  if not ts.Participants.GetCheckDiplomacyStateTo(helper_PID,Owner,g_LTL_Serp.DiplomacyState.TradeRights) then
+                    g_LTL_Serp.modlog("ERROR t_ChangeOwnerOIDToPID helper Scenario3_Archie has no TradeRights with the Owner "..tostring(Owner),ModID)
+                  end
+                  g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(helper_PID)..")]")
+                  if To_PID==g_LTL_Serp.PIDs.Third_party_03_Pirate_Harlow.PID then
+                    ts.Conditions.RegisterTriggerForCurrentParticipant(1500005617)
+                  elseif To_PID==g_LTL_Serp.PIDs.Third_party_04_Pirate_LaFortune.PID then
+                    ts.Conditions.RegisterTriggerForCurrentParticipant(1500005618)
+                  end
+                else -- then execute the normal BuyNet (for 2nd Party to change owner to them and for ThirdParty the ships will get neutral and leave map)
+                  if not To_IsThirdPartyTrader then -- if it is trader, we dont want to stop, because it gets the command to leave map (and if we do DebugStop it instantly disappears instead)
+                    g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Walking DebugStop()]") -- revoke all current commands, especially traderoutes
+                  end
+                  if with_middleman~=false then
+                    g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(with_middleman)..")]")
+                  end -- no yield needed it seems
+                  g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(To_PID)..")]")
+                 
+                  if not To_IsThirdPartyTrader then
+                    g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Walking DebugStop()]") -- revoke all current commands, especially traderoutes
+                  end
                 end
-                if with_middleman~=false then
-                  g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(with_middleman)..")]")
-                end -- no yield needed it seems
-                g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable BuyNet("..tostring(To_PID)..")]")
-               
-                if not To_IsThirdPartyTrader then
-                  g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(OID)..") Walking DebugStop()]") -- revoke all current commands, especially traderoutes
+                success = true
+                g_LTL_Serp.waitForTimeDelta(1000) -- wait for the money reach the Owner before to substract it again, keep it simple
+                local name = ts.GetGameObject(OID).Nameable.Name
+                local newname = g_LTL_Serp.myreplace(name,"NOSELL","") -- remove "NOSELL" from the name if it was spawned via supportfleet (gifting is allowed even with NOSELL)
+                if newname~=name then
+                  ts.GetGameObject(OID).Nameable.SetName(newname)
                 end
-              end
-              g_LTL_Serp.waitForTimeDelta(1000) -- wait for the money reach the Owner before to substract it again, keep it simple
-              local name = ts.GetGameObject(OID).Nameable.Name
-              local newname = g_LTL_Serp.myreplace(name,"NOSELL","") -- remove "NOSELL" from the name if it was spawned via supportfleet (gifting is allowed even with NOSELL)
-              if newname~=name then
-                ts.GetGameObject(OID).Nameable.SetName(newname)
-              end
-              if Owner_IsHuman then
-                local SellPrices = g_LTL_Serp.GetVectorGuidsFromSessionObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable SellPrice Costs Count]",{ProductGUID="number",Amount="number"})
-                for i,Sellinfo in pairs(SellPrices) do
-                  local Price = Sellinfo.Amount
-                  local Product = Sellinfo.ProductGUID
-                  -- g_LTL_Serp.modlog("SellPrice: Product:"..Product..", Price:"..Price,ModID)
-                  if Price~=nil and Price~=0 and Product~=nil and Product~=0 and Product~=InfluenceProduct then
-                    if Owner~=Local_PID then
-                      g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(Owner_KontorOID)..") Area Economy AddAmount("..tostring(Product)..","..tostring(Price)..")]")
-                    else
-                      ts.Economy.MetaStorage.AddAmount(Product, Price) -- reduce the money (is negative amount)
+                if Owner_IsHuman then
+                  local SellPrices = g_LTL_Serp.GetVectorGuidsFromSessionObject("[MetaObjects SessionGameObject("..tostring(OID)..") Sellable SellPrice Costs Count]",{ProductGUID="number",Amount="number"})
+                  for i,Sellinfo in pairs(SellPrices) do
+                    local Price = Sellinfo.Amount
+                    local Product = Sellinfo.ProductGUID
+                    -- g_LTL_Serp.modlog("SellPrice: Product:"..Product..", Price:"..Price,ModID)
+                    if Price~=nil and Price~=0 and Product~=nil and Product~=0 and Product~=InfluenceProduct then
+                      if Owner~=Local_PID then
+                        g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject("..tostring(Owner_KontorOID)..") Area Economy AddAmount("..tostring(Product)..","..tostring(Price)..")]")
+                      else
+                        ts.Economy.MetaStorage.AddAmount(Product, Price) -- reduce the money (is negative amount)
+                      end
                     end
                   end
                 end
+            else 
+              g_LTL_Serp.modlog("ChangeOwnerOIDToPID FAILED, because GetAnyValidKontorOIDFrom did not succeed to find a valid Kontor from owner/receiver.",ModID)
+              if notifyonfail then
+                -- TODO: evtl eine notification senden, dass man zum verschenken eine insel des spielers in diesem savegame-run gesehen haben muss (also zb einmal session wechel durchfüren)
+                
               end
-          else 
-            g_LTL_Serp.modlog("ChangeOwnerOIDToPID FAILED, because GetAnyValidKontorOIDFrom did not succeed to find a valid Kontor from owner/receiver.",ModID)
-            if notifyonfail then
-              -- TODO: evtl eine notification senden, dass man zum verschenken eine insel des spielers in diesem savegame-run gesehen haben muss (also zb einmal session wechel durchfüren)
+              -- return false
             end
-            return false
+          else -- not sellable
+            g_LTL_Serp.modlog("ChangeOwnerOIDToPID FAILED, because this Object can not be sold, GUID "..tostring(GUID),ModID)
+            if notifyonfail then
+              ts.Unlock.SetRelockNet(1500005611) -- sidenotification can not sell this ship (GUID is part of shared_Sellable mod, which might not be active at all times, but its ok I think)
+            end
+            -- return false
           end
-        else 
-          g_LTL_Serp.modlog("ChangeOwnerOIDToPID FAILED, because this Object can not be sold, GUID "..tostring(GUID),ModID)
-          if notifyonfail then
-            -- -- can not be sold. TODO Notification machen
-          end
-          return false
         end
       end
     end
-    return true
+    _OnObjectOwnerChanged(success,Local_PID,Owner,GUID,OID,To_PID,ignoreowner,notifyonfail,forbidpiratenewowner,with_middleman,CallerModID)
+    return success
   end
 
   
@@ -465,6 +494,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       IsThirdPartyTrader = IsThirdPartyTrader,
       ContinueCoopCalled = ContinueCoopCalled,
       t_ChangeOwnerOIDToPID = t_ChangeOwnerOIDToPID,
+      EventOnObjectOwnerChanged = EventOnObjectOwnerChanged, -- success,Local_PID,Owner,GUID,OID,To_PID,ignoreowner,notifyonfail,forbidpiratenewowner,with_middleman
       SimpleExecuteForEveryone = SimpleExecuteForEveryone,
       _DoExectionForEveryone = _DoExectionForEveryone,
       NatureParticipantPID = 158, -- has traderights with everyone (Enum: Mod10, GUID: 1500004528)

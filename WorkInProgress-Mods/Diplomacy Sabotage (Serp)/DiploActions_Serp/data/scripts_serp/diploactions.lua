@@ -292,8 +292,8 @@ if g_LuaScriptBlockers[ModID]==nil then
               end
             end
           end
-        else
-          ts.Unlock.SetRelockNet(1500005611) -- sidenotification can not sell this ship
+        -- else -- notification is already done in g_LTM_Serp.t_ChangeOwnerOIDToPID
+          -- ts.Unlock.SetRelockNet(1500005611) -- sidenotification can not sell this ship
         end
       end
     end
@@ -328,12 +328,41 @@ if g_LuaScriptBlockers[ModID]==nil then
   -- ####################################################################################################################
   -- ####################################################################################################################
   
-  local function CommandAllyAllowed(PID,TargetPID,topdiplostate,isfrequentcheck,actionname,Owner)
+  local function CommandAllowedForSelection()
+    local function ExecuteCommandAllowedForSelection()
+      local PID = ts.Participants.GetGetCurrentParticipantID()
+      local onlyallowedowner_selected = true
+      for i,userdata in ipairs(session.selection) do
+        if g_LTL_Serp.IsUserdataValid(userdata) then
+          local OID = g_LTL_Serp.get_OID(userdata)
+          if OID~=nil then
+            local Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
+            if not g_DiploActions_Serp.CommandAllyAllowed(PID,Owner,nil,nil,"CommandAlly",OID) then
+              onlyallowedowner_selected = false
+            end
+          end
+        end
+      end
+      return onlyallowedowner_selected
+    end
+    status,result = xpcall(ExecuteCommandAllowedForSelection,g_LTL_Serp.log_error) -- for error reporting in lua log
+    if status==true then
+      return result
+    end
+    return false
+  end
+  
+  
+  local function CommandAllyAllowed(PID,TargetPID,topdiplostate,isfrequentcheck,actionname,OID,Owner)
+    local ShipInfiltratedBuff = 1500002744 -- from Sabotage mod, made as StatusEffect via Projectile on ships
     Owner = Owner or TargetPID
     if g_LTL_Serp.table_contains_value(g_DiploActions_Serp.DiploButtonsUnlocks[actionname].AllowedFor,TargetPID) then
       if PID==Owner then 
         return true
       elseif TargetPID==Owner then
+        if g_LTL_Serp.GetGameObjectPath(OID,"Attackable.GetIsPartOfActiveStatusEffectChain("..tostring(ShipInfiltratedBuff)..")") then
+          return true
+        end
         if g_LTL_Serp.IsHuman(TargetPID) then
           if ts.Participants.GetParticipant(TargetPID).ProfileCounter.Stats.GetCounter(0,6,g_DiploActions_Serp.SharedAccessProducts[PID],3) then -- if the TargetPID has our helper product in stock, he allows it to us
             return true
@@ -365,7 +394,7 @@ if g_LuaScriptBlockers[ModID]==nil then
               local OID = g_LTL_Serp.get_OID(userdata)
               if OID~=nil then
                 local Owner = g_LTL_Serp.GetGameObjectPath(OID,"Owner")
-                if g_DiploActions_Serp.CommandAllyAllowed(PID,TargetPID,nil,nil,"CommandAlly",Owner) then
+                if g_DiploActions_Serp.CommandAllyAllowed(PID,TargetPID,nil,nil,"CommandAlly",OID,Owner) then
                   table.insert(userdatas,userdata)
                 else
                   onlyallowedornothing = false
@@ -611,6 +640,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       },
       IsKontorSelectedFrom = IsKontorSelectedFrom,
       CommandAllyAllowed = CommandAllyAllowed,
+      CommandAllowedForSelection = CommandAllowedForSelection,
       CreateSelectGroup = CreateSelectGroup,
     }
         

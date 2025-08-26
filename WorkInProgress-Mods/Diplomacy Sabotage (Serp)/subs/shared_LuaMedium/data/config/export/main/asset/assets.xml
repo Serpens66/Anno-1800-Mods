@@ -149,6 +149,8 @@
       </Values>
     </Asset>
     
+    <!-- using DefaultLockedState=1 here and only execute trigger while locked, to make the trigger save-to-remove in games. -->
+     <!-- because removed assets are always counted as unlocked, while regsitered triggers continue to fire at least once after removal of the mod -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
@@ -156,18 +158,44 @@
           <GUID>1500005527</GUID>
           <Name>Refresh Lua Cache on every new Session Load (eg SessionParticipants)</Name>
         </Standard>
+        <Locked>
+          <DefaultLockedState>1</DefaultLockedState>
+        </Locked>
         <Trigger>
           <TriggerCondition>
-            <Template>ConditionEvent</Template>
+            <Template>ConditionUnlocked</Template>
             <Values>
               <Condition />
-              <ConditionEvent>
-                <ConditionEvent>SessionLoaded</ConditionEvent>
-                <ContextAssetInfolayer>0</ContextAssetInfolayer>
-              </ConditionEvent>
-              <ConditionPropsNegatable />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005527</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
             </Values>
           </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>SessionLoaded</ConditionEvent>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
           <ResetTrigger>
             <Template>AutoCreateTrigger</Template>
             <Values>
@@ -411,14 +439,22 @@
           <GUID>1500005530</GUID>
           <Name>Refresh Lua Area Cache on IslandSettled/SessionEnter (eg get kontor OID)</Name>
         </Standard>
+        <Locked>
+          <DefaultLockedState>1</DefaultLockedState>
+        </Locked>
         <Trigger>
           <TriggerCondition>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Template>ConditionUnlocked</Template>
             <Values>
               <Condition>
                 <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
               </Condition>
-              <ConditionAlwaysTrue />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005530</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
             </Values>
           </TriggerCondition>
           <SubTriggers>

@@ -171,7 +171,7 @@ local to_bint = g_bint_Library051(256)
 
 -- special cases not all split functions on the net can handle: seperator = "." and seperator = "Session" in Human0_Session_1234. Now this hopefully can handle both...
 local function mysplit(pString, pPattern)
-   if pPattern=="." then
+   if pPattern=="." or pPattern=="(" or pPattern==")" then
      pPattern = "%"..pPattern
    end
    local Table = {}
@@ -1001,10 +1001,9 @@ end
     local ret
     if OID~=nil and OID~=0 then
       if type(OID)=="number" then -- GetGameObject can not handle other than number
-        local path_parts = g_LTL_Serp.mysplit(path,".")
-        ret = ts.GetGameObject(OID) -- every GameObj can only be used once directly. GetGameObject also works for Objects in other Session.
-        for _,path_part in ipairs(path_parts) do
-          ret = ret[path_part]
+        ret = load("return ts.GetGameObject("..tostring(OID)..")."..path)
+        if ret~=nil and type(ret)=="function" then
+          ret = ret()
         end
       else -- string or bint. we can only return strings, not any tabeles/gameobjects this way
         local path_textemb = g_LTL_Serp.ToTextembed(path)
@@ -1034,10 +1033,11 @@ end
     -- rauszufinden, welche Quests für wen aktiv sind -.-
     -- Also ist es am sichersten das lua script direkt nach dem Start der Quest zu starten und dort die neuste (letzte der liste) gefundene passenende Quest zu nehmen (sofern jetzt gerade nur für diesen Spieler gestartet wurde)!
     -- Alternativ jede Quest 4 mal machen, eine pro Human und WhichPlayerCondition Mod nutzen um eine Quest nur für Human0 usw zu starten
-  local function GetActiveQuestInstances(DescriptionTextGUID,firstfound,startfromID,logloop) -- we can only search for DescriptionText, not the Quest GUID...  
+  local function GetActiveQuestInstances(DescriptionTextGUID,firstfound,startfromID,logloop,maxemptycount) -- we can only search for DescriptionText, not the Quest GUID...  
     local ID = startfromID or 2 -- 0 to 1 are empty it seems. 2 always seems to be  "153179 Writers Quests Trigger"
     local QuestIndices = {} -- returning Indices instead of QuestInstance, because such instances are broken after one use (same for GameObject)
     local abortcount = 0 -- we loop until we reach empty quests. But unfortunately sometimes some quests may appear as empty (eg. A7_QuestSubQuest), so only abort after we hit x empty quests in a row
+    maxemptycount = maxemptycount or 20
     while true do
       if logloop then
         g_LTL_Serp.modlog("Quest ID "..tostring(ID)..", active: "..tostring(ts.Quests.GetQuest(ID).IsActive)..", HasEnded: "..tostring(ts.Quests.GetQuest(ID).HasEnded)..", StoryText: "..tostring(ts.Quests.GetQuest(ID).QuestStoryText)..", DescriptionText: "..tostring(ts.Quests.GetQuest(ID).QuestDescriptionText)..", TimeLeft: "..tostring(ts.Quests.GetQuest(ID).TimeLeft)..", StateReachable: "..tostring(ts.Quests.GetQuest(ID).StateReachable),ModID)
@@ -1052,7 +1052,7 @@ end
       else
         abortcount = 0
       end
-      if abortcount >= 20 then -- only after the last 20 quests were empty we can be sure enough... (ok that much "empty" quests usually only happen on testing much, not sure exactly what causes them... I think A7_QuestSubQuest)
+      if abortcount >= maxemptycount then -- only after the last 20 quests were empty we can be sure enough... (ok that much "empty" quests usually only happen on testing much, not sure exactly what causes them... I think A7_QuestSubQuest)
         break
       end
       if IsActive and not HasEnded and (DescriptionTextGUID==nil or DescriptionText==DescriptionTextGUID) then
@@ -1185,6 +1185,21 @@ end
       end
     end
   end
+  
+  
+  -- #####################################################################################################
+    
+    -- GUIState see datasets.xml. Nice is "ObjectMenuKontor", this way you can see storage of other players and add trades
+     -- only lasts until you select something else
+    local function ChangeGUIStateIf(PID,allowedOwner,allowedselectedGUIDs,GUIState)
+      if PID==nil or PID == ts.Participants.GetGetCurrentParticipantID() then
+        if (allowedOwner==nil or ts.Selection.Object.GUID.Owner==allowedOwner) and (allowedselectedGUIDs==nil or g_LTL_Serp.table_contains_value(allowedselectedGUIDs,ts.Selection.Object.GUID)) then
+          ts.Interface.ToggleStateVisibility(GUIState)
+        end
+      end
+    end
+
+
   -- ###################################################################################################
   -- ###################################################################################################
   -- ###################################################################################################
@@ -1504,6 +1519,7 @@ g_LTL_Serp = {
   DestroyGUIDByLocal = DestroyGUIDByLocal,
   EventOnObjectDeletionConfirmed = EventOnObjectDeletionConfirmed,
   _OnObjectDeletionConfirmed = _OnObjectDeletionConfirmed,
+  ChangeGUIStateIf = ChangeGUIStateIf,
   
   -- CheckObjectHelpers 
   IsUserdataValid = IsUserdataValid,

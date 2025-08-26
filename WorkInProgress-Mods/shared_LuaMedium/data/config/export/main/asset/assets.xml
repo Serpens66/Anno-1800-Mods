@@ -17,6 +17,20 @@
   <ModOp Type="add" GUID='500115' Path="/Values/GenericPopup/Popups/*[self::PlayerDisconnected or self::PlayerLeft]/Buttons/Item[1]/Command">Conditions.RegisterTriggerForCurrentParticipant(1500005602);</ModOp>
   
   
+  <!-- add to Exceptions in InitialRelation of everyone who does have War as Default -->
+   <!-- (only if "War" it is needed. If it is just "Peace" the DefaultTreaties of Scenario3_Archie already work) -->
+   <!-- We use Scenario3_Archie for gifting ships to pirats (3rd party) in our mediumtools.lua script -->
+  <ModOp Type="merge" Path="//Values/Diplomacy/InitialRelation[DefaultTreaties='War']">
+    <Exceptions />
+  </ModOp>
+  <ModOp Type="add" Path="//Values/Diplomacy/InitialRelation[DefaultTreaties='War']/Exceptions">
+    <Item>
+      <Participant>Scenario3_Archie</Participant>
+      <Reputation>100</Reputation>
+      <Memory>50</Memory>
+      <Treaties>Peace;TradeRights</Treaties>
+    </Item>
+  </ModOp>
   
   <ModOp Type="add" GUID="73,76" Path="/Values/Diplomacy/InitialRelation/Exceptions">
     <Item>
@@ -135,6 +149,8 @@
       </Values>
     </Asset>
     
+    <!-- using DefaultLockedState=1 here and only execute trigger while locked, to make the trigger save-to-remove in games. -->
+     <!-- because removed assets are always counted as unlocked, while regsitered triggers continue to fire at least once after removal of the mod -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
@@ -142,18 +158,44 @@
           <GUID>1500005527</GUID>
           <Name>Refresh Lua Cache on every new Session Load (eg SessionParticipants)</Name>
         </Standard>
+        <Locked>
+          <DefaultLockedState>1</DefaultLockedState>
+        </Locked>
         <Trigger>
           <TriggerCondition>
-            <Template>ConditionEvent</Template>
+            <Template>ConditionUnlocked</Template>
             <Values>
               <Condition />
-              <ConditionEvent>
-                <ConditionEvent>SessionLoaded</ConditionEvent>
-                <ContextAssetInfolayer>0</ContextAssetInfolayer>
-              </ConditionEvent>
-              <ConditionPropsNegatable />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005527</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
             </Values>
           </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionEvent</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionEvent>
+                          <ConditionEvent>SessionLoaded</ConditionEvent>
+                          <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                        </ConditionEvent>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
           <ResetTrigger>
             <Template>AutoCreateTrigger</Template>
             <Values>
@@ -397,14 +439,22 @@
           <GUID>1500005530</GUID>
           <Name>Refresh Lua Area Cache on IslandSettled/SessionEnter (eg get kontor OID)</Name>
         </Standard>
+        <Locked>
+          <DefaultLockedState>1</DefaultLockedState>
+        </Locked>
         <Trigger>
           <TriggerCondition>
-            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Template>ConditionUnlocked</Template>
             <Values>
               <Condition>
                 <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
               </Condition>
-              <ConditionAlwaysTrue />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500005530</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
             </Values>
           </TriggerCondition>
           <SubTriggers>
@@ -795,6 +845,11 @@
     
     <!-- Using Challenger as helpers (Challanger1 as helper to change owner from human to pirate) -->
     <!-- TradeRights are needed to have BuyNet in lua working -->
+    <!-- IMPORTANT: ActionForceDiplomaticRelation does not work for these Scenario participants if they are not really in the session (or so) -->
+     <!-- they kind of exist, but ActionForceDiplomaticRelation does not work for them, while it works for other normal participants -->
+      <!-- So this Trigger is useless, only the InitialRelation helps for new games. -->
+       <!-- I chose Scenario3_Archie for gifting to pirate, which already has TradeRights with Human (and since we use a Trigger it does not need traderights with pirates) -->
+       <!-- And for the other gifting I'm using the new nature participants  -->
     <Asset>
       <Template>Trigger</Template>
       <Values>
@@ -818,6 +873,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Third_party_03_Pirate_Harlow</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>Peace</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Third_party_03_Pirate_Harlow</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>Peace</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -974,6 +1042,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Third_party_03_Pirate_Harlow</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>TradeRights</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Third_party_03_Pirate_Harlow</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>TradeRights</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -1130,6 +1211,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Third_party_04_Pirate_LaFortune</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>Peace</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Third_party_04_Pirate_LaFortune</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>Peace</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -1286,6 +1380,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Third_party_04_Pirate_LaFortune</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>TradeRights</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Third_party_04_Pirate_LaFortune</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>TradeRights</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -1434,7 +1541,21 @@
                   </ActionForceDiplomaticRelation>
                 </Values>
               </TriggerAction>
-            </Item><Item>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Human0</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>Peace</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
               <TriggerAction>
                 <Template>ActionForceDiplomaticRelation</Template>
                 <Values>
@@ -1597,6 +1718,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Human0</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>TradeRights</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Human0</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>TradeRights</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -1753,6 +1887,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Human1</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>Peace</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Human1</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>Peace</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -1909,6 +2056,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Human1</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>TradeRights</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Human1</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>TradeRights</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -2065,6 +2225,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Human2</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>Peace</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Human2</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>Peace</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -2221,6 +2394,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Human2</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>TradeRights</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Human2</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>TradeRights</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -2377,6 +2563,19 @@
                   <Action />
                   <ActionForceDiplomaticRelation>
                     <ForceRelationSourceParticipant>Human3</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>Peace</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Human3</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger1</ForceRelationTargetParticipant>
                     <ForcedRelationType>Peace</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
@@ -2522,6 +2721,19 @@
                     <ForceRelationSourceParticipant>Human3</ForceRelationSourceParticipant>
                     <ForceRelationTargetParticipant>Scenario3_Challenger12</ForceRelationTargetParticipant>
                     <ForcedRelationType>Peace</ForcedRelationType>
+                  </ActionForceDiplomaticRelation>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionForceDiplomaticRelation</Template>
+                <Values>
+                  <Action />
+                  <ActionForceDiplomaticRelation>
+                    <ForceRelationSourceParticipant>Human3</ForceRelationSourceParticipant>
+                    <ForceRelationTargetParticipant>Scenario3_Archie</ForceRelationTargetParticipant>
+                    <ForcedRelationType>TradeRights</ForcedRelationType>
                   </ActionForceDiplomaticRelation>
                 </Values>
               </TriggerAction>
@@ -2708,6 +2920,7 @@
             </Values>
           </TriggerCondition>
           <TriggerActions>
+            <!-- Change to Pirate Ship Version -->
             <Item>
               <TriggerAction>
                 <Template>ActionRegisterTrigger</Template>
@@ -2731,7 +2944,7 @@
                   <ObjectFilter>
                     <ObjectGUID>700138</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
@@ -2783,7 +2996,7 @@
                   <ObjectFilter>
                     <ObjectGUID>700138</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
@@ -2824,7 +3037,7 @@
                   <ObjectFilter>
                     <ObjectGUID>102420</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
@@ -2840,7 +3053,7 @@
                   <ObjectFilter>
                     <ObjectGUID>100437</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
@@ -2856,7 +3069,7 @@
                   <ObjectFilter>
                     <ObjectGUID>102421</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
@@ -2872,7 +3085,7 @@
                   <ObjectFilter>
                     <ObjectGUID>100439</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
@@ -2888,7 +3101,7 @@
                   <ObjectFilter>
                     <ObjectGUID>102419</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
@@ -2904,7 +3117,7 @@
                   <ObjectFilter>
                     <ObjectGUID>100440</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
@@ -2920,7 +3133,7 @@
                   <ObjectFilter>
                     <ObjectGUID>102422</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
@@ -2936,7 +3149,7 @@
                   <ObjectFilter>
                     <ObjectGUID>100443</ObjectGUID>
                     <CheckParticipantID>1</CheckParticipantID>
-                    <ObjectParticipantID>Scenario3_Challenger1</ObjectParticipantID>
+                    <ObjectParticipantID>Scenario3_Archie</ObjectParticipantID>
                   </ObjectFilter>
                 </Values>
               </TriggerAction>
