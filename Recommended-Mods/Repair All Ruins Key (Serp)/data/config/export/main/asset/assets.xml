@@ -7,7 +7,7 @@
 	<ModOp Type="add" GUID='2001271' Path="/Values/GUIConfig/KeyBindings">
     <Item>
       <KeyTypes>Shift;J</KeyTypes>
-      <Command>local function get_oid(userdata);local oid,Namestring,success;success,Namestring = pcall(function();return userdata:getName();end);if success and Namestring~=nil and type(Namestring)=="string" then;oid = string.match(Namestring, "oid (.*)");if oid~=nil and type(oid)=="string" then;oid = tonumber(oid);end;end;return oid;end;system.start(function();local OIDlist = {};local OID;local PID = ts.Participants.GetGetCurrentParticipantID();local sessionguid = session.getSessionGUID();while true do;ts.Selection.SetSelectNextRuin();coroutine.yield();if sessionguid ~= session.getSessionGUID() then;if g_LTL_Serp~=nil then;g_LTL_Serp.waitForTimeDelta(800);else;system.waitForGameTimeDelta(800);end;end;if ts.Selection.Object.GUID~=0 and ts.Selection.Object.Owner==PID then;OID = get_oid(session.getSelectedFactory());if OIDlist[OID]==nil then;if ts.Selection.Object.Renovatability.IsRenovatable and ts.Selection.Object.Attackable.CurHitPoints==0 then;ts.Selection.UpgradeSelected(true);end;OIDlist[OID] = sessionguid;else;break;end;end;sessionguid = session.getSessionGUID();end;end,"upgradeallruins")</Command>
+      <Command>local function a(b)local c,d,e;e,d=pcall(function()return b:getName()end)if e and d~=nil and type(d)=="string"then c=string.match(d,"oid (.*)")if c~=nil and type(c)=="string"then c=tonumber(c)end end;return c end;system.start(function()local f={}local g;local h=ts.Participants.GetGetCurrentParticipantID()local i=session.getSessionGUID()while true do ts.Selection.SetSelectNextRuin()coroutine.yield()if i~=session.getSessionGUID()then if g_LTL_Serp~=nil then g_LTL_Serp.waitForTimeDelta(800)else system.waitForGameTimeDelta(800)end end;if ts.Selection.Object.GUID~=0 and ts.Selection.Object.Owner==h then g=a(session.getSelectedFactory())if f[g]==nil then if ts.Selection.Object.Attackable.CurHitPoints==0 and ts.Selection.Object.Renovatability.IsRenovatable then ts.Selection.UpgradeSelected(true)g_LTL_Serp.waitForTimeDelta(100)end;f[g]=i else print(g,i,f[g])break end end;i=session.getSessionGUID()end end,"upgradeallruins")</Command>
       <Active>Session</Active>
       <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
       <AudioEvent>200634</AudioEvent>
@@ -53,6 +53,7 @@
       <!-- if OIDlist[OID]==nil then -->
         <!-- if ts.Selection.Object.Attackable.CurHitPoints==0 and ts.Selection.Object.Renovatability.IsRenovatable then ## IsRenovatable checks if we can afford it (also returns true for not ruins) -->
           <!-- ts.Selection.UpgradeSelected(true)  ##   upgrade all of this kind on the whole island (mouse cursor changes to upgrade if not upgradeable, so we check if sth is selected and hitpoints to prevent it) -->
+          <!-- g_LTL_Serp.waitForTimeDelta(100) ## wait for the upgrade to take place , otherwise the next SetSelectNextRuin might select a building which is already going to be upgraded -->
         <!-- end -->
         <!-- OIDlist[OID] = sessionguid -->
       <!-- else ## then we checked all ruins -->
