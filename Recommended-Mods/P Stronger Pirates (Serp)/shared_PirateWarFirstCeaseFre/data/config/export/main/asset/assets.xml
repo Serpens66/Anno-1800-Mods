@@ -2,6 +2,20 @@
    
   <!-- CeaseFireDiscover -->
    
+   
+   <!-- Discover Pirates at the start of the game after 30 seconds. Then they will offer you the one time ceasefire for free -->
+   <!-- (is needed so they do not offer this free one much later after you finally discoverd them on unrevealed maps) -->
+   <!-- (AutomaticDiscovery for LaFortune is bad, because it seems to discover him already when unlocking the expedition to new world, -->
+    <!-- so way before you even enter the new world. So we should do the discovery instead via Trigger...) -->
+  <!-- <ModOp Type="merge" GUID='73,76' Path="/Values/Diplomacy">               -->
+    <!-- <AutomaticDiscovery> -->
+      <!-- <ProgressCheckEnabled>0</ProgressCheckEnabled> -->
+      <!-- <TimeCheckEnabled>1</TimeCheckEnabled> -->
+      <!-- <Time>30000</Time> -->
+    <!-- </AutomaticDiscovery> -->
+  <!-- </ModOp> -->
+   
+   
    <!-- bugfix_MP_LaFortune_Peace loads first -->
    
     <!-- Now change the Initial Treaty from humans with pirates to War instead 
@@ -40,177 +54,375 @@
     <!-- Human4 to Human7 are unused -->
   </ModOp>
   
-  <!-- Make Pirate offer CeaseFire for free 10 seconds after discover -->
-  <ModOp GUID="153271" Type="AddNextSibling">
-        <Asset>
-          <Template>Trigger</Template>
-          <Values>
-            <Standard>
-              <GUID>1500000035</GUID>
-              <Name>Free CeaseFire on Discover Harlow</Name>
-            </Standard>
-            <Trigger>
-              <TriggerCondition>
-                  <Template>ConditionIsDiscovered</Template>
-                  <Values>
-                    <Condition />
-                    <ParticipantRelation>
-                      <SourceIsOwner>1</SourceIsOwner>
-                      <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
-                    </ParticipantRelation>
-                    <ConditionIsDiscovered />
-                    <ConditionPropsNegatable />
-                  </Values>
-              </TriggerCondition>
-              <SubTriggers>
-                <Item>
-                  <SubTrigger>
-                    <Template>AutoCreateTrigger</Template>
-                    <Values>
-                      <Trigger>
-                        <TriggerCondition>
-                          <Template>ConditionDiplomaticState</Template>
-                          <Values>
-                            <Condition />
-                            <ConditionDiplomaticState>
-                                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
-                                <TargetParticipant2>Third_party_03_Pirate_Harlow</TargetParticipant2>
-                                <DesiredState>War</DesiredState>
-                            </ConditionDiplomaticState>
-                            <ConditionPropsNegatable />
-                          </Values>
-                        </TriggerCondition>
-                      </Trigger>
-                    </Values>
-                  </SubTrigger>
-                </Item>
-              </SubTriggers>
-              <TriggerActions>
-                <Item>
-                  <TriggerAction>
-                    <!-- need a delay here, otherwise it wont work, guess because intilaitation is not done yet at gamestart, whatever -->
-                    <Template>ActionDelayedActions</Template>
-                    <Values>
-                      <Action />
-                      <ActionDelayedActions>
-                        <ExecutionDelay>10000</ExecutionDelay>
-                        <DelayedActions>
-                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                          <Values>
-                            <ActionList>
-                              <Actions>
-                                <Item>
-                                  <Action>
-                                    <Template>ActionExecuteDiplomaticAction</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionExecuteDiplomaticAction>
-                                        <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
-                                        <DiplomaticSourceParticipant>Third_party_03_Pirate_Harlow</DiplomaticSourceParticipant>
-                                        <DiplomacyAction>RequestCeaseFire</DiplomacyAction>
-                                      </ActionExecuteDiplomaticAction>
-                                    </Values>
-                                  </Action>
-                                </Item>
-                              </Actions>
-                            </ActionList>
-                          </Values>
-                        </DelayedActions>
-                      </ActionDelayedActions>
-                    </Values>
-                  </TriggerAction>
-                </Item>
-              </TriggerActions>
-            </Trigger>
-          </Values>
-        </Asset>
-      </ModOp>
-    
-    
+    <!-- Make Pirate offer CeaseFire for free once after entering session -->
+     <!-- ActionExecuteDiplomaticAction can not be executed exactly at game start, so we need a delay of ~10 seconds, either via ConditionTimer or ActionDelayedActions -->
+    <!-- using 1500003867 from shared mod to test if the player owns at least one ship/kontor in the session of the pirate -->
     <ModOp GUID="153271" Type="AddNextSibling">
-        <Asset>
-          <Template>Trigger</Template>
-          <Values>
-            <Standard>
-              <GUID>1500000036</GUID>
-              <Name>Free CeaseFire on Discover LaFortune</Name>
-            </Standard>
-            <Trigger>
-              <TriggerCondition>
-                  <Template>ConditionIsDiscovered</Template>
+      <Asset>
+        <Template>Trigger</Template>
+        <Values>
+          <Standard>
+            <GUID>1500006111</GUID>
+            <Name>Discover Harlow</Name>
+          </Standard>
+          <Trigger>
+            <!-- <TriggerCondition> -->
+              <!-- <Template>ConditionIsParticipantInGame</Template> -->
+              <!-- <Values> -->
+                <!-- <Condition /> -->
+                <!-- <ConditionIsParticipantInGame> -->
+                  <!-- <InGameParticipant>Third_party_03_Pirate_Harlow</InGameParticipant> -->
+                <!-- </ConditionIsParticipantInGame> -->
+                <!-- <ConditionPropsNegatable /> -->
+              <!-- </Values> -->
+            <!-- </TriggerCondition> -->
+            <TriggerCondition>
+              <Template>ConditionPlayerCounter</Template>
+              <Values>
+                <Condition />
+                <ConditionPlayerCounter>
+                  <PlayerCounter>ObjectBuilt</PlayerCounter>
+                  <Context>100707</Context>
+                  <CounterAmount>1</CounterAmount>
+                  <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                  <CheckedParticipant>Third_party_03_Pirate_Harlow</CheckedParticipant>
+                  <CounterScope>Session</CounterScope>
+                  <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                  <CounterScopeContext>180023</CounterScopeContext>
+                </ConditionPlayerCounter>
+              </Values>
+            </TriggerCondition>
+            <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
                   <Values>
-                    <Condition />
-                    <ParticipantRelation>
-                      <SourceIsOwner>1</SourceIsOwner>
-                      <TargetParticipant>Third_party_04_Pirate_LaFortune</TargetParticipant>
-                    </ParticipantRelation>
-                    <ConditionIsDiscovered />
-                    <ConditionPropsNegatable />
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionPlayerCounter</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionPlayerCounter>
+                            <Context>1500003867</Context>
+                            <CounterAmount>1</CounterAmount>
+                            <CounterScope>Session</CounterScope>
+                            <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                            <CounterScopeContext>180023</CounterScopeContext>
+                          </ConditionPlayerCounter>
+                        </Values>
+                      </TriggerCondition>
+                      <SubTriggers>
+                        <Item>
+                          <SubTrigger>
+                            <Template>AutoCreateTrigger</Template>
+                            <Values>
+                              <Trigger>
+                                <TriggerCondition>
+                                  <Template>ConditionTimer</Template>
+                                  <Values>
+                                    <Condition />
+                                    <ConditionTimer>
+                                      <TimeLimit>30000</TimeLimit>
+                                    </ConditionTimer>
+                                  </Values>
+                                </TriggerCondition>
+                              </Trigger>
+                            </Values>
+                          </SubTrigger>
+                        </Item>
+                      </SubTriggers>
+                    </Trigger>
                   </Values>
-              </TriggerCondition>
-              <SubTriggers>
-                <Item>
-                  <SubTrigger>
-                    <Template>AutoCreateTrigger</Template>
-                    <Values>
-                      <Trigger>
-                        <TriggerCondition>
-                          <Template>ConditionDiplomaticState</Template>
-                          <Values>
-                            <Condition />
-                            <ConditionDiplomaticState>
-                                <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
-                                <TargetParticipant2>Third_party_04_Pirate_LaFortune</TargetParticipant2>
-                                <DesiredState>War</DesiredState>
-                            </ConditionDiplomaticState>
-                            <ConditionPropsNegatable />
-                          </Values>
-                        </TriggerCondition>
-                      </Trigger>
-                    </Values>
-                  </SubTrigger>
-                </Item>
-              </SubTriggers>
-              <TriggerActions>
-                <Item>
-                  <TriggerAction>
-                    <!-- need a delay here, otherwise it wont work, guess because intilaitation is not done yet at gamestart, whatever -->
-                    <Template>ActionDelayedActions</Template>
-                    <Values>
-                      <Action />
-                      <ActionDelayedActions>
-                        <ExecutionDelay>10000</ExecutionDelay>
-                        <DelayedActions>
-                          <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
-                          <Values>
-                            <ActionList>
-                              <Actions>
-                                <Item>
-                                  <Action>
-                                    <Template>ActionExecuteDiplomaticAction</Template>
-                                    <Values>
-                                      <Action />
-                                      <ActionExecuteDiplomaticAction>
-                                        <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
-                                        <DiplomaticSourceParticipant>Third_party_04_Pirate_LaFortune</DiplomaticSourceParticipant>
-                                        <DiplomacyAction>RequestCeaseFire</DiplomacyAction>
-                                      </ActionExecuteDiplomaticAction>
-                                    </Values>
-                                  </Action>
-                                </Item>
-                              </Actions>
-                            </ActionList>
-                          </Values>
-                        </DelayedActions>
-                      </ActionDelayedActions>
-                    </Values>
-                  </TriggerAction>
-                </Item>
-              </TriggerActions>
-            </Trigger>
-          </Values>
-        </Asset>
-      </ModOp>
+                </SubTrigger>
+              </Item>
+            </SubTriggers>
+            <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionDiscoverParticipant</Template>
+                  <Values>
+                    <Action />
+                    <ActionDiscoverParticipant>
+                      <UseProcessingSourceParticipant>1</UseProcessingSourceParticipant>
+                      <DiscoverTargetParticipant>Third_party_03_Pirate_Harlow</DiscoverTargetParticipant>
+                    </ActionDiscoverParticipant>
+                  </Values>
+                </TriggerAction>
+              </Item>
+            </TriggerActions>
+          </Trigger>
+        </Values>
+      </Asset>
+    
+      <Asset>
+        <Template>Trigger</Template>
+        <Values>
+          <Standard>
+            <GUID>1500006112</GUID>
+            <Name>Discover LaFortune</Name>
+          </Standard>
+          <Trigger>
+            <!-- ConditionIsParticipantInGame is unable to update on already registered trigger when New world is entered, therefore better check for the lighthouse building -->
+            <!-- <TriggerCondition> -->
+              <!-- <Template>ConditionIsParticipantInGame</Template> -->
+              <!-- <Values> -->
+                <!-- <Condition /> -->
+                <!-- <ConditionIsParticipantInGame> -->
+                  <!-- <InGameParticipant>Third_party_04_Pirate_LaFortune</InGameParticipant> -->
+                <!-- </ConditionIsParticipantInGame> -->
+                <!-- <ConditionPropsNegatable /> -->
+              <!-- </Values> -->
+            <!-- </TriggerCondition> -->
+            <TriggerCondition>
+              <Template>ConditionPlayerCounter</Template>
+              <Values>
+                <Condition />
+                <ConditionPlayerCounter>
+                  <PlayerCounter>ObjectBuilt</PlayerCounter>
+                  <Context>100708</Context>
+                  <CounterAmount>1</CounterAmount>
+                  <CheckSpecificParticipant>1</CheckSpecificParticipant>
+                  <CheckedParticipant>Third_party_04_Pirate_LaFortune</CheckedParticipant>
+                  <CounterScope>Session</CounterScope>
+                  <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                  <CounterScopeContext>180025</CounterScopeContext>
+                </ConditionPlayerCounter>
+              </Values>
+            </TriggerCondition>
+            <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionPlayerCounter</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionPlayerCounter>
+                            <Context>1500003867</Context>
+                            <CounterAmount>1</CounterAmount>
+                            <CounterScope>Session</CounterScope>
+                            <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                            <CounterScopeContext>180025</CounterScopeContext>
+                          </ConditionPlayerCounter>
+                        </Values>
+                      </TriggerCondition>
+                      <SubTriggers>
+                        <Item>
+                          <SubTrigger>
+                            <Template>AutoCreateTrigger</Template>
+                            <Values>
+                              <Trigger>
+                                <TriggerCondition>
+                                  <Template>ConditionTimer</Template>
+                                  <Values>
+                                    <Condition />
+                                    <ConditionTimer>
+                                      <TimeLimit>30000</TimeLimit>
+                                    </ConditionTimer>
+                                  </Values>
+                                </TriggerCondition>
+                              </Trigger>
+                            </Values>
+                          </SubTrigger>
+                        </Item>
+                      </SubTriggers>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+            </SubTriggers>
+            <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <Template>ActionDiscoverParticipant</Template>
+                  <Values>
+                    <Action />
+                    <ActionDiscoverParticipant>
+                      <UseProcessingSourceParticipant>1</UseProcessingSourceParticipant>
+                      <DiscoverTargetParticipant>Third_party_04_Pirate_LaFortune</DiscoverTargetParticipant>
+                    </ActionDiscoverParticipant>
+                  </Values>
+                </TriggerAction>
+              </Item>
+            </TriggerActions>
+          </Trigger>
+        </Values>
+      </Asset>
+      
+      
+      
+      <Asset>
+        <Template>Trigger</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000035</GUID>
+            <Name>Free CeaseFire on Discover Harlow</Name>
+          </Standard>
+          <Trigger>
+            <TriggerCondition>
+                <Template>ConditionIsDiscovered</Template>
+                <Values>
+                  <Condition />
+                  <ParticipantRelation>
+                    <SourceIsOwner>1</SourceIsOwner>
+                    <TargetParticipant>Third_party_03_Pirate_Harlow</TargetParticipant>
+                  </ParticipantRelation>
+                  <ConditionIsDiscovered />
+                  <ConditionPropsNegatable />
+                </Values>
+            </TriggerCondition>
+            <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionDiplomaticState</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionDiplomaticState>
+                              <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                              <TargetParticipant2>Third_party_03_Pirate_Harlow</TargetParticipant2>
+                              <DesiredState>War</DesiredState>
+                          </ConditionDiplomaticState>
+                          <ConditionPropsNegatable />
+                        </Values>
+                      </TriggerCondition>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+            </SubTriggers>
+            <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <!-- need a delay here, otherwise it wont work, guess because intilaitation is not done yet at gamestart, whatever -->
+                  <Template>ActionDelayedActions</Template>
+                  <Values>
+                    <Action />
+                    <ActionDelayedActions>
+                      <ExecutionDelay>10000</ExecutionDelay>
+                      <DelayedActions>
+                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                        <Values>
+                          <ActionList>
+                            <Actions>
+                              <Item>
+                                <Action>
+                                  <Template>ActionExecuteDiplomaticAction</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionExecuteDiplomaticAction>
+                                      <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
+                                      <DiplomaticSourceParticipant>Third_party_03_Pirate_Harlow</DiplomaticSourceParticipant>
+                                      <DiplomacyAction>RequestCeaseFire</DiplomacyAction>
+                                    </ActionExecuteDiplomaticAction>
+                                  </Values>
+                                </Action>
+                              </Item>
+                            </Actions>
+                          </ActionList>
+                        </Values>
+                      </DelayedActions>
+                    </ActionDelayedActions>
+                  </Values>
+                </TriggerAction>
+              </Item>
+            </TriggerActions>
+          </Trigger>
+        </Values>
+      </Asset>
+  
+  
+      <Asset>
+        <Template>Trigger</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000036</GUID>
+            <Name>Free CeaseFire on Discover LaFortune</Name>
+          </Standard>
+          <Trigger>
+            <TriggerCondition>
+                <Template>ConditionIsDiscovered</Template>
+                <Values>
+                  <Condition />
+                  <ParticipantRelation>
+                    <SourceIsOwner>1</SourceIsOwner>
+                    <TargetParticipant>Third_party_04_Pirate_LaFortune</TargetParticipant>
+                  </ParticipantRelation>
+                  <ConditionIsDiscovered />
+                  <ConditionPropsNegatable />
+                </Values>
+            </TriggerCondition>
+            <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionDiplomaticState</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionDiplomaticState>
+                              <SourceIsQuestOwner2>1</SourceIsQuestOwner2>
+                              <TargetParticipant2>Third_party_04_Pirate_LaFortune</TargetParticipant2>
+                              <DesiredState>War</DesiredState>
+                          </ConditionDiplomaticState>
+                          <ConditionPropsNegatable />
+                        </Values>
+                      </TriggerCondition>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+            </SubTriggers>
+            <TriggerActions>
+              <Item>
+                <TriggerAction>
+                  <!-- need a delay here, otherwise it wont work, guess because intilaitation is not done yet at gamestart, whatever -->
+                  <Template>ActionDelayedActions</Template>
+                  <Values>
+                    <Action />
+                    <ActionDelayedActions>
+                      <ExecutionDelay>10000</ExecutionDelay>
+                      <DelayedActions>
+                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                        <Values>
+                          <ActionList>
+                            <Actions>
+                              <Item>
+                                <Action>
+                                  <Template>ActionExecuteDiplomaticAction</Template>
+                                  <Values>
+                                    <Action />
+                                    <ActionExecuteDiplomaticAction>
+                                      <DiplomaticTargetUseProcessingParticipant>1</DiplomaticTargetUseProcessingParticipant>
+                                      <DiplomaticSourceParticipant>Third_party_04_Pirate_LaFortune</DiplomaticSourceParticipant>
+                                      <DiplomacyAction>RequestCeaseFire</DiplomacyAction>
+                                    </ActionExecuteDiplomaticAction>
+                                  </Values>
+                                </Action>
+                              </Item>
+                            </Actions>
+                          </ActionList>
+                        </Values>
+                      </DelayedActions>
+                    </ActionDelayedActions>
+                  </Values>
+                </TriggerAction>
+              </Item>
+            </TriggerActions>
+          </Trigger>
+        </Values>
+      </Asset>
+      
+      
+      
+    </ModOp>
     
     
     
