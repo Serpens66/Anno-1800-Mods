@@ -1,0 +1,154 @@
+<ModOps>
+    
+
+  
+  <!-- ########################################### -->
+  <!-- ########################################### -->
+  
+  <!-- Most Common Problem that this mod tries to solve/make less of a pain: -->
+   <!-- If one wants to apply global buffs with ActionBuff/AddBuff, they must be applied to every newly entered session again. -->
+   <!-- One could solve this by making a trigger that checks once for each Session eg. by ConditionActiveSession and hardcoding all known Session GUIDs here. -->
+    <!-- This should work fine for all the Session GUIDs you mentioned here and should be enough to execute this once per Session. -->
+   <!-- While this is the most efficient way, it can only support the sessions you explicit mentioned with GUID. It can not support other (mod-)sessions. -->
+    <!-- That is why many modders use SessionEnter instead, because this triggers everytime the user switches session and catches this way also unknown session GUIDs. -->
+    <!-- Downside is that it triggers everytime on switching session and depending on the number of buffs/the buff-targets this might lag a short time,  -->
+     <!-- which sucks if it happens on every session switching. -->
+    <!-- (You can also not use an SessionLoaded Event, because AddBuf only works if the user already visited the session or owns an object in it, which is not the case when SessionLoaded fires, especially if eg. AI made the session load, then the human may be far from entering that session) -->
+  
+  <!-- Since this one resets everytime the user loads a savegame, it also resets everytime the user changes mods. -->
+   <!-- so this means using this shared mod is easier to use to add global buffs than my OncePerSession_xml mod, which remembers if it already fired for a session forever -->
+  
+  
+  
+  <!-- HOW TO USE: xml code -->
+   <!-- add your actions you want to execute on first SessionEnter to 1500004530 this way: -->
+    <!-- (putting them into ResetTrigger, because this way the new actions added by your mod will directly be used (already registered triggers can not change code, but ResetTrigger will only get registered after main trigger is true)) -->
+    <!-- or check for ConditionEvent GUIDUnlocked 1500004530 in your own Condition -->
+
+	<!-- <ModOp Type="add" GUID="1500004530" Path="Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions"> -->
+    <!-- <Item> -->
+      <!-- <TriggerAction> -->
+        <!-- ... -->
+      <!-- </TriggerAction> -->
+    <!-- </Item> -->
+  <!-- </ModOp> -->
+  
+  
+  <!-- ########################################### -->
+  <!-- ########################################### -->
+  <!-- ########################################### -->
+  
+  <!-- Serp GUID 1500004530 -->
+  
+  <!-- Will get unlocked by lua everytime a session was entered the first time. (resets on savegame load in lua) -->
+   <!-- it will lock itself again directly after unlock and waits for his next unlock and so on -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004530</GUID>
+          <Name>Event: New Session Entered First Time since Loading Savegame</Name>
+        </Standard>
+        <Locked />
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500004530</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>300</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004530</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, just to be sure (in multiplayer it could be unlocked multiple times within miliseconds) -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>600</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions>
+                  <!-- other mods can add their actions here to be executed on Savegameloaded -->
+                  <!--  we add them to the ResetTrigger part, because this is only registered after main trigger is true, which means it will use the newest current code -->
+                   <!-- while the main trigger will keep the old code until reset -->
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+  
+  <!-- execute our lua script on every savegame loaded -->
+  <ModOp Type="add" GUID="1500004636" Path="Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/event_sessionentered.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+    
+    
+    
+    
+    
+</ModOps>

@@ -1,0 +1,343 @@
+<ModOps>
+    
+    <!-- Problems: -->
+    <!-- The category of a Propaganda article is automatically made based on the first ArticleEffect within ArticleEffects -->
+     <!-- (of if ArticleEffects is empty then the base ArticleEffect) -->
+    <!-- This is of course massive bullshit.. -->
+    <!-- These ArticleEffect are Enums, so limited. In NewspaperScene is then defined what text is displayed for this category/this effect -->
+    
+    <!-- And every category can only display 3 articles, one per ArticleStrength (if multiple , they overwrite each other) -->
+    
+    <!-- Although there is an ArticleEffect Enum for Anarchy, it does nothing and has not effect ingame. -->
+    <!-- Instead the game uses IsAnarchyArticle=1 to mark them regardless of their Effects as Anarchy Category. -->
+    <!-- The problem is, that this IsAnarchyArticle=1 has a hidden DLC Lock, artciles with this do not work in a game -->
+     <!-- from someone not owning the DLC (if DLC is owend, it works, even without Mercier in game)     -->
+    
+    <!-- einzige Lösung ist also als ersten Effect Anarchy einzutragen,  -->
+     <!-- die Scene zu füllen, -->
+      <!-- und dass auf der Karte dann nur einer der effekte angezeigt wird (weil insg. nur 2 angezeigt werden) -->
+       <!-- aber beim drüber hovern werden dann alle angezeigt. -->
+    
+    
+    <!-- allow anarchy newspaper article propganda buffs even without Mercier in game -->
+    <!-- they unlock with 300 workers -->
+    
+    <!-- Add new Assets for them -->
+    <!-- IsAnarchyArticle also blocks it if no DLC is owned, but I think it has no downside to remove it -->
+    <ModOp Type="AddNextSibling" GUID="111251">
+      <Asset>
+        <BaseAssetGUID>111241</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500006113</GUID>
+            <Name>Copy of Propaganda Anarchy RiotChance + Income</Name>
+          </Standard>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <NewspaperArticle>
+            <IsAnarchyArticle>0</IsAnarchyArticle>
+            <ArticleEffect>Anarchy</ArticleEffect>
+            <EffectValue>8</EffectValue>
+            <ArticleEffects>
+              <Item>
+                <ArticleEffect>Productivity</ArticleEffect>
+                <ArticleValue>20</ArticleValue>
+              </Item>
+              <Item>
+                <ArticleEffect>IllnessChanceGlobal</ArticleEffect>
+                <ArticleValue>30</ArticleValue>
+              </Item>
+              <!-- <Item> -->
+                <!-- <ArticleEffect>RiotChanceGlobal</ArticleEffect> -->
+                <!-- <ArticleValue>-90</ArticleValue> -->
+              <!-- </Item> -->
+              <!-- <Item> -->
+                <!-- <ArticleEffect>Income</ArticleEffect> -->
+                <!-- <ArticleValue>-10</ArticleValue> -->
+              <!-- </Item> -->
+            </ArticleEffects>
+          </NewspaperArticle>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionIsParticipantInGame</Template>
+              <Values>
+                <Condition />
+                <ConditionIsParticipantInGame>
+                  <InGameParticipant>Second_ai_11_Mercier</InGameParticipant>
+                </ConditionIsParticipantInGame>
+                <ConditionPropsNegatable>
+                  <NegateCondition>1</NegateCondition>
+                </ConditionPropsNegatable>
+              </Values>
+            </TriggerCondition>
+            <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionPlayerCounter</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionPlayerCounter>
+                            <PlayerCounter>PopulationByLevel</PlayerCounter>
+                            <Context>15000001</Context>
+                            <CounterAmount>300</CounterAmount>
+                          </ConditionPlayerCounter>
+                        </Values>
+                      </TriggerCondition>
+                      <SubTriggers>
+                        <Item>
+                          <SubTrigger>
+                            <Template>AutoCreateTrigger</Template>
+                            <Values>
+                              <Trigger>
+                                <TriggerCondition>
+                                  <Template>ConditionUnlockedList</Template>
+                                  <Values>
+                                    <Condition />
+                                    <ConditionUnlockList>
+                                      <UnlockNeededList>
+                                        <Item>
+                                          <UnlockNeeded>140596</UnlockNeeded>
+                                        </Item>
+                                      </UnlockNeededList>
+                                    </ConditionUnlockList>
+                                  </Values>
+                                </TriggerCondition>
+                              </Trigger>
+                            </Values>
+                          </SubTrigger>
+                        </Item>
+                      </SubTriggers>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+            </SubTriggers>
+          </Trigger>
+          <TriggerSetup>
+            <AutoSelfUnlock>1</AutoSelfUnlock>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          </TriggerSetup>
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>111250</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500006114</GUID>
+          </Standard>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <NewspaperArticle>
+            <IsAnarchyArticle>0</IsAnarchyArticle>
+            <ArticleEffect>Anarchy</ArticleEffect>
+            <EffectValue>8</EffectValue>
+            <ArticleEffects>
+              <Item>
+                <ArticleEffect>Productivity</ArticleEffect>
+                <ArticleValue>20</ArticleValue>
+              </Item>
+              <Item>
+                <ArticleEffect>IllnessChanceGlobal</ArticleEffect>
+                <ArticleValue>30</ArticleValue>
+              </Item>
+            </ArticleEffects>
+          </NewspaperArticle>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionIsParticipantInGame</Template>
+              <Values>
+                <Condition />
+                <ConditionIsParticipantInGame>
+                  <InGameParticipant>Second_ai_11_Mercier</InGameParticipant>
+                </ConditionIsParticipantInGame>
+                <ConditionPropsNegatable>
+                  <NegateCondition>1</NegateCondition>
+                </ConditionPropsNegatable>
+              </Values>
+            </TriggerCondition>
+            <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionPlayerCounter</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionPlayerCounter>
+                            <PlayerCounter>PopulationByLevel</PlayerCounter>
+                            <Context>15000001</Context>
+                            <CounterAmount>300</CounterAmount>
+                          </ConditionPlayerCounter>
+                        </Values>
+                      </TriggerCondition>
+                      <SubTriggers>
+                        <Item>
+                          <SubTrigger>
+                            <Template>AutoCreateTrigger</Template>
+                            <Values>
+                              <Trigger>
+                                <TriggerCondition>
+                                  <Template>ConditionUnlockedList</Template>
+                                  <Values>
+                                    <Condition />
+                                    <ConditionUnlockList>
+                                      <UnlockNeededList>
+                                        <Item>
+                                          <UnlockNeeded>140597</UnlockNeeded>
+                                        </Item>
+                                      </UnlockNeededList>
+                                    </ConditionUnlockList>
+                                  </Values>
+                                </TriggerCondition>
+                              </Trigger>
+                            </Values>
+                          </SubTrigger>
+                        </Item>
+                      </SubTriggers>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+            </SubTriggers>
+          </Trigger>
+          <TriggerSetup>
+            <AutoSelfUnlock>1</AutoSelfUnlock>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          </TriggerSetup>
+        </Values>
+      </Asset>
+      <Asset>
+        <BaseAssetGUID>111251</BaseAssetGUID>
+        <Values>
+          <Standard>
+            <GUID>1500006115</GUID>
+          </Standard>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <NewspaperArticle>
+            <IsAnarchyArticle>0</IsAnarchyArticle>
+            <ArticleEffect>Anarchy</ArticleEffect>
+            <EffectValue>8</EffectValue>
+            <ArticleEffects>
+              <Item>
+                <ArticleEffect>Workforce</ArticleEffect>
+                <ArticleValue>125</ArticleValue>
+                <ContextGuids>
+                  <Item>
+                    <Context>1010052</Context>
+                  </Item>
+                  <Item>
+                    <Context>1010115</Context>
+                  </Item>
+                  <Item>
+                    <Context>1010116</Context>
+                  </Item>
+                  <Item>
+                    <Context>1010117</Context>
+                  </Item>
+                  <Item>
+                    <Context>1010366</Context>
+                  </Item>
+                  <Item>
+                    <Context>1010367</Context>
+                  </Item>
+                  <Item>
+                    <Context>114340</Context>
+                  </Item>
+                  <Item>
+                    <Context>114341</Context>
+                  </Item>
+                </ContextGuids>
+              </Item>
+              <Item>
+                <ArticleEffect>NeedConsumption</ArticleEffect>
+                <ArticleValue>25</ArticleValue>
+              </Item>
+            </ArticleEffects>
+          </NewspaperArticle>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionIsParticipantInGame</Template>
+              <Values>
+                <Condition />
+                <ConditionIsParticipantInGame>
+                  <InGameParticipant>Second_ai_11_Mercier</InGameParticipant>
+                </ConditionIsParticipantInGame>
+                <ConditionPropsNegatable>
+                  <NegateCondition>1</NegateCondition>
+                </ConditionPropsNegatable>
+              </Values>
+            </TriggerCondition>
+            <SubTriggers>
+              <Item>
+                <SubTrigger>
+                  <Template>AutoCreateTrigger</Template>
+                  <Values>
+                    <Trigger>
+                      <TriggerCondition>
+                        <Template>ConditionPlayerCounter</Template>
+                        <Values>
+                          <Condition />
+                          <ConditionPlayerCounter>
+                            <PlayerCounter>PopulationByLevel</PlayerCounter>
+                            <Context>15000001</Context>
+                            <CounterAmount>300</CounterAmount>
+                          </ConditionPlayerCounter>
+                        </Values>
+                      </TriggerCondition>
+                    </Trigger>
+                  </Values>
+                </SubTrigger>
+              </Item>
+            </SubTriggers>
+          </Trigger>
+          <TriggerSetup>
+            <AutoSelfUnlock>1</AutoSelfUnlock>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          </TriggerSetup>
+        </Values>
+      </Asset>
+    </ModOp>
+    
+    <!-- <ModOp Type="merge" GUID="500045" Path="/Values/NewspaperScene/EffectVisualization"> -->
+      <!-- <Anarchy> -->
+        <!-- <ArticleValueText>10875</ArticleValueText> -->
+        <!-- <EffectDescription>22135</EffectDescription> -->
+        <!-- <EffectCategoryName>22135</EffectCategoryName> -->
+        <!-- <BackgroundImage>25966</BackgroundImage> -->
+        
+        <!-- <EffectName>10834</EffectName> -->
+        <!-- <ArticleValueText>10875</ArticleValueText> -->
+        <!-- <IconMap>500600</IconMap> -->
+        <!-- <EffectDescription>19843</EffectDescription> -->
+        <!-- <EffectCategoryName>21514</EffectCategoryName> -->
+        <!-- <BackgroundImage>25970</BackgroundImage> -->
+        <!-- <CategoryIcon>500636</CategoryIcon> -->
+      <!-- </Anarchy> -->
+    <!-- </ModOp> -->
+    
+    
+    <!-- Does not work if DLC is not owned (still locked and even lua command to unloack 111241 does not work) -->
+     <!-- so simply making a copy of the asset instead above -->
+    <!-- <ModOp Type="merge" Path="//Values[NewspaperArticle/IsAnarchyArticle='1']"> -->
+      <!-- <NewspaperArticle> -->
+        <!-- <IsAnarchyArticle>0</IsAnarchyArticle> -->
+      <!-- </NewspaperArticle> -->
+      <!-- <TriggerSetup> -->
+        <!-- <AutoRegisterTrigger>1</AutoRegisterTrigger> -->
+      <!-- </TriggerSetup> -->
+    <!-- </ModOp> -->
+     <!-- testen mit: ts.Newspaper.CreateNewspaper() -->
+      <!-- ts.Unlock.GetIsUnlocked(111241)  ts.Unlock.SetUnlockNet(111241) -->
+      
+
+</ModOps>

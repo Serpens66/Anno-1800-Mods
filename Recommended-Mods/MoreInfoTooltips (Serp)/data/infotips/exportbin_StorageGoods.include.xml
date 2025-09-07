@@ -20,7 +20,184 @@
   <ModOp Type="remove" Path="//InfoTipData[Guid='25000151']//InfoElement/InfoElement[Text/TextGUID='12725']/VisibilityElement/VisibilityElement[VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade Offer([RefGuid]) IsSellOnly]'] and VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade Offer([RefGuid]) IsBuyOrSell]'] and OperatorType/OperatorType='1']" />
   <!-- remove the condition to only display sell price if we passive sell the good -->
   <ModOp Type="remove" Path="//InfoTipData[Guid='25000151']//InfoElement/InfoElement[Text/TextGUID='12724']/VisibilityElement/VisibilityElement[VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade Offer([RefGuid]) IsBuyOnly]'] and VisibilityElement[Condition='[Area CurrentSelectedArea PassiveTrade Offer([RefGuid]) IsBuyOrSell]'] and OperatorType/OperatorType='1']" />
+  <!-- Also show BasePrice -->
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000151']/InfoElement/InfoElement[Text/TextGUID='2387']">
+    <InfoElement>
+      <ElementType>4</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[ProductAssetData([RefGuid]) IsValid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <Icon>
+        <IconGUID>1010017</IconGUID>
+        <Style />
+      </Icon>
+      <Text>
+        <TextGUID>7907</TextGUID>
+        <Style />
+      </Text>
+      <Value>
+        <Text>[ToolOneHelper ProductBasePrice([RefGuid])]</Text>
+        <Style />
+      </Value>
+      <WarningType />
+      <BackgroundType />
+    </InfoElement>
+  </ModOp>
   
+
+  <!-- also show baseprice for goods at traders, so you get an idea how good the price from the trader is compared to it -->
+  <!-- 25000084 ItemSocketInfotip -->
+  <!-- For whatever reason 25000084 is also used for hovering over normal goods in ship/in trading screen from others (despite the name). -->
+  <!-- And the "Handeln" part is not shown for goods, because it fails the IsItemRarityQuest-test, which looks like unintended bug to me. -->
+  <!-- When we reomve that check it is displayed for goods. But: -->
+  <!-- 1) showing the trading price for goods in a ship is not really needed (for traders it is) -->
+  <!-- 2) it is super difficult to display the correct price in all situations, based on active/passive current island or interacting island. -->
+  <!-- Therefore instead of "fixing" this IsItemRarityQuest Check, we will add below a new InfoElement for Goods -->
+   <!-- to show the BasePrice -->
+  
+  <!-- "Handeln"=2387 is only displayed for Items (because Goods fail IsItemRarityQuest) in 25000084, so display the ItemTradePrice as baseprice -->
+  <!-- Outcommented to not display ItemTradePrice (base price for item) because you never get this anyways, so it does not matter -->
+  <!-- <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000084']/InfoElement/InfoElement/InfoElement/InfoElement[Text/TextGUID='2387']"> -->
+    <!-- <InfoElement> -->
+      <!-- <ElementType>4</ElementType> -->
+      <!-- <VisibilityElement> -->
+        <!-- <ElementType> -->
+          <!-- <ElementType>2</ElementType> -->
+        <!-- </ElementType> -->
+        <!-- <ChildCount>1</ChildCount> -->
+        <!-- <VisibilityElement> -->
+          <!-- <ElementType> -->
+            <!-- <ElementType>2</ElementType> -->
+          <!-- </ElementType> -->
+          <!-- <OperatorType /> -->
+        <!-- </VisibilityElement> -->
+        <!-- <OperatorType /> -->
+      <!-- </VisibilityElement> -->
+      <!-- <Icon> -->
+        <!-- <IconGUID>1010017</IconGUID> -->
+        <!-- <Style /> -->
+      <!-- </Icon> -->
+      <!-- <Text> -->
+        <!-- <TextGUID>7907</TextGUID> -->
+        <!-- <Style /> -->
+      <!-- </Text> -->
+      <!-- <Value> -->
+        <!-- <Text>[ToolOneHelper ItemTradePrice([RefGuid])]</Text> -->
+        <!-- <Style /> -->
+      <!-- </Value> -->
+      <!-- <WarningType /> -->
+      <!-- <BackgroundType /> -->
+    <!-- </InfoElement> -->
+  <!-- </ModOp> -->
+  
+  <!-- add check to only display it for goods (has ProductCategory), not items -->
+  <!-- add a seperator after the Expedition infos -->
+  <ModOp Type="add" Path="//InfoTipData[Guid='25000084']/InfoElement/InfoElement[IconGUID='500385']/InfoElement[last()]">
+    <InfoElement>
+      <ElementType>6</ElementType>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <OperatorType />
+      </VisibilityElement>
+      <Text>
+        <Style />
+      </Text>
+    </InfoElement>
+  </ModOp>
+  <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000084']/InfoElement/InfoElement/InfoElement[InfoElement/Text/TextGUID='2387']">
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>1</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>1</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[ProductAssetData([RefGuid]) IsValid]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>5</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <TextGUID>2387</TextGUID>
+          <Style />
+        </Text>
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>1010017</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>7907</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <Text>[ToolOneHelper ProductBasePrice([RefGuid])]</Text>
+          <Style />
+        </Value>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>6</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Style />
+        </Text>
+      </InfoElement>
+    </InfoElement>
+    
+
+  </ModOp>
+
   
   
 </ModOps>

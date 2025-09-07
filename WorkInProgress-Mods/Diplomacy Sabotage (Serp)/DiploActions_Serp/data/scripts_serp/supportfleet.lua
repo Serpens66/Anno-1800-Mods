@@ -81,7 +81,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             if last_QID==nil then
               g_LTL_Serp.modlog("ERROR: Failed to find ActiveQuestInstances of Quest "..tostring(QuestDescriptionTextGUID),ModID)
             end
-            if requestsuccess then
+            if requestsuccess or last_QID==nil then
               g_LTL_Serp.start_thread("t_DoSupportFleet wait for owner change "..tostring(PID)..tostring(TargetPID)..tostring(fleetname),ModID,g_SupportFleet_Serp.t_DoSupportFleet,PID,TargetPID,IsThirdParty,last_QID,fleetname)
               g_LTL_Serp.modlog("_OnFleetRequested keep quest active "..tostring(QuestDescriptionTextGUID),ModID)
             elseif last_QID~=nil then -- only when found, we can abort it... if not found, it will always succeed... but I hope 2000 is enough to always find it..
