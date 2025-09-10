@@ -1,0 +1,1104 @@
+<ModOps>
+
+
+
+    
+    <!-- verwendet Serps GUIDS von 1500000100 bis 1500000214 (bis 1500000219 fuer diesen mod (1500000245 im Submod to remove AI lighthouse) freigehalten) -->
+    <!-- teilt GUIDrange mit InfluenceBuffs by Honor und shared_Honor Mod -->
+     <!-- 1500000121, 1500000122, 1500000123, 1500000124 sind wieder frei -->
+     <!-- 1500000166 bis 1500000167 sind auch wieder frei -->
+     
+     <!-- Nutzt ansonsten GUIDs 1500003001 bis 1500003499 (viel freigehalten, damit ich immer mal wieder mehr buffs zufügen kann, wenn mir welche einfallen)  -->
+      <!-- teils auch übergreifend in den anderen honor mods und 1500003001 bis 1500003052 (freigehalten bis einschließlich 1500003099) innerhalb des Passive Trading Mods -->
+
+
+  <!-- Handelsbuffs: -->
+   <!-- man könnte für sie als zusätliche unlock condition einbauen, dass man einen gewissen HandelsUmsatz gemacht haben muss (aus sicht des humans für sich selbst geprüft, also egal mit wem) -->
+    <!-- (oder wenn wir die buffs für jeden händler einzeln machen wollen, dann eben umsatz dieses händlers) -->
+
+  <!-- da es im Spiel durch Palast/Hacienda/Docklands eigentlich schon ziemlich viele ziemlich overpowered -->
+   <!-- möglichkeiten gibt, vllt statt weitere Buffs üer Ruhm freizuschalten, -->
+    <!-- stattdessen dafür sorgen, dass zb der Palast Ruhm kostet oderso? um den einsatz zu limiteren? -->
+    
+    
+    <!-- für sowas wie vergrößerter radius Öl/Gas kraftwerk/pumpe wo es keinen buff gibt sondern wir mit replaceguid arbeiten müssen: -->
+      <!-- Gebäude wie kurila es macht in Recipe Gebäude umwandeln, wo mann dann einfach ein rezept freischaltet -->
+       <!-- zu dem man wechseln kann -->
+     <!-- bzw. wenns einfach nur ein vergrößerter radius sein soll, dann ist Upgradable vermutlich sinnvoller! -->
+       <!-- und fürs upgrade braucht man einfach permits und diese bekommt man gegen ruhm? -->
+        <!-- wobei man das upgarde auch unlocken kann und dann kann man alle gebäude aufwerten ohne weiteren ruhm -->
+    
+    <!-- Items: -->
+      <!-- man könnte auch die meisten items zu beginn locken und über ruhm freischaltbar machen, sodass sie erst ab dann -->
+       <!-- bei händlern/quests/expeditionen auftauchen können. mpsste man mal gucken, obs bereits unlock tirgger nach fortschritt gibt, vemrutlich schon -->
+    
+    
+  <!-- wir können auch Frachtraum der schiffe erhöhen, da ActionSetObjectGUID scheinbar sehr gut funktioniert (durch eins mit mehr drachtraum ersetzen) -->
+   <!-- es behält aktuelle fracht und auch die Handelsroute bei! -->
+     <!-- (trifft aber keine schiffe die aktuell auf der weltkarte/Expedition sind) -->
+     <!-- und mit ReplaceAssemblyOptions die bauoptionen in werft ersetzen -->
+     <!-- wobei setguid kann durhcaus bei sovielen dingen in untersch. phasen zum crash führen... -->
+      <!-- also vllt. nur werft ändern, sodass es nur für neue schiffe gilt? -->
+       <!-- und vllt ne methode überlegen, wie man schiffe einzeln manuell nachrüsten kann... vllt verkaufen an nate und dieser gibt einem für -->
+        <!-- verkauf bestimmter schiffs guids dann per quest ein aufgewertests schiff. muss man nur gucken wie man klar macht, bei wlechen schiffen (nicht mod) das geht -->
+        <!-- falls ich mich dazu entscheide zeitgleich aufgewertete und nicht aufgewertete schiffe zu haben, dann evlt das schiffs icon markeiren, damit man sieht welche höheres stacklimit haben und welche nicht -->
+      <!-- Am Besten so machen, dass man zb 20 Ruhm für ein ItemWithUI zahlt (oder 2000 für 100 davon aufeinmal ist denke ich besser)  -->
+        <!-- und das muss dann auf Schiff und führt dann mit WhichPlayercondition checks ein lua script für diesen Spieler aus mit -->
+          <!-- session.getSelectedFactory():changeGUID(100439) um es in eine guid mit mehr stacklimit zu verwandeln -->
+          <!-- wobei wir davon in lua noch die schiffsguid überprüfen müssen, damit die richige zur richtigen aufgewertet wird. Es gibt nen exploit in COOP, weil dann wenn einer es startet uach die selection der anderen spieler umgewandelt wird, -->
+           <!-- aber das ist nicht so schlimm, wenn wir halt eh 100 der items geben und es vorgesehen ist, dass sie alle schiffe aufwerten. -->
+          <!-- (neue schiffe in der werft könnten wir dennoch direkt die pläne in werft austauschen) -->
+          <!-- ja ist mit ItemWithUI auf schiff denke ich schon am besten, Cargo des selected schiffs kann ich jetzt ja auch überprüfen mit helper nameable object -->
+        <!-- NEUE Option: -->
+         <!-- mit lua und projectileschuss können wir jetzt schiffe markieren, diese in lua finden und darauf changeguid anwenden. -->
+          <!-- könnte man zb in einem meuen Aufwertungsgebäude für Schiffe festsockeln womit man über die ganze karte auf eigene schiffe "schießen" kann. -->
+           <!-- und diese werden dann aufgewertet -->
+        <!-- Alternativ doch mit Selection und ThirdPartyButton Notification, wobei die notification zb über ein ItemWithUI getriggert wird -->
+         <!-- habe dabei das coop problem der selection gelöst und dabei würde dann nur die aktuelle selection aufgewertet -->
+    
+    <!-- radius von public buildings erhöhen, sollte über buff gehen -->
+    
+   
+   <!-- Info Merchant buff: -->
+   <!-- ActiveTradePriceInPercent machen wir nicht, weils nur aktiv käufe sind, und gerade aktiv wollen wir ja reduzieren, eher passivhandel verbessern. -->
+   <!-- PassiveTradeGoodGenUpgrade (chance auf belohnung bei jedem Trade) könnte man theoretisch nutzen, kann auch beliebigen rewardpool nehmen ,also auch Geld oder items, -->
+     <!-- aber mir gefällt nicht, dass das unabhängig von der handelsmenge ist. -->
+   <!-- .. -->
+   <!-- TradeMoneEarned testen ob man damit eine art rabattsystem ähnlich wie ActiveTradePriceInPercent aufbauen kann ,was aber für alles gilt, auch verkauf und auch passiv -->
+    <!-- problem dabei wird sein, dass wenn ich sage "verkaufe waren im wert von 10k dann bekommst du 1000" (also insgt. 10% bessere preise), -->
+     <!-- dann gibt es dennoch nur 1k wenn man waren im wert von 50k aufeinmal verkauft, weil der trigger halt nur einmal imselben frame ausgelöst werden kann. -->
+     <!-- daher wäre das bestmögliche den triggerwert recht hoch zu stzen und ans progresslevel anzupassen -->
+     <!-- TESTEN ob wir uns nicht doch in PaMSyTrade / ActiveTradeConfirmation (bzw passive) reinhacken können. -->
+      <!-- problem ist natürlich, dass diese notification nur einmal angezeigt wird und die reputation darin aufaddiert ist. -->
+       <!-- dh sich in die notificationanzeige zu hacken findet nicht raus wieoft rep nun aufaddiert wurde. -->
+      <!-- aber in ActiveTradeConfirmation steht drin: IsUnique , vllt wird es nicht aufaddiert, bzw. jedes auslösen des triggeramounts, -->
+       <!-- dann eine separate notification geschickt, dann würde reinhacken funktionieren (am besten über UnlockAsset innerhalb ActiveTradeConfirmation, evlt geht das sogar ohne IsUnique zu entfernen) -->
+      <!-- NEIN geht nicht, das beste ist dann nur happy hour Quest, dass man 100k verdienen soll dann bekommt man 10k, oder eben 100k ausgeben -->
+    <!-- .. -->
+    <!-- Die Produktion der merchants/deren Angebot beeinflussen geht ingame leider garnicht. Einiges versucht.: -->
+    <!-- - Warenangebot/Produktion erweitern? geht nicht direkt per code. -->
+       <!-- aber vllt weiteren 3rd party auf archibalds insel ein gebäude geben, der eigene produktion hat und nach erfoschung dann handelsvertrag mit spieler hat. -->
+        <!-- nachteil dabei wäre, dass es nicht in passivhandel mit eingeht. (müssten dem auch n handelschiff geben, aber das würde zu voll... wobei wir ihm 0 kaufbudget geben könnten, sodass er nur seine eigene produktion verkauft)  -->
+         <!-- sehr kompliziert... -->
+          <!-- einfach nur: -->
+           <!-- <ModOp Type="replace" GUID='101118' Path="/self::node()/Template"> -->
+             <!-- <BaseAssetGUID>100680</BaseAssetGUID> -->
+           <!-- </ModOp> -->
+           <!-- um dort auch handeln zu können geht nicht, es verbuggt das gesamte aktive handeln. -->
+        <!-- Alternativ ein produktionsgebäude erstellen, was ohne straßenanbindung direkt ins insellager produziert und das archibald geben, sobald buff erforscht wurde? -->
+         <!-- das wäre dann allerdings global für alle spieler, aber auch für passivhandel. -->
+         <!-- GEHT NICHT , produktion des gebäudes wird archibalds kontor nicht gutgeschrieben -->
+        <!-- NICHT MACHEN: ist zu kompliziert und ich denke wenn man den mod "merchants produce session goods" dazu nimmt, dann ist es schon ausreichend gut, -->
+         <!-- wenn man den passivhandel stärkt (durch die Handelsmengenerhöhung) -->
+   <!-- .. -->
+   <!-- In einem anderen Mod "QuestsInsteadPreferred" werde ich Quests für lukrative Handelsgeschäfte einbauen und evlt auch sowas wie globale Happy Hour. -->
+    <!-- also eher diese beiden Mods verbinden, dass wenn man den Merchantbuff hat, dass man solche guten Angebote häufiger bekommt -->
+   
+   
+
+
+   
+   
+
+  <!-- Buffs zufügen: -->
+  <!-- (siehe auch shared_Honor) -->
+  <!-- - militärschiffe speed -->
+  <!-- - frachtverlangsamung/schadenverlangsamumg reduziert (alle schiffe) -->
+  <!-- - expansion buff auch in arktis+enbesa (evlt nur halb so viel) -->
+  <!-- schiffe mehr stacklimit in slots? sehr aufwendig -->
+  <!-- schiffe der neutralen händler austauschen -->
+    <!-- mit ConditionObjectPosition tauschen wir das schiff immer dann aus, wenns vor einem kontor von jemanden mit buff ist (wobei wir KI den Buff garnicht geben, weil die nicht viel mit 3rd handeln soll) -->
+      <!-- auch LoadingTime könnte verschnellert werden -->
+    <!-- progresslevel hat damit dann in erster linie einfluss auf die geschwindigkeit der schiffe -->
+    
+    <!-- man könnte PassiveTradeFeature/PriceFactors ThirdParty <GlobalProductSellPriceFactor>2</GlobalProductSellPriceFactor> auf zb 2.2 erhöhen (von *2) -->
+      <!-- und mit merchant-attainemnt bekommen alle schiffe mit globalem buff dann ActiveTradePriceInPercent um vllt auf *1.8Basispreis insg. zu kommen (vanilla ist *2) -->
+     <!-- wobei, wirkt ActiveTradePriceInPercent auch bei second und 2st party? falls ja, müsste man den preis da evtl auch erhöhen? -->
+      <!-- wobei was passiert eig. wenn ein human mit 100% ActiveTradePriceInPercent bei einem anderen human einkauft? -->
+       <!-- zahlt er dann garnicht und der andere human bekommt nichts, oder wie ist das? -->
+    
+        
+    <!-- Anstatt die buffs mit höherem level nur stärker zu machen, -->
+      <!-- könnte man stattdessen/zusätzlich auch die EffectTargets erhöhen. -->
+    <!-- zb der LoadingSpeed buff kann auf stufe 3 dann zb. auch LoadingPiers treffen, während er vorher nur schiffe trifft oderso -->
+     
+     
+    <!-- manche buffs könnte man auch zeitlich befristen (BuffTimeout), dafür sind sie stärker? -->
+        
+        
+        
+        
+    <!-- add MetaBuffHandler to merchants, so they can receive global buffs -->
+    <ModOp Type="merge" GUID='45,46,77,78,76,73,29,237,119051' Path="/Values">
+      <MetaBuffHandler />
+    </ModOp>
+        
+        
+    <!--
+    ########################################################################################################################################################### -->
+    <!-- add dummy ships that representate the different buffs (categories, each 3
+    buff-levels) you can get -->
+    <!--
+    ########################################################################################################################################################### -->
+    <ModOp GUID="114166" Type="addNextSibling">
+
+      <!-- MLogistic -->
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000112</GUID>
+            <Name>Naval Logistics Buff Mod 1</Name>
+            <IconFilename>data/honor_graphics_serp/icons/hourglass_bronce.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>119392</Ingredient>
+                <Amount>3000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>300000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1500000205</GUID>
+              </Item>
+            </EffectTargets>
+          </ItemEffect>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000113</GUID>
+            <Name>Naval Logistics Buff Mod 2</Name>
+            <IconFilename>data/honor_graphics_serp/icons/hourglass_silver.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>119392</Ingredient>
+                <Amount>4500</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>600000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1500000206</GUID>
+              </Item>
+            </EffectTargets>
+          </ItemEffect>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500000114</GUID>
+            <Name>Naval Logistics Buff Mod 3</Name>
+            <IconFilename>data/honor_graphics_serp/icons/hourglass_gold.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>119392</Ingredient>
+                <Amount>20000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>900000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1500000207</GUID>
+              </Item>
+              <Item>
+                <GUID>1500003108</GUID>
+              </Item>
+            </EffectTargets>
+          </ItemEffect>
+        </Values>
+      </Asset>
+      
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500003110</GUID>
+            <Name>MilitarySpeed Buff Mod 1</Name>
+            <IconFilename>data/honor_graphics_serp/icons/icon_buff_speedmilitary_bronce.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>119392</Ingredient>
+                <Amount>3000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>300000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1500003113</GUID>
+              </Item>
+            </EffectTargets>
+          </ItemEffect>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500003111</GUID>
+            <Name>MilitarySpeed Buff Mod 2</Name>
+            <IconFilename>data/honor_graphics_serp/icons/icon_buff_speedmilitary_silver.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>119392</Ingredient>
+                <Amount>4500</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>600000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1500003114</GUID>
+              </Item>
+            </EffectTargets>
+          </ItemEffect>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500003112</GUID>
+            <Name>MilitarySpeed Buff Mod 3</Name>
+            <IconFilename>data/honor_graphics_serp/icons/icon_buff_speedmilitary_gold.png</IconFilename>
+            <InfoDescription>22076</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>119392</Ingredient>
+                <Amount>20000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>900000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1500003115</GUID>
+              </Item>
+            </EffectTargets>
+          </ItemEffect>
+        </Values>
+      </Asset>
+
+    </ModOp>
+    
+  <!-- The merchants buff makes only sense together with my BT Passive Trading mod, so wont be ingame without that mod More_Passive_Trade_Budget_Plus_Serp -->
+  <Group Condition="#More_Passive_Trade_Budget_Plus_Serp">
+    <ModOp GUID="114166" Type="addNextSibling">
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500003100</GUID>
+            <Name>Merchant Buff Mod 1</Name>
+            <IconFilename>data/honor_graphics_serp/icons/lily_bronce.png</IconFilename>
+            <InfoDescription>1500003070</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>119392</Ingredient>
+                <Amount>3000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>300000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>0</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1500003103</GUID>
+              </Item>
+            </EffectTargets>
+          </ItemEffect>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500003101</GUID>
+            <Name>Merchant Buff Mod 2</Name>
+            <IconFilename>data/honor_graphics_serp/icons/lily_silver.png</IconFilename>
+            <InfoDescription>1500003071</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>119392</Ingredient>
+                <Amount>4500</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>600000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1500003104</GUID>
+              </Item>
+            </EffectTargets>
+          </ItemEffect>
+        </Values>
+      </Asset>
+      <Asset>
+        <Template>ObjectDummyWithOwner_BuildInShipyard</Template>
+        <Values>
+          <Standard>
+            <GUID>1500003102</GUID>
+            <Name>Merchant Buff Mod 3</Name>
+            <IconFilename>data/honor_graphics_serp/icons/lily_gold.png</IconFilename>
+            <InfoDescription>1500003072</InfoDescription>
+          </Standard>
+          <Cost>
+            <Costs>
+              <Item>
+                <Ingredient>119392</Ingredient>
+                <Amount>20000</Amount>
+              </Item>
+            </Costs>
+            <InfluenceCostType>None</InfluenceCostType>
+          </Cost>
+          <Craftable>
+            <CraftingTime>900000</CraftingTime>
+          </Craftable>
+          <Locked>
+            <DefaultLockedState>1</DefaultLockedState>
+          </Locked>
+          <BuildPermit>
+            <VisibleWithoutPermits>1</VisibleWithoutPermits>
+          </BuildPermit>
+          <ItemEffect>
+            <EffectTargets>
+              <Item>
+                <GUID>1500003105</GUID>
+              </Item>
+            </EffectTargets>
+          </ItemEffect>
+        </Values>
+      </Asset>
+    </ModOp>
+  </Group>
+
+
+  <ModOp Type="addNextSibling" GUID="191451">
+    <!-- the stages have different targets too. first is only tradeships and trade airships. seond is all ships and all airships. third is all ships+aisrhsip and all loadingpiers+kontors. -->
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000205</GUID>
+          <Name>LoadingSpeedBuff1</Name>
+          <IconFilename>data/honor_graphics_serp/icons/hourglass_bronce.png</IconFilename>
+          <InfoDescription>22076</InfoDescription>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>193982</GUID>
+            </Item>
+            <Item>
+              <GUID>7087</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <TradeShipUpgrade>
+          <LoadingSpeedUpgrade>
+            <Value>15</Value>
+            <Percental>1</Percental>
+          </LoadingSpeedUpgrade>
+        </TradeShipUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000206</GUID>
+          <Name>LoadingSpeedBuff2</Name>
+          <IconFilename>data/honor_graphics_serp/icons/hourglass_silver.png</IconFilename>
+          <InfoDescription>22076</InfoDescription>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1512</GUID>
+            </Item>
+            <Item>
+              <GUID>4146</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <TradeShipUpgrade>
+          <LoadingSpeedUpgrade>
+            <Value>25</Value>
+            <Percental>1</Percental>
+          </LoadingSpeedUpgrade>
+        </TradeShipUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000207</GUID>
+          <Name>LoadingSpeedBuff3</Name>
+          <IconFilename>data/honor_graphics_serp/icons/hourglass_gold.png</IconFilename>
+          <InfoDescription>22076</InfoDescription>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1512</GUID>
+            </Item>
+            <Item>
+              <GUID>4146</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <TradeShipUpgrade>
+          <LoadingSpeedUpgrade>
+            <Value>25</Value>
+            <Percental>1</Percental>
+          </LoadingSpeedUpgrade>
+        </TradeShipUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003108</GUID>
+          <Name>LoadingSpeedBuff3 Piers</Name>
+          <IconFilename>data/honor_graphics_serp/icons/hourglass_gold.png</IconFilename>
+          <InfoDescription>22076</InfoDescription>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>193897</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <PierUpgrade>
+          <PierSpeedUpgrade>
+            <Value>25</Value>
+            <Percental>1</Percental>
+          </PierSpeedUpgrade>
+        </PierUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    
+    <!-- für 3rd party -->
+    <!-- wird entweder durch merchant attainment verteilt, oder wenn passive trading nicht aktiv, dann durch iwas anderes. -->
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003103</GUID>
+          <Name>MerchantStorageBuff1</Name>
+          <IconFilename>data/honor_graphics_serp/icons/lily_bronce.png</IconFilename>
+          <InfoDescription>1500003070</InfoDescription>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500003106</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <WarehouseUpgrade>
+          <StorageCapacityModifier>50</StorageCapacityModifier>
+        </WarehouseUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003104</GUID>
+          <Name>MerchantStorageBuff2</Name>
+          <IconFilename>data/honor_graphics_serp/icons/lily_silver.png</IconFilename>
+          <InfoDescription>1500003071</InfoDescription>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500003106</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <WarehouseUpgrade>
+          <StorageCapacityModifier>150</StorageCapacityModifier>
+        </WarehouseUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003105</GUID>
+          <Name>MerchantStorageBuff3</Name>
+          <IconFilename>data/honor_graphics_serp/icons/lily_gold.png</IconFilename>
+          <InfoDescription>1500003072</InfoDescription>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1500003106</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <WarehouseUpgrade>
+          <StorageCapacityModifier>350</StorageCapacityModifier>
+        </WarehouseUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003113</GUID>
+          <Name>MilitarySpeedBuff1</Name>
+          <IconFilename>data/honor_graphics_serp/icons/icon_buff_speedmilitary_bronce.png</IconFilename>
+          <InfoDescription>22076</InfoDescription>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>191458</GUID>
+            </Item>
+            <Item>
+              <GUID>4148</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>7</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+        </VehicleUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003114</GUID>
+          <Name>MilitarySpeedBuff2</Name>
+          <IconFilename>data/honor_graphics_serp/icons/icon_buff_speedmilitary_silver.png</IconFilename>
+          <InfoDescription>22076</InfoDescription>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>191458</GUID>
+            </Item>
+            <Item>
+              <GUID>4148</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>15</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+        </VehicleUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003115</GUID>
+          <Name>MilitarySpeedBuff3</Name>
+          <IconFilename>data/honor_graphics_serp/icons/icon_buff_speedmilitary_gold.png</IconFilename>
+          <InfoDescription>22076</InfoDescription>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>191458</GUID>
+            </Item>
+            <Item>
+              <GUID>4148</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Locked />
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>25</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+        </VehicleUpgrade>
+        <Buff />
+      </Values>
+    </Asset>
+    
+    
+  </ModOp>
+
+  <!-- Add the buffs properties to these dummy ships, -->
+   <!-- so our modified tooltip can automatically display them -->
+  <!-- no longer needed, since we added the buff guid directly as ItemEffect/EffectTargets in the DummyShip -->
+  
+  
+  <!-- <ModOp Type="add" GUID="1500000112" Path="/Values" -->
+    <!-- Condition="!/Values/ItemEffect" -->
+    <!-- Content="@1500000205/ItemEffect" /> -->
+  <!-- <ModOp Type="add" GUID="1500000112" Path="/Values" -->
+    <!-- Condition="!/Values/TradeShipUpgrade" -->
+    <!-- Content="@1500000205/TradeShipUpgrade" /> -->
+    <!-- <ModOp Type="add" GUID="1500000113" Path="/Values" -->
+    <!-- Condition="!/Values/ItemEffect" -->
+    <!-- Content="@1500000206/ItemEffect" /> -->
+  <!-- <ModOp Type="add" GUID="1500000113" Path="/Values" -->
+    <!-- Condition="!/Values/TradeShipUpgrade" -->
+    <!-- Content="@1500000206/TradeShipUpgrade" /> -->
+  <!-- <ModOp Type="add" GUID="1500000114" Path="/Values" -->
+    <!-- Condition="!/Values/ItemEffect" -->
+    <!-- Content="@1500000207/ItemEffect" /> -->
+  <!-- <ModOp Type="add" GUID="1500000114" Path="/Values" -->
+    <!-- Condition="!/Values/TradeShipUpgrade" -->
+    <!-- Content="@1500000207/TradeShipUpgrade" /> -->
+    
+  <!-- <ModOp Type="add" GUID="1500000114" Path="/Values/ItemEffect/EffectTargets" -->
+    <!-- Content="@1500003108/ItemEffect/EffectTargets/Item" /> -->
+  <!-- <ModOp Type="add" GUID="1500000114" Path="/Values" -->
+    <!-- Condition="!/Values/PierUpgrade" -->
+    <!-- Content="@1500003108/PierUpgrade" /> -->
+  
+  <!-- <Group Condition="#More_Passive_Trade_Budget_Plus_Serp"> -->
+    <!-- <ModOp Type="add" GUID="1500003100" Path="/Values" -->
+      <!-- Condition="!/Values/ItemEffect" -->
+      <!-- Content="@1500003103/ItemEffect" /> -->
+    <!-- <ModOp Type="add" GUID="1500003100" Path="/Values" -->
+      <!-- Condition="!/Values/WarehouseUpgrade" -->
+      <!-- Content="@1500003103/WarehouseUpgrade" /> -->
+    <!-- <ModOp Type="add" GUID="1500003101" Path="/Values" -->
+      <!-- Condition="!/Values/ItemEffect" -->
+      <!-- Content="@1500003104/ItemEffect" /> -->
+    <!-- <ModOp Type="add" GUID="1500003101" Path="/Values" -->
+      <!-- Condition="!/Values/WarehouseUpgrade" -->
+      <!-- Content="@1500003104/WarehouseUpgrade" /> -->
+    <!-- <ModOp Type="add" GUID="1500003102" Path="/Values" -->
+      <!-- Condition="!/Values/ItemEffect" -->
+      <!-- Content="@1500003105/ItemEffect" /> -->
+    <!-- <ModOp Type="add" GUID="1500003102" Path="/Values" -->
+      <!-- Condition="!/Values/WarehouseUpgrade" -->
+      <!-- Content="@1500003105/WarehouseUpgrade" /> -->
+  <!-- </Group> -->
+  
+  <!-- <ModOp Type="add" GUID="1500003110" Path="/Values" -->
+    <!-- Condition="!/Values/ItemEffect" -->
+    <!-- Content="@1500003113/ItemEffect" /> -->
+  <!-- <ModOp Type="add" GUID="1500003110" Path="/Values" -->
+    <!-- Condition="!/Values/VehicleUpgrade" -->
+    <!-- Content="@1500003113/VehicleUpgrade" /> -->
+  <!-- <ModOp Type="add" GUID="1500003111" Path="/Values" -->
+    <!-- Condition="!/Values/ItemEffect" -->
+    <!-- Content="@1500003114/ItemEffect" /> -->
+  <!-- <ModOp Type="add" GUID="1500003111" Path="/Values" -->
+    <!-- Condition="!/Values/VehicleUpgrade" -->
+    <!-- Content="@1500003114/VehicleUpgrade" /> -->
+  <!-- <ModOp Type="add" GUID="1500003112" Path="/Values" -->
+    <!-- Condition="!/Values/ItemEffect" -->
+    <!-- Content="@1500003115/ItemEffect" /> -->
+  <!-- <ModOp Type="add" GUID="1500003112" Path="/Values" -->
+    <!-- Condition="!/Values/VehicleUpgrade" -->
+    <!-- Content="@1500003115/VehicleUpgrade" /> -->
+  
+
+
+  <!-- ########################################################################################################################################################### -->
+  <!-- use a shipyard like building, where we can obtain the influence buffs instead via dummy ships -->
+
+
+  <!-- adding it to 1500000200 instead 1500000201 just to not need to build 2 buildings -->
+  <ModOp Type="add" GUID="1500000200" Path="/Values/Shipyard/AssemblyOptions">
+    <Item>
+      <Vehicle>1500000112</Vehicle>
+    </Item>
+    <Item>
+      <Vehicle>1500000113</Vehicle>
+    </Item>
+    <Item>
+      <Vehicle>1500000114</Vehicle>
+    </Item>
+    <Item>
+      <Vehicle>1500003110</Vehicle>
+    </Item>
+    <Item>
+      <Vehicle>1500003111</Vehicle>
+    </Item>
+    <Item>
+      <Vehicle>1500003112</Vehicle>
+    </Item>
+  </ModOp>
+  <Group Condition="#More_Passive_Trade_Budget_Plus_Serp">
+    <ModOp Type="add" GUID="1500000200" Path="/Values/Shipyard/AssemblyOptions">
+      <Item>
+        <Vehicle>1500003100</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500003101</Vehicle>
+      </Item>
+      <Item>
+        <Vehicle>1500003102</Vehicle>
+      </Item>
+    </ModOp>
+  </Group>
+    
+
+    
+  <!-- add start permits -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500000154</GUID>
+          <Name>distribute start permits</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <Condition />
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000112</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000113</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500000114</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500003100</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500003101</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500003102</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500003110</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500003111</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionAddResource</Template>
+                <Values>
+                  <Action />
+                  <ActionAddResource>
+                    <Resource>1500003112</Resource>
+                    <ResourceAmount>1</ResourceAmount>
+                  </ActionAddResource>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup />
+      </Values>
+    </Asset>      
+  </ModOp>
+  
+  <ModOp Type="AddNextSibling" GUID="190041">
+    <Asset>
+      <Template>ItemEffectTargetPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003106</GUID>
+          <Name>All Main Merchant Kontors</Name>
+        </Standard>
+        <ItemEffectTargetPool>
+          <EffectTargetGUIDs>
+            <Item>
+              <GUID>100680</GUID>
+            </Item>
+            <Item>
+              <GUID>100681</GUID>
+            </Item>
+            <Item>
+              <GUID>100683</GUID>
+            </Item>
+            <Item>
+              <GUID>100685</GUID>
+            </Item>
+            <Item>
+              <GUID>100686</GUID>
+            </Item>
+            <Item>
+              <GUID>101117</GUID>
+            </Item>
+            <Item>
+              <GUID>119409</GUID>
+            </Item>
+            <Item>
+              <GUID>100682</GUID>
+            </Item>
+            <Item>
+              <GUID>116035</GUID>
+            </Item>
+            
+            <Item>
+              <GUID>1500000200</GUID>
+            </Item>
+            <Item>
+              <GUID>1500000201</GUID>
+            </Item>
+          </EffectTargetGUIDs>
+        </ItemEffectTargetPool>
+      </Values>
+    </Asset>
+  
+  </ModOp>
+  
+  <!-- to display buffs at the buildings -->
+  <ModOp Type="add" GUID="193897,1512,4146,191458"
+    Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs">
+    <Item>
+      <GUID>1500000200</GUID>
+    </Item>
+    <Item>
+      <GUID>1500000201</GUID>
+    </Item>
+  </ModOp>
+  
+  
+  
+  <Include File="./BuffsBought.include.xml" />
+  <Include File="./BuffsUnlock.include.xml" />
+  <Include File="./BuffsAI.include.xml" />
+  <Include File="./BuffsReapplySession.include.xml" />
+  
+  <!-- enable this line for testmode, eg. fast/cheap -->
+  <!-- <Include File="./TestMode.include.xml" /> -->
+  
+  <!-- Add flagship to All Wooden-Hulled Ships 1398, so it is automatically also included in all ships for combat effects 1512 -->
+  <ModOp Type="add" GUID='1398' Path="/Values/ItemEffectTargetPool/EffectTargetGUIDs"
+    Condition="!/Values/ItemEffectTargetPool/EffectTargetGUIDs/Item[GUID='101121']">
+    <Item>
+      <GUID>101121</GUID>
+    </Item>
+  </ModOp>
+  
+
+
+</ModOps>

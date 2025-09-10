@@ -1,6 +1,14 @@
 <ModOps>
     <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
 
+  <!-- new better usage: -->
+   <!-- Add ItemEffect/EffectTargets list to your DummyShip and as GUID in this list use the Buff Assets you want to be shown. -->
+    <!-- make sure your Buff assets have at least 1 EffecTTarget defined themself, so my code is able to identfy them as buff asset -->
+  
+  <!-- old usage (still works): -->
+   <!-- - add ItemEffect/EffectTargets list to your DummyShip and as GUID in this list use the Targets the buff should hit -->
+   <!-- - copy all buff effects from the buff asset into your DummyShip Asset -->
+  
   <!-- change tooltip 500057 from hovering over buildable ships in shipyard, -->
    <!-- to display our buffs if the "ship" has EffecTTargets defined. -->
    
@@ -42,14 +50,6 @@
           <ElementType>2</ElementType>
         </ElementType>
         <ChildCount>2</ChildCount>
-        <!-- <VisibilityElement> -->
-          <!-- <ElementType> -->
-            <!-- <ElementType>1</ElementType> -->
-          <!-- </ElementType> -->
-          <!-- <CompareOperator /> -->
-          <!-- <ResultType /> -->
-          <!-- <Condition>[Unlock IsUnlocked([RefGuid])]</Condition> -->
-        <!-- </VisibilityElement> -->
         <VisibilityElement>
           <ElementType>
             <ElementType>1</ElementType>
@@ -87,6 +87,7 @@
         </Text>
         <BackgroundType />
       </InfoElement>
+      <!-- new: First EffecTTarget is a Buff asset, then display his buffs/EffecTTarget not the one from the DummyShip -->
       <InfoElement>
         <ElementType>8</ElementType>
         <ChildCount>2</ChildCount>
@@ -105,7 +106,103 @@
             <ResultType>
               <ResultType>1</ResultType>
             </ResultType>
-            <Condition>[ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) COUNT]</Condition>
+            <Condition>[ToolOneHelper ItemOrBuffEffectTargets([ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) AT(0)]) COUNT]</Condition>
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <InfoElement>
+          <ElementType>7</ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <InfoElement>
+            <ElementType>6</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <Text>
+              <Style />
+            </Text>
+          </InfoElement>
+          <InfoElement>
+            <ElementType>4</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <Icon>
+              <IconText>[AssetData([ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) AT(#index0#)]) Icon]</IconText>
+              <Style />
+            </Icon>
+            <Text>
+              <Text>[AssetData([ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) AT(#index0#)]) Text]</Text>
+              <Style />
+            </Text>
+            <BackgroundType />
+          </InfoElement>
+          <InfoElement>
+            <ElementType>19</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <TemplateGUID>454144439</TemplateGUID>
+            <Variables>
+              <None>
+                <Name>ItemGuid</Name>
+                <Source>[ItemAssetData([ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) AT(#index0#)]) Guid]</Source>
+              </None>
+            </Variables>
+          </InfoElement>
+          <InfoElement>
+            <ElementType>5</ElementType>
+            <VisibilityElement>
+              <ElementType>
+                <ElementType>2</ElementType>
+              </ElementType>
+              <OperatorType />
+            </VisibilityElement>
+            <Text>
+              <Text>[ItemAssetData([ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) AT(#index0#)]) ItemOrBuffEffectTargetsFormatted]</Text>
+              <Style />
+            </Text>
+            <BackgroundType />
+          </InfoElement>
+          <Source>[ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) COUNT]</Source>
+        </InfoElement>
+      </InfoElement>
+        
+      <!-- old: EffecTTarget is no Buff, but indeed a EffecTTarget, then treat the DummyShip like it is a buff and get his buff effects and targets -->
+      <InfoElement>
+        <ElementType>8</ElementType>
+        <ChildCount>2</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>1</ElementType>
+            </ElementType>
+            <CompareOperator>
+              <CompareOperator>0</CompareOperator>
+            </CompareOperator>
+            <ResultType>
+              <ResultType>1</ResultType>
+            </ResultType>
+            <Condition>[ToolOneHelper ItemOrBuffEffectTargets([ToolOneHelper ItemOrBuffEffectTargets([RefGuid]) AT(0)]) COUNT]</Condition>
           </VisibilityElement>
           <OperatorType />
         </VisibilityElement>
@@ -141,6 +238,7 @@
           </Variables>
         </InfoElement>
       </InfoElement>
+      
       
       <InfoElement>
         <ElementType>8</ElementType>
