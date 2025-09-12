@@ -2,7 +2,8 @@
    -- g_SaveLuaStuff_Serp.PIDToSaveData.PID
   -- Scenario3_Queen  GUID: 101523 , PID: 130
 
-
+-- nur für den local peer etwas zu speichern sollte auch ohne ultra tools gehen (denn das brauchen wir ja nur zum Teilen der Infos zwischen den Peers)
+ -- evtl. dazu noch was schreiben
 
 
 local ModID = "shared_LuaTools_Ultra_Serp savetablestuff.lua" -- used for logging
