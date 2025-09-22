@@ -1,0 +1,317 @@
+<ModOps>
+
+   
+  <!-- ############################################### -->
+  <!-- ###### LeaveUIState -->
+  <!-- ############################################### -->
+  
+  <!-- EnterUIState klappt vermutlich so, soferns durch forcenewspaper oder auch ItemWithUI usw kommt, weil das bei allen clients ausgelöst wird -->
+  <!-- LeaveUIState: move the trigger registering that checks for leaveui directly next to the action that opens the UI and then use ConditionTimer -->
+  
+  <!-- LeaveUIState CampaignNewspaper CQ103_EdvardsNewspaper_HannahsTextAfter -->
+  <!-- remove the trigger 150996 from the init 150559 and instead register it after the newspaper was opened in 150931, so we can savely use a ConditionTimer as replacement for LeaveUIState -->
+  <ModOp Type="remove" GUID='150559' Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Values/ActionRegisterTrigger/TriggerAsset='150996']" />
+  <ModOp Type="add" GUID='150931' Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionRegisterTrigger</Template>
+        <Values>
+          <Action />
+          <ActionRegisterTrigger>
+            <TriggerAsset>150996</TriggerAsset>
+          </ActionRegisterTrigger>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  <ModOp Type="replace" GUID='150996' Path="/Values/Trigger/TriggerCondition[Values/ConditionEvent[ContextData='CampaignNewspaper' and ConditionEvent='LeaveUIState']]">
+    <TriggerCondition>
+      <Template>ConditionTimer</Template>
+      <Values>
+        <Condition />
+        <ConditionTimer>
+          <TimeLimit>10000</TimeLimit>
+        </ConditionTimer>
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  <!-- LeaveUIState CampaignNewspaper CQ101_CleanTheIsland_SuccesReRegister -->
+  <ModOp Type="remove" GUID='150559' Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Values/ActionRegisterTrigger/TriggerAsset='151076']" />
+  <ModOp Type="add" GUID='150931' Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionRegisterTrigger</Template>
+        <Values>
+          <Action />
+          <ActionRegisterTrigger>
+            <TriggerAsset>151076</TriggerAsset>
+          </ActionRegisterTrigger>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  <ModOp Type="replace" GUID='151076' Path="/Values/Trigger/TriggerCondition[Values/ConditionEvent[ContextData='CampaignNewspaper' and ConditionEvent='LeaveUIState']]">
+    <TriggerCondition>
+      <Template>ConditionTimer</Template>
+      <Values>
+        <Condition />
+        <ConditionTimer>
+          <TimeLimit>10000</TimeLimit>
+        </ConditionTimer>
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  
+  <!-- LeaveUIState TextPopup CQ172B_CloseLetterTrigger -->
+  <!-- use an unlock with ItemWithUI, so it causes no harm if it is clicked multiple times and do not remove the vanilla register of trigger in this case -->
+  <ModOp Type="add" GUID='190443' Path="/Values/ItemWithUI/ItemActions/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionDelayedActions</Template>
+        <Values>
+          <Action />
+          <ActionDelayedActions>
+            <ExecutionDelay>15000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionLockAsset</Template>
+                        <Values>
+                          <Action />
+                          <ActionLockAsset>
+                            <LockAssets>
+                              <Item>
+                                <Asset>1500004361</Asset>
+                              </Item>
+                            </LockAssets>
+                          </ActionLockAsset>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <ModOp Type="replace" GUID='150772' Path="/Values/Trigger/TriggerCondition[Values/ConditionEvent[ContextData='TextPopup' and ConditionEvent='LeaveUIState']]">
+    <TriggerCondition>
+      <Template>ConditionEvent</Template>
+      <Values>
+        <Condition />
+        <ConditionEvent>
+          <ConditionEvent>GUIDLocked</ConditionEvent>
+          <ContextAsset>1500004361</ContextAsset>
+        </ConditionEvent>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  <!-- LeaveUIState NewspaperSpecialEdition Chapter200_Banner (sollte korrekt sein) -->
+  <!-- 150846 ist die photography aufgabe der Werft -->
+  <!-- ist das eine SpecialEdition ? Ja, photography hat SpecialEdition als default in templates  -->
+  <ModOp Type="remove" GUID='150846' Path="/Values/Quest/OnQuestStart/Values/ActionList/Actions/Item[Action/Values/ActionRegisterTrigger/TriggerAsset='150619']" />
+  <ModOp Type="add" GUID='150846' Path="/Values/Quest/OnQuestSucceeded/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionRegisterTrigger</Template>
+        <Values>
+          <Action />
+          <ActionRegisterTrigger>
+            <TriggerAsset>150619</TriggerAsset>
+          </ActionRegisterTrigger>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <ModOp Type="replace" GUID='150619' Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition[Values/ConditionEvent[ContextData='NewspaperSpecialEdition' and ConditionEvent='LeaveUIState']]">
+    <TriggerCondition>
+      <Template>ConditionTimer</Template>
+      <Values>
+        <Condition />
+        <ConditionTimer>
+          <TimeLimit>10000</TimeLimit>
+        </ConditionTimer>
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  <!-- LeaveUIState NewspaperSpecialEdition CQ241_Industrialization_QuestStarter sprengung erfolgreich (sollte korrekt sein) -->
+  <ModOp Type="replace" GUID='151064' Path="/Values/Trigger/TriggerCondition[Values/ConditionEvent[ContextData='NewspaperSpecialEdition' and ConditionEvent='LeaveUIState']]">
+    <TriggerCondition>
+      <Template>ConditionTimer</Template>
+      <Values>
+        <Condition />
+        <ConditionTimer>
+          <TimeLimit>10000</TimeLimit>
+        </ConditionTimer>
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  <!-- LeaveUIState TextPopup CQ255_CloseDiaryTrigger -->
+  <!-- use an unlock with ItemWithUI, so it causes no harm if it is clicked multiple times and do not remove the vanilla register of trigger in this case -->
+  <!-- diary is much text, so 30 seconds -->
+  <ModOp Type="add" GUID='101137' Path="/Values/ItemWithUI/ItemActions/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionDelayedActions</Template>
+        <Values>
+          <Action />
+          <ActionDelayedActions>
+            <ExecutionDelay>30000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionLockAsset</Template>
+                        <Values>
+                          <Action />
+                          <ActionLockAsset>
+                            <LockAssets>
+                              <Item>
+                                <Asset>1500004362</Asset>
+                              </Item>
+                            </LockAssets>
+                          </ActionLockAsset>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <ModOp Type="replace" GUID='150861' Path="/Values/Trigger/TriggerCondition[Values/ConditionEvent[ContextData='TextPopup' and ConditionEvent='LeaveUIState']]">
+    <TriggerCondition>
+      <Template>ConditionEvent</Template>
+      <Values>
+        <Condition />
+        <ConditionEvent>
+          <ConditionEvent>GUIDLocked</ConditionEvent>
+          <ContextAsset>1500004362</ContextAsset>
+        </ConditionEvent>
+        <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  
+  <!-- LeaveUIState NewspaperSpecialEdition CQ411_TheTrial -->
+   <!-- dadurch dass es als PreConditionList mit noch weiterem verwendet wird, brauchen wir nen unlcok als hilfe -->
+  <ModOp Type="add" GUID='152360' Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionDelayedActions</Template>
+        <Values>
+          <Action />
+          <ActionDelayedActions>
+            <ExecutionDelay>10000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionLockAsset</Template>
+                        <Values>
+                          <Action />
+                          <ActionLockAsset>
+                            <LockAssets>
+                              <Item>
+                                <Asset>1500004360</Asset>
+                              </Item>
+                            </LockAssets>
+                          </ActionLockAsset>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  <ModOp Type="replace" GUID='151421' Path="/Values/PreConditionList/SubConditions/Item/SubCondition/Values/PreConditionList/Condition[Values/ConditionEvent[ContextData='NewspaperSpecialEdition' and ConditionEvent='LeaveUIState']]">
+    <Condition>
+      <Template>ConditionEvent</Template>
+      <Values>
+        <Condition />
+        <ConditionEvent>
+          <ConditionEvent>GUIDLocked</ConditionEvent>
+          <ContextAsset>1500004360</ContextAsset>
+        </ConditionEvent>
+        <ConditionPropsNegatable />
+      </Values>
+    </Condition>
+  </ModOp>
+   
+   <!-- Im Kampagnen abschnitt gibt es mind. 9 SpecialEdition Article, aber nur 4 mal LeaveUIState NewspaperSpecialEdition: -->
+   <!-- Werft fotografiert OnPhotographySuccessNewspaperAction <Article>141408</Article> photography hat SpecialEdition als default in templates -->
+      <!-- gehört zu LeaveUIState in 150619 -->
+   <!-- CQ241_Industrialization_QuestStarter Sprengung erfolgreich <Article>141419</Article>  <OpenNewspaperType>SpecialEdition</OpenNewspaperType> -->
+     <!-- gehört zu LeaveUIState 151064 -->
+   <!-- CampaignSEArticle_SADiscovered machen Isabel Sarmento ausfindig <Article>142385</Article>  <OpenNewspaperType>SpecialEdition</OpenNewspaperType> -->
+   <!-- Mörder gefunden <Article>142384</Article>  <OpenNewspaperType>SpecialEdition</OpenNewspaperType> -->
+   <!-- CampaignSEArticle_PyrphoriansContact Pyr fasst in der Neuen Welt Fuß! <Article>142386</Article>  <OpenNewspaperType>SpecialEdition</OpenNewspaperType> -->
+   <!-- CampaignSEArticle_ProsperityGivenToPlayer Krieg zwischen Majestät Sarmento verhindert <Article>142387</Article> <OpenNewspaperType>SpecialEdition</OpenNewspaperType> -->
+   <!-- trigger 152360 CampaignSEArticle_CourtOfJustice Edvards Verhandlung steht vor dem Beginn <Article>142388</Article> <OpenNewspaperType>SpecialEdition</OpenNewspaperType>                     -->
+      <!-- wahrscheinlich gehört dazu LeaveUIState in CQ411_TheTrial 151421 -->
+   <!-- in trigger 151508 CampaignSEArticle_EndOfAllEmpire Edvard Goode ist tot <Article>141984</Article> <OpenNewspaperType>SpecialEdition</OpenNewspaperType>                                  -->
+   <!-- in trigger 151509 CampaignSEArticle_PyrphoriansDefeated <Article>141987</Article> <OpenNewspaperType>SpecialEdition</OpenNewspaperType> -->
+      <!-- hierzu gehört LeaveUIState in 151532 und löst die ganzen AftermathComment_ aus, muss also der letzte artikel sein und sich daher nicht auf 151508 beziehen, sondern 151509  -->
+
+  
+  <!-- LeaveUIState NewspaperSpecialEdition  -->
+  <ModOp Type="remove" GUID='151425' Path="/Values/Quest/OnQuestStart/Values/ActionList/Actions/Item[Action/Values/ActionRegisterTrigger/TriggerAsset='151532']" />
+  <ModOp Type="add" GUID='151509' Path="Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionDelayedActions/DelayedActions/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionRegisterTrigger</Template>
+        <Values>
+          <Action />
+          <ActionRegisterTrigger>
+            <TriggerAsset>151532</TriggerAsset>
+          </ActionRegisterTrigger>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <ModOp Type="replace" GUID='151532' Path="/Values/Trigger/SubTriggers/Item/SubTrigger/Values/Trigger/TriggerCondition[Values/ConditionEvent[ContextData='NewspaperSpecialEdition' and ConditionEvent='LeaveUIState']]">
+    <TriggerCondition>
+      <Template>ConditionTimer</Template>
+      <Values>
+        <Condition />
+        <ConditionTimer>
+          <TimeLimit>10000</TimeLimit>
+        </ConditionTimer>
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  
+  
+  
+      
+   
+</ModOps>

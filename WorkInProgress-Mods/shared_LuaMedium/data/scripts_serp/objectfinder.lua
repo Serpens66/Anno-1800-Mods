@@ -684,11 +684,11 @@ if g_LuaScriptBlockers[ModID]==nil then
     -- kind="Area" for Area helper. anything else for Walkable Helper
     local function SpawnMaxObjIdHelpers(kind)
       local unlockguid = kind=="Area" and g_ObjectFinderSerp.MaxObjIdAreaHelper.Unlock or g_ObjectFinderSerp.MaxObjIdWalkableHelper.Unlock
-      if not ts.Unlock.GetIsUnlocked(unlockguid) then
-        ts.Unlock.SetUnlockNet(unlockguid)
+      if ts.Unlock.GetIsUnlocked(unlockguid) then
+        ts.Unlock.SetRelockNet(unlockguid)
         return true
       end
-      return false -- if already unlocked, wait few seconds 10/30 to try again
+      return false -- if already locked, wait few seconds 10/30 to try again
     end
     
     -- Area/Building IslandID~=0 or Walkable IslandID==0)

@@ -1,0 +1,227 @@
+<ModOps>
+
+  <!-- Fixes for the Campaign that also might be used in singleplayer -->
+  
+  <!-- increase the DiplayTimeout from several notifications, otherwise they are nearly never shown (DiplayTimeout means how long a notification is queued and waiting for other notificatons to finish. if not shown after that time, it is never shown) -->
+  <!-- if not defined, default is 30 seconds, while for many here it is set 1 or 3 seconds. -->
+  <!-- Newspaper guy GUID 162 -->
+  <!-- hm... we could do the same for everything else in the game, but I'm not entirely sure what I miss. -->
+   <!-- vanilla has many notifications with DiplayTimeout=0 or 1000 or 2000 or 3000 or 5000 , while all of these in practice will exactly be the same -> not shown if there currently is another notification. -->
+  <!-- hm.. since in the campaign we are interested in every word anyone says, I will simply increase the value for all of them with values lower than 30 seconds -->
+  <ModOp Type="merge" Path="//Values/BaseNotification[DisplayTimeout&lt;=30000 or not(DisplayTimeout)]">
+    <DisplayTimeout>80000</DisplayTimeout>
+  </ModOp>
+  <!-- dont show welcome message for everyone when starting with discovered map, because it may block campaign notifications -->
+   <!-- Alternative: use a higher priority for campagin? -->
+  <!-- <ModOp Type="merge" Path="//Values/Diplomacy"> -->
+    <!-- <AllowDiscoveryPamsyWhenDiscoveryDisabled>0</AllowDiscoveryPamsyWhenDiscoveryDisabled> -->
+  <!-- </ModOp> -->
+  <!-- <NotificationPriority>800</NotificationPriority> -->
+  
+
+  <!-- letzte campaign quest <GUID>153232</GUID> sollte nötig sein, bevor Cape Quest (verschwundene Königin) startet, weil königin in mainquest vorkommt -->
+  <!-- only start the "queen missing"-Cape Quest after the last campaign quest is finished -->
+  <ModOp Type="merge" GUID="113443" Path="/Values/Trigger">
+    <SubTriggers />
+  </ModOp>
+  <ModOp Type="add" GUID="113443" Path="/Values/Trigger/SubTriggers">
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Reached</ConditionQuestStateStates>
+                  <ConditionQuestStateQuestGUID>153232</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+  </ModOp>
+  <!-- seems the above was not enough (guess 113443 is not used bythe game, never registered), so adding it also as PreCondition from 111842 -->
+  <ModOp Type="replace" GUID="111842" Path="/Values/PreConditionList/Condition[Values/ConditionAlwaysTrue]">
+    <Condition>
+      <Template>ConditionQuestState</Template>
+      <Values>
+        <Condition />
+        <ConditionQuestState>
+          <ConditionQuestStateStates>Reached</ConditionQuestStateStates>
+          <ConditionQuestStateQuestGUID>153232</ConditionQuestStateQuestGUID>
+        </ConditionQuestState>
+      </Values>
+    </Condition>
+  </ModOp>
+  
+  
+  <!-- Enbesa unlock also only after campaign? -->
+  <ModOp Type="add" GUID="119863" Path="/Values/Trigger/SubTriggers">
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Reached</ConditionQuestStateStates>
+                  <ConditionQuestStateQuestGUID>153232</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+  </ModOp>
+  
+  <!-- Arctic unlock also only after campaign? -->
+  <ModOp Type="add" GUID="114115" Path="/Values/Trigger/SubTriggers">
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Reached</ConditionQuestStateStates>
+                  <ConditionQuestStateQuestGUID>153232</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+  </ModOp>
+  
+
+  
+  <!-- make the monument "Court of Justice" moveable. I think location does not matter and this way it does not stand in your way. Maybe test if any camera movement from vanilla wants you to look at this position, but not a big problem. -->
+  <ModOp Type="merge" GUID="101951,101953,102035,101952" Path="/Values">
+    <Building>
+      <Movable>1</Movable>
+    </Building>
+  </ModOp>
+  
+  <!-- Spawn additional search-objects for all PuzzleQuests (where you have to find and click on specific objects) to make sure to spawn more than needed, instead less than needed -->
+    <!-- was eg. reported for the Quest 150900 in singleplayer that it did not spawn them. Not sure though if just too less spawned, or if the spawn location is the problem (most likley the latter, but I dont know why) -->
+  <!-- outcommented because this also can be immersion breaking if you need to find person named "A" and then there are 3 of them... -->
+   <!-- but how else can we make sure the stupid game for sure spawns the searched objects? -->
+   <!-- if we could detect the failed spawn, we also could auto-solve the quest after some seconds... -->
+  <!-- <ModOp Type="merge" Path="//Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestPicturePuzzle/PicturePuzzleObjects/Item[Amount and not(AdditionalAmount)]"> -->
+    <!-- <AdditionalAmount>2</AdditionalAmount> -->
+  <!-- </ModOp> -->
+  
+  <!-- ################ -->
+  
+  <!-- also part of community bugfix mod, does not hurt to have it twice -->
+  <!-- Fix campaign being unable to upgrade more farmers to workers -->
+  <!-- Campaign has a trigger 153245 that relocks the workers again as soon as you unlocked basic-clothes-chain -->
+  <!-- The Trigger to unlock it again is 150560 which triggers as soon as you completed the Quest 150841 (Freedom and the Free Press) -->
+   <!-- If you now complete this Quest before you reach clothes, the "again unlock" triggers before the relock, because it lacks proper conditions. -->
+   <!-- Instead of fixing the vanilla triggers, we will add a new Trigger that uses proper conditions (fixing vanilla would not resolve savegames) -->
+    <!-- So before we unlock workers we check: 1) is Quest 150841 completed. 2) are clothes unlocked? 3) are workers locked -->
+     <!-- this will make sure it unlocks it correctly and also in savegames. -->
+  <ModOp Type="addNextSibling" GUID="150560">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004330</GUID>
+          <Name>Campaign_UnlockResidenceLvl2_Fix</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionQuestState</Template>
+            <Values>
+              <Condition />
+              <ConditionQuestState>
+                <ConditionQuestStateStates>Reached</ConditionQuestStateStates>
+                <ConditionQuestStateQuestGUID>150841</ConditionQuestStateQuestGUID>
+              </ConditionQuestState>
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>130060</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable />
+                      </Values>
+                    </TriggerCondition>
+                    <SubTriggers>
+                      <Item>
+                        <SubTrigger>
+                          <Template>AutoCreateTrigger</Template>
+                          <Values>
+                            <Trigger>
+                              <TriggerCondition>
+                                <Template>ConditionUnlocked</Template>
+                                <Values>
+                                  <Condition />
+                                  <ConditionUnlocked>
+                                    <UnlockNeeded>1010344</UnlockNeeded>
+                                  </ConditionUnlocked>
+                                  <ConditionPropsNegatable>
+                                    <NegateCondition>1</NegateCondition>
+                                  </ConditionPropsNegatable>
+                                </Values>
+                              </TriggerCondition>
+                            </Trigger>
+                          </Values>
+                        </SubTrigger>
+                      </Item>
+                    </SubTriggers>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionUnlockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionUnlockAsset>
+                    <UnlockAssets>
+                      <Item>
+                        <Asset>1010344</Asset>
+                      </Item>
+                    </UnlockAssets>
+                  </ActionUnlockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <TriggerSetup>
+            <AutoRegisterTrigger>1</AutoRegisterTrigger>
+            <UsedBySecondParties>0</UsedBySecondParties>
+          </TriggerSetup>
+        </Trigger>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+
+</ModOps>

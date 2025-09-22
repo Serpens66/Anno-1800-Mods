@@ -1,0 +1,279 @@
+<ModOps>
+  
+  <!-- Nutzt GUIDs 1500003810 bis 1500003812 in shared mod und 1500003813 hier direkt (bis 1500003814 freigehalten) -->
+  <!-- und teilt guids mit Campaign in coop mod, siehe assets.xml von dort -->
+  
+  
+
+  <!-- Important info for myself/other modders: -->
+  <!-- VanillaBug: When replacing a ConditionEvent Condition with an UnlockNeeded Condition + NegateCondition the Condition will be true when disabling the mod! -->
+  <!-- This makes absolutely no sense and ONLY happens in this constellation! -->
+  <!-- Workaround is to use as replacement: ConditionEvent with GUIDLocked -->
+     
+  
+  <!-- [GameSetup IsMultiPlayerGame] in assets.xml nicht ersetzen nötig, zb. coop ping usw muss weiterhin funzen -->
+   <!-- und in text und infotip taucht das nicht auf -->
+  
+  
+   <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->   
+  <!-- ############################################################################################ -->
+  
+  
+  <!-- I search the assets.xml for ConditionIsMultiplayer and decide if it is good to replace this with my condition IsSingleHumanSlot. -->
+    <!-- Yes I think it is fine to replace all vanilla conditions -->
+   
+   
+   <!-- info: -->
+    <!-- um manche quests auch MP kompatibel außerhalb von coop zu machen (was wir hier nicht wollen, aber nur zur info), -->
+     <!-- muss man bei ActionSetQuestPoolEnablement vermutlich auch ChangeForProcessingParticipant=1 setzen, weils ohne das denke ich nur -->
+      <!-- Human0 betrifft -->
+   
+      
+  <!-- genaugenommen gibts noch in <MapGeneratorInput> <SetGameType> wo standardmäßig SinglePlayer (properties.xml) -->
+   <!-- drinsteht. Man könnte diese automatisiert durch single+multiplayer ersetzen, -->
+    <!-- aber vom vanilla spiel wird MapGeneratorInput bisher eh nur 2 mal bei nicht verwendeten maps verwendet, weshalb es eigentlich egal ist. -->
+  
+  <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->
+  
+  
+  <!-- fast code execution, but may overwrite other mods using ConditionIsMultiplayer -->
+  <!-- <Include File="./Conditions.include.xml" /> -->
+  
+  <!-- comment line with "Conditions_detailed" in (and "Conditions.include" out) to use the more compatible code, if you experience problems with mods designed to only or to not work in mutliplayer -->
+   <!-- (triggers using "IsMultiPlayerGame") because my mod here may overwrite it -->
+  <Include File="./Conditions_detailed.include.xml" />
+  
+  
+
+  
+  
+  <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->
+  
+  
+  <!-- No way to differentiate between MP with multiple or with single human slot for MapTemplate MapTemplateForMultiplayer !! -->
+   <!-- So only activate this mod if you play with a single human slot! -->
+   <!-- Africa Map with the quest relevant NPCs also in Multiplayer -->
+  <ModOp Type="replace" GUID='112132' Path="/Values/Session/MapTemplateForMultiplayer">
+    <MapTemplateForMultiplayer>112872</MapTemplateForMultiplayer>
+  </ModOp>
+  
+  <!-- map fertilites, mines. yes it is called "SandboxMultilayer"... -->
+  <ModOp AllowNoMatch="1" Type="replace" Path="//ResourceSetCondition/AllowedGameTypes[contains(.,'SandboxSingleplayer') and not(contains(.,'SandboxMultilayer')) and contains(.,'CampaignMode')]">
+    <AllowedGameTypes>SandboxSingleplayer;SandboxMultilayer;CampaignMode</AllowedGameTypes>
+  </ModOp>
+  <ModOp AllowNoMatch="1" Type="replace" Path="//ResourceSetCondition/AllowedGameTypes[contains(.,'SandboxSingleplayer') and not(contains(.,'SandboxMultilayer')) and not(contains(.,'CampaignMode'))]">
+    <AllowedGameTypes>SandboxSingleplayer;SandboxMultilayer</AllowedGameTypes>
+  </ModOp>
+  <ModOp AllowNoMatch="1" Type="replace" Path="//ResourceSetCondition[AllowedGameTypes='SandboxMultilayer']/AllowedGameTypes">
+    <AllowedGameTypes>None</AllowedGameTypes>
+  </ModOp>
+  <!-- RandomIslands, here it is AllowedGameType so without the s at the end.. -->
+  <ModOp AllowNoMatch="1" Type="replace" Path="//RandomIsland/AllowedGameType[contains(.,'SandboxSingleplayer') and not(contains(.,'SandboxMultilayer')) and contains(.,'CampaignMode')]">
+    <AllowedGameType>SandboxSingleplayer;SandboxMultilayer;CampaignMode</AllowedGameType>
+  </ModOp>
+  <ModOp AllowNoMatch="1" Type="replace" Path="//RandomIsland/AllowedGameType[contains(.,'SandboxSingleplayer') and not(contains(.,'SandboxMultilayer')) and not(contains(.,'CampaignMode'))]">
+    <AllowedGameType>SandboxSingleplayer;SandboxMultilayer</AllowedGameType>
+  </ModOp>
+  <ModOp AllowNoMatch="1" Type="replace" Path="//RandomIsland[AllowedGameType='SandboxMultilayer']/AllowedGameType">
+    <AllowedGameType>None</AllowedGameType>
+  </ModOp>
+  
+  <!-- wenn wir bei der Map eh nicht unterscheiden können, -->
+   <!-- dann könnten wir das auch für alle trigger/quests festmachen, -->
+    <!-- indem wir da einfach AlwaysTrue und AlwaysFalse verwenden. -->
+    <!-- Das hätte auch den Vorteil, dass Quests auch mit mehreren menschlichen Spielern funzen, wobei da Bugs natürlich wahrscheinlicher sind -->
+   <!-- wobei, lieber nicht, denn das funktioniert sehr sicher alles nicht, also lieber den Schaden gering halten, indem da echte MP spiele wie gewohnt funktionieren -->
+    <!-- und dann halt nur die Afrika/Artkis Map "falsch" ist -->
+  
+  
+  <!-- ############################################################################################ -->
+  <!-- ############################################################################################ -->
+
+  
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500003814</GUID>
+          <Name>WARNING if not MP or not single human slot</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionEvent>
+                <ConditionEvent>SessionEnter</ConditionEvent>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>NOT_OnlySingleHumanSlot</Template>
+                      <Values />                  
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionIsMultiplayer</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionIsMultiplayer />
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <!-- small delay to make sure everything is already loaded so message is also displayed eg. on game start -->
+                    <ExecutionDelay>5000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionNotification</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionNotification>
+                                    <Notification>
+                                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                                      <Values>
+                                        <SideNotification>
+                                          <IconAsset>501362</IconAsset>
+                                          <NotificationSideTitle>20461</NotificationSideTitle>
+                                          <FilterType>System</FilterType>
+                                          <Infotip>0</Infotip>
+                                          <HasJumpLocation>0</HasJumpLocation>
+                                          <IsWarning>1</IsWarning>
+                                        </SideNotification>
+                                        <BaseNotification>
+                                          <NotificationText>1500003814</NotificationText>
+                                          <NotificationAudioAsset>9818769</NotificationAudioAsset>
+                                          <NotificationPriority>900</NotificationPriority>
+                                          <NotificationMinDisplayTime>8000</NotificationMinDisplayTime>
+                                          <DisplayTimeout>330000</DisplayTimeout>
+                                        </BaseNotification>
+                                        <NotificationSubtitle />
+                                      </Values>
+                                    </Notification>
+                                  </ActionNotification>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>600000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+
+  </ModOp>
+  
+  
+  <!-- create a normal newspaper as soon as the system is unlocked, to make the newspaper button show up on the left buttons -->
+   <!-- only this way coop players can access the archive and look eg at photos made by the coop players -->
+   <!-- its fine to also affect campaign/normal games -->
+  <ModOp Type="merge" GUID="140540" Path="/Values/Trigger">
+    <TriggerActions />
+  </ModOp>
+  <ModOp Type="add" GUID="140540" Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionDelayedActions</Template>
+        <Values>
+          <Action />
+          <ActionDelayedActions>
+            <ExecutionDelay>30000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionForceNewspaper</Template>
+                        <Values>
+                          <Action />
+                          <ActionForceNewspaper>
+                            <ShowPamsyMessage>1</ShowPamsyMessage>
+                            <OpenNewspaperType>Default</OpenNewspaperType>
+                          </ActionForceNewspaper>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+
+  
+  <Include File="./AntiDesync/AntiDesync.include.xml" />
+
+
+</ModOps>

@@ -1,0 +1,514 @@
+<ModOps>
+
+  <!-- uses Serp GUIDs from 1500006116 to (reserved up to 1500006129) -->
+ 
+
+  
+  <!-- call our register scripts on savegame load -->
+  <ModOp Type="add" GUID="1500004636" Path="/Values/Trigger/ResetTrigger/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionExecuteScript</Template>
+        <Values>
+          <Action />
+          <ActionExecuteScript>
+            <ScriptFileName>data/scripts_serp/limitedpreferred_main.lua</ScriptFileName>
+          </ActionExecuteScript>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  <!-- make all 3rd party usable in ConditionPlayerCounter trigger conditions if they are not already -->
+  <ModOp Type = "merge" GUID = '45,46,77,78,76,73,29,237,119051' Path = "/Values">
+    <ProfileCounter />
+    <Nameable />
+  </ModOp>
+  
+  
+  <!-- We can not loop over any Pool in lua ... but we can loop over ItemEffect/EffectTargets in lua, so we use them instead -->
+  <ModOp Type="AddNextSibling" GUID="1010017">
+    <Asset>
+      <Template>SimpleAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006116</GUID>
+          <Name>Harlow</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_prefered_good.png</IconFilename>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets /> <!-- peferred goods will be added -->
+        </ItemEffect>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>SimpleAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006117</GUID>
+          <Name></Name>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets />
+        </ItemEffect>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>SimpleAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006118</GUID>
+          <Name>Blake</Name>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets />
+        </ItemEffect>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>SimpleAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006119</GUID>
+          <Name></Name>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets />
+        </ItemEffect>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>SimpleAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006120</GUID>
+          <Name></Name>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets />
+        </ItemEffect>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>SimpleAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006121</GUID>
+          <Name></Name>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets />
+        </ItemEffect>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>SimpleAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006122</GUID>
+          <Name></Name>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets />
+        </ItemEffect>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>SimpleAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006123</GUID>
+          <Name></Name>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets />
+        </ItemEffect>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>SimpleAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006124</GUID>
+          <Name></Name>
+        </Standard>
+        <Text />
+        <ItemEffect>
+          <EffectTargets />
+        </ItemEffect>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <!-- Trigger and ItemEffect/EffectTargets will be filled in submod, to put all preferred goods in it -->
+  
+  <!-- using MutuallyExclusive so in case the human trades with a thirdparty, which fullfills 2 of the conditions, -->
+   <!-- it still only starts the script once -->
+   <!-- PlayerCounter requires a context product ... -->
+    <!-- so we need modop to copy paste all preferred goods into it (PassiveTradeBalance seems always to be 0) -->
+    <!-- SubTriggers will be filled in submod -->
+  <ModOp GUID="153271" Type="AddNextSibling">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006125</GUID>
+          <Name>Trade Human or Third Party Happend</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionAlwaysTrue</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionAlwaysTrue />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <!-- tiny delay before resetting and starting the script, to make sure everything is updated and its not triggered twice for one trade between 2 participants -->
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition>
+                      <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+                    </Condition>
+                    <ConditionTimer>
+                      <TimeLimit>100</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+                <SubTriggers>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>WhichPlayer_Human0</Template>
+                            <Values />
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/scripts_serp/event_profitmade_human0.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>WhichPlayer_Human1</Template>
+                            <Values />
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/scripts_serp/event_profitmade_human1.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>WhichPlayer_Human2</Template>
+                            <Values />
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/scripts_serp/event_profitmade_human2.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                  <Item>
+                    <SubTrigger>
+                      <Template>AutoCreateTrigger</Template>
+                      <Values>
+                        <Trigger>
+                          <TriggerCondition>
+                            <Template>WhichPlayer_Human3</Template>
+                            <Values />
+                          </TriggerCondition>
+                          <TriggerActions>
+                            <Item>
+                              <TriggerAction>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/scripts_serp/event_profitmade_human3.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </TriggerAction>
+                            </Item>
+                          </TriggerActions>
+                        </Trigger>
+                      </Values>
+                    </SubTrigger>
+                  </Item>
+                </SubTriggers>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Update Text when Trader Kontor is selected. Is needed because we can not update the text on-change when the player is -->
+     <!-- in another session than the trader, eg. when traded via traderoute -->
+    <!-- Not that important, because it is also updated every minute when the amount is decreased by 1 -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006126</GUID>
+          <Name>Update Text</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionObjectSelected</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionObjectSelected>
+                <IgnoreSelectionBeforeActivation>1</IgnoreSelectionBeforeActivation>
+              </ConditionObjectSelected>
+              <ConditionPropsSessionSettings />
+              <ObjectFilter>
+                <ObjectGUID>1500006127</ObjectGUID>
+              </ObjectFilter>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human0</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/event_traderselected_human0.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human1</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/event_traderselected_human1.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human2</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/event_traderselected_human2.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>WhichPlayer_Human3</Template>
+                      <Values />
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionExecuteScript</Template>
+                          <Values>
+                            <Action />
+                            <ActionExecuteScript>
+                              <ScriptFileName>data/scripts_serp/event_traderselected_human3.lua</ScriptFileName>
+                            </ActionExecuteScript>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>AssetPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006127</GUID>
+          <Name>Neutral Trader Harbours (supported ones, currently only vanilla)</Name>
+        </Standard>
+        <AssetPool>
+          <AssetList>
+            <Item>
+              <Asset>100681</Asset>
+            </Item>
+            <Item>
+              <Asset>100682</Asset>
+            </Item>
+            <Item>
+              <Asset>100680</Asset>
+            </Item>
+            <Item>
+              <Asset>101117</Asset>
+            </Item>
+            <Item>
+              <Asset>100683</Asset>
+            </Item>
+            <Item>
+              <Asset>100685</Asset>
+            </Item>
+            <Item>
+              <Asset>100686</Asset>
+            </Item>
+            <Item>
+              <Asset>119409</Asset>
+            </Item>
+            <Item>
+              <Asset>116035</Asset>
+            </Item>
+          </AssetList>
+        </AssetPool>
+      </Values>
+    </Asset>
+    
+    
+  </ModOp>
+  
+    
+    
+</ModOps>

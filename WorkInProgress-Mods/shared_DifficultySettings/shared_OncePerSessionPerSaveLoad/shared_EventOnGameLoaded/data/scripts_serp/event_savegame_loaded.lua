@@ -23,7 +23,7 @@ local function g_OnLeaveUIState_serp(UILeft_ID)
     system.start(function()
       -- use a delay (at least 0.7 second), because multiplayer needs this for the code to be executed already ingame (because LeaveUIState fires too fast there)
       system.waitForGameTimeDelta(700)
-      ts.Unlock.SetUnlockNet(1500004636) -- Execute_SavegameLoadedEvent, unlock this FeatureUnlock to notify other mods
+      ts.Unlock.SetRelockNet(1500004636) -- Execute_SavegameLoadedEvent, lock this FeatureUnlock to notify other mods
     end)
     
   end
@@ -46,7 +46,7 @@ if event.OnLeaveUIState["shared_LuaOnGameLoaded_Serp"] == nil then -- only add i
     -- that means if g_OnLeaveUIState_serp was not yet added, Anno was just recently started, so the first SessionEnter for sure means a savegame was loaded.
     -- after that, the lua event.OnLeaveUIState will continue to work outside of a savegame, so also in main menu, so checking for LoadingScreenLeft_ID is enough then, to catch another savegame load without restarting the whole game
   -- modlog("register OnLeaveUIState")
-  ts.Unlock.SetUnlockNet(1500004636) -- Execute_SavegameLoadedEvent, unlock this FeatureUnlock to notify other mods
+  ts.Unlock.SetRelockNet(1500004636) -- Execute_SavegameLoadedEvent, lock this FeatureUnlock to notify other mods
 end
 
 

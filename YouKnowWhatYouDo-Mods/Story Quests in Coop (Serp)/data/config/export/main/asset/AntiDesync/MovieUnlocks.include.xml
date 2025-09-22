@@ -1,0 +1,2056 @@
+<ModOps>
+
+  <!-- GUID 1500004301 to 1500004310 and 1500004331 to 1500004340 is used in Campaign Coop mod -->
+  
+  <!-- Trigger/Unlocks to play the movie and to be unlocked when movie finished (or chosen to not play it) -->
+  <!-- MovieFinished -->
+    <!-- Für die Movies können wir die playMovie Trigger und die Unlocks in dieselbe GUID packen -->
+
+  <!-- ok CanBeSkipped does nothing, BUT using <SuppressGamePause>1</SuppressGamePause> within ActionPlayMovie makes them unskippable regardless of CanBeSkipped. -->
+    <!-- so we will use this instead (in MP the game is never paused anyways)... because skipping a movie is a 100% desync -->
+  
+  <!-- Important info for myself/other modders: -->
+  <!-- VanillaBug: When replacing a ConditionEvent Condition with an UnlockNeeded Condition + NegateCondition the Condition will be true when disabling the mod! -->
+  <!-- This makes absolutely no sense and ONLY happens in this constellation! -->
+  <!-- Workaround is to use as replacement: ConditionEvent with GUIDLocked -->
+  
+  
+  <ModOp Type="addNextSibling" GUID="130248">
+    <!-- blocking the ThirdpartyNotificationButtons is mandatory, otherwise the other players are able to choose different option which may bug the game because code is executed more than one and so on. -->
+      <!-- it automatically unblocks the buttons after 45 seconds, so we can reuse this one for all our notifications -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004300</GUID>
+          <Name>DoNothingExceptBlockButtons</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004300</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            <!-- an invisble abort notification, cancels all currently displayed notifications. aim is to remove the "display film" notification for coop clients -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <Template>CharacterNotification</Template>
+                      <Values>
+                        <CharacterNotification>
+                          <ShowDuringCameraSequence>1</ShowDuringCameraSequence>
+                        </CharacterNotification>
+                        <BaseNotification>
+                          <DisplayTimeout>100</DisplayTimeout>
+                          <NotificationPriority>-1</NotificationPriority>
+                          <NotificationMinDisplayTime>0</NotificationMinDisplayTime>
+                          <NotificationBlockingTime>0</NotificationBlockingTime>
+                        </BaseNotification>
+                        <NotificationSubtitle>
+                          <SubtitleGroup />
+                          <Subtitle />
+                        </NotificationSubtitle>
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <!-- the "play film" notification is roguhly displayed 45 seconds if nothing is hit -->
+                       <!-- but we abort the notification above with new text, so time can be shorter -->
+                      <TimeLimit>10000</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+                <TriggerActions> 
+                  <Item>
+                    <TriggerAction>
+                      <Template>ActionUnlockAsset</Template>
+                      <Values>
+                        <Action />
+                        <ActionUnlockAsset>
+                          <UnlockAssets>
+                            <Item>
+                              <Asset>1500004300</Asset>
+                            </Item>
+                          </UnlockAssets>
+                        </ActionUnlockAsset>
+                      </Values>
+                    </TriggerAction>
+                  </Item>
+                </TriggerActions>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Movie_SunkenTreasures_WelcomeToTrelawney -->
+    <Asset>
+      <Template>UnlockableAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004400</GUID>
+          <Name>Play Campaign_MF_113466</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004311</GUID>
+          <Name>Played Campaign_MF_113466</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004400</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/gamespeed_slow_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionPlayMovie</Template>
+                <Values>
+                  <Action />
+                  <ActionPlayMovie>
+                    <Movie>1500004211</Movie>
+                    <SuppressGamePause>1</SuppressGamePause>
+                  </ActionPlayMovie>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>60000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/gamespeed_normal_serp.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004311</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004341</GUID>
+          <Name>Dont play Campaign_MF_113466</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004341</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <!-- a delay, because it seems game crashes quite often when we skip the movie, maybe a delay helps -->
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004311</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Movie_SunkenTreasures_VascoOliveira -->
+    <Asset>
+      <Template>UnlockableAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004401</GUID>
+          <Name>Play Campaign_MF_113467</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004312</GUID>
+          <Name>Played Campaign_MF_113467</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004401</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/gamespeed_slow_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionPlayMovie</Template>
+                <Values>
+                  <Action />
+                  <ActionPlayMovie>
+                    <Movie>1500004212</Movie>
+                    <SuppressGamePause>1</SuppressGamePause>
+                  </ActionPlayMovie>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectGUID>100438</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>Third_party_09_Vasco_Silva</ObjectParticipantID>
+                                    <ObjectSession>110934</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectGUID>100441</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>Third_party_09_Vasco_Silva</ObjectParticipantID>
+                                    <ObjectSession>110934</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionEndQuest</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionEndQuest>
+                                    <Quest>114168</Quest>
+                                    <WinQuest>1</WinQuest>
+                                  </ActionEndQuest>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>60000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/gamespeed_normal_serp.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004312</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004342</GUID>
+          <Name>Dont play Campaign_MF_113467</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004342</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectGUID>100438</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>Third_party_09_Vasco_Silva</ObjectParticipantID>
+                                    <ObjectSession>110934</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectGUID>100441</ObjectGUID>
+                                    <CheckParticipantID>1</CheckParticipantID>
+                                    <ObjectParticipantID>Third_party_09_Vasco_Silva</ObjectParticipantID>
+                                    <ObjectSession>110934</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionEndQuest</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionEndQuest>
+                                    <Quest>114168</Quest>
+                                    <WinQuest>1</WinQuest>
+                                  </ActionEndQuest>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004312</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+
+    <!-- Movie_ThePassage_Intro -->
+    <Asset>
+      <Template>UnlockableAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004403</GUID>
+          <Name>Play Campaign_MF_115213</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004313</GUID>
+          <Name>Played Campaign_MF_115213</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004403</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/gamespeed_slow_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionPlayMovie</Template>
+                <Values>
+                  <Action />
+                  <ActionPlayMovie>
+                    <Movie>1500004213</Movie>
+                    <SuppressGamePause>1</SuppressGamePause>
+                  </ActionPlayMovie>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverIsland</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverIsland>
+                    <TargetIsland>114384</TargetIsland>
+                  </ActionDiscoverIsland>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverIsland</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverIsland>
+                    <TargetIsland>116974</TargetIsland>
+                  </ActionDiscoverIsland>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetIslandName</Template>
+                <Values>
+                  <Action />
+                  <ActionSetIslandName>
+                    <SessionIsland>180045</SessionIsland>
+                    <IslandAsset>114384</IslandAsset>
+                    <NewIslandName>116355</NewIslandName>
+                  </ActionSetIslandName>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>60000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/gamespeed_normal_serp.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004313</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004343</GUID>
+          <Name>Dont play Campaign_MF_115213</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004343</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverIsland</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverIsland>
+                    <TargetIsland>114384</TargetIsland>
+                  </ActionDiscoverIsland>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverIsland</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverIsland>
+                    <TargetIsland>116974</TargetIsland>
+                  </ActionDiscoverIsland>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetIslandName</Template>
+                <Values>
+                  <Action />
+                  <ActionSetIslandName>
+                    <SessionIsland>180045</SessionIsland>
+                    <IslandAsset>114384</IslandAsset>
+                    <NewIslandName>116355</NewIslandName>
+                  </ActionSetIslandName>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004313</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Movie_ThePassage_Explosion -->
+    <Asset>
+      <Template>UnlockableAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004404</GUID>
+          <Name>Play Campaign_MF_115214</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004314</GUID>
+          <Name>Played Campaign_MF_115214</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004404</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/gamespeed_slow_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionPlayMovie</Template>
+                <Values>
+                  <Action />
+                  <ActionPlayMovie>
+                    <Movie>1500004214</Movie>
+                    <SuppressGamePause>1</SuppressGamePause>
+                  </ActionPlayMovie>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectLabel>storyline_iceblocker</ObjectLabel>
+                                    <ObjectSession>180045</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectGUID>114421</ObjectGUID>
+                                    <ObjectSession>180045</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionSetObjectVisibility</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionSetObjectVisibility>
+                                    <Visibility>1</Visibility>
+                                    <ShowEffect>0</ShowEffect>
+                                  </ActionSetObjectVisibility>
+                                  <ObjectFilter>
+                                    <ObjectLabel>storyline_firstboat</ObjectLabel>
+                                    <ObjectSession>180045</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>60000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/gamespeed_normal_serp.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004314</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004344</GUID>
+          <Name>Dont play Campaign_MF_115214</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004344</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectLabel>storyline_iceblocker</ObjectLabel>
+                                    <ObjectSession>180045</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionDeleteObjects</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionDeleteObjects />
+                                  <ObjectFilter>
+                                    <ObjectGUID>114421</ObjectGUID>
+                                    <ObjectSession>180045</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionSetObjectVisibility</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionSetObjectVisibility>
+                                    <Visibility>1</Visibility>
+                                    <ShowEffect>0</ShowEffect>
+                                  </ActionSetObjectVisibility>
+                                  <ObjectFilter>
+                                    <ObjectLabel>storyline_firstboat</ObjectLabel>
+                                    <ObjectSession>180045</ObjectSession>
+                                  </ObjectFilter>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004314</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Movie_ThePassage_Ending -->
+    <Asset>
+      <Template>UnlockableAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004405</GUID>
+          <Name>Play Campaign_MF_115215</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004315</GUID>
+          <Name>Played Campaign_MF_115215</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004405</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/gamespeed_slow_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionPlayMovie</Template>
+                <Values>
+                  <Action />
+                  <ActionPlayMovie>
+                    <Movie>1500004215</Movie>
+                    <SuppressGamePause>1</SuppressGamePause>
+                  </ActionPlayMovie>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>60000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/gamespeed_normal_serp.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004315</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004345</GUID>
+          <Name>Dont play Campaign_MF_115215</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004345</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004315</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Movie_LandOfLions_WelcomeToEnbesa -->
+    <Asset>
+      <Template>UnlockableAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004406</GUID>
+          <Name>Play Campaign_MF_124933</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004316</GUID>
+          <Name>Played Campaign_MF_124933</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004406</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/gamespeed_slow_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionPlayMovie</Template>
+                <Values>
+                  <Action />
+                  <ActionPlayMovie>
+                    <Movie>1500004216</Movie>
+                    <SuppressGamePause>1</SuppressGamePause>
+                  </ActionPlayMovie>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <UseProcessingSourceParticipant>1</UseProcessingSourceParticipant>
+                    <DiscoverTargetParticipant>Africa_Ketema</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>60000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/gamespeed_normal_serp.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004316</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004346</GUID>
+          <Name>Dont play Campaign_MF_124933</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004346</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDiscoverParticipant</Template>
+                <Values>
+                  <Action />
+                  <ActionDiscoverParticipant>
+                    <UseProcessingSourceParticipant>1</UseProcessingSourceParticipant>
+                    <DiscoverTargetParticipant>Africa_Ketema</DiscoverTargetParticipant>
+                  </ActionDiscoverParticipant>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004316</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Movie_LandOfLions_SirArchibaldArrives -->
+    <Asset>
+      <Template>UnlockableAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004407</GUID>
+          <Name>Play Campaign_MF_125187</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004317</GUID>
+          <Name>Played Campaign_MF_125187</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004407</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/gamespeed_slow_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <Action>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>120342</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </Action>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionPlayMovie</Template>
+                <Values>
+                  <Action />
+                  <ActionPlayMovie>
+                    <Movie>1500004217</Movie>
+                    <SuppressGamePause>1</SuppressGamePause>
+                  </ActionPlayMovie>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500004364</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>60000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/gamespeed_normal_serp.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004317</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004347</GUID>
+          <Name>Dont play Campaign_MF_125187</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004347</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <Action>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>120342</TriggerAsset>
+                  </ActionRegisterTrigger>
+                </Values>
+              </Action>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500004364</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004317</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <!-- Movie_LandOfLions_ArchiesShame -->
+    <Asset>
+      <Template>UnlockableAsset</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004408</GUID>
+          <Name>Play Campaign_MF_125188</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004318</GUID>
+          <Name>Played Campaign_MF_125188</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004408</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/gamespeed_slow_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionPlayMovie</Template>
+                <Values>
+                  <Action />
+                  <ActionPlayMovie>
+                    <Movie>1500004218</Movie>
+                    <SuppressGamePause>1</SuppressGamePause>
+                  </ActionPlayMovie>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500004363</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>60000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionExecuteScript>
+                                    <ScriptFileName>data/gamespeed_normal_serp.lua</ScriptFileName>
+                                  </ActionExecuteScript>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>120344</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004318</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004348</GUID>
+          <Name>Dont play Campaign_MF_125188</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>GUIDLocked</ConditionEvent>
+                <ContextAsset>1500004348</ContextAsset>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionLockAsset</Template>
+                <Values>
+                  <Action />
+                  <ActionLockAsset>
+                    <LockAssets>
+                      <Item>
+                        <Asset>1500004363</Asset>
+                      </Item>
+                    </LockAssets>
+                  </ActionLockAsset>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>2000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionRegisterTrigger</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionRegisterTrigger>
+                                    <TriggerAsset>120344</TriggerAsset>
+                                  </ActionRegisterTrigger>
+                                </Values>
+                              </Action>
+                            </Item>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004318</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+
+  </ModOp>
+
+
+
+
+
+</ModOps>

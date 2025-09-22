@@ -1,0 +1,226 @@
+<ModOps>
+  
+  <!-- https://github.com/jakobharder/anno1800-mod-loader/blob/main/doc/modloader11.md#patching-infotip-exportbin -->
+    <!-- to export the tooltips from the game use FileDBReader and the FileFormat "infotip.xml" and unpack "data\infotips\export.bin" -->
+    <!-- or download it in anno modding discord here: -->
+    <!-- https://discord.com/channels/578443209940926465/1146098268850376816/1149910673678159964 -->
+
+ 
+
+  <!-- Display the "Name" of the ThirdParty Trader while hovering over a preferred Good -->
+  <!-- In the Name we save via lua how much we already sold to him per time -->
+  
+  <!-- InteractingAreaID only works for interaction with own kontors, not for ActiveTrade ... -->
+  <!-- so its impossible to get the trader when doing ActiveTrade, since the ship is always selected -->
+  <!-- only way I found is [Area Current Owner], which only works while camera view is over the island.. but better than nothing.. -->
+  
+  <ModOp Type="AddPrevSibling" Path="//InfoTipData[Guid='25000084']/InfoElement[InfoElement/Text/Text='[ToolOneHelper InfoDescription([RefGuid]) Text]']">
+    <!-- ActiveTrade Window open (always own ship selected, even if started via the kontor) -->
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>1</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>3</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[ProductAssetData([RefGuid]) IsValid]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[ActiveTrade TradeOffer IsActiveTradeActive]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Selection Object IsOwnedByCurrentParticipant]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[ActiveTrade TradeOffer TraderPassiveTrade Offer([RefGuid]) IsPreferedGood]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>1500006116</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>1500006117</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <TextGUID>1500006116</TextGUID>
+          <Style />
+        </Value>
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>3</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Text>[SessionParticipants GetParticipant([Area Current Owner]) Nameable Name]</Text>
+          <!-- <Text>[SessionParticipants GetParticipant([Area Area([Selection Object ItemContainer InteractingAreaID]) Owner]) Nameable Name]</Text> -->
+          <Style />
+        </Text>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>6</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Style />
+        </Text>
+      </InfoElement>
+    </InfoElement>
+    <!-- Third Party Kontor Selected -->
+    <InfoElement>
+      <ElementType>8</ElementType>
+      <ChildCount>1</ChildCount>
+      <VisibilityElement>
+        <ElementType>
+          <ElementType>2</ElementType>
+        </ElementType>
+        <ChildCount>3</ChildCount>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[ProductAssetData([RefGuid]) IsValid]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <ExpectedValueBool>False</ExpectedValueBool>
+          <Condition>[Selection Object IsOwnedByCurrentParticipant]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Selection Object IsKontor]</Condition>
+        </VisibilityElement>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>1</ElementType>
+          </ElementType>
+          <CompareOperator />
+          <ResultType />
+          <Condition>[Area CurrentSelectedArea PassiveTrade Offer([RefGuid]) IsPreferedGood]</Condition>
+        </VisibilityElement>
+        <OperatorType />
+      </VisibilityElement>
+      <InfoElement>
+        <ElementType>4</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Icon>
+          <IconGUID>1500006116</IconGUID>
+          <Style />
+        </Icon>
+        <Text>
+          <TextGUID>1500006117</TextGUID>
+          <Style />
+        </Text>
+        <Value>
+          <TextGUID>1500006116</TextGUID>
+          <Style />
+        </Value>
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>3</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <OperatorType />
+          </VisibilityElement>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Text>[SessionParticipants GetParticipant([Selection Object Owner]) Nameable Name]</Text>
+          <Style />
+        </Text>
+        <WarningType />
+        <BackgroundType />
+      </InfoElement>
+      <InfoElement>
+        <ElementType>6</ElementType>
+        <VisibilityElement>
+          <ElementType>
+            <ElementType>2</ElementType>
+          </ElementType>
+          <OperatorType />
+        </VisibilityElement>
+        <Text>
+          <Style />
+        </Text>
+      </InfoElement>
+    </InfoElement>
+    
+
+  </ModOp>
+
+  
+  
+</ModOps>

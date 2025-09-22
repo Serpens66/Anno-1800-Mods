@@ -1,0 +1,1352 @@
+<ModOps>
+    
+  <!-- uses Serp GUID 1500004381 (shared with Story/Campaign in multiplayer guids) -->
+   <!-- and 1500004410 bis einschl. 1500004413 -->
+  
+  
+  <!-- Seems like the Tutorial missions from how to airship are also already working in Coop without any code changes -->
+  
+  
+  <!-- Enable the whole and big paloma DLC11 Questline: 103687 StartDLC11_Questline_Pool -->
+   <!-- Dadurch starten die Quests also sobald die PreConditions für 103687 erfüllt sind: kein MP, DLC aktiv, Postamt/Briefkasten, 400 Obreros in neuer welt, irgendein Pop-Haus in alter Welt.  -->
+  <ModOp Type="addNextSibling" GUID="130248">
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004381</GUID>
+          <Name>EnableDLC11_Questline</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsCreativeMode</Template>
+            <Values>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+              <Condition />
+              <ConditionIsCreativeMode />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionSetQuestPoolEnablement</Template>
+                <Values>
+                  <Action />
+                  <ActionSetQuestPoolEnablement>
+                    <QuestPoolListToChange>
+                      <Item>
+                        <QuestPool>103687</QuestPool>
+                      </Item>
+                    </QuestPoolListToChange>
+                    <IsQuestPoolEnabled>1</IsQuestPoolEnabled>
+                    <ChangeForProcessingParticipant>1</ChangeForProcessingParticipant>
+                  </ActionSetQuestPoolEnablement>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- Add as condition for the questpool that new world session must be loaded, just to be sure it is not a scenario or so -->
+  <ModOp Type="merge" GUID='103687' Path="/Values/QuestPool">
+    <SessionDependencies>
+      <Item>
+        <SessionOrRegion>180025</SessionOrRegion>
+      </Item>
+    </SessionDependencies>
+  </ModOp>
+  
+  
+   <!-- ############## -->
+   
+    <!-- es kommt wohl noch in der alten Welt ein Zeitungsartikel zum Thema Paloma, bevor man die neue Welt erreicht hat. -->
+     <!-- evlt nochmal gucken ob das so sein soll und obs nicht mehr Sinn macht den erst anzuzeigen, wenn man in der neuen Welt ist? -->
+     <!-- suche evtl. nach <Name>DLC11_UnlockNewspaper oder <Name>Paloma_UnlockNewspaper -->
+   <!-- add condition that you need a kontor in the new world, before you get the paloma newspaper -->
+   <ModOp Type="merge" GUID='1379' Path="/Values">
+    <Trigger>
+      <TriggerCondition>
+        <Values>
+          <Condition>
+            <SubConditionCompletionOrder>Parallel</SubConditionCompletionOrder>
+          </Condition>
+        </Values>
+      </TriggerCondition>
+    </Trigger>
+  </ModOp>
+  <ModOp Type="replace" GUID='1379' Path="/Values/Trigger/SubTriggers">
+    <SubTriggers>
+      <Item>
+        <SubTrigger>
+          <Template>AutoCreateTrigger</Template>
+          <Values>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionUnlockedList</Template>
+                <Values>
+                  <Condition />
+                  <ConditionUnlockList>
+                    <UnlockNeededList>
+                      <Item>
+                        <UnlockNeeded>3761</UnlockNeeded>
+                      </Item>
+                      <Item>
+                        <UnlockNeeded>3741</UnlockNeeded>
+                      </Item>
+                    </UnlockNeededList>
+                    <UnlockRangeOP>Any</UnlockRangeOP>
+                  </ConditionUnlockList>
+                </Values>
+              </TriggerCondition>
+            </Trigger>
+          </Values>
+        </SubTrigger>
+      </Item>
+      <Item>
+        <SubTrigger>
+          <Template>AutoCreateTrigger</Template>
+          <Values>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionPlayerCounter</Template>
+                <Values>
+                  <Condition />
+                  <ConditionPlayerCounter>
+                    <Context>700000</Context>
+                    <CounterAmount>1</CounterAmount>
+                    <CounterScope>Session</CounterScope>
+                    <CounterScopeUseCurrentContext>0</CounterScopeUseCurrentContext>
+                    <CounterScopeContext>180025</CounterScopeContext>
+                  </ConditionPlayerCounter>
+                </Values>
+              </TriggerCondition>
+            </Trigger>
+          </Values>
+        </SubTrigger>
+      </Item>
+    </SubTriggers>
+  </ModOp>
+   
+   <!-- ############# -->
+   
+  
+  <!-- 103567 Q8 - Ending Popup letter3  sieht komisch aus, denn da ist als Condition ConditionTextPopupClosed PalomaEnding02 -->
+   <!-- und dann wird als Action ActionTriggerTextPopup PalomaEnding02 gemacht, während es auch PalomaEnding03 gibt aber nie im code verwendet wird. -->
+  <!-- ich würde also stark behaupten, dass es hier als Action PalomaEnding03 sein muss  -->
+  <!-- And add missing PopupText -->
+  <ModOp Type="merge" GUID='103567' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionTriggerTextPopup[TextPopupLayout='PalomaEnding02']">
+    <PopupText>103551</PopupText>
+    <TextPopupLayout>PalomaEnding03</TextPopupLayout>
+  </ModOp>
+  <ModOp Type="merge" GUID='103565' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionTriggerTextPopup[TextPopupLayout='PalomaEnding02']">
+    <PopupText>103550</PopupText>
+  </ModOp>
+  <ModOp Type="merge" GUID='103564' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionTriggerTextPopup[TextPopupLayout='PalomaEnding01']">
+    <PopupText>103549</PopupText>
+  </ModOp>
+        
+
+  <!-- ############# -->
+    
+    <!-- Königin verlangt in Quest "Ein königlicher Auftrag" zuerst den Bau eines "Zephyr" Luftschiffes. -->
+     <!-- Sobald das fertig ist ider die nachfolge quest plötzlich "verkaufe Archibald ein Quelzodingsbums", Quest GUID 1770 "Queen Q2.1 - Build &amp; Sell"  -->
+     <!-- das sollte offensichtlich eigentlich dasselbe luftschiff sein, was wir gerade gebaut haben. Muss man sich jetzt überlegen welches von beiden es sein soll. -->
+      <!-- Letzteres kann man auch ohne Arktis bauen, weshalb das denke ich sinnvoller ist. -->
+    <!-- Wobei der Verkauf des Zephyr die Quest gelöst hat. Also evlt nur ein Textfehler? (wobei Arktis Gas dennoch quatsch ist) -->
+    <!-- ok, in Quest steht, man muss ein Luftschiff aus dem Pool Q2_TargetAirshipPool 104456 bauen und verkaufen, was ein Zephyr ODER Quelzodingsbums ist -->
+      <!-- daher am Besten translation Text anpassen auf "Zephyr oder Quelzodingsbums" -->
+      <!-- <ObjectToSell>1060</ObjectToSell> hier steht aber wieder nur Quetzalcoatl drin.. komisch dass Zephyr verkaufen gefunzt hat?! -->
+       <!-- liegt daran, dass es eine hidden Quest gibt, 104457 Queen Q2.1 - Sell_Hidden, in dieser wird dann Zephyr geprüft, -->
+        <!-- da ObjectToSell nicht mit einem Pool umgehen kann. -->
+  
+  <!-- changed Text of the Pool in text file and use 104457 as SubQuestObjective instead (proper way of doing this) -->
+  <!-- also add jump to to any hangar -->
+  <ModOp Type="merge" GUID='1770' Path="/Values/Objectives/WinConditions/Item/Objective/Values[ConditionPlayerCounter/Context='104456']/ConditionQuestObjective">
+    <FakeMinimapPings>
+      <Objects>
+        <Item>
+          <FakeMinimapObjects>
+            <Template>ObjectFilter</Template>
+            <Values>
+              <ObjectFilter>
+                <ObjectGUID>636</ObjectGUID>
+              </ObjectFilter>
+            </Values>
+          </FakeMinimapObjects>
+        </Item>
+        <Item>
+          <FakeMinimapObjects>
+            <Template>ObjectFilter</Template>
+            <Values>
+              <ObjectFilter>
+                <ObjectGUID>635</ObjectGUID>
+              </ObjectFilter>
+            </Values>
+          </FakeMinimapObjects>
+        </Item>
+      </Objects>
+    </FakeMinimapPings>
+  </ModOp>
+  <ModOp Type="replace" GUID='1770' Path="/Values/Objectives/WinConditions/Item[Objective/Values/ConditionQuestSellObjectToParticipant]">
+    <Item>
+      <Objective>
+        <Template>SubQuestObjective</Template>
+        <Values>
+          <ConditionQuestSubQuest>
+            <Asset>104457</Asset>
+          </ConditionQuestSubQuest>
+          <ConditionQuestObjective>
+            <JumpToVisibility>Hide</JumpToVisibility>
+          </ConditionQuestObjective>
+        </Values>
+      </Objective>
+    </Item>
+  </ModOp>
+  <ModOp Type="replace" GUID='104457'>
+    <Asset>
+      <Template>A7_QuestSubQuest</Template>
+      <Values>
+        <Standard>
+          <GUID>104457</GUID>
+          <Name>Sell one of these airships</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/3rd_party_02.png</IconFilename>
+        </Standard>
+        <Objectives>
+          <WinConditionCompletionOrder>MutuallyExclusive</WinConditionCompletionOrder>
+          <WinConditions>
+            <Item>
+              <Objective>
+                <Template>SellObjectToParticipantObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>13777</TextCombinedContextValue>
+                    <FakeMinimapPings>
+                      <Objects>
+                        <Item>
+                          <FakeMinimapObjects>
+                            <Template>ObjectFilter</Template>
+                            <Values>
+                              <ObjectFilter>
+                                <ObjectGUID>100680</ObjectGUID>
+                              </ObjectFilter>
+                            </Values>
+                          </FakeMinimapObjects>
+                        </Item>
+                      </Objects>
+                    </FakeMinimapPings>
+                  </ConditionQuestObjective>
+                  <ConditionQuestSellObjectToParticipant>
+                    <BuyerParticipant>Third_party_02_Blake</BuyerParticipant>
+                    <ObjectToSell>1060</ObjectToSell>
+                  </ConditionQuestSellObjectToParticipant>
+                </Values>
+              </Objective>
+            </Item>
+            <Item>
+              <Objective>
+                <Template>SellObjectToParticipantObjective</Template>
+                <Values>
+                  <ConditionQuestObjective>
+                    <TextCombinedContextValue>13777</TextCombinedContextValue>
+                    <FakeMinimapPings>
+                      <Objects>
+                        <Item>
+                          <FakeMinimapObjects>
+                            <Template>ObjectFilter</Template>
+                            <Values>
+                              <ObjectFilter>
+                                <ObjectGUID>100680</ObjectGUID>
+                              </ObjectFilter>
+                            </Values>
+                          </FakeMinimapObjects>
+                        </Item>
+                      </Objects>
+                    </FakeMinimapPings>
+                  </ConditionQuestObjective>
+                  <ConditionQuestSellObjectToParticipant>
+                    <BuyerParticipant>Third_party_02_Blake</BuyerParticipant>
+                    <ObjectToSell>1737</ObjectToSell>
+                  </ConditionQuestSellObjectToParticipant>
+                </Values>
+              </Objective>
+            </Item>
+          </WinConditions>
+        </Objectives>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- we dont need start quest 104457 anymore, since we use SubQuest now-->
+  <ModOp Type="remove" GUID='1770' Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestObjective/OnSuccessActions/Values/ActionList/Actions/Item[Action/Values/ActionStartQuest/Quest='104457']" />
+  <!-- ActionEndQuest 104457 is already removed by replacing the WinCondition SellObjectToParticipantObjective above -->
+  
+  
+  
+  <!-- ##################### -->
+  
+  
+  <!-- Tutorial Quests funzen ja auch nicht im Story/Campaign Coop Mod -->
+  <!-- Quests wie <GUID>102995</GUID> <Name>TQ2_DLC11_Platform</Name> scheinen nicht zu starten? (da wird vermutlich ein wenig erklärt wie das funzt) -->
+   <!-- sollte eig kommen, wenn man in neuer welt ist, lufthafen freigeschaltet hat, noch keinen gebaut hat und mehr als 8 aluminum besitzt. -->
+   <!-- liegt vllt auch an savegame, mal in neuem spiel testen -->
+   <!-- Bestandteil der folgenden Gruppen: -->
+   <!-- <Group> -->
+    <!-- <GUID>-1314136424</GUID> -->
+    <!-- <Groups> -->
+      <!-- <Group> -->
+        <!-- <GUID>-1508242692</GUID> -->
+        <!-- <Groups> -->
+          <!-- <Group> -->
+            <!-- <GUID>-889831084</GUID>  ist im QuestPool 103652 QP_DLC11_Tutorial_1_Quests_HighPrio -->
+             <!-- gehört widerum zu 103646 QP_DLC11_Tutorial_Quests -->
+              <!-- und das zu 103643 QP_DLC11_Tutorial_Elements_ALL -->
+              <!-- und damit der was macht muss 103720 Unlock_DLC11_Tutorial unlocked sein , was in Quest 104437 TQ0000_DLC11_START_TUTORIAL unlocked wird -->
+               <!-- wobei diese Quest zu Gruppe -2031000854 gehört, welche zum pool 102931 DLC11_Start_Pool gehört, für den die Aluminiumchain unlokced sein muss -->
+                <!-- und erst enabled wird in Trigger 1382 Paloma_UnlockNewspaper_Audio, was in Trigger 1381 registered wird, was in 1379 DLC11_UnlockNewspaper_Trigger registered wird, wenn man ein postamt freigeschaltet hat -->
+      <!-- in meinem save ist 103720 locked, also stimmt da was nicht.. also schon nochmal neues spiel testen -->
+
+  <!-- vllt muss bei spielstart "mehr hilfe" aktiviert werden? Denke schon, Tutorial Quests funzen ja auch nicht im Story/Campaign Coop Mod -->
+
+
+  <!-- ################# -->
+  <!-- Add Hint about the Session where to fullfill the Quest -->
+  <ModOp Type="merge" Path="//Values[Objectives/WinConditions/Item/Objective/Values/ConditionQuestObjective/TextCombinedContextValue='104761']/Quest">
+    <QuestHints />
+  </ModOp>
+  <ModOp Type="add" Path="//Values[Objectives/WinConditions/Item/Objective/Values/ConditionQuestObjective/TextCombinedContextValue='104761']/Quest/QuestHints">
+    <Item>
+      <Text>180023</Text>
+    </Item>
+  </ModOp>
+  <ModOp Type="merge" Path="//Values[Objectives/WinConditions/Item/Objective/Values/ConditionQuestObjective/TextCombinedContextValue='104762']/Quest">
+    <QuestHints />
+  </ModOp>
+  <ModOp Type="add" Path="//Values[Objectives/WinConditions/Item/Objective/Values/ConditionQuestObjective/TextCombinedContextValue='104762']/Quest/QuestHints">
+    <Item>
+      <Text>180025</Text>
+    </Item>
+  </ModOp>
+  
+  <!-- ##### -->
+  
+  <!-- Add hint to 102445 that you need to hover over every island with your airship directly, so any airship is near the sister -->
+  <ModOp Type="merge" GUID="102445" Path="/Values/Quest">
+    <QuestHints />
+  </ModOp>
+  <ModOp Type="add" GUID="102445" Path="/Values/Quest/QuestHints">
+    <Item>
+      <Text>1500004381</Text>
+    </Item>
+  </ModOp>
+  
+  <!-- ########################## -->
+  <!-- quest 102808 in die beschreibung reinpacken, dass man die expedition nur mit luftschiffen machen kann, damit anfänger weiß, warum er da kein schiff auswwählen kann -->
+  <ModOp Type="merge" GUID='102808' Path="/Values/Quest">
+    <QuestHints />
+  </ModOp>
+  <ModOp Type="add" GUID='102808' Path="/Values/Quest/QuestHints">
+    <Item>
+      <Text>116566</Text>
+    </Item>
+  </ModOp>
+  
+  <!-- ##################### -->
+  
+  <!-- make the Expedition consume the QuestItem-Map, since it has no other purpose -->
+  <ModOp Type="add" GUID='104038' Path="/Values/ExpeditionOption">
+    <ConsumeRequirement>1</ConsumeRequirement>
+  </ModOp>
+  <!-- delete unneeded quest items after Expedition if we did not use them -->
+  <ModOp Type="merge" GUID='102808' Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionDeleteItem</Template>
+        <Values>
+          <Action />
+          <ActionDeleteItem>
+            <ItemGUID>103977</ItemGUID>
+          </ActionDeleteItem>
+        </Values>
+      </Action>
+    </Item>
+    <Item>
+      <Action>
+        <Template>ActionDeleteItem</Template>
+        <Values>
+          <Action />
+          <ActionDeleteItem>
+            <ItemGUID>102803</ItemGUID>
+          </ActionDeleteItem>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <!-- check correct ending for the expedition. no clue what "Returning" means, its not giving up. But with that the Quest does not solve when expedition is solved, so we use Ended instead, there it works -->
+  <ModOp Type="merge" GUID='102808' Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestExpedition[RequestedExpedition='103944']">
+    <CheckedExpeditionStates>Ended</CheckedExpeditionStates>
+  </ModOp>
+  <!-- and bigger delay for notifications -->
+  <ModOp Type="replace" GUID='102808' Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions/Item[Action/Values/ActionNotification/Notification/Values/BaseNotification/NotificationText='1674']">
+    <Item>
+      <Action>
+        <Template>ActionDelayedActions</Template>
+        <Values>
+          <Action />
+          <ActionDelayedActions>
+            <ExecutionDelay>10000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionNotification</Template>
+                        <Values>
+                          <Action />
+                          <ActionNotification>
+                            <Notification>
+                              <Template>CharacterNotification</Template>
+                              <Values>
+                                <CharacterNotification>
+                                  <Profile>1362</Profile>
+                                </CharacterNotification>
+                                <BaseNotification>
+                                  <NotificationText>1674</NotificationText>
+                                </BaseNotification>
+                                <NotificationSubtitle>
+                                  <Subtitle>1668</Subtitle>
+                                </NotificationSubtitle>
+                              </Values>
+                            </Notification>
+                          </ActionNotification>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <ModOp Type="merge" GUID='102808' Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions/Item/Action/Values/ActionDelayedActions[DelayedActions/Values/ActionList/Actions/Item/Action/Values/ActionForceNewspaper]">
+    <ExecutionDelay>20000</ExecutionDelay>
+  </ModOp>
+  <ModOp Type="merge" GUID='102808' Path="/Values/Quest/OnQuestEnd/Values/ActionList/Actions/Item/Action/Values/ActionDelayedActions[DelayedActions/Values/ActionList/Actions/Item/Action/Values/ActionStartQuest]">
+    <ExecutionDelay>30000</ExecutionDelay>
+  </ModOp>
+    
+    
+  <!-- ###### -->
+  
+  <!-- Seltsame Figur -->
+  <!-- <IconFilename>data/ui/2kimages/main/3dicons/narative_item/icon_cursed_artefact.png</IconFilename> -->
+  <!-- Vermutlich ein Glücksbringer. Sie hat tatsächlich eine verzaubernde Aura ... -->
+  <!-- einem merkwürdigen Artefakt, das in einer Schublade liegt.&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Die Mannschaft reicht die Figur begeistert untereinander weiter, während sie zum Luftschiff zurückkehrt, in der Überzeugung, dass es sich um einen Glücksbringer handeln muss. -->
+  <!-- <GUID>104054</GUID> <Name>StrangeIdol_Expedition_fluff</Name>: Jeder, der ihr in die Augen schaut, wird umgehend verzaubert. -->
+  
+  <!-- Allerdings ergibt sich mir nicht wofür man das braucht, scheint in keiner quest oderso gebraucht zu werden -->
+  <!-- mal schauen was zukünftige entscheidungen der expedition so verlangen, man könnte dem item iein expeditionsbonus geben, was dabei hilft. -->
+   <!-- oder vllt wird es explizit ja noch in den texten erwähnt, ne sieht nicht so aus. -->
+  
+  <!-- also machen wir einfach ein FluffItem mit starken Expeditionsboni draus, aber negativer Medicine dafür dass es cursed ist -->
+  
+  <ModOp Type="replace" GUID='104052'>
+    <Asset>
+      <Template>FluffItem</Template>
+      <Values>
+        <Standard>
+          <GUID>104052</GUID>
+          <Name>Strange Idol</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/narative_item/icon_cursed_artefact.png</IconFilename>
+          <InfoDescription>104053</InfoDescription>
+        </Standard>
+        <Text />
+        <Item>
+          <Allocation>None</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Narrative</Rarity>
+          <ItemType>None</ItemType>
+          <TradePrice>100000</TradePrice>
+        </Item>
+        <ExpeditionAttribute>
+          <BaseMorale>10</BaseMorale>
+          <ExpeditionAttributes>
+            <Item>
+              <Attribute>PerkHypnotist</Attribute>
+              <Amount>1</Amount>
+            </Item>
+            <Item>
+              <Attribute>Faith</Attribute>
+              <Amount>50</Amount>
+            </Item>
+            <Item>
+              <Attribute>Diplomacy</Attribute>
+              <Amount>50</Amount>
+            </Item>
+            <Item>
+              <Attribute>Melee</Attribute>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Attribute>Might</Attribute>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Attribute>Navigation</Attribute>
+              <Amount>5</Amount>
+            </Item>
+            <Item>
+              <Attribute>Medicine</Attribute>
+              <Amount>-30</Amount>
+            </Item>
+            <Item>
+              <Attribute>Crafting</Attribute>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Attribute>Hunting</Attribute>
+              <Amount>10</Amount>
+            </Item>
+          </ExpeditionAttributes>
+          <FluffText>104054</FluffText>
+        </ExpeditionAttribute>
+        <Locked />
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
+  <!-- ##### -->
+  <!-- <GUID>103980</GUID><Text>Langsam den Pinguinen nähern</Text> -->
+  <!-- evtl von der paloma arktis epxedition einen echten pinguin für die schwester mitnehemn? :D -->
+  <!-- evtl. doch ein QuestItem draus machen und ne Quest dazu, dass man der Schwester ein Stoff Pinguin schenken kann -->
+   <!-- zb. indem man jemanden beauftragt aus Material X einen herzustellen TODO? -->
+   <!-- Alternativ als Reward von der Quest 103933 an den Spieler geben, der Handwerker hat selbst neue hergestellt -->
+  <ModOp Type="add" GUID='103933' Path="/Values/Reward/RewardAssets">
+    <Item>
+      <Reward>1500004411</Reward>
+      <Amount>1</Amount>
+      <IsHidden>1</IsHidden>
+      <IsDisguised>1</IsDisguised>
+    </Item>
+  </ModOp>
+  <ModOp Type="addNextSibling" GUID='112574'>
+    <Asset>
+      <Template>FluffItem</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004411</GUID>
+          <Name>Penguin Quinn</Name>
+          <!-- <IconFilename>data/ui/2kimages/main/3dicons/animals/icon_penguin.png</IconFilename> -->
+          <IconFilename>data/icons_serp/Quinn.png</IconFilename>
+          <InfoDescription>103550</InfoDescription>
+        </Standard>
+        <Text />
+        <Item>
+          <Allocation>None</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Narrative</Rarity>
+          <ItemType>None</ItemType>
+          <TradePrice>1</TradePrice>
+        </Item>
+        <ExpeditionAttribute>
+          <BaseMorale>50</BaseMorale>
+          <ExpeditionAttributes>
+            <Item />
+          </ExpeditionAttributes>
+          <FluffText>103550</FluffText>
+        </ExpeditionAttribute>
+        <Locked />
+      </Values>
+    </Asset>
+  </ModOp>
+
+  
+  <!-- Make the DecisionQuest autoclose -->
+  <ModOp Type="merge" GUID='102878,102324,814' Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestDecision/DecisionList/Item/Decision/Values/ConditionDecision/DecisionOptionList/Item/DecisionOption/Values/ConditionDecisionOption">
+    <HideDecisionPanelAfterChoice>1</HideDecisionPanelAfterChoice>
+  </ModOp>
+  
+  <!-- Die Quest Lösegeld 102910 bezahlen sollte ein Zeitlimit haben und abbrechbar sein. und wenn failed, dann kommt eben "wir zahlen kein Lösegeld" -->
+  <ModOp Type="merge" GUID='102910' Path="/Values">
+    <Quest>
+      <OnQuestAborted>
+        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+        <Values>
+          <ActionList>
+            <Actions />
+          </ActionList>
+        </Values>
+      </OnQuestAborted>
+      <OnQuestFailed>
+        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+        <Values>
+          <ActionList>
+            <Actions />
+          </ActionList>
+        </Values>
+      </OnQuestFailed>
+      <QuestTimeLimit>7200000</QuestTimeLimit>
+      <IsAbortable>1</IsAbortable>
+    </Quest>
+  </ModOp>
+  <ModOp Type="add" GUID='102910' Path="/Values/Quest/*[self::OnQuestAborted or self::OnQuestFailed]/Values/ActionList/Actions">
+    <Item>
+      <Action>
+        <Template>ActionStartQuest</Template>
+        <Values>
+          <Action />
+          <ActionStartQuest>
+            <Quest>102911</Quest>
+            <InheritQuestArea>1</InheritQuestArea>
+            <InheritQuestSession>1</InheritQuestSession>
+            <InheritQuestObjects>1</InheritQuestObjects>
+          </ActionStartQuest>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  
+  <!-- ############# -->
+
+
+  <!-- den ungenutzten "gefunden" Zeitungsartikel am Ende von der letzen Quest Brotkrumen anzeigen lassen sollte wohl passen -->
+  <ModOp Type="add" GUID='103753' Path="/Values/Trigger/TriggerActions">
+    <Item>
+      <TriggerAction>
+        <Template>ActionForceNewspaper</Template>
+        <Values>
+          <Action />
+          <ActionForceNewspaper>
+            <Articles>
+              <Item>
+                <Article>786</Article>
+              </Item>
+            </Articles>
+            <OpenNewspaperUI>1</OpenNewspaperUI>
+            <OpenNewspaperType>SpecialEdition</OpenNewspaperType>
+          </ActionForceNewspaper>
+        </Values>
+      </TriggerAction>
+    </Item>
+  </ModOp>
+  
+  <!-- vermissten Bruder als Airship Specialist mit guten Expeditionsboni -->
+  <ModOp Type="replace" GUID='104089,104088' Path="/Values/Standard/IconFilename">
+    <IconFilename>data/icons_serp/paloma_brother.png</IconFilename>
+  </ModOp>
+  <!-- add ShipSpecialist Palomas Brother: Saulo Valente as final reward -->
+  <ModOp Type="add" GUID='104821' Path="/Values/Reward/RewardAssets">
+    <Item>
+      <Reward>1500004410</Reward>
+      <Amount>1</Amount>
+    </Item>
+  </ModOp>
+  <!-- optional eine DecisionQuest machen, wo man sich aussuchen kann ob man ihn als Kapitän für Luftschiff haben will -->
+   <!-- oder als jemand der Luftschiff Werft verschnellert -->
+  <ModOp Type="addNextSibling" GUID="112574">
+    <Asset>
+      <Template>ShipSpecialist</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004410</GUID>
+          <Name>Palomas Brother: Saulo Valente</Name>
+          <IconFilename>data/icons_serp/paloma_brother.png</IconFilename>
+          <InfoDescription>103404</InfoDescription>
+        </Standard>
+        <Text>
+          <TextOverride>104089</TextOverride>
+        </Text>
+        <Item>
+          <Allocation>AirShip</Allocation>
+          <MaxStackSize>1</MaxStackSize>
+          <Rarity>Legendary</Rarity>
+          <TradePrice>1</TradePrice>
+          <ExclusiveGroup>Captain</ExclusiveGroup>
+          <HasAction>1</HasAction>
+        </Item>
+        <Cost />
+        <ItemAction>
+          <ActionCooldown>600000</ActionCooldown>
+          <ActionDuration>60000</ActionDuration>
+          <ActiveBuff>192156</ActiveBuff>
+          <CanEndItemAction>1</CanEndItemAction>
+          <StopMovementOnInteraction>1</StopMovementOnInteraction>
+          <ActionDescription>20071</ActionDescription>
+        </ItemAction>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <SpecialAction />
+        <VehicleUpgrade>
+          <ForwardSpeedUpgrade>
+            <Value>20</Value>
+            <Percental>1</Percental>
+          </ForwardSpeedUpgrade>
+          <IgnoreDamageFactorUpgrade>
+            <Value>60</Value>
+            <Percental>1</Percental>
+          </IgnoreDamageFactorUpgrade>
+          <MaintainanceUpgrade>
+            <Value>-25</Value>
+            <Percental>1</Percental>
+          </MaintainanceUpgrade>
+          <IgnoreWeightFactorUpgrade>
+            <Value>-20</Value>
+            <Percental>1</Percental>
+          </IgnoreWeightFactorUpgrade>
+        </VehicleUpgrade>
+        <AttackerUpgrade>
+          <AttackRangeUpgrade>
+            <Value>10</Value>
+            <Percental>1</Percental>
+          </AttackRangeUpgrade>
+          <BaseDamageUpgrade>
+            <Value>10</Value>
+            <Percental>1</Percental>
+          </BaseDamageUpgrade>
+          <LineOfSightRangeUpgrade>
+            <Value>10</Value>
+            <Percental>1</Percental>
+          </LineOfSightRangeUpgrade>
+        </AttackerUpgrade>
+        <AttackableUpgrade />
+        <TradeShipUpgrade />
+        <DivingBellUpgrade />
+        <ExpeditionAttribute>
+          <BaseMorale>5</BaseMorale>
+          <ExpeditionAttributes>
+            <Item>
+              <Attribute>PerkMale</Attribute>
+              <Amount>1</Amount>
+            </Item>
+            <Item>
+              <Attribute>PerkAnthropologist</Attribute>
+              <Amount>1</Amount>
+            </Item>
+            <Item>
+              <Attribute>PerkJackOfAllTraits</Attribute>
+              <Amount>1</Amount>
+            </Item>
+            <Item>
+              <Attribute>Navigation</Attribute>
+              <Amount>20</Amount>
+            </Item>
+            <Item>
+              <Attribute>Melee</Attribute>
+              <Amount>30</Amount>
+            </Item>
+            <Item>
+              <Attribute>Crafting</Attribute>
+              <Amount>50</Amount>
+            </Item>
+            <Item>
+              <Attribute>Faith</Attribute>
+              <Amount>10</Amount>
+            </Item>
+            <Item>
+              <Attribute>Hunting</Attribute>
+              <Amount>10</Amount>
+            </Item>
+          </ExpeditionAttributes>
+          <FluffText>103404</FluffText>
+        </ExpeditionAttribute>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <!-- ## -->
+  
+  <!-- add Jump To to Archibalds island -->
+  <ModOp Type="merge" GUID="102445" Path="/Values/Objectives/WinConditions/Item/Objective[Template='FakeQuestObjective']/Values">
+    <ConditionQuestObjective>
+      <FakeMinimapPings>
+        <Objects>
+          <Item>
+            <FakeMinimapObjects>
+              <Template>ObjectFilter</Template>
+              <Values>
+                <ObjectFilter>
+                  <ObjectGUID>100680</ObjectGUID>
+                </ObjectFilter>
+              </Values>
+            </FakeMinimapObjects>
+          </Item>
+        </Objects>
+      </FakeMinimapPings>
+      <JumpToVisibility>ShowOnlyFakePings</JumpToVisibility>
+    </ConditionQuestObjective>
+  </ModOp>
+  
+  <!-- ################### -->
+  <!-- Queen ransom Quest -->
+
+   <!-- ts.Quests.StartQuestForCurrentPlayerNet(104752) -->
+
+  <!-- spawn a few more pirates -->
+   <ModOp Type="merge" GUID="102874" Path="/Values/Quest/OnQuestStart/Values/ActionList/Actions/Item/Action/Values/ActionDelayedActions/DelayedActions/Values/ActionList/Actions/Item/Action/Values/ActionSpawnObjects">
+    <Amount>3</Amount>
+  </ModOp>
+  
+  <ModOp Type="AddNextSibling" GUID="700000">
+    <Asset>
+      <Template>AssetPool</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004412</GUID>
+          <Name>AP - All Quest Pirate Ship Queen Ransom (to make them move as fleet)</Name>
+        </Standard>
+        <AssetPool>
+          <AssetList>
+            <Item>
+              <Asset>104017</Asset>
+            </Item>
+            <Item>
+              <Asset>104018</Asset>
+            </Item>
+            <Item>
+              <Asset>104019</Asset>
+            </Item>
+          </AssetList>
+        </AssetPool>
+      </Values>
+    </Asset>
+  </ModOp>
+  <!-- make the pirate ships move as fleet at same speed -->
+  <ModOp Type="add" GUID="102911" Path="/Values/Quest/OnQuestActive/Values/ActionList/Actions/Item/Action/Values/ActionDelayedActions/DelayedActions/Values/ActionList/Actions[Item/Action/Values/ActionMoveObject]">
+    <Item>
+      <Action>
+        <Template>ActionMoveObject</Template>
+        <Values>
+          <Action />
+          <ObjectFilter>
+            <ObjectGUID>1500004412</ObjectGUID>
+            <CheckQuestStarterSession>1</CheckQuestStarterSession>
+            <ObjectRestrictToQuestObjects>1</ObjectRestrictToQuestObjects>
+          </ObjectFilter>
+          <ObjectTargetFilter>
+            <TargetGUID>700048</TargetGUID>
+            <TargetCheckQuestStarterSession>1</TargetCheckQuestStarterSession>
+            <TargetCheckQuestArea>1</TargetCheckQuestArea>
+            <TargetMaxObjectCount>1</TargetMaxObjectCount>
+          </ObjectTargetFilter>
+          <ActionMoveObject />
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+  <!-- remove old move commands -->
+  <ModOp Type="remove" GUID="102911" Path="/Values/Quest/OnQuestActive/Values/ActionList/Actions/Item/Action/Values/ActionDelayedActions/DelayedActions/Values/ActionList/Actions/Item[Action/Values[ActionMoveObject and (ObjectFilter/ObjectGUID='104017' or ObjectFilter/ObjectGUID='104018' or ObjectFilter/ObjectGUID='104019')]]"></ModOp>
+  
+  
+  <!-- make jump to pirate ships work -->
+  <!-- ShowMinimapToken=0 sorgt scheinbar dafür, dass JumpTo in Quest nicht funktioniert -->
+  <!-- (also fixed for all vanilla Quests in Bugfix community patch mod) -->
+  <ModOp Type="merge" GUID="102911,102912,103841,104006" Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestObjective/FakeMinimapPings/Objects/Item/SignsAndFeedback/Values/ConditionObjectiveSignsAndFeedback">
+    <ShowMinimapToken>1</ShowMinimapToken>
+    <MinimapToken>0</MinimapToken>
+    <ShowOutline>0</ShowOutline>
+  </ModOp>
+  <!-- also allow jump to moving pirate airship -->
+  <ModOp Type="add" GUID="102912,103841" Path="/Values/Objectives/WinConditions/Item/Objective/Values/ConditionQuestObjective/FakeMinimapPings/Objects">
+    <Item>
+      <FakeMinimapObjects>
+        <Template>ObjectFilter</Template>
+        <Values>
+          <ObjectFilter>
+            <ObjectGUID>102875</ObjectGUID>
+          </ObjectFilter>
+        </Values>
+      </FakeMinimapObjects>
+      <SignsAndFeedback>
+        <Template>ConditionObjectiveSignsAndFeedback</Template>
+        <Values>
+          <ConditionObjectiveSignsAndFeedback>
+            <Infolayer>0</Infolayer>
+            <MinimapToken>0</MinimapToken>
+            <ShowMinimapToken>1</ShowMinimapToken>
+          </ConditionObjectiveSignsAndFeedback>
+        </Values>
+      </SignsAndFeedback>
+    </Item>
+  </ModOp>
+
+
+  <!-- Queen Rewards am Ende der Quest 103095 sind skins: 103830 und 103833 (werden auch unlocked), -->
+   <!-- aber es wird nicht in der Nacricht der Queen angezeigt, -->
+  <!-- make the skin rewards be properly displayed as final reward -->
+  <ModOp Type="merge" GUID="103095,104351" Path="/Values/Reward">
+    <GenerateIgnoreUnlocks>1</GenerateIgnoreUnlocks>
+  </ModOp>
+  
+  <!-- und startet dann wieder Paloma Questreihe: <GUID>104756</GUID><Name>Q7_WaitQuest</Name> in der alten welt -->
+   <!-- mit sustain Postamt in subquest 104808. alte welt ist hierbei offenbar egal, geht auch neue welt -->
+   <!-- Man könnte diese unnötige Aufgabe mit dem Postamt entfernen, weil man das ja eh schon hat, aber ich will da auch nicht zuviel mitmischen, -->
+    <!-- weils sehr verschaltelt ist, und vllt ist sowohl Postamt als auch die 1 Minute Wartezeit im Laufe der Quest notwendig. -->
+     <!-- Also auch wenns unnsinnig scheint, einfach so lassen. -->
+  
+
+  <!-- Queen Quest am besten nur dann nicht erlauben, während Quest "Königin verschwunden" aktiv ist. Rest ist egal, so erspart man sich auch -->
+    <!-- komplizierte Checks mit der Session und anderen Mods -->
+    <!-- Gibt davor auch noch: <GUID>103722</GUID><Text>Ein königlicher Auftrag</Text> -->
+    <!-- Dh. in 103722 und in 103747 (bzw. Pools 103721 und 103746) als PreConditionList/SubConditions zufügen, dass die Quest (questline 113430) 111842/113383 nicht active sein darf -->
+    <!-- Genauso am besten auch umgekehrt, diese verschwunden Quests nicht starten, während die Paloma Questreihe mit der Königin aktiv sind. -->
+  <!-- do not start the 2 Quests Parts with the Queen while the Queen is vanished from Cape-Expedition Quest -->
+  
+  
+  <!-- ist das die richtige quest? -->
+  <!-- <GUID>103729</GUID><Name>Start_Questline5_Pool</Name> mit quest 103730 -->
+  <!-- scheint auch mit Queen zusammen zu hängen? -->
+  <!-- sowohl 103722 (pool 103721) als auch 103730 (pool 103729) sowie 103747 (pool 103746) heißen Hidden_QueenArrival -->
+  
+  <ModOp Type="merge" GUID="103721,103729,103746" Path="/Values/PreConditionList">
+    <SubConditions />
+  </ModOp>
+  <ModOp Type="add" GUID="103721,103729,103746" Path="/Values/PreConditionList/SubConditions">
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>111842</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>113383</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+  </ModOp>
+  <!-- do not start the cape queen vanished quest while one of the paloma queen questlines are active -->
+  <ModOp Type="merge" GUID="111842,113383" Path="/Values/PreConditionList">
+    <SubConditions />
+  </ModOp>
+  <ModOp Type="add" GUID="111842,113383" Path="/Values/PreConditionList/SubConditions">
+    <!-- build airship for queen questline -->
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>103722</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>103444</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>1770</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>104457</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>101066</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <!-- ransom questline -->
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>103747</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>102845</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>102874</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>102878</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>102910</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>102912</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>103817</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>103823</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>103821</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>103095</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>103841</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+    <Item>
+      <SubCondition>
+        <Template>PreConditionList</Template>
+        <Values>
+          <PreConditionList>
+            <Condition>
+              <Template>ConditionQuestState</Template>
+              <Values>
+                <Condition />
+                <ConditionQuestState>
+                  <ConditionQuestStateStates>Active</ConditionQuestStateStates>
+                  <ConditionQuestStateIsBlacklist>1</ConditionQuestStateIsBlacklist>
+                  <ConditionQuestStateQuestGUID>104351</ConditionQuestStateQuestGUID>
+                </ConditionQuestState>
+              </Values>
+            </Condition>
+          </PreConditionList>
+        </Values>
+      </SubCondition>
+    </Item>
+  </ModOp>
+  
+
+  <!-- ############ -->
+
+  
+  <!-- Deleting the fake Airdrops clouds (101210 is already deleted, the other 3 are not), because they block clicking houses below -->
+  <ModOp Type="add" GUID="103894,103821" Path="/Values/Quest/OnQuestStart/Values/ActionList/Actions/Item/Action/Values/ActionDelayedActions/DelayedActions/Values/ActionList/Actions[Item/Action/Values/ObjectFilter/ObjectGUID='101210']">
+    <Item>
+      <Action>
+        <Template>ActionDeleteObjects</Template>
+        <Values>
+          <Action />
+          <ActionDeleteObjects />
+          <ObjectFilter>
+            <ObjectGUID>104776</ObjectGUID>
+          </ObjectFilter>
+        </Values>
+      </Action>
+    </Item>
+    <Item>
+      <Action>
+        <Template>ActionDeleteObjects</Template>
+        <Values>
+          <Action />
+          <ActionDeleteObjects />
+          <ObjectFilter>
+            <ObjectGUID>104777</ObjectGUID>
+          </ObjectFilter>
+        </Values>
+      </Action>
+    </Item>
+    <Item>
+      <Action>
+        <Template>ActionDeleteObjects</Template>
+        <Values>
+          <Action />
+          <ActionDeleteObjects />
+          <ObjectFilter>
+            <ObjectGUID>104778</ObjectGUID>
+          </ObjectFilter>
+        </Values>
+      </Action>
+    </Item>
+  </ModOp>
+    
+    
+</ModOps>

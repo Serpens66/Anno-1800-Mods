@@ -55,7 +55,7 @@ if event.OnLeaveUIState[ModID] == nil then -- only add it once (per anno game st
     end
     g_LuaScriptBlockers = {} -- also reset these tables on game load
     g_OnGameLeave_serp = {}
-    ts.Unlock.SetUnlockNet(1500004636) -- Execute_SavegameLoadedEvent, unlock this FeatureUnlock to notify other mods
+    ts.Unlock.SetRelockNet(1500004636) -- Execute_SavegameLoadedEvent, lock this FeatureUnlock to notify other mods
   end
 
 

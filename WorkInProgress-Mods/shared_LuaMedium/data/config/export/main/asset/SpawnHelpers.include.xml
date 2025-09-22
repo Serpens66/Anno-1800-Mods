@@ -12,7 +12,7 @@
      <!-- then only spawn a helper building in islands which have building X on it) -->
   
   <!-- usage for lua: -->
-   <!-- For Buildings: unlock 1500005549 eg with. ts.Unlock.SetUnlockNet(1500005549) to spawn a helper building on every island owned by the current player (every session) -->
+   <!-- For Buildings: lock 1500005549 eg with. ts.Unlock.SetRelockNet(1500005549) to spawn a helper building on every island owned by the current player (every session) -->
     <!-- Use code like this to wait for the spawning to finish (takes ~100ms per island) -->
     <!-- local islandssettled = ts.Participants.GetParticipant(0).ProfileCounter.Stats.GetCounter(0,14,0,3) -->
     <!-- local count = ts.Participants.GetParticipant(0).ProfileCounter.Stats.GetCounter(0,0,1500005548,3) -->
@@ -24,7 +24,7 @@
      <!-- because it will know what the current max ObjectID is, as soon as it found object 1500005548. -->
     <!-- Currently the object 1500005548 stays for 30 GameTime seconds, while the spawning takes roughly 10 seconds for 80 islands (very huge savegame) -->
      <!-- I hope this is enough time, even on slower PCs... if not I have to adjust the DelayedAction and ConditoinTimer in the FeatureUnlocks -->
-   <!-- For Walkables (Ships) do the same with unlock 1500005552 , which will spawn one helper ship per settled Session.  -->
+   <!-- For Walkables (Ships) do the same with 1500005552 , which will spawn one helper ship per settled Session.  -->
    <!-- This should complete within a second, even if ~8 sessions are active. The helpers will disappear after ~10 seconds. -->
     <!-- use this to compare to find out if all already spawned: local num_sessions = g_LuaTools.table_len(g_LTM_Serp.Shared_Cache[ModID].LoadedSessions) -->
    
@@ -523,7 +523,9 @@
                         <ConditionUnlocked>
                           <UnlockNeeded>1500005549</UnlockNeeded>
                         </ConditionUnlocked>
-                        <ConditionPropsNegatable />
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
                       </Values>
                     </Condition>
                   </PreConditionList>
@@ -647,7 +649,9 @@
                         <ConditionUnlocked>
                           <UnlockNeeded>1500005552</UnlockNeeded>
                         </ConditionUnlocked>
-                        <ConditionPropsNegatable />
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
                       </Values>
                     </Condition>
                   </PreConditionList>
@@ -714,7 +718,9 @@
           <GUID>1500005549</GUID>
           <Name>Enable Spawn Dummy Building on All Human Islands</Name>
         </Standard>
-        <Locked />
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
         <Trigger>
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
@@ -723,7 +729,9 @@
               <ConditionUnlocked>
                 <UnlockNeeded>1500005549</UnlockNeeded>
               </ConditionUnlocked>
-              <ConditionPropsNegatable />
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
             </Values>
           </TriggerCondition>
           <TriggerActions>
@@ -741,16 +749,16 @@
                           <Actions>
                             <Item>
                               <Action>
-                                <Template>ActionLockAsset</Template>
+                                <Template>ActionUnlockAsset</Template>
                                 <Values>
                                   <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
+                                  <ActionUnlockAsset>
+                                    <UnlockAssets>
                                       <Item>
                                         <Asset>1500005549</Asset>
                                       </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
+                                    </UnlockAssets>
+                                  </ActionUnlockAsset>
                                 </Values>
                               </Action>
                             </Item>
@@ -810,7 +818,9 @@
           <GUID>1500005552</GUID>
           <Name>Enable Spawn Dummy Walkable on All Human settled Sessions</Name>
         </Standard>
-        <Locked />
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
         <Trigger>
           <TriggerCondition>
             <Template>ConditionUnlocked</Template>
@@ -819,7 +829,9 @@
               <ConditionUnlocked>
                 <UnlockNeeded>1500005552</UnlockNeeded>
               </ConditionUnlocked>
-              <ConditionPropsNegatable />
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
             </Values>
           </TriggerCondition>
           <TriggerActions>
@@ -837,16 +849,16 @@
                           <Actions>
                             <Item>
                               <Action>
-                                <Template>ActionLockAsset</Template>
+                                <Template>ActionUnlockAsset</Template>
                                 <Values>
                                   <Action />
-                                  <ActionLockAsset>
-                                    <LockAssets>
+                                  <ActionUnlockAsset>
+                                    <UnlockAssets>
                                       <Item>
                                         <Asset>1500005552</Asset>
                                       </Item>
-                                    </LockAssets>
-                                  </ActionLockAsset>
+                                    </UnlockAssets>
+                                  </ActionUnlockAsset>
                                 </Values>
                               </Action>
                             </Item>
