@@ -42,34 +42,44 @@
           </TriggerCondition>
           <TriggerActions> 
             <!-- an invisble abort notification, cancels all currently displayed notifications. aim is to remove the "display film" notification for coop clients -->
-            <Item>
-              <TriggerAction>
-                <Template>ActionNotification</Template>
-                <Values>
-                  <Action />
-                  <ActionNotification>
-                    <Notification>
-                      <Template>CharacterNotification</Template>
-                      <Values>
-                        <CharacterNotification>
-                          <ShowDuringCameraSequence>1</ShowDuringCameraSequence>
-                        </CharacterNotification>
-                        <BaseNotification>
-                          <DisplayTimeout>100</DisplayTimeout>
-                          <NotificationPriority>-1</NotificationPriority>
-                          <NotificationMinDisplayTime>0</NotificationMinDisplayTime>
-                          <NotificationBlockingTime>0</NotificationBlockingTime>
-                        </BaseNotification>
-                        <NotificationSubtitle>
-                          <SubtitleGroup />
-                          <Subtitle />
-                        </NotificationSubtitle>
-                      </Values>
-                    </Notification>
-                  </ActionNotification>
-                </Values>
-              </TriggerAction>
-            </Item>
+            <!-- unfortunately this does only remove the current displayed notification, not the ones queued afterwards. -->
+             <!-- so we would have to do it multiple times to be sure... but we can not know which notification is currently shown -->
+              <!-- and we dont want to abort any movie-notifications, not notifications shown if the movie is not played... -->
+              <!-- DO NOT abort notification here again after 100 or 500 or 1000 ms to make really sure the 'play movie?' notification was removed -->
+               <!-- because if the movie is started meanwhile, the abortion will be done after the movie, which is not good since it aborts story notifications. -->
+                <!-- So either only do directly one abortion here without delay (what we will do) or multiple and delayed abortions to really be sure the play-movie-notification is removed, -->
+                 <!-- but then it is required to WAIT with playing the movie/doing other story progress, so it has to be added to nearly every single unlock in this  -->
+                  <!-- file and delay playing the movie/do other progress. -->
+                <!-- ok, we dont abort notifications at all, because even without delay it will abort the first notification after eg. refusing to play the movie for the player who hit the button. -->
+                 <!-- and by using unlocks, we already made sure the mobie wont be played twice, regardless what other players hit -->
+            <!-- <Item> -->
+              <!-- <TriggerAction> -->
+                <!-- <Template>ActionNotification</Template> -->
+                <!-- <Values> -->
+                  <!-- <Action /> -->
+                  <!-- <ActionNotification> -->
+                    <!-- <Notification> -->
+                      <!-- <Template>CharacterNotification</Template> -->
+                      <!-- <Values> -->
+                        <!-- <CharacterNotification> -->
+                          <!-- <ShowDuringCameraSequence>1</ShowDuringCameraSequence> -->
+                        <!-- </CharacterNotification> -->
+                        <!-- <BaseNotification> -->
+                          <!-- <DisplayTimeout>100</DisplayTimeout> -->
+                          <!-- <NotificationPriority>-1</NotificationPriority> -->
+                          <!-- <NotificationMinDisplayTime>0</NotificationMinDisplayTime> -->
+                          <!-- <NotificationBlockingTime>0</NotificationBlockingTime> -->
+                        <!-- </BaseNotification> -->
+                        <!-- <NotificationSubtitle> -->
+                          <!-- <SubtitleGroup /> -->
+                          <!-- <Subtitle /> -->
+                        <!-- </NotificationSubtitle> -->
+                      <!-- </Values> -->
+                    <!-- </Notification> -->
+                  <!-- </ActionNotification> -->
+                <!-- </Values> -->
+              <!-- </TriggerAction> -->
+            <!-- </Item> -->
           </TriggerActions>
           <ResetTrigger>
             <Template>AutoCreateTrigger</Template>
@@ -80,9 +90,8 @@
                   <Values>
                     <Condition />
                     <ConditionTimer>
-                      <!-- the "play film" notification is roguhly displayed 45 seconds if nothing is hit -->
-                       <!-- but we abort the notification above with new text, so time can be shorter -->
-                      <TimeLimit>10000</TimeLimit>
+                      <!-- the "play film" notification is roughly displayed 45 seconds if nothing is hit -->
+                      <TimeLimit>45000</TimeLimit>
                     </ConditionTimer>
                   </Values>
                 </TriggerCondition>
@@ -150,8 +159,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
-            
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004341</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             <Item>
               <TriggerAction>
                 <Template>ActionExecuteScript</Template>
@@ -251,7 +271,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004311</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <!-- a delay, because it seems game crashes quite often when we skip the movie, maybe a delay helps -->
             <Item>
@@ -333,7 +365,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004342</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
               <TriggerAction>
@@ -498,7 +542,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004312</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             
             <Item>
@@ -645,7 +701,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004343</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
               <TriggerAction>
@@ -783,7 +851,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004313</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             
             <Item>
@@ -902,7 +982,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004344</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
               <TriggerAction>
@@ -1067,7 +1159,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004314</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             
             <Item>
@@ -1213,7 +1317,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004345</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
               <TriggerAction>
@@ -1314,7 +1430,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004315</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
               <TriggerAction>
@@ -1396,7 +1524,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004346</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
               <TriggerAction>
@@ -1511,7 +1651,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004316</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             
             <Item>
@@ -1605,7 +1757,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004347</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
               <TriggerAction>
@@ -1619,7 +1783,7 @@
               </TriggerAction>
             </Item>
             <Item>
-              <Action>
+              <TriggerAction>
                 <Template>ActionRegisterTrigger</Template>
                 <Values>
                   <Action />
@@ -1627,7 +1791,7 @@
                     <TriggerAsset>120342</TriggerAsset>
                   </ActionRegisterTrigger>
                 </Values>
-              </Action>
+              </TriggerAction>
             </Item>
             <Item>
               <TriggerAction>
@@ -1642,18 +1806,40 @@
               </TriggerAction>
             </Item>
             
+            <!-- Important: seems to be important to not register the trigger and do the unlock which is condition for that trigger at the same time, -->
+             <!-- because ConditionEvent GUIDLocked will not notice it in that case... -->
             <Item>
               <TriggerAction>
-                <Template>ActionLockAsset</Template>
+                <Template>ActionDelayedActions</Template>
                 <Values>
                   <Action />
-                  <ActionLockAsset>
-                    <LockAssets>
-                      <Item>
-                        <Asset>1500004364</Asset>
-                      </Item>
-                    </LockAssets>
-                  </ActionLockAsset>
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004364</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
                 </Values>
               </TriggerAction>
             </Item>
@@ -1735,9 +1921,21 @@
             </Values>
           </TriggerCondition>
           <TriggerActions> 
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004317</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
-              <Action>
+              <TriggerAction>
                 <Template>ActionRegisterTrigger</Template>
                 <Values>
                   <Action />
@@ -1745,20 +1943,42 @@
                     <TriggerAsset>120342</TriggerAsset>
                   </ActionRegisterTrigger>
                 </Values>
-              </Action>
+              </TriggerAction>
             </Item>
+            <!-- Important: seems to be important to not register the trigger and do the unlock which is condition for that trigger at the same time, -->
+             <!-- because ConditionEvent GUIDLocked will not notice it in that case... -->
             <Item>
               <TriggerAction>
-                <Template>ActionLockAsset</Template>
+                <Template>ActionDelayedActions</Template>
                 <Values>
                   <Action />
-                  <ActionLockAsset>
-                    <LockAssets>
-                      <Item>
-                        <Asset>1500004364</Asset>
-                      </Item>
-                    </LockAssets>
-                  </ActionLockAsset>
+                  <ActionDelayedActions>
+                    <ExecutionDelay>1000</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionLockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionLockAsset>
+                                    <LockAssets>
+                                      <Item>
+                                        <Asset>1500004364</Asset>
+                                      </Item>
+                                    </LockAssets>
+                                  </ActionLockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
                 </Values>
               </TriggerAction>
             </Item>
@@ -1842,7 +2062,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004348</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
               <TriggerAction>
@@ -1971,7 +2203,19 @@
               <ConditionPropsNegatable />
             </Values>
           </TriggerCondition>
-          <TriggerActions> 
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionRegisterTrigger</Template>
+                <Values>
+                  <Action />
+                  <ActionRegisterTrigger>
+                    <TriggerAsset>1500004318</TriggerAsset>
+                    <UnregisterTrigger>1</UnregisterTrigger>
+                  </ActionRegisterTrigger>
+                </Values>
+              </TriggerAction>
+            </Item>
             
             <Item>
               <TriggerAction>

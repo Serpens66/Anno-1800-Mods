@@ -1,6 +1,6 @@
 local Preferred_AmountLimit = 60 -- the max amount where this script will give extra money
 local Preferred_IntervallReduce = 60000 -- in ms, every x time the current amount is reduced by one to achieve a rolling max limit. time is hardcoded in text file currently, so also change there if you change it here
-local Preferred_ProfitMultiplier = 2 -- multiply the money you got for the preferred goods with this
+local Preferred_ProfitMultiplier = 2 -- multiply the money you got for the preferred goods with this (if changed, also adjust the gui text)
 
 
 
@@ -37,7 +37,8 @@ if g_LuaScriptBlockers[ModID]==nil then
     
 
     -- ###############################
-
+    
+    -- called by extra script with ActionExecuteScript when a Trader is selected
     local function _UpdateNames(PID)
       if PID==nil then
         PID = ts.Participants.GetGetCurrentParticipantID()
@@ -62,14 +63,14 @@ if g_LuaScriptBlockers[ModID]==nil then
         local infos = g_LimitedPrefered_Serp.TraderInfos[TraderEnum]
         local TraderPID = g_LTL_Serp.PIDs[TraderEnum].PID
         if ts.SessionParticipants.GetParticipant(TraderPID).GUID~=0 then -- only works if it exists in current session
-          local productstring = ""
-          for Product,tradeinfos in pairs(infos.PGoods) do
+          local productstring = ts.Participants.GetParticipant(PID).Profile.CompanyName..":\n"
+          for Product,tradeinfos in pairs(infos.PGoods[PID]) do
             local text = ts.GetAssetData(Product).Text
             local icon = ts.GetAssetData(Product).Icon
             icon = '<img height="24" width="24" src="'..tostring(icon)..'"/>'
             -- local timelimit = " / "..tostring(Preferred_AmountLimit*Preferred_IntervallReduce/1000/60).." min"
             local timelimit = "" -- better hardcode to text as kind of header, so change it there if you change values here
-            local amountstring = "<b>"..tostring(tradeinfos.BoughtFromLocale).."/"..tostring(Preferred_AmountLimit).." t</b>"
+            local amountstring = "<b>"..tostring(tradeinfos.BoughtFromPID).."/"..tostring(Preferred_AmountLimit).." t</b>"
             productstring = productstring..tostring(icon).." "..tostring(text)..": "..tostring(amountstring)..""..tostring(timelimit).."\n"
           end
           local moneyicon = ts.GetAssetData(1010017).Icon
@@ -78,7 +79,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           if language=="English" or language=="Chinese" or language=="Taiwanese" or language=="Japanese" or language=="Korean" then
             seperator = " " -- "," is not allowed in Name unfortunately, so we will divide it with space
           end
-          local profit = g_LTL_Serp.comma_value(g_LimitedPrefered_Serp.HumanTrades.ExtraProfit,seperator)
+          local profit = g_LTL_Serp.comma_value(g_LimitedPrefered_Serp.HumanTrades[PID].ExtraProfit,seperator)
           profit = '+ <img height="24" width="24" src="'..tostring(moneyicon)..'"/> '..tostring(profit)
           productstring = productstring..tostring(profit)
           -- productstring = g_LTL_Serp.replace_chars_for_Name(productstring) -- dont use it, it also removes valid formatting signs...
@@ -117,7 +118,7 @@ if g_LuaScriptBlockers[ModID]==nil then
       for TraderEnum, infos in pairs(g_LimitedPrefered_Serp.TraderInfos) do
         local TraderPID = g_LTL_Serp.PIDs[TraderEnum].PID
         local Session = infos.Session
-        for Product,tradeinfos in pairs(infos.PGoods) do
+        for Product,tradeinfos in pairs(infos.PGoods[PID]) do
           
           local Bought = ts.Participants.GetParticipant(TraderPID).ProfileCounter.Stats.GetCounter(0,TradeProductBought,Product,1,Session)
           local Payed = ts.Participants.GetParticipant(TraderPID).ProfileCounter.Stats.GetCounter(0,TradeMoneyPayed,Product,1,Session)
@@ -126,7 +127,7 @@ if g_LuaScriptBlockers[ModID]==nil then
           
           local Sold = ts.Participants.GetParticipant(PID).ProfileCounter.Stats.GetCounter(0,TradeProductSold,Product,1,Session)
           local Earned = ts.Participants.GetParticipant(PID).ProfileCounter.Stats.GetCounter(0,TradeMoneyEarned,Product,1,Session)
-          local HumanTradePr = g_LimitedPrefered_Serp.HumanTrades[TraderEnum][Product] -- shortcut
+          local HumanTradePr = g_LimitedPrefered_Serp.HumanTrades[PID][TraderEnum][Product] -- shortcut
           HumanTradePr.Sold = Sold
           HumanTradePr.Earned = Earned
           
@@ -135,8 +136,8 @@ if g_LuaScriptBlockers[ModID]==nil then
             if selldiff > 0 then
               if tradeinfos.Bought - tradeinfos.old_Bought >= selldiff then
                 g_LTL_Serp.modlog("Human sold "..tostring(selldiff).."t of Product GUID "..tostring(Product).." to '"..TraderEnum.."' ",ModID)
-                local add = math.min((Preferred_AmountLimit-tradeinfos.BoughtFromLocale),selldiff)
-                tradeinfos.BoughtFromLocale = tradeinfos.BoughtFromLocale + add
+                local add = math.min((Preferred_AmountLimit-tradeinfos.BoughtFromPID),selldiff)
+                tradeinfos.BoughtFromPID = tradeinfos.BoughtFromPID + add
                 local gain = math.min(HumanTradePr.Earned-HumanTradePr.old_Earned,tradeinfos.Payed-tradeinfos.old_Payed)
                 if add~=selldiff then -- only up to max Preferred_AmountLimit
                   gain = gain / selldiff * add
@@ -147,8 +148,8 @@ if g_LuaScriptBlockers[ModID]==nil then
                 end
                 gain = math.tointeger(gain)
                 ts.Economy.MetaStorage.AddAmount(1010017, gain)
-                g_LimitedPrefered_Serp.HumanTrades.ExtraProfit = g_LimitedPrefered_Serp.HumanTrades.ExtraProfit + gain
-                g_LimitedPrefered_Serp._UpdateName(PID,TraderEnum)
+                g_LimitedPrefered_Serp.HumanTrades[PID].ExtraProfit = g_LimitedPrefered_Serp.HumanTrades[PID].ExtraProfit + gain
+                -- g_LimitedPrefered_Serp._UpdateName(PID,TraderEnum)
                 breaken = true
                 break
               end
@@ -159,20 +160,20 @@ if g_LuaScriptBlockers[ModID]==nil then
           break
         end
       end
-      g_LimitedPrefered_Serp._SetNewOld()
+      g_LimitedPrefered_Serp._SetNewOld(PID)
       if g_LTM_Serp~=nil and g_LTM_Serp.Shared_Cache~=nil and g_LTU_Serp~=nil then
         g_LTM_Serp.Shared_Cache[ModID] = {HumanTrades=g_LimitedPrefered_Serp.HumanTrades,TraderInfos=g_LimitedPrefered_Serp.TraderInfos}
         -- g_LTL_Serp.modlog(g_LTL_Serp.TableToFormattedString(g_LTM_Serp.Shared_Cache.LimitedPreferredProfit_Serp),"LimitedPreferredProfit_Serp")
       end
     end
     
-    local function _SetNewOld()
+    local function _SetNewOld(PID)
       for TraderEnum, infos in pairs(g_LimitedPrefered_Serp.TraderInfos) do
-        for Product,tradeinfos in pairs(infos.PGoods) do
+        for Product,tradeinfos in pairs(infos.PGoods[PID]) do
           tradeinfos.old_Bought = tradeinfos.Bought
           tradeinfos.old_Payed = tradeinfos.Payed
-          g_LimitedPrefered_Serp.HumanTrades[TraderEnum][Product].old_Payed = g_LimitedPrefered_Serp.HumanTrades[TraderEnum][Product].Payed
-          g_LimitedPrefered_Serp.HumanTrades[TraderEnum][Product].old_Sold = g_LimitedPrefered_Serp.HumanTrades[TraderEnum][Product].Sold
+          g_LimitedPrefered_Serp.HumanTrades[PID][TraderEnum][Product].old_Payed = g_LimitedPrefered_Serp.HumanTrades[PID][TraderEnum][Product].Payed
+          g_LimitedPrefered_Serp.HumanTrades[PID][TraderEnum][Product].old_Sold = g_LimitedPrefered_Serp.HumanTrades[PID][TraderEnum][Product].Sold
         end
       end
     end
@@ -182,17 +183,18 @@ if g_LuaScriptBlockers[ModID]==nil then
      -- so we saved preferred Goods from Traders instead in a helper asset in ItemEffectTargets, so we are able to loop 
      -- over them in lua (yes we can not loop over eg. an AssetPool in lua...)
     local function _t_Init()
+      local PID = ts.Participants.GetGetCurrentParticipantID()
       for TraderEnum, infos in pairs(g_LimitedPrefered_Serp.TraderInfos) do
         local TraderPID = g_LTL_Serp.PIDs[TraderEnum].PID
         local Session = infos.Session
-        if g_LimitedPrefered_Serp.HumanTrades[TraderEnum]==nil then
-          g_LimitedPrefered_Serp.HumanTrades[TraderEnum] = {}
+        if g_LimitedPrefered_Serp.HumanTrades[PID][TraderEnum]==nil then
+          g_LimitedPrefered_Serp.HumanTrades[PID][TraderEnum] = {}
         end
         local _PreferredGoods = g_LTL_Serp.GetVectorGuidsFromSessionObject("[ToolOneHelper ItemOrBuffEffectTargets("..tostring(infos.HelpAsset)..") Count]",{[""]="integer"})
         for _,PGinfo in pairs(_PreferredGoods) do
           local Product = PGinfo[""] -- ItemOrBuffEffectTargets directly returns a list of integers, so we used empty string as InfoToInclude
-          infos.PGoods[Product] = {old_Bought=0,old_Payed=0,Bought=0,Payed=0,BoughtFromLocale=0}
-          g_LimitedPrefered_Serp.HumanTrades[TraderEnum][Product] = {old_Earned=0,old_Sold=0,Earned=0,Sold=0}
+          infos.PGoods[PID][Product] = {old_Bought=0,old_Payed=0,Bought=0,Payed=0,BoughtFromPID=0}
+          g_LimitedPrefered_Serp.HumanTrades[PID][TraderEnum][Product] = {old_Earned=0,old_Sold=0,Earned=0,Sold=0}
         end
       end
       
@@ -204,27 +206,28 @@ if g_LuaScriptBlockers[ModID]==nil then
           coroutine.yield()
         end
         -- g_LTL_Serp.modlog(g_LTL_Serp.TableToFormattedString(g_LTM_Serp.Shared_Cache[ModID]),ModID)
-        if g_LTM_Serp.Shared_Cache[ModID]~=nil and g_LTM_Serp.Shared_Cache[ModID].HumanTrades~=nil and g_LTM_Serp.Shared_Cache[ModID].HumanTrades.ExtraProfit~=nil then
+        if g_LTM_Serp.Shared_Cache[ModID]~=nil and g_LTM_Serp.Shared_Cache[ModID].HumanTrades~=nil and g_LTM_Serp.Shared_Cache[ModID].HumanTrades[0] then
           g_LimitedPrefered_Serp.HumanTrades = g_LTM_Serp.Shared_Cache[ModID].HumanTrades
           g_LimitedPrefered_Serp.TraderInfos = g_LTM_Serp.Shared_Cache[ModID].TraderInfos
         end
       end
       
       g_LimitedPrefered_Serp._UpdateTrades()
-      g_LimitedPrefered_Serp._UpdateNames()
+      -- g_LimitedPrefered_Serp._UpdateNames()
       g_LimitedPrefered_Serp._Reduceamout()
     end
     
     -- endless loop reducing the traded amount by 1 every Preferred_IntervallReduce
     local function _Reduceamout()
+      local PID = ts.Participants.GetGetCurrentParticipantID()
       g_LTL_Serp.start_thread("g_LimitedPrefered_Serp Tick",ModID,function()
         while true do
           system.waitForGameTimeDelta(Preferred_IntervallReduce)
           for TraderEnum, infos in pairs(g_LimitedPrefered_Serp.TraderInfos) do
-            for Product,tradeinfos in pairs(infos.PGoods) do
-              if tradeinfos.BoughtFromLocale > 0 then
-                tradeinfos.BoughtFromLocale = tradeinfos.BoughtFromLocale - 1
-                g_LimitedPrefered_Serp._UpdateName(nil,TraderEnum)
+            for Product,tradeinfos in pairs(infos.PGoods[PID]) do
+              if tradeinfos.BoughtFromPID > 0 then
+                tradeinfos.BoughtFromPID = tradeinfos.BoughtFromPID - 1
+                -- g_LimitedPrefered_Serp._UpdateName(PID,TraderEnum)
               end
             end
           end
@@ -232,7 +235,7 @@ if g_LuaScriptBlockers[ModID]==nil then
             g_LTM_Serp.Shared_Cache[ModID] = {HumanTrades=g_LimitedPrefered_Serp.HumanTrades,TraderInfos=g_LimitedPrefered_Serp.TraderInfos}
           end
         end
-      end)
+      end,PID)
     end
 
 
@@ -248,17 +251,17 @@ if g_LuaScriptBlockers[ModID]==nil then
       _OnProfitMade = _OnProfitMade,
       _SetNewOld = _SetNewOld,
       _UpdateTrades = _UpdateTrades,
-      HumanTrades = {ExtraProfit=0}, -- local human trades
+      HumanTrades = {[0]={ExtraProfit=0},[1]={ExtraProfit=0},[2]={ExtraProfit=0},[3]={ExtraProfit=0}}, -- local human trades
       TraderInfos = {
-        Third_party_03_Pirate_Harlow = {Session=180023,HelpAsset=1500006116,PGoods={}}, -- PGoods={11={Earned=0,Payed=0}}
-        Third_party_04_Pirate_LaFortune = {Session=180025,HelpAsset=1500006117,PGoods={}},
-        Third_party_02_Blake = {Session=180023,HelpAsset=1500006118,PGoods={}},
-        Third_party_06_Nate = {Session=110934,HelpAsset=1500006119,PGoods={}},
-        Third_party_05_Sarmento = {Session=180025,HelpAsset=1500006120,PGoods={}},
-        Third_party_07_Jailor_Bleakworth = {Session=180023,HelpAsset=1500006121,PGoods={}},
-        Third_party_08_Kahina = {Session=180023,HelpAsset=1500006122,PGoods={}},
-        Africa_Ketema = {Session=112132,HelpAsset=1500006123,PGoods={}},
-        Arctic_Inuit = {Session=180045,HelpAsset=1500006124,PGoods={}},
+        Third_party_03_Pirate_Harlow = {Session=180023,HelpAsset=1500006116,PGoods={[0]={},[1]={},[2]={},[3]={}}}, -- PGoods={11={Earned=0,Payed=0}}
+        Third_party_04_Pirate_LaFortune = {Session=180025,HelpAsset=1500006117,PGoods={[0]={},[1]={},[2]={},[3]={}}},
+        Third_party_02_Blake = {Session=180023,HelpAsset=1500006118,PGoods={[0]={},[1]={},[2]={},[3]={}}},
+        Third_party_06_Nate = {Session=110934,HelpAsset=1500006119,PGoods={[0]={},[1]={},[2]={},[3]={}}},
+        Third_party_05_Sarmento = {Session=180025,HelpAsset=1500006120,PGoods={[0]={},[1]={},[2]={},[3]={}}},
+        Third_party_07_Jailor_Bleakworth = {Session=180023,HelpAsset=1500006121,PGoods={[0]={},[1]={},[2]={},[3]={}}},
+        Third_party_08_Kahina = {Session=180023,HelpAsset=1500006122,PGoods={[0]={},[1]={},[2]={},[3]={}}},
+        Africa_Ketema = {Session=112132,HelpAsset=1500006123,PGoods={[0]={},[1]={},[2]={},[3]={}}},
+        Arctic_Inuit = {Session=180045,HelpAsset=1500006124,PGoods={[0]={},[1]={},[2]={},[3]={}}},
       }
     }
     

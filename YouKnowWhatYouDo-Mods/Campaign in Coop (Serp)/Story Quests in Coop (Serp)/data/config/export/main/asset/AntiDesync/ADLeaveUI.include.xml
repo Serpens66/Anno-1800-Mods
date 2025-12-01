@@ -314,20 +314,20 @@
                                 <ActionList>
                                   <Actions>
                                     <Item>
-                                    <Action>
-                                      <Template>ActionLockAsset</Template>
-                                      <Values>
-                                        <Action />
-                                        <ActionLockAsset>
-                                          <LockAssets>
-                                            <Item>
-                                              <Asset>1500004369</Asset>
-                                            </Item>
-                                          </LockAssets>
-                                        </ActionLockAsset>
-                                      </Values>
-                                    </Action>
-                                  </Item>
+                                      <Action>
+                                        <Template>ActionUnlockAsset</Template>
+                                        <Values>
+                                          <Action />
+                                          <ActionUnlockAsset>
+                                            <UnlockAssets>
+                                              <Item>
+                                                <Asset>1500004369</Asset>
+                                              </Item>
+                                            </UnlockAssets>
+                                          </ActionUnlockAsset>
+                                        </Values>
+                                      </Action>
+                                    </Item>
                                   </Actions>
                                 </ActionList>
                               </Values>
@@ -723,20 +723,161 @@
   <!-- wird registered in OnQuestSucceeded 128635 Chronicles_03_LibraryTreasures_HiddenTrigger , welches wincondition quest 128621 oder 128623 hat -->
    <!-- welche wiederum das anlklicken von objekten als ziel hat was auch in quest 123832/123834 das ziel ist und da wird ActionTriggerTextBook gemacht -->
     <!-- es gibt offenbar mehrere Quests die 128621/128623 unter anderem als windcondition haben, denn 123832/123834 hatten wir schon -->
-    <!-- dh. wir nutzen hier denselben Unlock wie oben 1500004371 und gehen davon aus, dass es entweder/oder Quests sind, also wir dieselben books nicht mehrfach LeaveUIState brauchen... TODO sollte man evlt überprüfen -->
+  
+  <!-- 128626 ist die Main Quest die als wincondition hat dass man die 6 subquests, welche je 1 buch anklicken sind. -->
+  <!-- wie braucht es da überhaupt trigger 128636 der 128633 beendet? -->
+  <!-- Quest 128633 ist die sichtbare Quest, während 128626 und alle weiteren 6 Quests unsichtbar sind. -->
+   <!-- absolut unnötig komplizierter Aufbau. -->
+  <!-- Stattdessen in OnQuestEnd von 128626 reinpacken, dass nach ~20 sekunden 128633 beendet wird -->
+  
+  <!-- hm scheint als würden die Quests  -->
+  <!-- 128620,128621,128622,128623,128624,128625 -->
+  <!-- garnicht genutzt? in meinem Test starten sie jedenfalls nicht. -->
+  <!-- stattdessen laufen die Quests: 123831,123832,123833,123834,123835,123836 -->
+   <!-- welche auch das TextPopup starten wenn angeklickt, und über den Pool 128093 immer wieder neu gestartet werden. -->
+   <!-- auch nachdem die Hauptquest zuende ist, werden sie endlos oft neu gestartet und bleiben endlos lange aktiv -->
+  
+  <!-- This Quest has roughly 13 or more subquests and Triggers, absolutely incredible complex while it would be easy to make it with 1 or 2 Quests... -->
+  <!-- In the end we want to end the visible Quest after ALL "click on book" Quests are done -->
   <ModOp Type="replace" GUID='128636' Path="/Values/Trigger/TriggerCondition[Values/ConditionEvent[ContextData='TextPopup' and ConditionEvent='LeaveUIState']]">
     <TriggerCondition>
-      <Template>ConditionEvent</Template>
+      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
       <Values>
         <Condition />
-        <ConditionEvent>
-          <ConditionEvent>GUIDLocked</ConditionEvent>
-          <ContextAsset>1500004371</ContextAsset>
-        </ConditionEvent>
-        <ConditionPropsNegatable />
+        <ConditionAlwaysTrue />
       </Values>
     </TriggerCondition>
   </ModOp>
+  <!-- add 20 sec delay -->
+  <ModOp Type="merge" GUID='128636' Path="/Values/Trigger/TriggerActions/Item/TriggerAction/Values/ActionDelayedActions">
+    <ExecutionDelay>20000</ExecutionDelay>
+  </ModOp>
+  <ModOp Type="merge" GUID='128636' Path="/Values/Trigger">
+    <SubTriggers />
+  </ModOp>
+  <ModOp Type="add" GUID='128636' Path="/Values/Trigger/SubTriggers">
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionPlayerCounter</Template>
+              <Values>
+                <Condition />
+                <ConditionPlayerCounter>
+                  <PlayerCounter>QuestSolved</PlayerCounter>
+                  <Context>123831</Context>
+                  <CounterAmount>1</CounterAmount>
+                </ConditionPlayerCounter>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionPlayerCounter</Template>
+              <Values>
+                <Condition />
+                <ConditionPlayerCounter>
+                  <PlayerCounter>QuestSolved</PlayerCounter>
+                  <Context>123832</Context>
+                  <CounterAmount>1</CounterAmount>
+                </ConditionPlayerCounter>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionPlayerCounter</Template>
+              <Values>
+                <Condition />
+                <ConditionPlayerCounter>
+                  <PlayerCounter>QuestSolved</PlayerCounter>
+                  <Context>123833</Context>
+                  <CounterAmount>1</CounterAmount>
+                </ConditionPlayerCounter>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionPlayerCounter</Template>
+              <Values>
+                <Condition />
+                <ConditionPlayerCounter>
+                  <PlayerCounter>QuestSolved</PlayerCounter>
+                  <Context>123834</Context>
+                  <CounterAmount>1</CounterAmount>
+                </ConditionPlayerCounter>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionPlayerCounter</Template>
+              <Values>
+                <Condition />
+                <ConditionPlayerCounter>
+                  <PlayerCounter>QuestSolved</PlayerCounter>
+                  <Context>123835</Context>
+                  <CounterAmount>1</CounterAmount>
+                </ConditionPlayerCounter>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+    <Item>
+      <SubTrigger>
+        <Template>AutoCreateTrigger</Template>
+        <Values>
+          <Trigger>
+            <TriggerCondition>
+              <Template>ConditionPlayerCounter</Template>
+              <Values>
+                <Condition />
+                <ConditionPlayerCounter>
+                  <PlayerCounter>QuestSolved</PlayerCounter>
+                  <Context>123836</Context>
+                  <CounterAmount>1</CounterAmount>
+                </ConditionPlayerCounter>
+              </Values>
+            </TriggerCondition>
+          </Trigger>
+        </Values>
+      </SubTrigger>
+    </Item>
+  </ModOp>
+  
   
   <!-- TODO ActionTriggerTextBook wird noch verwendet in (gucken ob sich darauf auch ein LeaveUIState beziehen könnte): -->
   <!-- <ActionTriggerTextBook><Text>131322</Text> in OnSuccessActions von Quest 131237 beim select <ObjectGUID>128350</ObjectGUID> -->
@@ -1085,20 +1226,20 @@
                                 <ActionList>
                                   <Actions>
                                     <Item>
-                                    <Action>
-                                      <Template>ActionLockAsset</Template>
-                                      <Values>
-                                        <Action />
-                                        <ActionLockAsset>
-                                          <LockAssets>
-                                            <Item>
-                                              <Asset>1500004376</Asset>
-                                            </Item>
-                                          </LockAssets>
-                                        </ActionLockAsset>
-                                      </Values>
-                                    </Action>
-                                  </Item>
+                                      <Action>
+                                        <Template>ActionUnlockAsset</Template>
+                                        <Values>
+                                          <Action />
+                                          <ActionUnlockAsset>
+                                            <UnlockAssets>
+                                              <Item>
+                                                <Asset>1500004376</Asset>
+                                              </Item>
+                                            </UnlockAssets>
+                                          </ActionUnlockAsset>
+                                        </Values>
+                                      </Action>
+                                    </Item>
                                   </Actions>
                                 </ActionList>
                               </Values>
@@ -1173,20 +1314,20 @@
                                 <ActionList>
                                   <Actions>
                                     <Item>
-                                    <Action>
-                                      <Template>ActionLockAsset</Template>
-                                      <Values>
-                                        <Action />
-                                        <ActionLockAsset>
-                                          <LockAssets>
-                                            <Item>
-                                              <Asset>1500004377</Asset>
-                                            </Item>
-                                          </LockAssets>
-                                        </ActionLockAsset>
-                                      </Values>
-                                    </Action>
-                                  </Item>
+                                      <Action>
+                                        <Template>ActionUnlockAsset</Template>
+                                        <Values>
+                                          <Action />
+                                          <ActionUnlockAsset>
+                                            <UnlockAssets>
+                                              <Item>
+                                                <Asset>1500004377</Asset>
+                                              </Item>
+                                            </UnlockAssets>
+                                          </ActionUnlockAsset>
+                                        </Values>
+                                      </Action>
+                                    </Item>
                                   </Actions>
                                 </ActionList>
                               </Values>

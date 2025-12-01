@@ -539,6 +539,17 @@
       </Item>
       <Item>
         <TriggerAction>
+          <Template>ActionRegisterTrigger</Template>
+          <Values>
+            <Action />
+            <ActionRegisterTrigger>
+              <TriggerAsset>153242</TriggerAsset>
+            </ActionRegisterTrigger>
+          </Values>
+        </TriggerAction>
+      </Item>
+      <Item>
+        <TriggerAction>
           <Template>ActionDelayedActions</Template>
           <Values>
             <Action />
@@ -569,12 +580,12 @@
                                       </Item>
                                       <Item>
                                         <Icon>500108</Icon>
-                                        <Command>[Unlock RelockNet(1500004300)];[Unlock RelockNet(1500004391)]</Command>
+                                        <Command>[Unlock RelockNet(1500004300)];[Unlock RelockNet(1500004336)]</Command>
                                         <ActiveCallback>[Unlock IsUnlocked(1500004300)]</ActiveCallback>
                                         <Infotip>6049</Infotip>
                                       </Item>
                                     </ThirdpartyNotificationButtons>
-                                    <ThirdpartyDefaultCommand>[Unlock RelockNet(1500004300)];[Unlock RelockNet(1500004391)]</ThirdpartyDefaultCommand>
+                                    <ThirdpartyDefaultCommand>[Unlock RelockNet(1500004300)];[Unlock RelockNet(1500004336)]</ThirdpartyDefaultCommand>
                                   </CharacterNotification>
                                   <BaseNotification>
                                     <NotificationText>105825</NotificationText>
@@ -625,17 +636,6 @@
           <ActionDiscoverIsland>
             <TargetIsland>160005</TargetIsland>
           </ActionDiscoverIsland>
-        </Values>
-      </TriggerAction>
-    </Item>
-    <Item>
-      <TriggerAction>
-        <Template>ActionRegisterTrigger</Template>
-        <Values>
-          <Action />
-          <ActionRegisterTrigger>
-            <TriggerAsset>153242</TriggerAsset>
-          </ActionRegisterTrigger>
         </Values>
       </TriggerAction>
     </Item>
@@ -852,16 +852,18 @@
     </TriggerCondition>
   </ModOp>
   <!-- also add it to banner trigger 150807, to make sure it is displayed after movie -->
+  <!-- using ConditionUnlocked here instead of ConditionEvent because it is order independant and ConditionEvent only needed if vanilla uses ConditionEvent, which is not the case here -->
   <ModOp Type="replace" GUID='150807' Path="/Values/Trigger/TriggerCondition">
     <TriggerCondition>
-      <Template>ConditionEvent</Template>
+      <Template>ConditionUnlocked</Template>
       <Values>
         <Condition />
-        <ConditionEvent>
-          <ConditionEvent>GUIDLocked</ConditionEvent>
-          <ContextAsset>1500004307</ContextAsset>
-        </ConditionEvent>
-        <ConditionPropsNegatable />
+        <ConditionUnlocked>
+          <UnlockNeeded>1500004307</UnlockNeeded>
+        </ConditionUnlocked>
+        <ConditionPropsNegatable>
+          <NegateCondition>1</NegateCondition>
+        </ConditionPropsNegatable>
       </Values>
     </TriggerCondition>
   </ModOp>
@@ -1154,7 +1156,7 @@
     </TriggerActions>
   </ModOp>
   <!-- MovieFinished 300008 -->
-  <ModOp Type="replace" GUID='152281,151428,151509,151532' Path="/Values/Trigger/TriggerCondition">
+  <ModOp Type="replace" GUID='152281,151428,151509' Path="/Values/Trigger/TriggerCondition">
     <TriggerCondition>
       <Template>ConditionEvent</Template>
       <Values>
@@ -1164,6 +1166,18 @@
           <ContextAsset>1500004310</ContextAsset>
         </ConditionEvent>
         <ConditionPropsNegatable />
+      </Values>
+    </TriggerCondition>
+  </ModOp>
+  <!-- registering 151532 is moved into 151509 so it gets registered AFTER the movie , so we dont need the movie condition anymore (and with ConditionEvent it would not trigger) -->
+  <ModOp Type="replace" GUID='151532' Path="/Values/Trigger/TriggerCondition">
+    <TriggerCondition>
+      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+      <Values>
+        <Condition>
+          <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+        </Condition>
+        <ConditionAlwaysTrue />
       </Values>
     </TriggerCondition>
   </ModOp>

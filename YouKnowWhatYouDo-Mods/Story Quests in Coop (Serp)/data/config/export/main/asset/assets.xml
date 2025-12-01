@@ -9,7 +9,11 @@
   <!-- VanillaBug: When replacing a ConditionEvent Condition with an UnlockNeeded Condition + NegateCondition the Condition will be true when disabling the mod! -->
   <!-- This makes absolutely no sense and ONLY happens in this constellation! -->
   <!-- Workaround is to use as replacement: ConditionEvent with GUIDLocked -->
-     
+  <!-- Attention: That means the order is important! the trigger must be registered and AFTER that ActionLockAsset must happen! -->
+   <!-- (do not register all game triggers at game start to keep order, because at least some LeaveUI triggers are used multiple times with the same -->
+   <!-- unlock, so time of registering matters! Maybe better consider going back to UnlockNeeded instead and use Unlocked-test for savegamecompatible unregister/register code (to make sure already fired FeatureUnlocks from me are not again registered) -->
+    <!-- if GUIDLocked Order causes still too much problems .. although vanilla code is also order dependant, so if mine checks, it should be fine) -->
+  
   
   <!-- [GameSetup IsMultiPlayerGame] in assets.xml nicht ersetzen nötig, zb. coop ping usw muss weiterhin funzen -->
    <!-- und in text und infotip taucht das nicht auf -->
@@ -274,6 +278,8 @@
 
   
   <Include File="./AntiDesync/AntiDesync.include.xml" />
+  
+  <Include File="./savegamebugfixed.include.xml" />
 
 
 </ModOps>

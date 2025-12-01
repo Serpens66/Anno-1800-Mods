@@ -4,6 +4,7 @@
    <!-- and 1500004410 bis einschl. 1500004413 -->
   
   
+  
   <!-- Seems like the Tutorial missions from how to airship are also already working in Coop without any code changes -->
   
   
@@ -526,6 +527,127 @@
     </Asset>
   </ModOp>
   
+  <!-- fix graphics and that it can not display infolayer -->
+  <ModOp Type="replace" GUID='102351,102502' Path="/Values/Object/Variations">
+    <Variations>
+      <Item>
+        <!-- <Filename>data/dlc11/graphics/quest/quest_units/palomas_sister/palomas_sister_quest.cfg</Filename> -->
+        <Filename>data/dlc11/graphics/quest/quest_units/palomas_sister/palomas_sister_unit.cfg</Filename>
+      </Item>
+    </Variations>
+  </ModOp>
+  <!-- change QuestObject to QuestObjectFeedback, so its not collectable to prevent confusing that you can not collect it -->
+  <ModOp Type="replace" GUID='103141'>
+    <Asset>
+      <Template>QuestObjectFeedback</Template>
+      <Values>
+        <Standard>
+          <GUID>103141</GUID>
+          <Name>Q7 - Editor_Unit</Name>
+          <IconFilename>data/ui/2kimages/main/profiles/editor.png</IconFilename>
+        </Standard>
+        <Mesh>
+          <MeshPlacement>OnTerrain</MeshPlacement>
+          <DefaultSequence>default</DefaultSequence>
+        </Mesh>
+        <Selection>
+          <GUIType>Quest</GUIType>
+          <OnSelection>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList />
+            </Values>
+          </OnSelection>
+        </Selection>
+        <Object>
+          <Variations>
+            <Item>
+              <Filename>data/graphics/campaign/units/campaign_editor_01/campaign_editor_01.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Text>
+          <LocaText>
+            <English>
+              <Text>The Editor</Text>
+              <Status>Exported</Status>
+            </English>
+          </LocaText>
+          <LineID>56597</LineID>
+        </Text>
+        <MinimapToken />
+        <QuestObject />
+        <Infolayer />
+        <SoundEmitter>
+          <CollectedSounds>
+            <Item>
+              <Sound>214110</Sound>
+            </Item>
+          </CollectedSounds>
+        </SoundEmitter>
+        <FeedbackController>
+          <UseMeshRenderFlags>1</UseMeshRenderFlags>
+        </FeedbackController>
+      </Values>
+    </Asset>
+  </ModOp>
+  <ModOp Type="replace" GUID='103404'>
+    <Asset>
+      <Template>QuestObjectFeedback</Template>
+      <Values>
+        <Standard>
+          <GUID>103404</GUID>
+          <Name>Q7 - Brother</Name>
+          <IconFilename>data/ui/2kimages/main/icons/icon_questoptional.png</IconFilename>
+        </Standard>
+        <Mesh>
+          <MeshPlacement>OnTerrain</MeshPlacement>
+          <DefaultSequence>default</DefaultSequence>
+        </Mesh>
+        <Selection>
+          <GUIType>Quest</GUIType>
+          <OnSelection>
+            <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+            <Values>
+              <ActionList />
+            </Values>
+          </OnSelection>
+        </Selection>
+        <Object>
+          <Variations>
+            <Item>
+              <!-- <Filename>data/dlc11/graphics/quest/quest_units/palomas_brother/palomas_brother_quest.cfg</Filename> -->
+              <Filename>data/dlc11/graphics/quest/quest_units/palomas_brother/palomas_brother.cfg</Filename>
+            </Item>
+          </Variations>
+        </Object>
+        <Text>
+          <LocaText>
+            <English>
+              <Text>Paloma's Brother</Text>
+              <Status>Exported</Status>
+            </English>
+          </LocaText>
+          <LineID>56598</LineID>
+        </Text>
+        <MinimapToken />
+        <QuestObject />
+        <Infolayer />
+        <SoundEmitter>
+          <CollectedSounds>
+            <Item>
+              <Sound>214110</Sound>
+            </Item>
+          </CollectedSounds>
+        </SoundEmitter>
+        <FeedbackController>
+          <UseMeshRenderFlags>1</UseMeshRenderFlags>
+        </FeedbackController>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  
   
   <!-- ##### -->
   <!-- <GUID>103980</GUID><Text>Langsam den Pinguinen nähern</Text> -->
@@ -537,9 +659,10 @@
     <Item>
       <Reward>1500004411</Reward>
       <Amount>1</Amount>
-      <IsHidden>1</IsHidden>
-      <IsDisguised>1</IsDisguised>
     </Item>
+  </ModOp>
+  <ModOp Type="merge" GUID='103933' Path="/Values/Reward">
+    <GenerateIgnoreUnlocks>1</GenerateIgnoreUnlocks>
   </ModOp>
   <ModOp Type="addNextSibling" GUID='112574'>
     <Asset>
@@ -548,7 +671,6 @@
         <Standard>
           <GUID>1500004411</GUID>
           <Name>Penguin Quinn</Name>
-          <!-- <IconFilename>data/ui/2kimages/main/3dicons/animals/icon_penguin.png</IconFilename> -->
           <IconFilename>data/icons_serp/Quinn.png</IconFilename>
           <InfoDescription>103550</InfoDescription>
         </Standard>
@@ -563,11 +685,16 @@
         <ExpeditionAttribute>
           <BaseMorale>50</BaseMorale>
           <ExpeditionAttributes>
-            <Item />
+            <Item>
+              <Attribute>Faith</Attribute>
+              <Amount>50</Amount>
+            </Item>
           </ExpeditionAttributes>
           <FluffText>103550</FluffText>
         </ExpeditionAttribute>
-        <Locked />
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
       </Values>
     </Asset>
   </ModOp>
@@ -620,37 +747,113 @@
   
   <!-- ############# -->
 
+  <!-- There is no image for this newspaper... so we will use one of the photos -->
+  <!-- Colourization done with: https://imagecolorizer.com/ -->
+  <ModOp Type="addNextSibling" GUID='103751'>
+    <Asset>
+      <Template>NewspaperImage</Template>
+      <Values>
+        <Standard>
+          <GUID>1500004413</GUID>
+          <Name>DLC11_FinalEnd_NewspaperImage</Name>
+        </Standard>
+        <NewspaperImage>
+          <Size>
+            <Small>
+              <Image>data/icons_serp/paloma_brother_color.png</Image>
+            </Small>
+            <Medium>
+              <Image>data/icons_serp/paloma_brother_color.png</Image>
+            </Medium>
+            <Big>
+              <Image>data/icons_serp/paloma_brother_color.png</Image>
+            </Big>
+          </Size>
+          <SideNotificationImage>data/icons_serp/paloma_brother_color.png</SideNotificationImage>
+        </NewspaperImage>
+      </Values>
+    </Asset>
+  </ModOp>
+  
+  <ModOp Type="merge" GUID='786' Path="/Values/NewspaperSpecialEditionArticle">
+    <SpecialEditionImage>1500004413</SpecialEditionImage>
+  </ModOp>
+  
+  <ModOp Type="add" GUID='162' Path="/Values/ParticipantMessages/MessageTriggers/MenuWelcomeMessage/Reactions">
+    <Item>
+      <MyRole>Initiator</MyRole>
+      <RequiredContextAsset>265499</RequiredContextAsset>
+      <RequiredContextMenu>NewspaperSpecialEdition</RequiredContextMenu>
+      <Notification>
+        <Template>CharacterNotification</Template>
+        <Values>
+          <CharacterNotification />
+          <BaseNotification>
+            <DisplayTimeout>1000</DisplayTimeout>
+          </BaseNotification>
+          <NotificationSubtitle>
+            <Subtitle>265499</Subtitle>
+          </NotificationSubtitle>
+        </Values>
+      </Notification>
+    </Item>
+  </ModOp>
 
-  <!-- den ungenutzten "gefunden" Zeitungsartikel am Ende von der letzen Quest Brotkrumen anzeigen lassen sollte wohl passen -->
+  <!-- den ungenutzten "gefunden" Zeitungsartikel am Ende von der letzen Quest Brotkrumen anzeigen lassen sollte wohl passen -->  
   <ModOp Type="add" GUID='103753' Path="/Values/Trigger/TriggerActions">
     <Item>
       <TriggerAction>
-        <Template>ActionForceNewspaper</Template>
+        <Template>ActionDelayedActions</Template>
         <Values>
           <Action />
-          <ActionForceNewspaper>
-            <Articles>
-              <Item>
-                <Article>786</Article>
-              </Item>
-            </Articles>
-            <OpenNewspaperUI>1</OpenNewspaperUI>
-            <OpenNewspaperType>SpecialEdition</OpenNewspaperType>
-          </ActionForceNewspaper>
+          <ActionDelayedActions>
+            <ExecutionDelay>40000</ExecutionDelay>
+            <DelayedActions>
+              <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+              <Values>
+                <ActionList>
+                  <Actions>
+                    <Item>
+                      <Action>
+                        <Template>ActionForceNewspaper</Template>
+                        <Values>
+                          <Action />
+                          <ActionForceNewspaper>
+                            <Articles>
+                              <Item>
+                                <Article>786</Article>
+                              </Item>
+                            </Articles>
+                            <OpenNewspaperUI>1</OpenNewspaperUI>
+                            <OpenNewspaperType>SpecialEdition</OpenNewspaperType>
+                            <PamsyWelcomeRequiredAsset>265499</PamsyWelcomeRequiredAsset>
+                          </ActionForceNewspaper>
+                        </Values>
+                      </Action>
+                    </Item>
+                  </Actions>
+                </ActionList>
+              </Values>
+            </DelayedActions>
+          </ActionDelayedActions>
         </Values>
       </TriggerAction>
     </Item>
   </ModOp>
   
+  <!-- ###################### -->
+  
   <!-- vermissten Bruder als Airship Specialist mit guten Expeditionsboni -->
   <ModOp Type="replace" GUID='104089,104088' Path="/Values/Standard/IconFilename">
-    <IconFilename>data/icons_serp/paloma_brother.png</IconFilename>
+    <IconFilename>data/icons_serp/paloma_brother_color_quad.png</IconFilename>
   </ModOp>
   <!-- add ShipSpecialist Palomas Brother: Saulo Valente as final reward -->
-  <ModOp Type="add" GUID='104821' Path="/Values/Reward/RewardAssets">
+  <!-- <ModOp Type="add" GUID='104821' Path="/Values/Reward/RewardAssets"> -->
+  <ModOp Type="add" GUID='103558' Path="/Values/Reward/RewardAssets">
     <Item>
       <Reward>1500004410</Reward>
       <Amount>1</Amount>
+      <SentToQuestArea>1</SentToQuestArea>
     </Item>
   </ModOp>
   <!-- optional eine DecisionQuest machen, wo man sich aussuchen kann ob man ihn als Kapitän für Luftschiff haben will -->
@@ -662,7 +865,7 @@
         <Standard>
           <GUID>1500004410</GUID>
           <Name>Palomas Brother: Saulo Valente</Name>
-          <IconFilename>data/icons_serp/paloma_brother.png</IconFilename>
+          <IconFilename>data/icons_serp/paloma_brother_color_quad.png</IconFilename>
           <InfoDescription>103404</InfoDescription>
         </Standard>
         <Text>
@@ -1303,7 +1506,12 @@
       </SubCondition>
     </Item>
   </ModOp>
-  
+  <!-- add hint that you have to complete the Queen Vanished Quest, if it is active -->
+  <ModOp Type="add" GUID='102708' Path="/Values/Quest/QuestHints">
+    <Item>
+      <Text>1500004412</Text>
+    </Item>
+  </ModOp>
 
   <!-- ############ -->
 
