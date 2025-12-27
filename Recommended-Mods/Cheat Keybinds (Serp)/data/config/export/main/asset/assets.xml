@@ -1,0 +1,607 @@
+<ModOps>
+       
+  <!-- uses serp guids 1500006142 bis 1500006149 (1500006147 bis 1500006149 noch frei) -->
+  
+    <!-- We can make these keybinds changeable in gamesettings, but it will revert to the keybinds here on every new game start (blame Ubi), so I save that time -->
+     <!-- if you want to add it, set Configurable=1, HideInOptionMenu=0 and add a <Text>TextGUID</Text> entry with the text of that option in menu -->
+    
+    
+    <!-- derselbe Command darf nur einmal vergeben sein! -->
+    <!-- Wenn ich also 2 einträge mache mit demselben Command -->
+    <!-- dann funzt nur der erste eintrag davon! -->
+    
+    <ModOp Type="add" GUID='2001271' Path="/Values/GUIConfig/KeyBindings">
+        <!-- fast quit the game without saving -->
+        <Item>
+            <KeyTypes>Alt;F4</KeyTypes>
+            <Command>game.fastQuit(1)</Command>
+            <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+            <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+            <AudioEvent>200634</AudioEvent>
+            <Configurable>0</Configurable>
+            <HideInOptionMenu>1</HideInOptionMenu>
+            <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+        </Item>
+        
+        <Item>
+            <KeyTypes>Alt;C</KeyTypes>
+            <Command>CheatKeybinds_Serp.ChangeCheat(-1)</Command>
+            <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+            <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+            <AudioEvent>200634</AudioEvent>
+            <Configurable>0</Configurable>
+            <HideInOptionMenu>1</HideInOptionMenu>
+            <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+        </Item>
+        <Item>
+            <KeyTypes>Alt;B</KeyTypes>
+            <Command>CheatKeybinds_Serp.ChangeCheat(1)</Command>
+            <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+            <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+            <AudioEvent>200634</AudioEvent>
+            <Configurable>0</Configurable>
+            <HideInOptionMenu>1</HideInOptionMenu>
+            <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+        </Item>
+        <Item>
+            <KeyTypes>Alt;V</KeyTypes>
+            <Command>CheatKeybinds_Serp.StartCheat()</Command>
+            <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+            <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+            <AudioEvent>200634</AudioEvent>
+            <Configurable>0</Configurable>
+            <HideInOptionMenu>1</HideInOptionMenu>
+            <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+        </Item>
+    </ModOp>
+    
+    
+  <ModOp GUID="153271" Type="AddNextSibling">
+    <!-- AudioNotification can not display textsource as NotificationSubtitle ...[Participants Participant(8) Profile CompanyName] -->
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006142</GUID>
+          <Name>Show current Cheat</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500006142</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501236</IconAsset>
+                          <FilterType>System</FilterType>
+                          <HasJumpLocation>0</HasJumpLocation>
+                          <IsArchived>0</IsArchived>
+                          <Infotip>0</Infotip>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>1500006142</NotificationText>
+                          <NotificationMinDisplayTime>6000</NotificationMinDisplayTime>
+                          <NotificationPriority>-1</NotificationPriority>
+                          <NotificationAudioAsset>239732</NotificationAudioAsset>
+                          <DisplayTimeout>10000</DisplayTimeout>
+                        </BaseNotification>
+                        <NotificationSubtitle />
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+            
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>100</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionUnlockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionUnlockAsset>
+                                    <UnlockAssets>
+                                      <Item>
+                                        <Asset>1500006142</Asset>
+                                      </Item>
+                                    </UnlockAssets>
+                                  </ActionUnlockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>200</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006143</GUID>
+          <Name>Notify others of Cheater</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition />
+              <ConditionUnlocked>
+                <UnlockNeeded>1500006143</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/someonecheating.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>100</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionUnlockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionUnlockAsset>
+                                    <UnlockAssets>
+                                      <Item>
+                                        <Asset>1500006143</Asset>
+                                      </Item>
+                                    </UnlockAssets>
+                                  </ActionUnlockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>200</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006144</GUID>
+          <Name>Register Cheat Script</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionEvent</Template>
+            <Values>
+              <Condition />
+              <ConditionEvent>
+                <ConditionEvent>SessionEnter</ConditionEvent>
+              </ConditionEvent>
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/scripts_serp/cheatkeybinds_serp.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                  <Values>
+                    <Condition />
+                    <ConditionAlwaysTrue />
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+    <Asset>
+      <Template>FeatureUnlock</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006146</GUID>
+          <Name>Add/Remove Ship Buff</Name>
+        </Standard>
+        <Locked>
+          <DefaultLockedState>0</DefaultLockedState>
+        </Locked>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionUnlocked</Template>
+            <Values>
+              <Condition>
+                <SubConditionCompletionOrder>MutuallyExclusive</SubConditionCompletionOrder>
+              </Condition>
+              <ConditionUnlocked>
+                <UnlockNeeded>1500006146</UnlockNeeded>
+              </ConditionUnlocked>
+              <ConditionPropsNegatable>
+                <NegateCondition>1</NegateCondition>
+              </ConditionPropsNegatable>
+            </Values>
+          </TriggerCondition>
+          
+          <SubTriggers>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500006145</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable>
+                          <NegateCondition>1</NegateCondition>
+                        </ConditionPropsNegatable>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionUnlockAsset</Template>
+                          <Values>
+                            <Action />
+                            <ActionUnlockAsset>
+                              <UnlockAssets>
+                                <Item>
+                                  <Asset>1500006145</Asset>
+                                </Item>
+                              </UnlockAssets>
+                            </ActionUnlockAsset>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500006145</BuffAsset>
+                              <AddBuff>1</AddBuff>
+                              <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+            <Item>
+              <SubTrigger>
+                <Template>AutoCreateTrigger</Template>
+                <Values>
+                  <Trigger>
+                    <TriggerCondition>
+                      <Template>ConditionUnlocked</Template>
+                      <Values>
+                        <Condition />
+                        <ConditionUnlocked>
+                          <UnlockNeeded>1500006145</UnlockNeeded>
+                        </ConditionUnlocked>
+                        <ConditionPropsNegatable/>
+                      </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionLockAsset</Template>
+                            <Values>
+                              <Action />
+                              <ActionLockAsset>
+                                <LockAssets>
+                                  <Item>
+                                    <Asset>1500006145</Asset>
+                                  </Item>
+                                </LockAssets>
+                              </ActionLockAsset>
+                            </Values>
+                        </TriggerAction>
+                      </Item>
+                      <Item>
+                        <TriggerAction>
+                          <Template>ActionBuff</Template>
+                          <Values>
+                            <Action />
+                            <ActionBuff>
+                              <BuffAsset>1500006145</BuffAsset>
+                              <AddBuff>0</AddBuff>
+                              <BuffProcessingParticipant>1</BuffProcessingParticipant>
+                            </ActionBuff>
+                          </Values>
+                        </TriggerAction>
+                      </Item>
+                    </TriggerActions>
+                  </Trigger>
+                </Values>
+              </SubTrigger>
+            </Item>
+          </SubTriggers>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionDelayedActions</Template>
+                <Values>
+                  <Action />
+                  <ActionDelayedActions>
+                    <ExecutionDelay>100</ExecutionDelay>
+                    <DelayedActions>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <ActionList>
+                          <Actions>
+                            <Item>
+                              <Action>
+                                <Template>ActionUnlockAsset</Template>
+                                <Values>
+                                  <Action />
+                                  <ActionUnlockAsset>
+                                    <UnlockAssets>
+                                      <Item>
+                                        <Asset>1500006146</Asset>
+                                      </Item>
+                                    </UnlockAssets>
+                                  </ActionUnlockAsset>
+                                </Values>
+                              </Action>
+                            </Item>
+                          </Actions>
+                        </ActionList>
+                      </Values>
+                    </DelayedActions>
+                  </ActionDelayedActions>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+          <!-- use a small timer to reset, because because of coroutine.yield the lua local coop players could be in a different gametick which could lead to multiple unlocks within short time -->
+          <ResetTrigger>
+            <Template>AutoCreateTrigger</Template>
+            <Values>
+              <Trigger>
+                <TriggerCondition>
+                  <Template>ConditionTimer</Template>
+                  <Values>
+                    <Condition />
+                    <ConditionTimer>
+                      <TimeLimit>200</TimeLimit>
+                    </ConditionTimer>
+                  </Values>
+                </TriggerCondition>
+              </Trigger>
+            </Values>
+          </ResetTrigger>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>1</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+          <AutoSelfUnlock>0</AutoSelfUnlock>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    
+  </ModOp>
+  
+  <!-- Buffs -->
+  <ModOp Type="AddNextSibling" GUID="130942">
+    <Asset>
+      <Template>InfluenceTitleBuff</Template>
+      <Values>
+        <Standard>
+          <GUID>1500006145</GUID>
+          <Name>Stronger Ships</Name>
+          <IconFilename>data/ui/2kimages/main/3dicons/icon_skull.png</IconFilename>
+        </Standard>
+        <ItemEffect>
+          <EffectTargets>
+            <Item>
+              <GUID>1512</GUID>
+            </Item>
+          </EffectTargets>
+          <AllowStacking>0</AllowStacking>
+        </ItemEffect>
+        <Buff>
+          <!-- <ShouldBeShownInForeignObjectMenu>0</ShouldBeShownInForeignObjectMenu> -->
+        </Buff>
+        <TradeShipUpgrade>
+          <ActiveTradePriceInPercent>50</ActiveTradePriceInPercent>
+          <LoadingSpeedUpgrade>
+            <Value>100</Value>
+            <Percental>1</Percental>
+          </LoadingSpeedUpgrade>
+        </TradeShipUpgrade>
+        <VehicleUpgrade>
+          <MaintainanceUpgrade>
+            <Value>-50</Value>
+            <Percental>1</Percental>
+          </MaintainanceUpgrade>
+          <IgnoreWeightFactorUpgrade>
+            <Value>50</Value>
+            <Percental>1</Percental>
+          </IgnoreWeightFactorUpgrade>
+          <IgnoreDamageFactorUpgrade>
+            <Value>50</Value>
+            <Percental>1</Percental>
+          </IgnoreDamageFactorUpgrade>
+        </VehicleUpgrade>
+        <AttackerUpgrade>
+          <AttackRangeUpgrade>
+            <Value>20</Value>
+            <Percental>1</Percental>
+          </AttackRangeUpgrade>
+          <LineOfSightRangeUpgrade>
+            <Value>20</Value>
+            <Percental>1</Percental>
+          </LineOfSightRangeUpgrade>
+          <BaseDamageUpgrade>
+            <Value>100</Value>
+            <Percental>1</Percental>
+          </BaseDamageUpgrade>
+          <AttackSpeedUpgrade>100</AttackSpeedUpgrade>
+        </AttackerUpgrade>
+        <AttackableUpgrade>
+          <SelfHealUpgrade>
+            <Value>300</Value>
+            <Percental>1</Percental>
+          </SelfHealUpgrade>
+          <DamageReceiveFactor>
+            <Cannon>
+              <Factor>0.50</Factor>
+            </Cannon>
+            <Normal>
+              <Factor>0.50</Factor>
+            </Normal>
+            <Torpedo>
+              <Factor>0.50</Factor>
+            </Torpedo>
+            <BigBertha>
+              <Factor>0.50</Factor>
+            </BigBertha>
+          </DamageReceiveFactor>
+        </AttackableUpgrade>
+      </Values>
+    </Asset>
+  </ModOp>
+    
+    
+</ModOps>
