@@ -5,6 +5,16 @@
     <!-- We can make these keybinds changeable in gamesettings, but it will revert to the keybinds here on every new game start (blame Ubi), so I save that time -->
      <!-- if you want to add it, set Configurable=1, HideInOptionMenu=0 and add a <Text>TextGUID</Text> entry with the text of that option in menu -->
     
+    <!-- destroy: -->
+    <!-- game.MetaGameManager.destroySelectionNextGametick() -->
+    <!-- game.MetaGameManager.killGameObject  man übergibt OID, macht auch desync wenn nicht alle es ausführen -->
+    <!-- userdata.kill() desync . tötet objekt ohne nachfrage, sieht bei objekten ohne sterbeanimation (was zb schiffe haben) -->
+      <!-- komisch aus, weil grafik noch ~10 sek da bleibt, zb bei Gebäuden -->
+    <!-- userdata.destruct() wie wenn man Entf gedrückt hat (klappt auch nur bei eigenen), gibt dann je nach objekt auch noch eine  -->
+      <!-- Bestätigungsabfrrage. ist gedacht für Gebäude von der Graphic die abgespielt wird.  -->
+      <!-- Bestätigungsabfrage lässt sich wohl nicht umgehen, bei Dingen die Building/DestructionConfirmation haben (ob man das bei schiffen auch ein/aus schalten kann weiß ich nicht) -->
+  <!-- local PID=ts.Participants.GetGetCurrentParticipantID();ts.Selection.Object.Attackable.SetAddDamagePercent(100,PID) No desync -->
+            
     
     <!-- derselbe Command darf nur einmal vergeben sein! -->
     <!-- Wenn ich also 2 einträge mache mit demselben Command -->
@@ -53,6 +63,30 @@
             <HideInOptionMenu>1</HideInOptionMenu>
             <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
         </Item>
+        <!-- seperate keybind to not accidently delete -->
+        <!-- destroys object, like destroyed by shooting (so building get ruins) -->
+        <Item>
+            <KeyTypes>Shift;Delete</KeyTypes>
+            <Command>local PID=ts.Participants.GetGetCurrentParticipantID();ts.Selection.Object.Attackable.SetAddDamagePercent(100,PID)</Command>
+            <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+            <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+            <AudioEvent>200634</AudioEvent>
+            <Configurable>0</Configurable>
+            <HideInOptionMenu>1</HideInOptionMenu>
+            <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+        </Item>
+        <!-- delete object, so completely removed, not ruin -->
+        <Item>
+            <KeyTypes>Alt;Delete</KeyTypes>
+            <Command>game.MetaGameManager.destroySelectionNextGametick();</Command>
+            <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+            <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+            <AudioEvent>200634</AudioEvent>
+            <Configurable>0</Configurable>
+            <HideInOptionMenu>1</HideInOptionMenu>
+            <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+        </Item>
+        
     </ModOp>
     
     
