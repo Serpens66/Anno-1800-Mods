@@ -1,0 +1,545 @@
+<ModOps>
+
+  <!-- Difference to version from Ac3s: -->
+   <!-- - Hiding the "change keybind" in the menu (because the game is unable to remember these settings anyway after the game was restarted..) -->
+   <!-- - Play different Audio (narrator) when the gamespeed was changed -->
+   <!-- - On leaving the game, the Speed is reset to 1, if it was below 1, because otherwise the game will freeze. -->
+  <!-- (no super important changes. ac3s is fine, but still I will use this version personally) -->
+
+    <!-- TextSources.TextSourceRoots.GameClock.IncreaseGameSpeed() (does not work anymore when slowest speed reached -.-) -->
+	<!-- TextSources.TextSourceRoots.GameClock.DecreaseGameSpeed() -->
+	<!-- both these commands can be used to increase and decrease GameSpeed, when doing so you will notice the game has in fact 5 different GameSpeeds, 1-2-3-4-5 -->
+	<!-- yet ingame we can only select 4 of these GameSpeeds, 2-3-4-5, but 1 can never be selected normally, unless you use this mod -->
+	<!-- 1 = 0.25x GameSpeed -->
+	<!-- 2 = 0.5x GameSpeed -->
+	<!-- 3 = 1x GameSpeed -->
+	<!-- 4 = 2x GameSpeed -->
+	<!-- 5 = 4x GameSpeed -->
+	
+	<ModOp Type="add" GUID='2001271' Path="/Values/GUIConfig/KeyBindings">
+    <Item>
+      <KeyTypes>Shift;NumpadSubtract</KeyTypes>
+      <!-- <Command>TextSources.TextSourceRoots.GameClock.SetSetGameSpeed(1)</Command> -->
+      <Command>TextSources.TextSourceRoots.Conditions.RegisterTriggerForCurrentParticipant(1500001011)</Command>
+      <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+      <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+      <AudioEvent>200634</AudioEvent>
+      <Configurable>0</Configurable>
+      <HideInOptionMenu>1</HideInOptionMenu>
+      <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+    </Item>
+		<Item>
+      <KeyTypes>NumpadSubtract</KeyTypes>
+      <!-- <Command>TextSources.TextSourceRoots.GameClock.SetSetGameSpeed(2)</Command> -->
+      <Command>TextSources.TextSourceRoots.Conditions.RegisterTriggerForCurrentParticipant(1500001012)</Command>
+      <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+      <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+      <AudioEvent>203877</AudioEvent>
+      <Configurable>0</Configurable>
+      <HideInOptionMenu>1</HideInOptionMenu>
+      <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+    </Item>
+    <Item>
+      <KeyTypes>Numpad0</KeyTypes>
+      <!-- <Command>TextSources.TextSourceRoots.GameClock.SetSetGameSpeed(3)</Command> -->
+      <Command>TextSources.TextSourceRoots.Conditions.RegisterTriggerForCurrentParticipant(1500001013)</Command>
+      <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+      <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+      <AudioEvent>239765</AudioEvent>
+      <Configurable>0</Configurable>
+      <HideInOptionMenu>1</HideInOptionMenu>
+      <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+    </Item>
+		<Item>
+      <KeyTypes>NumpadAdd</KeyTypes>
+      <!-- <Command>TextSources.TextSourceRoots.GameClock.SetSetGameSpeed(4)</Command> -->
+      <Command>TextSources.TextSourceRoots.Conditions.RegisterTriggerForCurrentParticipant(1500001014)</Command>
+      <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+      <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+      <AudioEvent>239763</AudioEvent>
+      <Configurable>0</Configurable>
+      <HideInOptionMenu>1</HideInOptionMenu>
+      <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+    </Item>
+		<Item>
+      <KeyTypes>Shift;NumpadAdd</KeyTypes>
+      <!-- <Command>TextSources.TextSourceRoots.GameClock.SetSetGameSpeed(5)</Command> -->
+      <Command>TextSources.TextSourceRoots.Conditions.RegisterTriggerForCurrentParticipant(1500001015)</Command>
+      <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+      <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+      <AudioEvent>239764</AudioEvent>
+      <Configurable>0</Configurable>
+      <HideInOptionMenu>1</HideInOptionMenu>
+      <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+    </Item>
+    
+  </ModOp>
+    
+    
+    
+  <!-- Code by Serp: -->
+  <!-- Keybind Commands are only executed for the player who hit the button, which is most of the time exactly what we want. -->
+  <!-- But when changing the game speed in multiplayer, it must be executed for all players. -->
+  <!-- "ActionExecuteScript" does execute a script for all players at the same time, regardless which player triggered this action. -->
+  <!-- Although this is something we usually DONT want, in this case it is the solution for the multiplayer gamespeed. -->
+  
+  <ModOp GUID="153271" Type="AddNextSibling">
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001011</GUID>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/changegamespeed1.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <!-- extra trigger for notification started via ActionExecuteScript lua code, to make sure it is displayed for all players, not only the one who hit the button -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1999003464</GUID>
+          <Name>Notification 0.25x Speed</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501356</IconAsset>
+                          <FilterType>System</FilterType>
+                          <HasJumpLocation>0</HasJumpLocation>
+                          <IsArchived>0</IsArchived>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>1999003465</NotificationText>
+                          <NotificationMinDisplayTime>2000</NotificationMinDisplayTime>
+                          <NotificationPriority>-1</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle>
+                          <Subtitle>265257</Subtitle>
+                        </NotificationSubtitle>
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001012</GUID>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/changegamespeed2.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <!-- extra trigger for notification started via ActionExecuteScript lua code, to make sure it is displayed for all players, not only the one who hit the button -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1999003467</GUID>
+          <Name>Notification 0.5x Speed</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501356</IconAsset>
+                          <FilterType>System</FilterType>
+                          <HasJumpLocation>0</HasJumpLocation>
+                          <IsArchived>0</IsArchived>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>1999003468</NotificationText>
+                          <NotificationMinDisplayTime>2000</NotificationMinDisplayTime>
+                          <NotificationPriority>-1</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle>
+                          <Subtitle>265257</Subtitle>
+                        </NotificationSubtitle>
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001013</GUID>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/changegamespeed3.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <!-- extra trigger for notification started via ActionExecuteScript lua code, to make sure it is displayed for all players, not only the one who hit the button -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1999003470</GUID>
+          <Name>Notification 1x Speed</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501356</IconAsset>
+                          <FilterType>System</FilterType>
+                          <HasJumpLocation>0</HasJumpLocation>
+                          <IsArchived>0</IsArchived>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>1999003471</NotificationText>
+                          <NotificationMinDisplayTime>2000</NotificationMinDisplayTime>
+                          <NotificationPriority>-1</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle>
+                          <Subtitle>265256</Subtitle>
+                        </NotificationSubtitle>
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001014</GUID>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/changegamespeed4.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <!-- extra trigger for notification started via ActionExecuteScript lua code, to make sure it is displayed for all players, not only the one who hit the button -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1999003473</GUID>
+          <Name>Notification 2x Speed</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501356</IconAsset>
+                          <FilterType>System</FilterType>
+                          <HasJumpLocation>0</HasJumpLocation>
+                          <IsArchived>0</IsArchived>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>1999003474</NotificationText>
+                          <NotificationMinDisplayTime>2000</NotificationMinDisplayTime>
+                          <NotificationPriority>-1</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle>
+                          <Subtitle>265258</Subtitle>
+                        </NotificationSubtitle>
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1500001015</GUID>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionExecuteScript</Template>
+                <Values>
+                  <Action />
+                  <ActionExecuteScript>
+                    <ScriptFileName>data/changegamespeed5.lua</ScriptFileName>
+                  </ActionExecuteScript>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    <!-- extra trigger for notification started via ActionExecuteScript lua code, to make sure it is displayed for all players, not only the one who hit the button -->
+    <Asset>
+      <Template>Trigger</Template>
+      <Values>
+        <Standard>
+          <GUID>1999003476</GUID>
+          <Name>Notification 4x Speed</Name>
+        </Standard>
+        <Trigger>
+          <TriggerCondition>
+            <Template>ConditionIsMultiplayer</Template>
+            <Values>
+              <Condition />
+              <ConditionIsMultiplayer />
+              <ConditionPropsNegatable />
+            </Values>
+          </TriggerCondition>
+          <TriggerActions>
+            <Item>
+              <TriggerAction>
+                <Template>ActionNotification</Template>
+                <Values>
+                  <Action />
+                  <ActionNotification>
+                    <Notification>
+                      <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                      <Values>
+                        <SideNotification>
+                          <IconAsset>501356</IconAsset>
+                          <FilterType>System</FilterType>
+                          <HasJumpLocation>0</HasJumpLocation>
+                          <IsArchived>0</IsArchived>
+                        </SideNotification>
+                        <BaseNotification>
+                          <NotificationText>1999003477</NotificationText>
+                          <NotificationMinDisplayTime>2000</NotificationMinDisplayTime>
+                          <NotificationPriority>-1</NotificationPriority>
+                        </BaseNotification>
+                        <NotificationSubtitle>
+                          <Subtitle>265259</Subtitle>
+                        </NotificationSubtitle>
+                      </Values>
+                    </Notification>
+                  </ActionNotification>
+                </Values>
+              </TriggerAction>
+            </Item>
+          </TriggerActions>
+        </Trigger>
+        <TriggerSetup>
+          <AutoRegisterTrigger>0</AutoRegisterTrigger>
+          <UsedBySecondParties>0</UsedBySecondParties>
+        </TriggerSetup>
+      </Values>
+    </Asset>
+    
+  </ModOp>
+
+</ModOps> 
