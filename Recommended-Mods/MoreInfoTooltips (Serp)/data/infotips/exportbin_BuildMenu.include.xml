@@ -480,25 +480,33 @@
      
     <!-- copy the NeedsElectricity entry (copying makes sure changes by other mods are also copied) -->
        <!-- eg our removal of permit requirement to show cost is also copied this way -->
-    <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement[InfoElement/Text/TextGUID='13659']" Content="//InfoTipData[Guid='25000020']/InfoElement/InfoElement/InfoElement[InfoElement/Text/TextGUID='12508']">
-      <!-- putting it in an empty InfoElement to make sure the Path contains the same amount of InfoElement like the original had, for better compatibility with other mods -->
-      <InfoElement>
-        <ElementType>8</ElementType>
-        <ChildCount>1</ChildCount>
-        <VisibilityElement>
-          <ElementType>
-            <ElementType>2</ElementType>
-          </ElementType>
-          <ChildCount>2</ChildCount>
-          <OperatorType />
-        </VisibilityElement>
-        
-        <ModOpContent/>
-        
-      </InfoElement>
-    </ModOp>
-    <!-- using following-sibling to remove all entries with path InfoElement/InfoElement/InfoElement[InfoElement/Text/TextGUID='12508'] if they are found AFTER InfoElement[InfoElement/InfoElement/Text/TextGUID='13659']  -->
-    <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement[InfoElement/InfoElement/Text/TextGUID='13659']/following-sibling::InfoElement/InfoElement/InfoElement[InfoElement/Text/TextGUID='12508']"></ModOp>
+    <Group Condition="!#jakob-modular-factories">
+      <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000020']/InfoElement/InfoElement[InfoElement/Text/TextGUID='13659']" Content="//InfoTipData[Guid='25000020']/InfoElement/InfoElement/InfoElement[InfoElement/Text/TextGUID='12508']">
+        <!-- putting it in an empty InfoElement to make sure the Path contains the same amount of InfoElement like the original had, for better compatibility with other mods -->
+        <InfoElement>
+          <ElementType>8</ElementType>
+          <ChildCount>1</ChildCount>
+          <VisibilityElement>
+            <ElementType>
+              <ElementType>2</ElementType>
+            </ElementType>
+            <ChildCount>2</ChildCount>
+            <OperatorType />
+          </VisibilityElement>
+          <ModOpContent/>
+        </InfoElement>
+      </ModOp>
+      <!-- using following-sibling to remove all entries with path InfoElement/InfoElement/InfoElement[InfoElement/Text/TextGUID='12508'] if they are found AFTER InfoElement[InfoElement/InfoElement/Text/TextGUID='13659']  -->
+      <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']/InfoElement[InfoElement/InfoElement/Text/TextGUID='13659']/following-sibling::InfoElement/InfoElement/InfoElement[InfoElement/Text/TextGUID='12508']"></ModOp>
+    </Group>
+    <Group Condition="#jakob-modular-factories">
+     <ModOp Type="Add" Path="//InfoTipData[Guid='373']/Variables" Content="//InfoTipData[Guid='25000020']//InfoElement[InfoElement/Text/TextGUID='12508']">
+      </ModOp>
+      <ModOp Type="remove" Path="//InfoTipData[Guid='25000020']//InfoElement[InfoElement/Text/TextGUID='12508']"></ModOp>
+      <ModOp Type="AddNextSibling" Path="//InfoTipData[Guid='25000020']//InfoElement[InfoElement/Text/TextGUID='13659']" Content="//InfoTipData[Guid='373']/Variables/InfoElement">
+      </ModOp>
+      <ModOp Type="remove" Path="//InfoTipData[Guid='373']/Variables/InfoElement"></ModOp>
+    </Group>
   
   <!-- </Group> -->
   
