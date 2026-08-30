@@ -1,6 +1,7 @@
 ts.GameClock.SetSetGameSpeed(1)
 ts.Conditions.RegisterTriggerForCurrentParticipant(1999003464) -- notification
 
+local ModID = "Change_GameSpeed_Serp"
 
 -- game will freeze on leaving the MP game if speed is slower than normal (3)
 if event.OnLeaveUIState["ChangeGameSpeedMP"] == nil then -- only add it once (per anno game start)
