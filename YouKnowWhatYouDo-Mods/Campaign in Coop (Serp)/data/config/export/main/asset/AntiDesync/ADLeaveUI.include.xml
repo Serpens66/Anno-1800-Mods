@@ -37,30 +37,42 @@
   </ModOp>
   
   <!-- LeaveUIState CampaignNewspaper CQ101_CleanTheIsland_SuccesReRegister -->
-  <ModOp Type="remove" GUID='150559' Path="/Values/Trigger/TriggerActions/Item[TriggerAction/Values/ActionRegisterTrigger/TriggerAsset='151076']" />
-  <ModOp Type="add" GUID='150931' Path="/Values/Trigger/TriggerActions">
-    <Item>
-      <TriggerAction>
-        <Template>ActionRegisterTrigger</Template>
-        <Values>
-          <Action />
-          <ActionRegisterTrigger>
-            <TriggerAsset>151076</TriggerAsset>
-          </ActionRegisterTrigger>
-        </Values>
-      </TriggerAction>
-    </Item>
-  </ModOp>
+  <!-- Keep vanilla InitCampaign registration and quest 150564's cancellation. Registering here from 150931 would revive a cancelled reminder. -->
+  <!-- Wait for the same synchronized newspaper-open signal as 150931 before starting the replacement delay. -->
   <ModOp Type="replace" GUID='151076' Path="/Values/Trigger/TriggerCondition[Values/ConditionEvent[ContextData='CampaignNewspaper' and ConditionEvent='LeaveUIState']]">
     <TriggerCondition>
-      <Template>ConditionTimer</Template>
+      <Template>ConditionEvent</Template>
       <Values>
         <Condition />
-        <ConditionTimer>
-          <TimeLimit>10000</TimeLimit>
-        </ConditionTimer>
+        <ConditionEvent>
+          <ConditionEvent>GUIDLocked</ConditionEvent>
+          <ContextAsset>1500004238</ContextAsset>
+        </ConditionEvent>
+        <ConditionPropsNegatable />
       </Values>
     </TriggerCondition>
+  </ModOp>
+  <ModOp Type="add" GUID='151076' Path="/Values/Trigger">
+    <SubTriggers>
+      <Item>
+        <SubTrigger>
+          <Template>AutoCreateTrigger</Template>
+          <Values>
+            <Trigger>
+              <TriggerCondition>
+                <Template>ConditionTimer</Template>
+                <Values>
+                  <Condition />
+                  <ConditionTimer>
+                    <TimeLimit>10000</TimeLimit>
+                  </ConditionTimer>
+                </Values>
+              </TriggerCondition>
+            </Trigger>
+          </Values>
+        </SubTrigger>
+      </Item>
+    </SubTriggers>
   </ModOp>
   
   
